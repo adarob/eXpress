@@ -1,0 +1,20 @@
+cmake_minimum_required (VERSION 2.6)
+
+project(cuffexpress)
+
+set(cuffexpress_VERSION_MAJOR 0)
+set(cuffexpress_VERSION_MINOR 01)
+
+set(CMAKE_CXX_FLAGS "-Wall")
+set(CMAKE_CXX_FLAGS_DEBUG "-g ${CMAKE_CXX_FLAGS}")
+set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O3 -g ${CMAKE_CXX_FLAGS}")
+set(CMAKE_CXX_FLAGS_MINSIZEREL "-Os ${CMAKE_CXX_FLAGS}")
+
+set(CMAKE_BUILD_TYPE Release)
+
+find_package(Boost 1.43
+    COMPONENTS
+        thread
+    REQUIRED)
+
+add_subdirectory(src)
