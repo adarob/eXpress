@@ -12,7 +12,7 @@ set(CMAKE_CXX_FLAGS_MINSIZEREL "-Os ${CMAKE_CXX_FLAGS}")
 
 set(CMAKE_BUILD_TYPE Release)
 
-find_package(Boost 1.43
+find_package(Boost 1.42
     COMPONENTS
         thread
     REQUIRED)

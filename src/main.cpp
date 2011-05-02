@@ -10,7 +10,7 @@
 
 #include <boost/thread.hpp>
 #include <assert.h>
-#include <iostream.h>
+#include <iostream>
 #include <math.h>
 #include "transcripts.h"
 #include "fld.h"
