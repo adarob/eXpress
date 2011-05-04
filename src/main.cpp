@@ -9,9 +9,9 @@
 #define ENABLE_THREADS 0
 
 #include <boost/thread.hpp>
-#include <assert.h>
+#include <cassert>
 #include <iostream>
-#include <math.h>
+#include <cmath>
 #include "transcripts.h"
 #include "fld.h"
 #include "fragments.h"

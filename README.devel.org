@@ -1,0 +1,31 @@
+#+TITLE:    Developer's Guide
+#+AUTHOR:   Harold Pimentel
+
+* The build System
+** Running CMake
+   - You should almost always make a separate build tree outside of the main
+     tree. For example, if you have directory 'project' with 'project/src' etc.,
+     you should make a directory outside of project called 'project\_build'. You
+     should change to the new directory and run CMake there.
+
+        mkdir project\_build
+        cd project\_build
+        cmake ../project
+
+** Making projects
+*** Making an Xcode project
+    - Change to your build directory and run:
+
+        cmake -G Xcode ../project
+
+      Your new Xcode project should be in 'project\_build/project.xcodeproj'
+
+*** Making an Eclipse CDT project
+    - Change to your build directory and run:
+
+        cmake -G "Eclipse CDT4 - Unix Makefiles" -D CMAKE_BUILD_TYPE=Debug ../project
+
+      Your new Eclipse CDT project is stored in 'project\_build/.project'. In
+      Eclipse, go to Import -> General -> Existng Projects into Workspace ->
+      Select root directory and choose the 'project\_build' directory.
+      

@@ -5,5 +5,4 @@ add_executable(cuffexpress ${sources})
 
 target_link_libraries(cuffexpress ${Boost_LIBRARIES})
 
-
-
+install(TARGETS cuffexpress DESTINATION bin)

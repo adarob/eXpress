@@ -17,4 +17,6 @@ find_package(Boost 1.42
         thread
     REQUIRED)
 
+include_directories(${Boost_INCLUDE_DIRS})
+
 add_subdirectory(src)
