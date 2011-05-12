@@ -46,7 +46,7 @@ char complement(char c)
             return 'C';
         case 'T':
         case 't':
-            return 'T';
+            return 'A';
         default:
             return 'N';
     }
