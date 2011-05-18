@@ -7,6 +7,7 @@
 //
 
 #include "fragments.h"
+#include "transcripts.h"
 #include <string.h>
 #include <cstring>
 using namespace std;
@@ -64,11 +65,16 @@ Fragment::~Fragment()
     {
         delete _frag_maps[i];
     }
+    
+    for (size_t i = 0; i < _open_mates.size(); i++)
+    {
+        delete _open_mates[i];
+    }
 }
 
 bool Fragment::add_map_end(FragMap* m)
 {
-    if (_name == "")
+    if (_name.empty())
     {
         _name = m->name;
     }
@@ -77,69 +83,85 @@ bool Fragment::add_map_end(FragMap* m)
         return false;
     }
     
-    add_open_mate(m);
+    if (m->mate_l >= 0)
+    {
+        add_open_mate(m);
+    }
+    else
+    {
+        _frag_maps.push_back(m);
+    }
     
     return true;
 }
 
-void Fragment::add_open_mate(FragMap* pm)
+void Fragment::add_open_mate(FragMap* new_p)
 {
-    if (!_om)
+    bool found = false;
+    
+    FragMap& nm = *new_p;
+    for( vector<FragMap*>::iterator it = _open_mates.begin(); it != _open_mates.end(); ++it)
     {
-        _om = pm;
-    }
-    else if (pm->ref == _om->ref && pm->mate_l == _om->left && _om->mate_l == pm->left)
-    {
-        if (pm->left < _om->left)
+        FragMap& om = **it;
+        if (nm.trans_id == om.trans_id && nm.mate_l == om.left && om.mate_l == nm.left)
         {
-            pm->right = _om->right;
-            pm->seq_r = _om->seq_l;
-            _frag_maps.push_back(pm);
-            _om = NULL;
-            delete _om;
+            if (nm.left < om.left)
+            {
+                assert(nm.seq_r.empty());
+                nm.right = om.right;
+                nm.seq_r = om.seq_r;
+            }
+            else
+            {
+                assert(nm.seq_l.empty());
+                nm.left = om.left;
+                nm.seq_l = om.seq_l;
+            }
+            
+            assert(nm.left_first == om.left_first);
+            found = true;
+            delete *it;
+            _frag_maps.push_back(&nm);
+            _open_mates.erase(it);
+            break;
         }
-        else
-        {
-            _om->right = pm->right;
-            _om->seq_r = pm->seq_l;
-            _frag_maps.push_back(_om);
-            delete pm;
-        }
-        _om = NULL;
     }
-    else
-    {
-        delete _om;
-        _om = pm;
-    }
+    
+    if (!found)
+        _open_mates.push_back(&nm);
 }
- 
-//void Fragment::add_open_mate(FragMap& om)
-//{
-//    for( vector<FragMap>::iterator it = _open_mates.begin(); it != _open_mates.end(); ++it)
+
+//void Fragment::add_open_mate(FragMap* om)
 //    {
-//        FragMap& pm = *it;
-//        if (pm.ref == om.ref && pm.mate_l == om.left && om.mate_l == pm.left)
-//        {
-//            if (pm.left < om.left)
-//            {
-//                pm.right = om.right;
-//                _frag_maps.push_back(pm);
-//            }
-//            else
-//            {
-//                om.right = pm.right;
-//                _frag_maps.push_back(om);
-//            }
-//            
-//            found = true;
-//            _open_mates.erase(it);
-//            break;
-//        }
+//    if (!_om)
+//    {
+//        _om = pm;
 //    }
-//    
-//    if (!found)
-//        _open_mates.push_back(om);
+//    else if (pm->trans_id == _om->trans_id && pm->mate_l == _om->left && _om->mate_l == pm->left)
+//    {
+//        if (pm->left < _om->left)
+//        {
+//            pm->right = _om->right;
+//            pm->seq_r = _om->seq_r;
+//            _frag_maps.push_back(pm);
+//            _om = NULL;
+//            delete _om;
+//        }
+//        else
+//        {
+//            _om->right = pm->right;
+//            _om->seq_r = pm->seq_r;
+//            _frag_maps.push_back(_om);
+//            delete pm;
+//        }
+//        assert(_frag_maps.back().pair_status() == PAIRED);
+//        _om = NULL;
+//    }
+//    else
+//    {
+//        delete _om;
+//        _om = pm;
+//    }
 //}
 
 const size_t BUFF_SIZE = 9999;
@@ -206,8 +228,8 @@ bool MapParser::map_end_from_line()
 {
     FragMap& f = *_frag_buff;
     char *p = strtok(_line_buff, "\t");
-    string read_seq;
-
+    int sam_flag;    
+    bool paired;
     
     int i = 0;
     while (p && i <= 9) 
@@ -218,11 +240,14 @@ bool MapParser::map_end_from_line()
                 f.name = p;
                 break;
             case 1:
+                sam_flag = atoi(p);
+                paired = sam_flag & 0x1;
+                f.left_first = (sam_flag & 0x40) && (sam_flag & 0x10) || !(sam_flag & 0x40) && !(sam_flag & 0x10);
                 break;
             case 2:
                 if(p[0] == '*')
                     goto stop;
-                f.ref = p;
+                f.trans_id = hash_trans_name(p);
                 break;
             case 3:
                 f.left = atoi(p)-1;
@@ -233,7 +258,7 @@ bool MapParser::map_end_from_line()
                 f.right = f.left + cigar_length(p);
                 break;
             case 6:
-                if(p[0] != '=')
+                if(paired && p[0] != '=')
                     goto stop;
                 break;
             case 7:
@@ -242,12 +267,15 @@ bool MapParser::map_end_from_line()
             case 8:
                 break;
             case 9:
-                f.seq_l = p;
+                if (sam_flag & 0x10)
+                    f.seq_r = p;
+                else
+                    f.seq_l = p;
                 goto stop;
         }
         
         p = strtok(NULL, "\t");
     }
 stop:
-    return i >= 9;
+    return i == 9;
 }

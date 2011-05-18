@@ -6,8 +6,9 @@
 //  Copyright 2011 __MyCompanyName__. All rights reserved.
 //
 
-#define ENABLE_THREADS 0
+#define PACKAGE_VERSION "INTERNAL"
 
+#include <getopt.h>
 #include <boost/thread.hpp>
 #include <cassert>
 #include <iostream>
@@ -20,17 +21,107 @@
 
 using namespace std;
 
+string output_dir = ".";
 double expr_alpha = .001;
 double fld_alpha = 1;
 double bias_alpha = 1;
 double mm_alpha = 1;
-int max_len = 800;
 
-boost::mutex proc_lock;
+int def_fl_max = 800;
+int def_fl_mean = 200;
+int def_fl_stddev = 80;
+bool user_provided_fld = false;
 
-void unlock_proc()
+bool bias_correct = true;
+bool upper_quart_norm = false;
+
+void print_usage()
 {
-    proc_lock.unlock();
+    fprintf(stderr, "cuffexpress v%s\n", PACKAGE_VERSION);
+//    fprintf(stderr, "linked against Boost version %d\n", BOOST_VERSION);
+    fprintf(stderr, "-----------------------------\n"); 
+    fprintf(stderr, "File Usage:   cuffexpress [options] <transcripts.fasta> <hits.sam>\n");
+    fprintf(stderr, "Piped Usage:  bowtie [options] -S <reads.fastq> | cuffexpress [options] <transcripts.fasta>\n");
+    fprintf(stderr, "General Options:\n");
+    fprintf(stderr, "  -o/--output-dir              write all output files to this directory              [ default:     ./ ]\n");
+    fprintf(stderr, "  -m/--frag-len-mean           average fragment length (unpaired reads only)         [ default:    200 ]\n");
+    fprintf(stderr, "  -s/--frag-len-std-dev        fragment length std deviation (unpaired reads only)   [ default:     80 ]\n");
+    fprintf(stderr, "  --upper-quartile-norm        use upper-quartile normalization                      [ default:  FALSE ]\n");
+    fprintf(stderr, "  --no-bias-correct            do not correct for fragment bias                      [ default:  FALSE ]\n");
+}
+
+#define OPT_UPPER_QUARTILE_NORM 200
+#define OPT_NO_BIAS_CORRECT 201
+
+const char *short_options = "o:m:s";
+
+static struct option long_options[] = {
+    // general options
+    {"output-dir",              required_argument,		 0,			 'o'},
+    {"frag-len-mean",			required_argument,       0,          'm'},
+    {"frag-len-std-dev",		required_argument,       0,          's'},
+    {"upper-quartile-norm",     no_argument,             0,          OPT_UPPER_QUARTILE_NORM},
+    {"no-bias-correct",         no_argument,             0,          OPT_NO_BIAS_CORRECT},
+    {0, 0, 0, 0} // terminator
+};
+
+/**
+ * Parse an int out of optarg and enforce that it be at least 'lower';
+ * if it is less than 'lower', than output the given error message and
+ * exit with an error and a usage message.
+ */
+int parseInt(int lower, const char *errmsg, void (*print_usage)()) {
+    long l;
+    char *endPtr= NULL;
+    l = strtol(optarg, &endPtr, 10);
+    if (endPtr != NULL) {
+        if (l < lower) {
+            cerr << errmsg << endl;
+            print_usage();
+            exit(1);
+        }
+        return (int32_t)l;
+    }
+    cerr << errmsg << endl;
+    print_usage();
+    exit(1);
+    return -1;
+}
+
+int parse_options(int argc, char** argv)
+{
+    int option_index = 0;
+    int next_option;
+	
+    do {
+        next_option = getopt_long(argc, argv, short_options, long_options, &option_index);
+        switch (next_option) {
+			case -1:     /* Done with options. */
+				break;
+			case 'm':
+                user_provided_fld = true;
+				def_fl_mean = (uint32_t)parseInt(0, "-m/--frag-len-mean arg must be at least 0", print_usage);
+				break;
+			case 's':
+                user_provided_fld = true;
+                def_fl_stddev = (uint32_t)parseInt(0, "-s/--frag-len-std-dev arg must be at least 0", print_usage);
+				break;
+            case 'o':
+                output_dir = optarg;
+				break;
+			case OPT_UPPER_QUARTILE_NORM:
+                upper_quart_norm = true;
+                break;
+            case OPT_NO_BIAS_CORRECT:
+                bias_correct = false;
+                break;
+			default:
+				print_usage();
+				return 1;
+        }
+    } while(next_option != -1);
+	
+    return 0;
 }
 
 double log_sum(double x, double y)
@@ -40,9 +131,6 @@ double log_sum(double x, double y)
 
 void process_fragment(Fragment* frag_p, TranscriptTable* trans_table, FLD* fld, BiasBoss* bias_table, MismatchTable* mismatch_table)
 {
-#if ENABLE_THREADS
-   	boost::this_thread::at_thread_exit(unlock_proc);
-#endif
     Fragment& frag = *frag_p;
     
     if (frag.num_maps()==0)
@@ -53,10 +141,10 @@ void process_fragment(Fragment* frag_p, TranscriptTable* trans_table, FLD* fld, 
     if (frag.num_maps()==1)
     {
         const FragMap& m = *frag.maps()[0];
-        Transcript* t  = trans_table->get_trans(m.ref);
+        Transcript* t  = trans_table->get_trans(m.trans_id);
         if (!t)
         {
-            cerr << "ERROR: Transcript " << m.ref << " not found in reference fasta.";
+            cerr << "ERROR: Transcript " << m.name << " not found in reference fasta.";
             exit(1);
         }
         double mass = 1.0;
@@ -75,9 +163,9 @@ void process_fragment(Fragment* frag_p, TranscriptTable* trans_table, FLD* fld, 
     for(size_t i = 0; i < frag.num_maps(); ++i)
     {
         const FragMap& m = *frag.maps()[i];
-        Transcript* t = trans_table->get_trans(m.ref);
+        Transcript* t = trans_table->get_trans(m.trans_id);
         transcripts[i] = t;
-        assert(t->id() == m.ref);
+        assert(t->id() == m.trans_id);
         //t->update_transcript_bias();
         likelihoods[i] = t->log_likelihood(m);
         if (!likelihoods[i])
@@ -144,28 +232,35 @@ void calc_abundances(MapParser& map_parser, TranscriptTable* trans_table, FLD* f
         count += frag->num_maps();
         if (count % 10000 < frag->num_maps() )
             cout<< count << "\n";
-#if ENABLE_THREADS
-        proc_lock.lock();
-        boost::thread process(process_fragment, frag, trans_table, fld, bias_table, mismatch_table);
-#else
         process_fragment(frag, trans_table, fld, bias_table, mismatch_table);
-#endif
     }
 }
 
-int main (int argc, const char * argv[])
+int main (int argc, char ** argv)
 {
-    FLD fld(fld_alpha, max_len);
-    BiasBoss bias_table(bias_alpha);
+	int parse_ret = parse_options(argc,argv);
+    if (parse_ret)
+        return parse_ret;
+	
+    if(optind >= argc)
+    {
+        print_usage();
+        return 1;
+    }
+    
+    string trans_fasta_file_name = argv[optind++];
+    string sam_hits_file_name = argv[optind++];
+    
+    FLD fld(fld_alpha, def_fl_max);
+    BiasBoss* bias_table = (bias_correct) ? new BiasBoss(bias_alpha):NULL;
     MismatchTable mismatch_table(mm_alpha);
-    MapParser map_parser("/Users/adarob/projects/Tuxedo/devel/expressionline2/test_data/hits.sam");
-    BiasBoss* b= &bias_table;
-    //b = NULL;
-    TranscriptTable trans_table("/Users/adarob/projects/Tuxedo/devel/expressionline2/test_data/mtg_out.fa", expr_alpha, &fld, b, &mismatch_table);
-    trans_table.threaded_bias_update();
+    MapParser map_parser(sam_hits_file_name);
+    TranscriptTable trans_table(trans_fasta_file_name, expr_alpha, &fld, bias_table, &mismatch_table);
+
     boost::thread bias_update(&TranscriptTable::threaded_bias_update, &trans_table);
-    threaded_calc_abundances(map_parser, &trans_table, &fld, b, &mismatch_table);
-    mismatch_table.output("/Users/adarob/projects/Tuxedo/devel/expressionline2/test_data");
-    trans_table.output_expression("/Users/adarob/projects/Tuxedo/devel/expressionline2/test_data");
+    threaded_calc_abundances(map_parser, &trans_table, &fld, bias_table, &mismatch_table);
+    
+    mismatch_table.output(output_dir);
+    trans_table.output_expression(output_dir);
     return 0;
 }

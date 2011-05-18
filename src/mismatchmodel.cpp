@@ -60,13 +60,17 @@ inline size_t MismatchTable::ctoi_r(const char c) const
 
 MismatchTable::MismatchTable(double alpha)
 {
-    _markov_model = vector<FrequencyMatrix>(MAX_READ_LEN, FrequencyMatrix(16, 4, alpha));
+    _first_read_mm = vector<FrequencyMatrix>(MAX_READ_LEN, FrequencyMatrix(16, 4, alpha));
+    _second_read_mm = vector<FrequencyMatrix>(MAX_READ_LEN, FrequencyMatrix(16, 4, alpha));
 }
 
 double MismatchTable::likelihood(const FragMap& f, const Transcript& t) const
 {
     const string& t_seq = t.seq();
     double p = 1.0;
+    
+    const vector<FrequencyMatrix>& left_mm = (f.left_first) ? _first_read_mm : _second_read_mm;
+    const vector<FrequencyMatrix>& right_mm = (!f.left_first) ? _first_read_mm : _second_read_mm;
     
     size_t cur;
     size_t ref;
@@ -80,7 +84,7 @@ double MismatchTable::likelihood(const FragMap& f, const Transcript& t) const
         if (prev != 4 && cur != 4 && ref != 4)
         {
             index = (prev << 2) + ref;
-            p *= _markov_model[i](index, cur);
+            p *= left_mm[i](index, cur);
         }
         prev = ref;
     }
@@ -94,7 +98,7 @@ double MismatchTable::likelihood(const FragMap& f, const Transcript& t) const
         if (prev != 4 && cur != 4 && ref != 4)
         {
             index = (prev << 2) + ref;
-            p *= _markov_model[i](index, cur);
+            p *= right_mm[i](index, cur);
         }
         prev = ref;
     }
@@ -106,6 +110,9 @@ double MismatchTable::log_likelihood(const FragMap& f, const Transcript& t) cons
     const string& t_seq = t.seq();
     double ll = 0;
     
+    const vector<FrequencyMatrix>& left_mm = (f.left_first) ? _first_read_mm : _second_read_mm;
+    const vector<FrequencyMatrix>& right_mm = (!f.left_first) ? _first_read_mm : _second_read_mm;
+    
     size_t cur;
     size_t ref;
     size_t prev = 0;
@@ -118,7 +125,7 @@ double MismatchTable::log_likelihood(const FragMap& f, const Transcript& t) cons
         if (prev != 4 && cur != 4 && ref != 4)
         {
             index = (prev << 2) + ref;
-            ll += log(_markov_model[i](index, cur));
+            ll += log(left_mm[i](index, cur));
         }
         prev = ref;
     }
@@ -132,7 +139,7 @@ double MismatchTable::log_likelihood(const FragMap& f, const Transcript& t) cons
         if (prev != 4 && cur != 4 && ref != 4)
         {
             index = (prev << 2) + ref;
-            ll += log(_markov_model[i](index, cur));
+            ll += log(right_mm[i](index, cur));
         }
         prev = ref;
     }
@@ -143,6 +150,9 @@ double MismatchTable::log_likelihood(const FragMap& f, const Transcript& t) cons
 void MismatchTable::update(const FragMap& f, const Transcript& t, double mass)
 {
     const string& t_seq = t.seq();
+    
+    vector<FrequencyMatrix>& left_mm = (f.left_first) ? _first_read_mm : _second_read_mm;
+    vector<FrequencyMatrix>& right_mm = (!f.left_first) ? _first_read_mm : _second_read_mm;
     
     size_t cur;
     size_t ref;
@@ -156,7 +166,7 @@ void MismatchTable::update(const FragMap& f, const Transcript& t, double mass)
         if (prev != 4 && cur != 4 && ref != 4)
         {
             index = (prev << 2) + ref;
-            _markov_model[i].increment(index, cur, mass);
+            left_mm[i].increment(index, cur, mass);
         }
         prev = ref;
     }
@@ -170,7 +180,7 @@ void MismatchTable::update(const FragMap& f, const Transcript& t, double mass)
         if (prev != 4 && cur != 4 && ref != 4)
         {
             index = (prev << 2) + ref;
-            _markov_model[i].increment(index, cur, mass);
+            right_mm[i].increment(index, cur, mass);
         }
         prev = ref;
     }
@@ -180,14 +190,26 @@ void MismatchTable::output(string path)
 {
     string filename = path + "/mismatch_probs.tab";
     ofstream outfile(filename.c_str());
- 
+    outfile<<"First Read\n";
     for(size_t i = 0; i < 16; i++)
     {
         for(size_t j = 0; j < 4; j++)
         {
             for (size_t k = 0; k < MAX_READ_LEN; k++)
             {
-                outfile << _markov_model[k](i,j)<<"\t";
+                outfile << _first_read_mm[k](i,j)<<"\t";
+            }
+            outfile<<"\n";
+        }
+    }
+    outfile<<"Second Read\n";
+    for(size_t i = 0; i < 16; i++)
+    {
+        for(size_t j = 0; j < 4; j++)
+        {
+            for (size_t k = 0; k < MAX_READ_LEN; k++)
+            {
+                outfile << _second_read_mm[k](i,j)<<"\t";
             }
             outfile<<"\n";
         }
