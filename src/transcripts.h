@@ -21,7 +21,19 @@ class BiasBoss;
 class MismatchTable;
 
 typedef uint64_t TransID;
-TransID hash_trans_name(const char* name);
+
+// This is FNV-1, see http://en.wikipedia.org/wiki/Fowler_Noll_Vo_hash
+inline TransID hash_trans_name(const char* name)
+{
+    const char * __s = name;
+    uint64_t hash = 0xcbf29ce484222325ull;
+    for ( ; *__s; ++__s)
+    {
+        hash *= 1099511628211ull;
+        hash ^= *__s;
+    }
+    return hash;
+}
 
 /**
  * Transcript class.  This class is used to store objects for the transcripts

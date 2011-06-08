@@ -19,19 +19,6 @@
 
 using namespace std;
 
-// This is FNV-1, see http://en.wikipedia.org/wiki/Fowler_Noll_Vo_hash
-inline TransID hash_trans_name(const char* name)
-{
-    const char * __s = name;
-    uint64_t hash = 0xcbf29ce484222325ull;
-    for ( ; *__s; ++__s)
-    {
-        hash *= 1099511628211ull;
-        hash ^= *__s;
-    }
-    return hash;
-}
-
 
 Transcript::Transcript(const std::string& name, const std::string& seq, double alpha, const FLD* fld, const BiasBoss* bias_table, const MismatchTable* mismatch_table)
 :_name(name),
@@ -46,20 +33,6 @@ _fld(fld),
 _bias_table(bias_table),
 _mismatch_table(mismatch_table)
 { }
-
-//double Transcript::likelihood(const FragMap& frag) const
-//{
-//    double len_prob = _fld->pdf(frag.length());
-//    if (len_prob == 0) return 0.0;
-//
-//    double l = frag_count();
-//    l *= _start_bias[frag.left] * _end_bias[frag.right-1];
-//    l *= len_prob;
-//    l *= _mismatch_table->likelihood(frag, *this);
-//    l /= total_bias_for_length(frag.length());
-//    assert(!isnan(l) && !isinf(l));
-//    return l;
-//}
 
 double Transcript::log_likelihood(const FragMap& frag) const
 {
@@ -106,9 +79,8 @@ double Transcript::effective_length() const
         eff_len += _fld->pdf(l)*(length()-l+1);
     }
     
-    _bias_lock.lock();
+    boost::mutex::scoped_lock lock(_bias_lock);
     eff_len *= _avg_bias;
-    _bias_lock.unlock();
     return eff_len;
 }
 
