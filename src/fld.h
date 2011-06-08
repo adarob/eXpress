@@ -21,7 +21,12 @@ class FLD
     /**
      * a private double that stores the total observed counts
      */
-    double _total;
+    double _num_obs;
+    
+    /**
+     * a private double that stores the sum of the observations for quick mean calculations
+     */
+    double _sum;
     
     /**
      * a private int that stores the minimum observed length
@@ -36,7 +41,17 @@ public:
      */
     FLD(double alpha, size_t max_val);
     
+    /**
+     * a member function that returns the maximum allowed FragMap length
+     * @return max allowed FragMap length
+     */ 
     size_t max_val() const;
+    
+    /**
+     * a member function that returns the mean FragMap length
+     * @return mean observed FragMap length
+     */ 
+    double mean() const;
     
     /**
      * a member function that updates the distribution based on a new FragMap observation
@@ -68,7 +83,12 @@ public:
      */
     double npdf(size_t len, size_t max) const;
     
-    double total() const;
+    /**
+     * a member function that returns the number of observed fragmaps (including pseudo-counts)
+     * @return number of observed fragments
+     */ 
+    double num_obs() const;
+
 };
 
 #endif

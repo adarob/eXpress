@@ -15,34 +15,45 @@
 #include <fstream>
 #include <boost/thread.hpp>
 
+typedef uint64_t TransID;
+
+enum PairStatus { PAIRED, LEFT_ONLY, RIGHT_ONLY };
 
 struct FragMap
 {
     std::string name;
-    std::string ref;
+    TransID trans_id;
     std::string seq_l;
     std::string seq_r;
     int left;
     int right;
     int mate_l;
+    bool left_first;
+    
     int length() const
     { 
         if (left >= 0 && right > 0)
             return right - left;
         return -1;
     }
-    bool has_mate() { return mate_l >= 0; }
+    PairStatus pair_status() const
+    { 
+        if (!seq_l.empty() && !seq_r.empty())
+            return PAIRED;
+        if (seq_l.empty())
+            return LEFT_ONLY;
+        return RIGHT_ONLY;
+    }
 };
 
 class Fragment
 {
     std::vector<FragMap*> _frag_maps;
-//    std::vector<FragMap> _open_mates;
-    FragMap* _om;
+    std::vector<FragMap*> _open_mates;
+//    FragMap* _om;
     std::string _name;
     void add_open_mate(FragMap* om);
 public:
-    Fragment() { _om = NULL; }
     ~Fragment();
     bool add_map_end(FragMap* f);
     const std::string name() const { return _name; }

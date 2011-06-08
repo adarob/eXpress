@@ -15,12 +15,13 @@
 #include <vector>
 #include <boost/thread.hpp>
 
-typedef unsigned char Nuc;
-
 class FLD;
 class FragMap;
 class BiasBoss;
 class MismatchTable;
+
+typedef uint64_t TransID;
+TransID hash_trans_name(const char* name);
 
 /**
  * Transcript class.  This class is used to store objects for the transcripts
@@ -32,9 +33,11 @@ class MismatchTable;
 class Transcript
 {
     /**
-     * a private string that stores the transcript id
+     * a private string that stores the transcript name
      */
-    std::string _id;
+    std::string _name;
+    
+    TransID _id;
     
     std::string _seq;
     
@@ -48,10 +51,12 @@ class Transcript
      */
     double _counts;
     
+    double _var;
+    
     mutable boost::mutex _bias_lock;
     std::vector<double> _start_bias;
     std::vector<double> _end_bias;
-    std::vector<double> _tot_bias_for_len;
+    double _avg_bias;
     
     /**
      * a pointer to the Fragment Length Distribution (FLD) object
@@ -62,6 +67,8 @@ class Transcript
     
     const MismatchTable* _mismatch_table;
         
+    double total_bias_for_length(size_t l) const;
+    
 public:
     
     /**
@@ -71,13 +78,19 @@ public:
      * @param alpha a double that specifies the intial pseudo-counts
      * @param fld a pointer to the Fragment Length Distribution (FLD) object
      */
-    Transcript(std::string& id, const std::string& seq, double alpha, const FLD* fld, const BiasBoss* bias_table, const MismatchTable* mismatch_table);
+    Transcript(const std::string& name, const std::string& seq, double alpha, const FLD* fld, const BiasBoss* bias_table, const MismatchTable* mismatch_table);
+    
+    /**
+     * a member function that returns the transcript name
+     * @return transcript id
+     */
+    const std::string& name() const { return _name; }
     
     /**
      * a member function that returns the transcript id
-     * @return transcript id
+     * @return transcript name
      */
-    const std::string& id() const { return _id; }
+    TransID id() const { return _id; }
     
     const std::string& seq() const { return _seq; }
     /**
@@ -96,26 +109,27 @@ public:
      * a member function that increases the expected fragment counts by a given mass
      * @param mass a double to increase the expected fragment counts by
      */
-    void add_mass(double mass) { _counts += mass; }  
+    void add_mass(double mass) 
+    { 
+        _counts += mass;
+        _var += mass*(1-mass);
+    }  
     
     /**
      * a member function that returns (a value proportional to) the likelihood the given fragment
      * originated from this transcript
      * @param frag a FragMap to return the likelihood of being originated from this transcript
      */
-    double likelihood(const FragMap& frag) const;
     double log_likelihood(const FragMap& frag) const;
 
     double effective_length() const;
     
     void update_transcript_bias();
     
-    double total_bias_for_length(size_t l) const;
-    
     const FLD* fld() { return _fld; }
 };
 
-typedef std::tr1::unordered_map<uint64_t, Transcript*> TransMap;
+typedef std::tr1::unordered_map<TransID, Transcript*> TransMap;
 
 /**
  * TranscriptTable class.  This class is used to keep track of the Transcript objects for a run.
@@ -136,7 +150,6 @@ class TranscriptTable
      * @param trans a pointer to the transcript to be added
      */
     void add_trans(Transcript* trans);  
-    uint64_t hash_id(const std::string& id) const;
 public:
     /**
      * TranscriptTable Constructor
@@ -157,7 +170,7 @@ public:
      * @param trans_name id of the transcript wanted
      * @return pointer to the transcript wit hthe given id
      */
-    Transcript* get_trans(const std::string& trans_name);
+    Transcript* get_trans(TransID id);
     
     /**
      * a member function that returns the number of transcripts in the table

@@ -15,7 +15,8 @@ class Transcript;
 
 class MismatchTable
 {
-    std::vector<FrequencyMatrix> _markov_model;
+    std::vector<FrequencyMatrix> _first_read_mm;
+    std::vector<FrequencyMatrix> _second_read_mm;
     size_t ctoi(const char c) const;
     size_t ctoi_r(const char c) const;
 public:

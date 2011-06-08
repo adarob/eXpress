@@ -9,6 +9,7 @@
 
 #include <assert.h>
 #include <algorithm>
+#include <boost/assign.hpp>
 #include "biascorrection.h"
 #include "transcripts.h"
 #include "fragments.h"
@@ -16,7 +17,15 @@
 
 using namespace std;
 
-int NUM_NUCS = 4;
+const int NUM_NUCS = 4;
+
+const vector<size_t> LEN_BINS = boost::assign::list_of(1)(2)(3)(4); 
+const vector<double> POS_BINS = boost::assign::list_of(0.1)(0.2)(0.3)(0.4)(0.5)(0.6)(0.7)(0.8)(0.9)(1.0);
+
+const size_t SURROUND = 10;
+const size_t CENTER = 11;
+const size_t WINDOW = 21;
+const string PADDING = "NNNNNNNNNN"; 
 
 SeqWeightTable::SeqWeightTable(size_t window_size, double alpha)
 :_observed(window_size, NUM_NUCS, alpha),
@@ -65,11 +74,6 @@ void SeqWeightTable::increment_observed(string& seq, double normalized_mass)
     }
 }
 
-const size_t SURROUND = 10;
-const size_t CENTER = 11;
-const size_t WINDOW = 21;
-string PADDING = "NNNNNNNNNN"; 
-
 double SeqWeightTable::get_weight(const string& seq, size_t i) const
 {
     boost::mutex::scoped_lock lock(_lock);
@@ -83,9 +87,58 @@ double SeqWeightTable::get_weight(const string& seq, size_t i) const
     return weight;
 }
 
+PosWeightTable::PosWeightTable(const vector<size_t>& len_bins, const vector<double>& pos_bins, double alpha)
+:_observed(FrequencyMatrix(len_bins.size(), pos_bins.size(),alpha)),
+ _expected(FrequencyMatrix(len_bins.size(), pos_bins.size(),0)),
+ _len_bins(len_bins),
+ _pos_bins(pos_bins)
+{}
+
+void PosWeightTable::increment_expected(size_t len, double pos)
+{
+    size_t l = upper_bound(len_bins().begin(),len_bins().end(), len) - len_bins().begin();
+    size_t p = upper_bound(pos_bins().begin(),pos_bins().end(), pos) - pos_bins().begin();
+    increment_expected(l,p);
+}
+
+void PosWeightTable::increment_expected(size_t l, size_t p)
+{
+    boost::mutex::scoped_lock lock(_lock);
+    _expected.increment(l, p, 1.0);
+}
+
+void PosWeightTable::increment_observed(size_t len, double pos, double normalized_mass)
+{
+    size_t l = upper_bound(len_bins().begin(),len_bins().end(), len) - len_bins().begin();
+    size_t p = upper_bound(pos_bins().begin(),pos_bins().end(), pos) - pos_bins().begin();
+    increment_observed(l,p, normalized_mass);
+} 
+
+void PosWeightTable::increment_observed(size_t l, size_t p, double normalized_mass)
+{
+    boost::mutex::scoped_lock lock(_lock);
+    _observed.increment(l,p, normalized_mass);
+} 
+
+double PosWeightTable::get_weight(size_t len, double pos) const
+{
+    size_t l = upper_bound(len_bins().begin(),len_bins().end(), len) - len_bins().begin();
+    size_t p = upper_bound(pos_bins().begin(),pos_bins().end(), pos) - pos_bins().begin();
+    boost::mutex::scoped_lock lock(_lock);
+    return _observed(l,p)/_expected(l,p);
+}
+
+double PosWeightTable::get_weight(size_t l, size_t p) const
+{
+    boost::mutex::scoped_lock lock(_lock);
+    return _observed(l,p)/_expected(l,p);
+}
+
 BiasBoss::BiasBoss(double alpha)
 : _5_seq_bias(WINDOW, alpha),
-  _3_seq_bias(WINDOW, alpha)
+  _3_seq_bias(WINDOW, alpha),
+  _5_pos_bias(LEN_BINS, POS_BINS, alpha),
+  _3_pos_bias(LEN_BINS, POS_BINS, alpha)
 {}
 
 void BiasBoss::update_expectations(const Transcript& trans)
@@ -125,13 +178,31 @@ void BiasBoss::update_observed(const FragMap& frag, const Transcript& trans, dou
     _3_seq_bias.increment_observed(seq_3, normalized_mass);
 }
 
-void BiasBoss::get_transcript_bias(std::vector<double>& start_bias, std::vector<double>& end_bias, const Transcript& trans) const
+double BiasBoss::get_transcript_bias(std::vector<double>& start_bias, std::vector<double>& end_bias, const Transcript& trans) const
 {
-    size_t n;
+    double tot_start = 0.0;
+    double tot_end = 0.0;
+    
+    size_t l = upper_bound(_5_pos_bias.len_bins().begin(),_5_pos_bias.len_bins().end(), trans.length()) - _5_pos_bias.len_bins().begin();
+    
+    size_t p = 0;
+    double next_bin_start = trans.length() * _5_pos_bias.len_bins()[p];
+    double curr_5_pos_bias = _5_pos_bias.get_weight(l,p);
+    double curr_3_pos_bias = _3_pos_bias.get_weight(l,p);
     for (size_t i = 0; i < trans.length(); ++i)
     {
-        start_bias[i] = _5_seq_bias.get_weight(trans.seq(), i);
-        end_bias[i] = _3_seq_bias.get_weight(trans.seq(), i);
+        if (i >= next_bin_start)
+        {
+            next_bin_start = trans.length() * _5_pos_bias.len_bins()[++p];
+            curr_5_pos_bias = _5_pos_bias.get_weight(l,p);
+            curr_3_pos_bias = _3_pos_bias.get_weight(l,p);
+        }
+        start_bias[i] = _5_seq_bias.get_weight(trans.seq(), i) * curr_5_pos_bias;
+        end_bias[i] = _3_seq_bias.get_weight(trans.seq(), i) * curr_3_pos_bias;
+        tot_start += start_bias[i];
+        tot_end += end_bias[i];
     }
+    double avg_bias = (tot_start/trans.length()) * (tot_end/trans.length());
+    return avg_bias;
 }
 

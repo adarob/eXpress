@@ -19,48 +19,80 @@
 
 using namespace std;
 
-Transcript::Transcript(std::string& id, const std::string& seq, double alpha, const FLD* fld, const BiasBoss* bias_table, const MismatchTable* mismatch_table)
-:_id(id),
+// This is FNV-1, see http://en.wikipedia.org/wiki/Fowler_Noll_Vo_hash
+inline TransID hash_trans_name(const char* name)
+{
+    const char * __s = name;
+    uint64_t hash = 0xcbf29ce484222325ull;
+    for ( ; *__s; ++__s)
+    {
+        hash *= 1099511628211ull;
+        hash ^= *__s;
+    }
+    return hash;
+}
+
+
+Transcript::Transcript(const std::string& name, const std::string& seq, double alpha, const FLD* fld, const BiasBoss* bias_table, const MismatchTable* mismatch_table)
+:_name(name),
+_id(hash_trans_name(name.c_str())),
 _seq(seq),
 _len(seq.length()),
 _counts(seq.length()*alpha),
 _start_bias(std::vector<double>(seq.length(),1.0)),
 _end_bias(std::vector<double>(seq.length(),1.0)),
+_avg_bias(1),
 _fld(fld),
 _bias_table(bias_table),
 _mismatch_table(mismatch_table)
-{
-    _tot_bias_for_len = std::vector<double>(_fld->max_val()+1);
-    for (size_t l = 1; l <= _fld->max_val(); ++l)
-    {
-        _tot_bias_for_len[l] = seq.length()-l+1;
-    }
-}
+{ }
 
-double Transcript::likelihood(const FragMap& frag) const
-{
-    double len_prob = _fld->pdf(frag.length());
-    if (len_prob == 0) return 0.0;
-
-    double l = frag_count();
-    l *= _start_bias[frag.left] * _end_bias[frag.right-1];
-    l *= len_prob;
-    l *= _mismatch_table->likelihood(frag, *this);
-    l /= total_bias_for_length(frag.length());
-    assert(!isnan(l) && !isinf(l));
-    return l;
-}
+//double Transcript::likelihood(const FragMap& frag) const
+//{
+//    double len_prob = _fld->pdf(frag.length());
+//    if (len_prob == 0) return 0.0;
+//
+//    double l = frag_count();
+//    l *= _start_bias[frag.left] * _end_bias[frag.right-1];
+//    l *= len_prob;
+//    l *= _mismatch_table->likelihood(frag, *this);
+//    l /= total_bias_for_length(frag.length());
+//    assert(!isnan(l) && !isinf(l));
+//    return l;
+//}
 
 double Transcript::log_likelihood(const FragMap& frag) const
 {
-    double len_prob = _fld->pdf(frag.length());
-    if (len_prob == 0) return 0.0;
-    
+    boost::mutex::scoped_lock lock(_bias_lock);
+
     double ll = log(frag_count());
-    ll += log(_start_bias[frag.left] * _end_bias[frag.right-1]);
-    ll += log(len_prob);
     ll += _mismatch_table->log_likelihood(frag, *this);
-    ll -= log(total_bias_for_length(frag.length()));
+    
+    switch(frag.pair_status())
+    {
+        case PAIRED:
+        {
+            double len_prob = _fld->pdf(frag.length());
+            if (len_prob == 0) return 0.0;
+            ll += log(_start_bias[frag.left] * _end_bias[frag.right-1]);
+            ll += log(len_prob);
+            ll -= log(total_bias_for_length(frag.length()));
+            break;
+        }
+        case LEFT_ONLY:
+        {
+            ll += log(_start_bias[frag.left]);
+            ll -= log(total_bias_for_length(min((int)length()-frag.left, (int)_fld->mean())));
+            break;
+        }
+        case RIGHT_ONLY:
+        {
+            ll += log(_end_bias[frag.right-1]);
+            ll -= log(total_bias_for_length(min(frag.right, (int)_fld->mean())));
+            break;
+        }
+    }
+    
     assert(!isnan(ll) && !isinf(ll));
     return ll;
 }
@@ -71,16 +103,19 @@ double Transcript::effective_length() const
     
     for(size_t l = 1; l <= min(length(), _fld->max_val()); l++)
     {
-        eff_len += _fld->pdf(l)*total_bias_for_length(l);
+        eff_len += _fld->pdf(l)*(length()-l+1);
     }
+    
+    _bias_lock.lock();
+    eff_len *= _avg_bias;
+    _bias_lock.unlock();
     return eff_len;
 }
 
 double Transcript::total_bias_for_length(size_t l) const
 {
-    //boost::mutex::scoped_lock lock(_bias_lock);
     assert(l <= _fld->max_val());
-    return _tot_bias_for_len[l];
+    return _avg_bias * (length() - l + 1);
 }
 
 void Transcript::update_transcript_bias()
@@ -88,16 +123,7 @@ void Transcript::update_transcript_bias()
     if (!_bias_table)
         return;
     boost::mutex::scoped_lock lock(_bias_lock);
-    _bias_table->get_transcript_bias(_start_bias, _end_bias, *this);
-    for (size_t l = 1; l <= min(length(), _fld->max_val()); ++l)
-    {
-        double len_bias = 0;
-        for(size_t i = 0; i <= length()-l+1; ++i)
-        {
-            len_bias += _start_bias[i]*_end_bias[i+l-1];
-        }
-        _tot_bias_for_len[l] = len_bias;
-    }
+    _avg_bias = _bias_table->get_transcript_bias(_start_bias, _end_bias, *this);
 }
 
 TranscriptTable::TranscriptTable(const string& trans_fasta_file, double alpha, const FLD* fld, BiasBoss* bias_table, const MismatchTable* mismatch_table)
@@ -114,7 +140,7 @@ TranscriptTable::TranscriptTable(const string& trans_fasta_file, double alpha, c
             getline (infile, line, '\n');
             if (line[0] == '>')
             {
-                if (name != "")
+                if (!name.empty())
                 {
                     Transcript* trans = new Transcript(name, seq, alpha, fld, bias_table, mismatch_table);
                     add_trans(trans);
@@ -130,7 +156,7 @@ TranscriptTable::TranscriptTable(const string& trans_fasta_file, double alpha, c
             }
             
         }
-        if (name != "")
+        if (!name.empty())
         {
             Transcript* trans = new Transcript(name, seq, alpha, fld, bias_table, mismatch_table);
             add_trans(trans);
@@ -161,40 +187,28 @@ TranscriptTable::~TranscriptTable()
     }
 }
 
-// This is FNV-1, see http://en.wikipedia.org/wiki/Fowler_Noll_Vo_hash
-inline uint64_t TranscriptTable::hash_id(const string& id) const
-{
-    const char * __s = id.c_str();
-    uint64_t hash = 0xcbf29ce484222325ull;
-    for ( ; *__s; ++__s)
-    {
-        hash *= 1099511628211ull;
-        hash ^= *__s;
-    }
-    return hash;
-}
-
 void TranscriptTable::add_trans(Transcript* trans)
 {
     Transcript* ret = get_trans(trans->id());
     if (ret)
     {
-        if (trans->id() == ret->id())
+        if (trans->name() == ret->name())
         {
-            cerr << "ERROR: Repeated transcript ID in multi-fasta input (" << ret->id() << ").\n";
+            cerr << "ERROR: Repeated transcript ID in multi-fasta input (" << ret->name() << ").\n";
         }
         else
         {
-            cerr << "ERROR: Hash collision (" << ret->id() << ").\n";
+            cerr << "ERROR: Hash collision (" << ret->name() << ").\n";
         }
         exit(1);
     }
-    _trans_map.insert(make_pair(hash_id(trans->id()), trans));
+    
+    _trans_map.insert(make_pair(trans->id(), trans));
 }
 
-Transcript* TranscriptTable::get_trans(const string& name)
+Transcript* TranscriptTable::get_trans(TransID id)
 {
-    TransMap::iterator it = _trans_map.find(hash_id(name));
+    TransMap::iterator it = _trans_map.find(id);
     if(it != _trans_map.end())
         return it->second;
     return NULL;
@@ -223,7 +237,7 @@ void TranscriptTable::output_expression(string output_dir)
     for( TransMap::iterator it = _trans_map.begin(); it != _trans_map.end(); ++it)
     {
         Transcript& trans = *(it->second);
-        double M = trans.fld()->total();
+        double M = trans.fld()->num_obs();
         trans.update_transcript_bias();
         double counts = trans.frag_count() - _alpha * trans.length();
         double fpkm = (counts/trans.effective_length())*(1000000000/M);
