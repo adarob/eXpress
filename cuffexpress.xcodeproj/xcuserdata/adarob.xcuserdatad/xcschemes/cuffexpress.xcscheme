@@ -46,6 +46,12 @@
             ReferencedContainer = "container:cuffexpress.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
+      <CommandLineArguments>
+         <CommandLineArgument
+            argument = "--no-bias-correct /Users/adarob/projects/tuxedo/devel/cuffexpress/test_data/mtg_out.fa /Users/adarob/projects/tuxedo/devel/cuffexpress/test_data/hits.sam"
+            isEnabled = "YES">
+         </CommandLineArgument>
+      </CommandLineArguments>
       <AdditionalOptions>
       </AdditionalOptions>
    </LaunchAction>

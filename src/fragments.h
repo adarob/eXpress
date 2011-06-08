@@ -70,7 +70,7 @@ struct ParseThreadSafety
 
 class MapParser
 {
-    std::ifstream _in;
+    std::istream* _in;
     char* _line_buff;
     FragMap* _frag_buff;
     

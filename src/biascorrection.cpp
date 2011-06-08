@@ -18,8 +18,7 @@
 using namespace std;
 
 const int NUM_NUCS = 4;
-
-const vector<size_t> LEN_BINS = boost::assign::list_of(1)(2)(3)(4); 
+const vector<size_t> LEN_BINS = boost::assign::list_of(791)(1265)(1707)(2433)(999999999); 
 const vector<double> POS_BINS = boost::assign::list_of(0.1)(0.2)(0.3)(0.4)(0.5)(0.6)(0.7)(0.8)(0.9)(1.0);
 
 const size_t SURROUND = 10;
@@ -143,9 +142,19 @@ BiasBoss::BiasBoss(double alpha)
 
 void BiasBoss::update_expectations(const Transcript& trans)
 {
+    
+    size_t l = upper_bound(_5_pos_bias.len_bins().begin(),_5_pos_bias.len_bins().end(), trans.length()) - _5_pos_bias.len_bins().begin();
+    size_t p = 0;
+    double next_bin_start = trans.length() * _5_pos_bias.len_bins()[p];
     const string& seq = trans.seq();
     for (size_t i = 0; i < seq.length(); ++i)
     {
+        if (i >= next_bin_start)
+        {
+            next_bin_start = trans.length() * _5_pos_bias.len_bins()[++p];
+        }
+        _5_pos_bias.increment_expected(l,p);
+        _3_pos_bias.increment_expected(l,p);
         _5_seq_bias.increment_expected(seq[i]);
         _3_seq_bias.increment_expected(seq[i]);
     }
@@ -155,27 +164,39 @@ void BiasBoss::update_observed(const FragMap& frag, const Transcript& trans, dou
 {
     assert (frag.length() > WINDOW);
     
-    string seq_5;
-    int left_window = frag.left - (CENTER-1);
-    if (left_window < 0)
+    if (frag.pair_status() != RIGHT_ONLY)
     {
-        seq_5 = PADDING.substr(0, -left_window);
-        seq_5 += trans.seq().substr(0, WINDOW + left_window);
+        string seq_5;
+        int left_window = frag.left - (CENTER-1);
+        if (left_window < 0)
+        {
+            seq_5 = PADDING.substr(0, -left_window);
+            seq_5 += trans.seq().substr(0, WINDOW + left_window);
+        }
+        else
+        {
+            seq_5 = trans.seq().substr(left_window, WINDOW); 
+        }
+        
+        _5_seq_bias.increment_observed(seq_5, normalized_mass);
+        _5_pos_bias.increment_observed(trans.length(), (size_t)frag.left, normalized_mass);
     }
-    else
-    {
-        seq_5 = trans.seq().substr(left_window, WINDOW); 
-    }
-    _5_seq_bias.increment_observed(seq_5, normalized_mass);
     
-    left_window = frag.right - CENTER;
-    string seq_3 = trans.seq().substr(left_window, WINDOW);
-    int overhang =left_window + WINDOW - trans.length();
-    if (overhang > 0)
+    if (frag.pair_status() != LEFT_ONLY)
     {
-        seq_3 += PADDING.substr(0, overhang);
+        int left_window = frag.right - CENTER;
+        string seq_3 = trans.seq().substr(left_window, WINDOW);
+        int overhang =left_window + WINDOW - trans.length();
+        if (overhang > 0)
+        {
+            seq_3 += PADDING.substr(0, overhang);
+        }
+        
+        _3_seq_bias.increment_observed(seq_3, normalized_mass);
+        _3_pos_bias.increment_observed(trans.length(), (size_t)frag.right-1, normalized_mass);
     }
-    _3_seq_bias.increment_observed(seq_3, normalized_mass);
+       
+
 }
 
 double BiasBoss::get_transcript_bias(std::vector<double>& start_bias, std::vector<double>& end_bias, const Transcript& trans) const

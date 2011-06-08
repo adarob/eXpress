@@ -127,26 +127,49 @@ public:
 
     /**
      * a member function that increments the expected counts for the given fractional position by 1
+     * @param len the transcript length
      * @param pos the fractional transcript position
      */
     void increment_expected(size_t len, double pos); 
+    
+    /**
+     * a member function that increments the expected counts for the given fractional position by 1
+     * @param l the transcript length bin
+     * @param p the fractional transcript position bin
+     */
     void increment_expected(size_t l, size_t p); 
 
     
     /**
      * a member function that increments the observed counts for the given fragment position by some mass
+     * @param len the transcript length
      * @param pos the fractional transcript position
      * @param normalized_mass the mass (probabilistic assignment) of the fragment normalized by its estimated expression
      */
     void increment_observed(size_t len, double pos, double normalized_mass);
+    
+    /**
+     * a member function that increments the observed counts for the given fragment position by some mass
+     * @param l the transcript length bin
+     * @param p the fractional transcript position bin
+     * @param normalized_mass the mass (probabilistic assignment) of the fragment normalized by its estimated expression
+     */
     void increment_observed(size_t l, size_t p, double normalized_mass);
 
     /**
      * a member function that return the bias weight of a fractional transcript position
+     * @param len the transcript length
      * @param pos the fractional transcript position
      * @return the bias weight for the fractional transcript position
      */
     double get_weight(size_t len, double pos) const;
+    
+    /**
+     * a member function that return the bias weight of a fractional transcript position
+     * @param l the transcript length bin
+     * @param p the fractional transcript position bin
+     * @return the bias weight for the fractional transcript position
+     */
     double get_weight(size_t l, size_t p) const;
 
 };
