@@ -170,16 +170,25 @@ const char* MISMATCH_TAG = "MD:Z:";
 MapParser::MapParser(string sam_file)
 {
     _line_buff = new char[BUFF_SIZE];
-    _in.open(sam_file.c_str());
-    if(!_in.is_open())
+    if (sam_file.size() == 0)
     {
-        cerr << "Unable to open SAM file '" << sam_file << "'.\n" ; 
-        exit(1);
+        _in = &cin;
     }
-    _frag_buff = new FragMap();
-    while(_in.good())
+    else
     {
-        _in.getline(_line_buff, BUFF_SIZE-1, '\n');
+        ifstream* ifs = new ifstream(sam_file.c_str());
+        if(!ifs->is_open())
+        {
+            cerr << "Unable to open SAM file '" << sam_file << "'.\n" ; 
+            exit(1);
+        } 
+        _in = ifs;
+    }
+
+    _frag_buff = new FragMap();
+    while(_in->good())
+    {
+        _in->getline(_line_buff, BUFF_SIZE-1, '\n');
         if (_line_buff[0] != '@')
         {
             map_end_from_line();
@@ -211,9 +220,9 @@ bool MapParser::next_fragment(Fragment& nf)
     
     _frag_buff = new FragMap();
     
-    while(_in.good())
+    while(_in->good())
     {        
-        _in.getline (_line_buff, BUFF_SIZE-1, '\n');
+        _in->getline (_line_buff, BUFF_SIZE-1, '\n');
         if (!map_end_from_line())
             continue;
         if (!nf.add_map_end(_frag_buff))
@@ -221,7 +230,7 @@ bool MapParser::next_fragment(Fragment& nf)
         _frag_buff = new FragMap();
     }
     
-    return _in.good();
+    return _in->good();
 }
 
 bool MapParser::map_end_from_line()
@@ -277,5 +286,5 @@ bool MapParser::map_end_from_line()
         p = strtok(NULL, "\t");
     }
 stop:
-    return i == 9;
+    return i == 10;
 }

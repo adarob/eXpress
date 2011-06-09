@@ -37,17 +37,18 @@ bool upper_quart_norm = false;
 
 void print_usage()
 {
+    
     fprintf(stderr, "cuffexpress v%s\n", PACKAGE_VERSION);
 //    fprintf(stderr, "linked against Boost version %d\n", BOOST_VERSION);
     fprintf(stderr, "-----------------------------\n"); 
     fprintf(stderr, "File Usage:   cuffexpress [options] <transcripts.fasta> <hits.sam>\n");
     fprintf(stderr, "Piped Usage:  bowtie [options] -S <reads.fastq> | cuffexpress [options] <transcripts.fasta>\n");
     fprintf(stderr, "General Options:\n");
-    fprintf(stderr, "  -o/--output-dir              write all output files to this directory              [ default:     ./ ]\n");
-    fprintf(stderr, "  -m/--frag-len-mean           average fragment length (unpaired reads only)         [ default:    200 ]\n");
-    fprintf(stderr, "  -s/--frag-len-std-dev        fragment length std deviation (unpaired reads only)   [ default:     80 ]\n");
-    fprintf(stderr, "  --upper-quartile-norm        use upper-quartile normalization                      [ default:  FALSE ]\n");
-    fprintf(stderr, "  --no-bias-correct            do not correct for fragment bias                      [ default:  FALSE ]\n");
+    fprintf(stderr, " -o/--output-dir       write all output files to this directory              [ default:     ./ ]\n");
+    fprintf(stderr, " -m/--frag-len-mean    average fragment length (unpaired reads only)         [ default:    200 ]\n");
+    fprintf(stderr, " -s/--frag-len-std-dev fragment length std deviation (unpaired reads only)   [ default:     80 ]\n");
+    fprintf(stderr, " --upper-quartile-norm use upper-quartile normalization                      [ default:  FALSE ]\n");
+    fprintf(stderr, " --no-bias-correct     do not correct for fragment bias                      [ default:  FALSE ]\n");
 }
 
 #define OPT_UPPER_QUARTILE_NORM 200
@@ -249,15 +250,16 @@ int main (int argc, char ** argv)
     }
     
     string trans_fasta_file_name = argv[optind++];
-    string sam_hits_file_name = argv[optind++];
-    
+    string sam_hits_file_name = (optind >= argc) ? "" : argv[optind++];
+        
     FLD fld(fld_alpha, def_fl_max);
     BiasBoss* bias_table = (bias_correct) ? new BiasBoss(bias_alpha):NULL;
     MismatchTable mismatch_table(mm_alpha);
     MapParser map_parser(sam_hits_file_name);
     TranscriptTable trans_table(trans_fasta_file_name, expr_alpha, &fld, bias_table, &mismatch_table);
 
-    boost::thread bias_update(&TranscriptTable::threaded_bias_update, &trans_table);
+    if (bias_table)
+        boost::thread bias_update(&TranscriptTable::threaded_bias_update, &trans_table);
     threaded_calc_abundances(map_parser, &trans_table, &fld, bias_table, &mismatch_table);
     
     mismatch_table.output(output_dir);
