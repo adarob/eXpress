@@ -15,6 +15,8 @@ set(CMAKE_BUILD_TYPE Release)
 find_package(Boost 1.41
     COMPONENTS
         thread
+	system
+	filesystem
     REQUIRED)
 
 include_directories(${Boost_INCLUDE_DIRS})
