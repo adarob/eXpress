@@ -179,7 +179,7 @@ void BiasBoss::update_observed(const FragMap& frag, const Transcript& trans, dou
         }
         
         _5_seq_bias.increment_observed(seq_5, normalized_mass);
-        _5_pos_bias.increment_observed(trans.length(), (size_t)frag.left, normalized_mass);
+        _5_pos_bias.increment_observed(trans.length(), (double)frag.left/trans.length(), normalized_mass);
     }
     
     if (frag.pair_status() != LEFT_ONLY)
@@ -193,7 +193,7 @@ void BiasBoss::update_observed(const FragMap& frag, const Transcript& trans, dou
         }
         
         _3_seq_bias.increment_observed(seq_3, normalized_mass);
-        _3_pos_bias.increment_observed(trans.length(), (size_t)frag.right-1, normalized_mass);
+        _3_pos_bias.increment_observed(trans.length(), (double)(frag.right-1)/trans.length(), normalized_mass);
     }
        
 

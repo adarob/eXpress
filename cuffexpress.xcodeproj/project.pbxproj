@@ -14,7 +14,9 @@
 		0A5C763C136F2EF10095365C /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0A5C7632136F2EF10095365C /* main.cpp */; };
 		0A5C763D136F2EF10095365C /* mismatchmodel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0A5C7634136F2EF10095365C /* mismatchmodel.cpp */; };
 		0A5C763E136F2EF10095365C /* transcripts.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0A5C7636136F2EF10095365C /* transcripts.cpp */; };
-		0A5C7640136F2F950095365C /* libboost_thread.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A5C763F136F2F950095365C /* libboost_thread.a */; };
+		0A60597313A170A400B5C9BA /* libboost_thread-mt.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A60597213A170A400B5C9BA /* libboost_thread-mt.a */; };
+		0A60597513A170AD00B5C9BA /* libboost_filesystem.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A60597413A170AD00B5C9BA /* libboost_filesystem.a */; };
+		0A60597713A1753B00B5C9BA /* libboost_system.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A60597613A1753B00B5C9BA /* libboost_system.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -45,7 +47,9 @@
 		0A5C7635136F2EF10095365C /* mismatchmodel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mismatchmodel.h; sourceTree = "<group>"; };
 		0A5C7636136F2EF10095365C /* transcripts.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = transcripts.cpp; sourceTree = "<group>"; };
 		0A5C7637136F2EF10095365C /* transcripts.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = transcripts.h; sourceTree = "<group>"; };
-		0A5C763F136F2F950095365C /* libboost_thread.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libboost_thread.a; path = ../../../../../../usr/local/lib/libboost_thread.a; sourceTree = "<group>"; };
+		0A60597213A170A400B5C9BA /* libboost_thread-mt.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libboost_thread-mt.a"; path = "../../../../../../opt/local/lib/libboost_thread-mt.a"; sourceTree = "<group>"; };
+		0A60597413A170AD00B5C9BA /* libboost_filesystem.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libboost_filesystem.a; path = ../../../../../../opt/local/lib/libboost_filesystem.a; sourceTree = "<group>"; };
+		0A60597613A1753B00B5C9BA /* libboost_system.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libboost_system.a; path = ../../../../../../opt/local/lib/libboost_system.a; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -53,7 +57,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				0A5C7640136F2F950095365C /* libboost_thread.a in Frameworks */,
+				0A60597313A170A400B5C9BA /* libboost_thread-mt.a in Frameworks */,
+				0A60597513A170AD00B5C9BA /* libboost_filesystem.a in Frameworks */,
+				0A60597713A1753B00B5C9BA /* libboost_system.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -63,7 +69,9 @@
 		0A5C75FD136F2E850095365C = {
 			isa = PBXGroup;
 			children = (
-				0A5C763F136F2F950095365C /* libboost_thread.a */,
+				0A60597613A1753B00B5C9BA /* libboost_system.a */,
+				0A60597413A170AD00B5C9BA /* libboost_filesystem.a */,
+				0A60597213A170A400B5C9BA /* libboost_thread-mt.a */,
 				0A5C7629136F2EF10095365C /* src */,
 				0A5C7609136F2E850095365C /* Products */,
 			);
@@ -198,7 +206,11 @@
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
 				GCC_VERSION = 4.2;
-				HEADER_SEARCH_PATHS = "/usr/local/include/boost-1_41";
+				HEADER_SEARCH_PATHS = /opt/local/include;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					/opt/local/lib,
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -211,7 +223,11 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
 				GCC_VERSION = 4.2;
-				HEADER_SEARCH_PATHS = "/usr/local/include/boost-1_41";
+				HEADER_SEARCH_PATHS = /opt/local/include;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					/opt/local/lib,
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
@@ -235,6 +251,7 @@
 				0A5C7613136F2E850095365C /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
