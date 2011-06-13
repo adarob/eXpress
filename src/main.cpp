@@ -8,6 +8,7 @@
 
 #define PACKAGE_VERSION "INTERNAL"
 
+#include <boost/filesystem.hpp>
 #include <getopt.h>
 #include <boost/thread.hpp>
 #include <cassert>
@@ -247,6 +248,16 @@ int main (int argc, char ** argv)
     {
         print_usage();
         return 1;
+    }
+    
+    if (output_dir != ".")
+    {
+        boost::filesystem::create_directories(output_dir);
+    }
+    if (!boost::filesystem::exists(output_dir))
+    {
+        cerr << "Error: cannot create directory " << output_dir << ".\n";
+        exit(1);
     }
     
     string trans_fasta_file_name = argv[optind++];
