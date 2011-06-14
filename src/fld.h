@@ -88,6 +88,8 @@ public:
      * @return number of observed fragments
      */ 
     double num_obs() const;
+    
+    void output(std::string path) const;
 
 };
 

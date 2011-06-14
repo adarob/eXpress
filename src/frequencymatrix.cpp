@@ -9,6 +9,7 @@
 #include <assert.h>
 #include "frequencymatrix.h"
 #include <boost/array.hpp>
+
 using namespace std;
 
 FrequencyMatrix::FrequencyMatrix(size_t m, size_t n, double alpha)

@@ -8,14 +8,21 @@
 
 #include "fld.h"
 #include <numeric>
+#include <boost/assign.hpp>
+#include <iostream>
+#include <fstream>
 
 using namespace std;
 
-FLD::FLD(double alpha, size_t max_val) : _min(max_val)
+const vector<double> KERNEL = boost::assign::list_of(0.0625)(0.25)(0.375)(0.25)(0.0625); 
+
+FLD::FLD(double alpha, size_t max_val) : 
+    _min(max_val), 
+    _hist(max_val+1, alpha),
+    _num_obs(max_val * alpha), 
+    _sum((max_val)*(max_val+1)*alpha/2)
 {
-    _hist = vector<double>(max_val+1, alpha);
-    _num_obs = max_val * alpha;
-    _sum = (max_val)*(max_val+1)*alpha/2;
+    assert(KERNEL.size() % 2 == 1);
 }
 
 size_t FLD::max_val() const
@@ -27,9 +34,16 @@ void FLD::add_val(size_t len, double mass)
 {
     if (len > max_val()) return;
     if (len < _min) _min = len;
-    _hist[len] += mass;
+    
+    size_t offset = len - KERNEL.size()/2; 
+    
+    for (size_t i = 0; i < KERNEL.size(); i++)
+    {
+        double k_mass = mass * KERNEL[i];
+        _hist[offset] += k_mass;
+        _sum += (offset++)*k_mass;
+    }
     _num_obs += mass;
-    _sum += mass*len;
 }
 
 double FLD::pdf(size_t len) const
@@ -57,4 +71,16 @@ double FLD::num_obs() const
 double FLD::mean() const
 {
     return _sum/num_obs();
+}
+
+void FLD::output(string path) const
+{
+    string filename = path + "/frag_len_hist.tab";
+    ofstream outfile(filename.c_str());
+    outfile<<"Length\tMass\n";
+    for(size_t i = 0; i < max_val()+1; i++)
+    {
+        outfile << i << '\t' << _hist[i]; 
+    }
+    outfile.close();
 }
