@@ -213,7 +213,7 @@ void TranscriptTable::output_expression(string output_dir)
         trans.update_transcript_bias();
         double counts = trans.frag_count() - _alpha * trans.length();
         double fpkm = (counts/trans.effective_length())*(1000000000/M);
-        expr_file << trans.id() << "\t" << fpkm << "\n";
+        expr_file << trans.name() << "\t" << fpkm << "\n";
     }   
     expr_file.close();
 }
