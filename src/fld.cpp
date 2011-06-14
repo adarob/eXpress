@@ -17,10 +17,10 @@ using namespace std;
 const vector<double> KERNEL = boost::assign::list_of(0.0625)(0.25)(0.375)(0.25)(0.0625); 
 
 FLD::FLD(double alpha, size_t max_val) : 
-    _min(max_val), 
     _hist(max_val+1, alpha),
     _num_obs(max_val * alpha), 
-    _sum((max_val)*(max_val+1)*alpha/2)
+    _sum((max_val)*(max_val+1)*alpha/2),
+    _min(max_val)
 {
     assert(KERNEL.size() % 2 == 1);
 }
