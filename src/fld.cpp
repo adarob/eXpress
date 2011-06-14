@@ -80,7 +80,7 @@ void FLD::output(string path) const
     outfile<<"Length\tMass\n";
     for(size_t i = 0; i < max_val()+1; i++)
     {
-        outfile << i << '\t' << _hist[i]; 
+      outfile << i << '\t' << _hist[i] << '\n'; 
     }
     outfile.close();
 }
