@@ -13,6 +13,7 @@
 #include <boost/thread.hpp>
 #include <cassert>
 #include <iostream>
+#include <fstream>
 #include <cmath>
 #include "transcripts.h"
 #include "fld.h"
@@ -205,7 +206,10 @@ void threaded_calc_abundances(MapParser& map_parser, TranscriptTable* trans_tabl
     ts.proc_lk.lock();
     ts.parse_lk.lock();
     boost::thread parse(&MapParser::threaded_parse, &map_parser, &ts);
+    
     size_t count = 0;
+    ofstream running_expr_file((output_dir + "/running.expr").c_str());
+    trans_table->output_header(running_expr_file);
     while(true)
     {
         ts.proc_lk.lock();
@@ -216,11 +220,19 @@ void threaded_calc_abundances(MapParser& map_parser, TranscriptTable* trans_tabl
             ts.proc_lk.unlock();
             return;
         }
-        count += frag->num_maps();
-        if (count % 100000 < frag->num_maps() )
+//        count += frag->num_maps();
+//        if (count % 100000 < frag->num_maps() )
+//            cout<< count << "\n";
+
+        count += 1;
+        if (count % 1000 == 0)
+        {
             cout<< count << "\n";
+            trans_table->output_current(running_expr_file);
+        }
         process_fragment(frag, trans_table, fld, bias_table, mismatch_table);
     }
+    running_expr_file.close();
 }
 
 void calc_abundances(MapParser& map_parser, TranscriptTable* trans_table, FLD* fld, BiasBoss* bias_table, MismatchTable* mismatch_table)

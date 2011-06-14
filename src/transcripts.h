@@ -14,6 +14,9 @@
 #include <tr1/unordered_map>
 #include <vector>
 #include <boost/thread.hpp>
+#include <iostream>
+#include <fstream>
+
 
 class FLD;
 class FragMap;
@@ -192,6 +195,9 @@ public:
     
     void threaded_bias_update();
     
+    void output_header(std::ofstream& runexpr_file);
+    void output_current(std::ofstream& runexpr_file);
+
     void output_expression(std::string output_dir);
 };
 
