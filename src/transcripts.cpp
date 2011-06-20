@@ -205,6 +205,7 @@ void TranscriptTable::threaded_bias_update()
 
 void TranscriptTable::output_header(ofstream& runexpr_file)
 {
+  runexpr_file << "Read_Num\t";
     for( TransMap::iterator it = _trans_map.begin(); it != _trans_map.end(); ++it)
     {
         Transcript& trans = *(it->second);

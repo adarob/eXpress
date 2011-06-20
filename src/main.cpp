@@ -225,10 +225,11 @@ void threaded_calc_abundances(MapParser& map_parser, TranscriptTable* trans_tabl
 //            cout<< count << "\n";
 
         count += 1;
-        if (count % 1000 == 0)
+        if (count % 1 == 0)
         {
-            cout<< count << "\n";
-            trans_table->output_current(running_expr_file);
+	  //    cout<< count << "\n";
+          running_expr_file << count << '\t';  
+	  trans_table->output_current(running_expr_file);
         }
         process_fragment(frag, trans_table, fld, bias_table, mismatch_table);
     }
@@ -244,7 +245,7 @@ void calc_abundances(MapParser& map_parser, TranscriptTable* trans_table, FLD* f
         Fragment* frag = new Fragment();
         fragments_remain = map_parser.next_fragment(*frag);
         count += frag->num_maps();
-        if (count % 10000 < frag->num_maps() )
+        if (count % 100000 < frag->num_maps() )
             cout<< count << "\n";
         process_fragment(frag, trans_table, fld, bias_table, mismatch_table);
     }
