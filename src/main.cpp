@@ -210,6 +210,10 @@ void threaded_calc_abundances(MapParser& map_parser, TranscriptTable* trans_tabl
     size_t count = 0;
     ofstream running_expr_file((output_dir + "/running.expr").c_str());
     trans_table->output_header(running_expr_file);
+    
+    int m = 0;
+    int n = 1;
+    
     while(true)
     {
         ts.proc_lk.lock();
@@ -225,11 +229,19 @@ void threaded_calc_abundances(MapParser& map_parser, TranscriptTable* trans_tabl
 //            cout<< count << "\n";
 
         count += 1;
-        if (count % 1 == 0)
+        if (count == n * pow(10.,m))
         {
-	  //    cout<< count << "\n";
-          running_expr_file << count << '\t';  
-	  trans_table->output_current(running_expr_file);
+            running_expr_file << count << '\t';  
+            trans_table->output_current(running_expr_file);
+            if (n==9)
+            {
+                n = 1;
+                m += 1;
+            }
+            else
+            {
+                n += 1;
+            }
         }
         process_fragment(frag, trans_table, fld, bias_table, mismatch_table);
     }
