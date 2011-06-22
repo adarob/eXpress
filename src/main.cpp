@@ -23,6 +23,8 @@
 
 using namespace std;
 
+double ff_param = 0;
+
 string output_dir = ".";
 double expr_alpha = .001;
 double fld_alpha = 1;
@@ -47,6 +49,7 @@ void print_usage()
     fprintf(stderr, "Piped Usage:  bowtie [options] -S <reads.fastq> | cuffexpress [options] <transcripts.fasta>\n");
     fprintf(stderr, "General Options:\n");
     fprintf(stderr, " -o/--output-dir       write all output files to this directory              [ default:     ./ ]\n");
+    fprintf(stderr, " -f/--forget-param     forgetting factor exponent parameter                  [ default:      0 ]\n");
     fprintf(stderr, " -m/--frag-len-mean    average fragment length (unpaired reads only)         [ default:    200 ]\n");
     fprintf(stderr, " -s/--frag-len-std-dev fragment length std deviation (unpaired reads only)   [ default:     80 ]\n");
     fprintf(stderr, " --upper-quartile-norm use upper-quartile normalization                      [ default:  FALSE ]\n");
@@ -56,13 +59,14 @@ void print_usage()
 #define OPT_UPPER_QUARTILE_NORM 200
 #define OPT_NO_BIAS_CORRECT 201
 
-const char *short_options = "o:m:s";
+const char *short_options = "o:f:m:s";
 
 static struct option long_options[] = {
     // general options
-    {"output-dir",              required_argument,		 0,			 'o'},
-    {"frag-len-mean",			required_argument,       0,          'm'},
-    {"frag-len-std-dev",		required_argument,       0,          's'},
+    {"output-dir",              required_argument,	 0,	     'o'},
+    {"forget-param",            required_argument,       0,          'f'},
+    {"frag-len-mean",		required_argument,       0,          'm'},
+    {"frag-len-std-dev",	required_argument,       0,          's'},
     {"upper-quartile-norm",     no_argument,             0,          OPT_UPPER_QUARTILE_NORM},
     {"no-bias-correct",         no_argument,             0,          OPT_NO_BIAS_CORRECT},
     {0, 0, 0, 0} // terminator
@@ -91,6 +95,36 @@ int parseInt(int lower, const char *errmsg, void (*print_usage)()) {
     return -1;
 }
 
+/**
+ * Parse an float out of optarg and enforce that is between 'lower' and 'upper';
+ * if it is not, output the given error message and
+ * exit with an error and a usage message.
+ */
+float parseFloat(float lower, float upper, const char *errmsg, void (*print_usage)()) {
+  float l;
+  l = (float)atof(optarg);
+  
+  if (l < lower) {
+    cerr << errmsg << endl;
+    print_usage();
+    exit(1);
+  }
+  
+  if (l > upper)
+    {
+      cerr << errmsg << endl;
+      print_usage();
+      exit(1);
+    }
+  
+  return l;
+  
+  cerr << errmsg << endl;
+  print_usage();
+  exit(1);
+  return -1;
+}
+
 int parse_options(int argc, char** argv)
 {
     int option_index = 0;
@@ -101,6 +135,9 @@ int parse_options(int argc, char** argv)
         switch (next_option) {
 			case -1:     /* Done with options. */
 				break;
+	                case 'f':
+			  ff_param = parseFloat(0, 5, "-f/--forget-param arg must be between 0 and 1", print_usage);
+			  break;
 			case 'm':
                 user_provided_fld = true;
 				def_fl_mean = (uint32_t)parseInt(0, "-m/--frag-len-mean arg must be at least 0", print_usage);
@@ -132,7 +169,7 @@ double log_sum(double x, double y)
     return x+log(1+exp(y-x));
 }
 
-void process_fragment(Fragment* frag_p, TranscriptTable* trans_table, FLD* fld, BiasBoss* bias_table, MismatchTable* mismatch_table)
+void process_fragment(size_t n, Fragment* frag_p, TranscriptTable* trans_table, FLD* fld, BiasBoss* bias_table, MismatchTable* mismatch_table)
 {
     Fragment& frag = *frag_p;
     
@@ -141,6 +178,9 @@ void process_fragment(Fragment* frag_p, TranscriptTable* trans_table, FLD* fld, 
         delete frag_p;
         return;
     }
+
+    double forget_fact = pow(n, ff_param);
+
     if (frag.num_maps()==1)
     {
         const FragMap& m = *frag.maps()[0];
@@ -150,7 +190,7 @@ void process_fragment(Fragment* frag_p, TranscriptTable* trans_table, FLD* fld, 
             cerr << "ERROR: Transcript " << m.name << " not found in reference fasta.";
             exit(1);
         }
-        double mass = 1.0;
+	double mass = forget_fact;
         t->add_mass(mass);
         fld->add_val(m.length(), mass);
         if (bias_table)
@@ -186,7 +226,7 @@ void process_fragment(Fragment* frag_p, TranscriptTable* trans_table, FLD* fld, 
             continue;
         const FragMap& m = *frag.maps()[i];
         Transcript* t  = transcripts[i];
-        double mass = exp(likelihoods[i]-total_likelihood);
+        double mass = forget_fact*exp(likelihoods[i]-total_likelihood);
         assert(!isnan(mass));
 
         if (frag.num_maps() == trans_table->size()
@@ -203,7 +243,7 @@ void process_fragment(Fragment* frag_p, TranscriptTable* trans_table, FLD* fld, 
         mismatch_table->update(m, *t, mass);
         total_mass += mass;
     }
-    assert(abs(total_mass-1.0) < .0001);
+    assert(abs(total_mass-forget_fact) < .0001);
     delete frag_p;
 }
 
@@ -250,7 +290,7 @@ void threaded_calc_abundances(MapParser& map_parser, TranscriptTable* trans_tabl
                 n += 1;
             }
         }
-        process_fragment(frag, trans_table, fld, bias_table, mismatch_table);
+        process_fragment(count, frag, trans_table, fld, bias_table, mismatch_table);
     }
     running_expr_file.close();
 }
@@ -266,7 +306,7 @@ void calc_abundances(MapParser& map_parser, TranscriptTable* trans_table, FLD* f
         count += frag->num_maps();
         if (count % 100000 < frag->num_maps() )
             cout<< count << "\n";
-        process_fragment(frag, trans_table, fld, bias_table, mismatch_table);
+        process_fragment(count, frag, trans_table, fld, bias_table, mismatch_table);
     }
 }
 
