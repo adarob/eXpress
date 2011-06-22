@@ -231,7 +231,7 @@ void process_fragment(size_t n, Fragment* frag_p, TranscriptTable* trans_table, 
 
         if (frag.num_maps() == trans_table->size()
         {
-            t->set_counts( (t->counts() + mass)/ (fld->num_obs() + ff) * fld->num_obs() );
+            t->set_counts( (t->counts() + mass)/ (fld->num_obs() + forget_fact) * fld->num_obs() );
         }
         else
         {
