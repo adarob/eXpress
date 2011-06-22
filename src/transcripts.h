@@ -130,6 +130,11 @@ public:
         _var += mass*(1-mass);
     }  
     
+    void set_counts(double counts)
+    {
+        _counts = counts;
+    }
+    
     /**
      * a member function that returns (a value proportional to) the likelihood the given fragment
      * originated from this transcript

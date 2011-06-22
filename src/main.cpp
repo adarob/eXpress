@@ -136,7 +136,7 @@ void process_fragment(Fragment* frag_p, TranscriptTable* trans_table, FLD* fld, 
 {
     Fragment& frag = *frag_p;
     
-    if (frag.num_maps()==0)
+    if (frag.num_maps()==0 || frag.num_maps()== trans_table->size())
     {
         delete frag_p;
         return;
@@ -169,7 +169,6 @@ void process_fragment(Fragment* frag_p, TranscriptTable* trans_table, FLD* fld, 
         Transcript* t = trans_table->get_trans(m.trans_id);
         transcripts[i] = t;
         assert(t->id() == m.trans_id);
-        //t->update_transcript_bias();
         likelihoods[i] = t->log_likelihood(m);
         if (!likelihoods[i])
             continue;
@@ -189,11 +188,19 @@ void process_fragment(Fragment* frag_p, TranscriptTable* trans_table, FLD* fld, 
         Transcript* t  = transcripts[i];
         double mass = exp(likelihoods[i]-total_likelihood);
         assert(!isnan(mass));
-        t->add_mass(mass);
+
+        if (frag.num_maps() == trans_table->size()
+        {
+            t->set_counts( (t->counts() + mass)/ (fld->num_obs() + ff) * fld->num_obs() );
+        }
+        else
+        {
+            t->add_mass(mass);
+            fld->add_val(m.length(), mass);
+        }
         if (bias_table)
             bias_table->update_observed(m, *t, mass);
         mismatch_table->update(m, *t, mass);
-        fld->add_val(m.length(), mass);
         total_mass += mass;
     }
     assert(abs(total_mass-1.0) < .0001);
