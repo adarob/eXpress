@@ -229,9 +229,9 @@ void process_fragment(size_t n, Fragment* frag_p, TranscriptTable* trans_table, 
         double mass = forget_fact*exp(likelihoods[i]-total_likelihood);
         assert(!isnan(mass));
 
-        if (frag.num_maps() == trans_table->size()
+        if (frag.num_maps() == trans_table->size())
         {
-            t->set_counts( (t->counts() + mass)/ (fld->num_obs() + forget_fact) * fld->num_obs() );
+	  t->set_counts( (t->frag_count() + mass) / (fld->num_obs() + forget_fact) * fld->num_obs() );
         }
         else
         {
