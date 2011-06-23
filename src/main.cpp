@@ -169,17 +169,15 @@ double log_sum(double x, double y)
     return x+log(1+exp(y-x));
 }
 
-void process_fragment(size_t n, Fragment* frag_p, TranscriptTable* trans_table, FLD* fld, BiasBoss* bias_table, MismatchTable* mismatch_table)
+void process_fragment(double gamma_n, Fragment* frag_p, TranscriptTable* trans_table, FLD* fld, BiasBoss* bias_table, MismatchTable* mismatch_table)
 {
     Fragment& frag = *frag_p;
     
-    if (frag.num_maps()==0 || frag.num_maps()== trans_table->size())
+    if (frag.num_maps()==0)
     {
         delete frag_p;
         return;
     }
-
-    double forget_fact = pow(n, ff_param);
 
     if (frag.num_maps()==1)
     {
@@ -190,7 +188,7 @@ void process_fragment(size_t n, Fragment* frag_p, TranscriptTable* trans_table, 
             cerr << "ERROR: Transcript " << m.name << " not found in reference fasta.";
             exit(1);
         }
-	double mass = forget_fact;
+	double mass = gamma_n;
         t->add_mass(mass);
         fld->add_val(m.length(), mass);
         if (bias_table)
@@ -226,18 +224,12 @@ void process_fragment(size_t n, Fragment* frag_p, TranscriptTable* trans_table, 
             continue;
         const FragMap& m = *frag.maps()[i];
         Transcript* t  = transcripts[i];
-        double mass = forget_fact*exp(likelihoods[i]-total_likelihood);
+        double mass = gamma_n*exp(likelihoods[i]-total_likelihood);
         assert(!isnan(mass));
 
-        if (frag.num_maps() == trans_table->size())
-        {
-	  t->set_counts( (t->frag_count() + mass) / (fld->num_obs() + forget_fact) * fld->num_obs() );
-        }
-        else
-        {
-            t->add_mass(mass);
-            fld->add_val(m.length(), mass);
-        }
+        t->add_mass(mass);
+        fld->add_val(m.length(), mass);
+ 
         if (bias_table)
             bias_table->update_observed(m, *t, mass);
         mismatch_table->update(m, *t, mass);
@@ -255,6 +247,7 @@ void threaded_calc_abundances(MapParser& map_parser, TranscriptTable* trans_tabl
     boost::thread parse(&MapParser::threaded_parse, &map_parser, &ts);
     
     size_t count = 0;
+    double mass = 1;
     ofstream running_expr_file((output_dir + "/running.expr").c_str());
     trans_table->output_header(running_expr_file);
     
@@ -290,7 +283,9 @@ void threaded_calc_abundances(MapParser& map_parser, TranscriptTable* trans_tabl
                 n += 1;
             }
         }
-        process_fragment(count, frag, trans_table, fld, bias_table, mismatch_table);
+	if (count > 1)
+	  mass = mass * pow(count-1,ff_param) / (pow(count, ff_param) -1);
+	process_fragment(mass, frag, trans_table, fld, bias_table, mismatch_table);
     }
     running_expr_file.close();
 }
