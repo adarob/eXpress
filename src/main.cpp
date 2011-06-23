@@ -23,7 +23,7 @@
 
 using namespace std;
 
-double ff_param = 0;
+double ff_param = 1;
 
 string output_dir = ".";
 double expr_alpha = .001;
@@ -49,7 +49,7 @@ void print_usage()
     fprintf(stderr, "Piped Usage:  bowtie [options] -S <reads.fastq> | cuffexpress [options] <transcripts.fasta>\n");
     fprintf(stderr, "General Options:\n");
     fprintf(stderr, " -o/--output-dir       write all output files to this directory              [ default:     ./ ]\n");
-    fprintf(stderr, " -f/--forget-param     forgetting factor exponent parameter                  [ default:      0 ]\n");
+    fprintf(stderr, " -f/--forget-param     forgetting factor exponent parameter                  [ default:    1.0 ]\n");
     fprintf(stderr, " -m/--frag-len-mean    average fragment length (unpaired reads only)         [ default:    200 ]\n");
     fprintf(stderr, " -s/--frag-len-std-dev fragment length std deviation (unpaired reads only)   [ default:     80 ]\n");
     fprintf(stderr, " --upper-quartile-norm use upper-quartile normalization                      [ default:  FALSE ]\n");
@@ -248,7 +248,7 @@ void threaded_calc_abundances(MapParser& map_parser, TranscriptTable* trans_tabl
     ts.parse_lk.lock();
     boost::thread parse(&MapParser::threaded_parse, &map_parser, &ts);
     
-    size_t n = 1;
+    size_t n = 0;
     double mass_n = 1.0;
     double prev_n_to_ff = 1.0;
     
@@ -269,6 +269,8 @@ void threaded_calc_abundances(MapParser& map_parser, TranscriptTable* trans_tabl
             return;
         }
         
+        n++;
+        
         // Output rhos on log scale
         if (n == i * pow(10.,m))
         {
@@ -279,12 +281,13 @@ void threaded_calc_abundances(MapParser& map_parser, TranscriptTable* trans_tabl
         }
         
         // Update mass_n based on forgetting factor
-        if (n++ > 1)
+        if (n > 1)
         {
             double n_to_ff = pow(n, ff_param);
             mass_n = mass_n * prev_n_to_ff / (n_to_ff - 1);
             prev_n_to_ff = n_to_ff;
         }
+        assert(!isinf(mass_n) && !isnan(mass_n));
         
         process_fragment(mass_n, frag, trans_table, fld, bias_table, mismatch_table);
     }

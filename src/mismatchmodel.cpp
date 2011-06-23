@@ -143,6 +143,7 @@ double MismatchTable::log_likelihood(const FragMap& f, const Transcript& t) cons
         }
         prev = ref;
     }
+    assert(!isnan(ll) && !isinf(ll));
     return ll;
 }
 
@@ -190,28 +191,31 @@ void MismatchTable::output(string path)
 {
     string filename = path + "/mismatch_probs.tab";
     ofstream outfile(filename.c_str());
+    
     outfile<<"First Read\n";
-    for(size_t i = 0; i < 16; i++)
+    for(size_t k = 0; k < MAX_READ_LEN; k++)
     {
-        for(size_t j = 0; j < 4; j++)
+        for(size_t i = 0; i < 16; i++)
         {
-            for (size_t k = 0; k < MAX_READ_LEN; k++)
+            for (size_t j = 0; j < 4; j++)
             {
                 outfile << _first_read_mm[k](i,j)<<"\t";
             }
-            outfile<<"\n";
         }
+        outfile<<"\n";
     }
+
+    
     outfile<<"Second Read\n";
-    for(size_t i = 0; i < 16; i++)
+    for(size_t k = 0; k < MAX_READ_LEN; k++)
     {
-        for(size_t j = 0; j < 4; j++)
+        for(size_t i = 0; i < 16; i++)
         {
-            for (size_t k = 0; k < MAX_READ_LEN; k++)
+            for (size_t j = 0; j < 4; j++)
             {
                 outfile << _second_read_mm[k](i,j)<<"\t";
             }
-            outfile<<"\n";
         }
+        outfile<<"\n";
     }
 }
