@@ -136,7 +136,7 @@ int parse_options(int argc, char** argv)
 			case -1:     /* Done with options. */
 				break;
 	                case 'f':
-			  ff_param = parseFloat(0, 5, "-f/--forget-param arg must be between 0 and 1", print_usage);
+			  ff_param = parseFloat(0.5, 1, "-f/--forget-param arg must be between 0.5 and 1", print_usage);
 			  break;
 			case 'm':
                 user_provided_fld = true;
@@ -169,7 +169,7 @@ double log_sum(double x, double y)
     return x+log(1+exp(y-x));
 }
 
-void process_fragment(double gamma_n, Fragment* frag_p, TranscriptTable* trans_table, FLD* fld, BiasBoss* bias_table, MismatchTable* mismatch_table)
+void process_fragment(double mass_n, Fragment* frag_p, TranscriptTable* trans_table, FLD* fld, BiasBoss* bias_table, MismatchTable* mismatch_table)
 {
     Fragment& frag = *frag_p;
     
@@ -188,12 +188,11 @@ void process_fragment(double gamma_n, Fragment* frag_p, TranscriptTable* trans_t
             cerr << "ERROR: Transcript " << m.name << " not found in reference fasta.";
             exit(1);
         }
-	double mass = gamma_n;
-        t->add_mass(mass);
-        fld->add_val(m.length(), mass);
+        t->add_mass(mass_n);
+        fld->add_val(m.length(), mass_n);
         if (bias_table)
-            bias_table->update_observed(m, *t, mass);
-        mismatch_table->update(m, *t, mass);
+            bias_table->update_observed(m, *t, mass_n);
+        mismatch_table->update(m, *t, mass_n);
         delete frag_p;
         return;
     }
@@ -217,25 +216,28 @@ void process_fragment(double gamma_n, Fragment* frag_p, TranscriptTable* trans_t
         delete frag_p;
         return;
     }
-    double total_mass = 0.0;
+    double total_p = 0.0;
     for(size_t i = 0; i < frag.num_maps(); ++i)
     {
         if (!likelihoods[i])
             continue;
+        
         const FragMap& m = *frag.maps()[i];
         Transcript* t  = transcripts[i];
-        double mass = gamma_n*exp(likelihoods[i]-total_likelihood);
-        assert(!isnan(mass));
+        double p = exp(likelihoods[i]-total_likelihood);
+        double mass_t = mass_n * p;
+        
+        assert(!isnan(mass_t));
 
-        t->add_mass(mass);
-        fld->add_val(m.length(), mass);
+        t->add_mass(mass_t);
+        fld->add_val(m.length(), mass_t);
  
         if (bias_table)
-            bias_table->update_observed(m, *t, mass);
-        mismatch_table->update(m, *t, mass);
-        total_mass += mass;
+            bias_table->update_observed(m, *t, mass_t);
+        mismatch_table->update(m, *t, mass_t);
+        total_p += p;
     }
-    assert(abs(total_mass-forget_fact) < .0001);
+    assert(abs(total_p - 1) < .0001);
     delete frag_p;
 }
 
@@ -246,13 +248,15 @@ void threaded_calc_abundances(MapParser& map_parser, TranscriptTable* trans_tabl
     ts.parse_lk.lock();
     boost::thread parse(&MapParser::threaded_parse, &map_parser, &ts);
     
-    size_t count = 0;
-    double mass = 1;
-    ofstream running_expr_file((output_dir + "/running.expr").c_str());
-    trans_table->output_header(running_expr_file);
+    size_t n = 1;
+    double mass_n = 1.0;
+    double prev_n_to_ff = 1.0;
     
+    // For outputting rhos on log scale
+    ofstream running_expr_file((output_dir + "/running.expr").c_str());
+    trans_table->output_header(running_expr_file);    
     int m = 0;
-    int n = 1;
+    int i = 1;
     
     while(true)
     {
@@ -264,45 +268,27 @@ void threaded_calc_abundances(MapParser& map_parser, TranscriptTable* trans_tabl
             ts.proc_lk.unlock();
             return;
         }
-//        count += frag->num_maps();
-//        if (count % 100000 < frag->num_maps() )
-//            cout<< count << "\n";
-
-        count += 1;
-        if (count == n * pow(10.,m))
+        
+        // Output rhos on log scale
+        if (n == i * pow(10.,m))
         {
-            running_expr_file << count << '\t';  
+            running_expr_file << n << '\t';  
             trans_table->output_current(running_expr_file);
-            if (n==9)
-            {
-                n = 1;
-                m += 1;
-            }
-            else
-            {
-                n += 1;
-            }
+            i = (i==9) ? (i+1) : 1;
+            m += (i==9);
         }
-	if (count > 1)
-	  mass = mass * pow(count-1,ff_param) / (pow(count, ff_param) -1);
-	process_fragment(mass, frag, trans_table, fld, bias_table, mismatch_table);
+        
+        // Update mass_n based on forgetting factor
+        if (n++ > 1)
+        {
+            double n_to_ff = pow(n, ff_param);
+            mass_n = mass_n * prev_n_to_ff / (n_to_ff - 1);
+            prev_n_to_ff = n_to_ff;
+        }
+        
+        process_fragment(mass_n, frag, trans_table, fld, bias_table, mismatch_table);
     }
     running_expr_file.close();
-}
-
-void calc_abundances(MapParser& map_parser, TranscriptTable* trans_table, FLD* fld, BiasBoss* bias_table, MismatchTable* mismatch_table)
-{
-    bool fragments_remain = true;
-    size_t count = 0;
-    while(fragments_remain)
-    {
-        Fragment* frag = new Fragment();
-        fragments_remain = map_parser.next_fragment(*frag);
-        count += frag->num_maps();
-        if (count % 100000 < frag->num_maps() )
-            cout<< count << "\n";
-        process_fragment(count, frag, trans_table, fld, bias_table, mismatch_table);
-    }
 }
 
 int main (int argc, char ** argv)
