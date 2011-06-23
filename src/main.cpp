@@ -276,8 +276,8 @@ void threaded_calc_abundances(MapParser& map_parser, TranscriptTable* trans_tabl
         {
             running_expr_file << n << '\t';  
             trans_table->output_current(running_expr_file);
-            i = (i==9) ? (i+1) : 1;
             m += (i==9);
+            i = (i==9) ? 1 : (i+1);
         }
         
         // Update mass_n based on forgetting factor
