@@ -53,9 +53,9 @@ public:
     /**
      * SeqWeightTable Constructor
      * @param window_size an unsigned integer specifying the size of the bias window surrounding fragment ends
-     * @param alpha a long double specifying the strength of the uniform prior (pseudo-counts for each paramater)
+     * @param alpha a double specifying the strength of the uniform prior (pseudo-counts for each paramater)
      */
-    SeqWeightTable(size_t window_size, long double alpha);
+    SeqWeightTable(size_t window_size, double alpha);
     
     /**
      * a member function that increments the expected counts for the given nucleotide by 1
@@ -68,7 +68,7 @@ public:
      * @param seq a string of nucleotides in the bias window for the sequenced fragment end
      * @param normalized_mass the mass (probabilistic assignment) of the fragment normalized by its estimated expression
      */
-    void increment_observed(std::string& seq, long double normalized_mass);
+    void increment_observed(std::string& seq, double normalized_mass);
     
     /**
      * a member function that calculates the bias weight of a bias window
@@ -76,7 +76,7 @@ public:
      * @param i the fragment end point (the central point of the bias window)
      * @return the bias weight for the bias window which is the product of the individual nucleotide bias weights
      */
-    long double get_weight(const std::string& seq, size_t i) const;
+    double get_weight(const std::string& seq, size_t i) const;
 };
 
 /**
@@ -103,9 +103,9 @@ class PosWeightTable
     const std::vector<size_t> _len_bins;
     
     /**
-     * a private vector of long doubles specifying the bin ranges for fractional positions
+     * a private vector of doubles specifying the bin ranges for fractional positions
      */
-    const std::vector<long double> _pos_bins;
+    const std::vector<double> _pos_bins;
     
     /**
      * a private mutex block access for multi-threaded bias updating
@@ -117,20 +117,20 @@ public:
     /**
      * PosWeightTable Constructor
      * @param len_bins a vector of unsigned integers specifying the bin ranges for transcript lengths
-     * @param pos_bins a vector of long doubles specifying the bin ranges for fractional positions
-     * @param alpha a long double specifying the strength of the uniform prior (pseudo-counts for each paramater)
+     * @param pos_bins a vector of doubles specifying the bin ranges for fractional positions
+     * @param alpha a double specifying the strength of the uniform prior (pseudo-counts for each paramater)
      */
-    PosWeightTable(const std::vector<size_t>& len_bins, const std::vector<long double>& pos_bins, long double alpha);
+    PosWeightTable(const std::vector<size_t>& len_bins, const std::vector<double>& pos_bins, double alpha);
     
     const std::vector<size_t>& len_bins() const { return _len_bins; }
-    const std::vector<long double>& pos_bins() const { return _pos_bins; }
+    const std::vector<double>& pos_bins() const { return _pos_bins; }
 
     /**
      * a member function that increments the expected counts for the given fractional position by 1
      * @param len the transcript length
      * @param pos the fractional transcript position
      */
-    void increment_expected(size_t len, long double pos); 
+    void increment_expected(size_t len, double pos); 
     
     /**
      * a member function that increments the expected counts for the given fractional position by 1
@@ -146,7 +146,7 @@ public:
      * @param pos the fractional transcript position
      * @param normalized_mass the mass (probabilistic assignment) of the fragment normalized by its estimated expression
      */
-    void increment_observed(size_t len, long double pos, long double normalized_mass);
+    void increment_observed(size_t len, double pos, double normalized_mass);
     
     /**
      * a member function that increments the observed counts for the given fragment position by some mass
@@ -154,7 +154,7 @@ public:
      * @param p the fractional transcript position bin
      * @param normalized_mass the mass (probabilistic assignment) of the fragment normalized by its estimated expression
      */
-    void increment_observed(size_t l, size_t p, long double normalized_mass);
+    void increment_observed(size_t l, size_t p, double normalized_mass);
 
     /**
      * a member function that return the bias weight of a fractional transcript position
@@ -162,7 +162,7 @@ public:
      * @param pos the fractional transcript position
      * @return the bias weight for the fractional transcript position
      */
-    long double get_weight(size_t len, long double pos) const;
+    double get_weight(size_t len, double pos) const;
     
     /**
      * a member function that return the bias weight of a fractional transcript position
@@ -170,7 +170,7 @@ public:
      * @param p the fractional transcript position bin
      * @return the bias weight for the fractional transcript position
      */
-    long double get_weight(size_t l, size_t p) const;
+    double get_weight(size_t l, size_t p) const;
 
 };
 
@@ -205,9 +205,9 @@ public:
     
     /**
      * BiasBoss Constructor
-     * @param alpha a long double specifying the strength of the uniform prior (pseudo-counts for each paramater)
+     * @param alpha a double specifying the strength of the uniform prior (pseudo-counts for each paramater)
      */
-    BiasBoss(long double alpha);
+    BiasBoss(double alpha);
     
     /**
      * a member function that updates the expectation parametersn(sequence-specific and positional)
@@ -223,7 +223,7 @@ public:
      * @param trans the transcript mapped to by the fragment
      * @param mass the probabality of the mapping, which is the amount to update the observed counts by
      */
-    void update_observed(const FragMap& frag, const Transcript& trans, long double mass);
+    void update_observed(const FragMap& frag, const Transcript& trans, double mass);
     
     /**
      * a member function that returns the 5' and 3' bias values at each position in a given transcript
@@ -233,7 +233,7 @@ public:
      * @param trans the transcript for which to calculate the bias
      * @return the product of the average 5' and 3' bias
      */
-    long double get_transcript_bias(std::vector<long double>& start_bias, std::vector<long double>& end_bias, const Transcript& trans) const;
+    double get_transcript_bias(std::vector<double>& start_bias, std::vector<double>& end_bias, const Transcript& trans) const;
 };
 
 

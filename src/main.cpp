@@ -15,6 +15,7 @@
 #include <iostream>
 #include <fstream>
 #include <cmath>
+#include "main.h"
 #include "transcripts.h"
 #include "fld.h"
 #include "fragments.h"
@@ -23,13 +24,13 @@
 
 using namespace std;
 
-long double ff_param = 1;
+double ff_param = 1;
 
 string output_dir = ".";
-long double expr_alpha = .001;
-long double fld_alpha = 1;
-long double bias_alpha = 1;
-long double mm_alpha = 1;
+double expr_alpha = .001;
+double fld_alpha = 1;
+double bias_alpha = 1;
+double mm_alpha = 1;
 
 int def_fl_max = 800;
 int def_fl_mean = 200;
@@ -164,12 +165,9 @@ int parse_options(int argc, char** argv)
     return 0;
 }
 
-long double log_sum(long double x, long double y)
-{
-    return x+log(1+exp(y-x));
-}
 
-void process_fragment(long double mass_n, Fragment* frag_p, FLD* fld, BiasBoss* bias_table, MismatchTable* mismatch_table)
+
+void process_fragment(double mass_n, Fragment* frag_p, FLD* fld, BiasBoss* bias_table, MismatchTable* mismatch_table)
 {
     Fragment& frag = *frag_p;
     
@@ -197,44 +195,41 @@ void process_fragment(long double mass_n, Fragment* frag_p, FLD* fld, BiasBoss* 
         return;
     }
     
-    vector<long double> likelihoods(frag.num_maps());
-    long double total_likelihood = 0.0;
+    vector<double> likelihoods(frag.num_maps());
+    double total_likelihood = 0.0;
     for(size_t i = 0; i < frag.num_maps(); ++i)
     {
         const FragMap& m = *frag.maps()[i];
         Transcript* t = m.mapped_trans;
         likelihoods[i] = t->log_likelihood(m);
-        if (!likelihoods[i])
-            continue;
         total_likelihood = (i) ? log_sum(total_likelihood, likelihoods[i]):likelihoods[i];
     }
-    if (total_likelihood == 0)
+    if (fabs(total_likelihood) == HUGE_VAL)
     {
         delete frag_p;
         return;
     }
-    long double total_p = 0.0;
+//    double total_p = 0.0;
     for(size_t i = 0; i < frag.num_maps(); ++i)
     {
-        if (!likelihoods[i])
+        if (fabs(likelihoods[i]) == HUGE_VAL)
             continue;
         
         const FragMap& m = *frag.maps()[i];
         Transcript* t  = m.mapped_trans;
-        long double p = exp(likelihoods[i]-total_likelihood);
-        long double mass_t = mass_n * p;
+        double p = likelihoods[i]-total_likelihood;
+        double mass_t = mass_n + p;
         
-        assert(!isnan(mass_t));
-
         t->add_mass(mass_t);
         fld->add_val(m.length(), mass_t);
  
         if (bias_table)
             bias_table->update_observed(m, *t, mass_t);
         mismatch_table->update(m, *t, mass_t);
-        total_p += p;
+        
+//        log_sum(total_p, p);
     }
-    assert(abs(total_p - 1) < .0001);
+//    assert(abs(sexp(total_p) - 1) < .0001);
     delete frag_p;
 }
 
@@ -246,8 +241,8 @@ void threaded_calc_abundances(MapParser& map_parser, TranscriptTable* trans_tabl
     boost::thread parse(&MapParser::threaded_parse, &map_parser, &ts, trans_table);
     
     size_t n = 0;
-    long double mass_n = 1.0;
-    long double prev_n_to_ff = 1.0;
+    double mass_n = 0;
+    double prev_n_to_ff = 1.0;
     
     // For outputting rhos on log scale
     ofstream running_expr_file((output_dir + "/running.expr").c_str());
@@ -281,11 +276,10 @@ void threaded_calc_abundances(MapParser& map_parser, TranscriptTable* trans_tabl
         // Update mass_n based on forgetting factor
         if (n > 1)
         {
-            long double n_to_ff = pow(n, ff_param);
-            mass_n = mass_n * prev_n_to_ff / (n_to_ff - 1);
+            double n_to_ff = ff_param*log(n);
+            mass_n += prev_n_to_ff - log_sum(n_to_ff, -1);
             prev_n_to_ff = n_to_ff;
         }
-        assert(!isinf(mass_n) && !isnan(mass_n));
         
         process_fragment(mass_n, frag, fld, bias_table, mismatch_table);
     }
@@ -294,10 +288,11 @@ void threaded_calc_abundances(MapParser& map_parser, TranscriptTable* trans_tabl
 
 int main (int argc, char ** argv)
 {
-	int parse_ret = parse_options(argc,argv);
+    int parse_ret = parse_options(argc,argv);
     if (parse_ret)
         return parse_ret;
 	
+    
     if(optind >= argc)
     {
         print_usage();

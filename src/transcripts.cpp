@@ -6,6 +6,7 @@
 //  Copyright 2011 Adam Roberts. All rights reserved.
 //
 
+#include "main.h"
 #include "transcripts.h"
 #include "fld.h"
 #include "fragments.h"
@@ -20,74 +21,71 @@
 using namespace std;
 
 
-Transcript::Transcript(const std::string& name, const std::string& seq, long double alpha, const FLD* fld, const BiasBoss* bias_table, const MismatchTable* mismatch_table)
+Transcript::Transcript(const std::string& name, const std::string& seq, double alpha, const FLD* fld, const BiasBoss* bias_table, const MismatchTable* mismatch_table)
 :_name(name),
 _id(hash_trans_name(name.c_str())),
 _seq(seq),
 _len(seq.length()),
-_counts(seq.length()*alpha),
-_start_bias(std::vector<long double>(seq.length(),1.0)),
-_end_bias(std::vector<long double>(seq.length(),1.0)),
-_avg_bias(1),
+_counts(log(seq.length()*alpha)),
+_start_bias(std::vector<double>(seq.length(),0)),
+_end_bias(std::vector<double>(seq.length(),0)),
+_avg_bias(0),
 _fld(fld),
 _bias_table(bias_table),
 _mismatch_table(mismatch_table)
 { }
 
-long double Transcript::log_likelihood(const FragMap& frag) const
+double Transcript::log_likelihood(const FragMap& frag) const
 {
     boost::mutex::scoped_lock lock(_bias_lock);
 
-    long double ll = log(frag_count());
+    double ll = frag_count();
     ll += _mismatch_table->log_likelihood(frag, *this);
     
     switch(frag.pair_status())
     {
         case PAIRED:
         {
-            long double len_prob = _fld->pdf(frag.length());
-            if (len_prob == 0) return 0.0;
-            ll += log(_start_bias[frag.left] * _end_bias[frag.right-1]);
-            ll += log(len_prob);
-            ll -= log(total_bias_for_length(frag.length()));
+            ll += _start_bias[frag.left] + _end_bias[frag.right-1];
+            ll += _fld->pdf(frag.length());
+            ll -= total_bias_for_length(frag.length());
             break;
         }
         case LEFT_ONLY:
         {
-            ll += log(_start_bias[frag.left]);
-            ll -= log(total_bias_for_length(min((int)length()-frag.left, (int)_fld->mean())));
+            ll += _start_bias[frag.left];
+            ll -= total_bias_for_length(min((int)length()-frag.left, (int)sexp(_fld->mean())));
             break;
         }
         case RIGHT_ONLY:
         {
-            ll += log(_end_bias[frag.right-1]);
-            ll -= log(total_bias_for_length(min(frag.right, (int)_fld->mean())));
+            ll += _end_bias[frag.right-1];
+            ll -= total_bias_for_length(min(frag.right, (int)sexp(_fld->mean())));
             break;
         }
     }
     
-    assert(!isnan(ll) && !isinf(ll));
     return ll;
 }
 
-long double Transcript::effective_length() const
+double Transcript::effective_length() const
 {
-    long double eff_len = 0.0;
+    double eff_len = 0.0;
     
     for(size_t l = 1; l <= min(length(), _fld->max_val()); l++)
     {
-        eff_len += _fld->pdf(l)*(length()-l+1);
+        eff_len += sexp(_fld->pdf(l))*(length()-l+1);
     }
     
     boost::mutex::scoped_lock lock(_bias_lock);
-    eff_len *= _avg_bias;
+    eff_len *= sexp(_avg_bias);
     return eff_len;
 }
 
-long double Transcript::total_bias_for_length(size_t l) const
+double Transcript::total_bias_for_length(size_t l) const
 {
     assert(l <= _fld->max_val());
-    return _avg_bias * (length() - l + 1);
+    return sexp(_avg_bias) * (length() - l + 1);
 }
 
 void Transcript::update_transcript_bias()
@@ -98,7 +96,7 @@ void Transcript::update_transcript_bias()
     _avg_bias = _bias_table->get_transcript_bias(_start_bias, _end_bias, *this);
 }
 
-TranscriptTable::TranscriptTable(const string& trans_fasta_file, long double alpha, const FLD* fld, BiasBoss* bias_table, const MismatchTable* mismatch_table)
+TranscriptTable::TranscriptTable(const string& trans_fasta_file, double alpha, const FLD* fld, BiasBoss* bias_table, const MismatchTable* mismatch_table)
 {
     _alpha = alpha;
     ifstream infile (trans_fasta_file.c_str());
@@ -216,20 +214,20 @@ void TranscriptTable::output_header(ofstream& runexpr_file)
 
 void TranscriptTable::output_current(ofstream& runexpr_file)
 {    
-    long double sum = 0;
+    double sum = 0;
     for( TransMap::iterator it = _trans_map.begin(); it != _trans_map.end(); ++it)
     {
         Transcript& trans = *(it->second);
-        long double counts = trans.frag_count();
-        long double fpkm = counts/trans.length();
+        double counts = sexp(trans.frag_count());
+        double fpkm = counts/trans.length();
         sum += fpkm;
     }   
     
     for( TransMap::iterator it = _trans_map.begin(); it != _trans_map.end(); ++it)
     {
         Transcript& trans = *(it->second);
-        long double counts = trans.frag_count();
-        long double fpkm = counts/trans.length();
+        double counts = sexp(trans.frag_count());
+        double fpkm = counts/trans.length();
         runexpr_file << fpkm/sum << '\t';
     }   
     runexpr_file << '\n';
@@ -244,10 +242,10 @@ void TranscriptTable::output_expression(string output_dir)
     for( TransMap::iterator it = _trans_map.begin(); it != _trans_map.end(); ++it)
     {
         Transcript& trans = *(it->second);
-        long double M = trans.fld()->num_obs();
+        double M = sexp(trans.fld()->num_obs());
         trans.update_transcript_bias();
-        long double counts = trans.frag_count();
-        long double fpkm = (counts/trans.effective_length())*(1000000000/M);
+        double counts = sexp(trans.frag_count());
+        double fpkm = (counts/trans.effective_length())*(1000000000/M);
         expr_file << trans.name() << '\t' << fpkm << '\t' << counts << '\n';
     }   
     expr_file.close();

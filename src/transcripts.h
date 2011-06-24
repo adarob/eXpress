@@ -62,16 +62,16 @@ class Transcript
     size_t _len;
     
     /**
-     * a private long double that stores the expected counts
+     * a private double that stores the expected counts
      */
-    long double _counts;
+    double _counts;
     
-    long double _var;
+    double _var;
     
     mutable boost::mutex _bias_lock;
-    std::vector<long double> _start_bias;
-    std::vector<long double> _end_bias;
-    long double _avg_bias;
+    std::vector<double> _start_bias;
+    std::vector<double> _end_bias;
+    double _avg_bias;
     
     /**
      * a pointer to the Fragment Length Distribution (FLD) object
@@ -82,7 +82,7 @@ class Transcript
     
     const MismatchTable* _mismatch_table;
         
-    long double total_bias_for_length(size_t l) const;
+    double total_bias_for_length(size_t l) const;
     
 public:
     
@@ -90,10 +90,10 @@ public:
      * Transcript Constructor
      * @param id a string that stores the transcript name/id
      * @param seq a string that stores the transcript sequence
-     * @param alpha a long double that specifies the intial pseudo-counts
+     * @param alpha a double that specifies the intial pseudo-counts
      * @param fld a pointer to the Fragment Length Distribution (FLD) object
      */
-    Transcript(const std::string& name, const std::string& seq, long double alpha, const FLD* fld, const BiasBoss* bias_table, const MismatchTable* mismatch_table);
+    Transcript(const std::string& name, const std::string& seq, double alpha, const FLD* fld, const BiasBoss* bias_table, const MismatchTable* mismatch_table);
     
     /**
      * a member function that returns the transcript name
@@ -118,19 +118,19 @@ public:
      * a member function that returns the current expected fragment count
      * @return expected fragment count
      */
-    long double frag_count() const { return _counts; }
+    double frag_count() const { return _counts; }
     
     /**
      * a member function that increases the expected fragment counts by a given mass
-     * @param mass a long double to increase the expected fragment counts by
+     * @param mass a double to increase the expected fragment counts by
      */
-    void add_mass(long double mass) 
+    void add_mass(double mass) 
     { 
         _counts += mass;
         _var += mass*(1-mass);
     }  
     
-    void set_counts(long double counts)
+    void set_counts(double counts)
     {
         _counts = counts;
     }
@@ -140,9 +140,9 @@ public:
      * originated from this transcript
      * @param frag a FragMap to return the likelihood of being originated from this transcript
      */
-    long double log_likelihood(const FragMap& frag) const;
+    double log_likelihood(const FragMap& frag) const;
 
-    long double effective_length() const;
+    double effective_length() const;
     
     void update_transcript_bias();
     
@@ -163,7 +163,7 @@ class TranscriptTable
      */
     TransMap _trans_map;
     
-    long double _alpha;
+    double _alpha;
     
     /**
      * a private function that adds a transcript pointer to the table
@@ -174,10 +174,10 @@ public:
     /**
      * TranscriptTable Constructor
      * @param trans_fasta_file a string storing the path to the fasta file from which to load transcripts
-     * @param alpha a long double that specifies the intial pseudo-counts for the transcripts
+     * @param alpha a double that specifies the intial pseudo-counts for the transcripts
      * @param fld a pointer to the Fragment Length Distribution (FLD) object
      */
-    TranscriptTable(const std::string& trans_fasta_file, long double alpha, const FLD* fld, BiasBoss* bias_table, const MismatchTable* mismatch_table);
+    TranscriptTable(const std::string& trans_fasta_file, double alpha, const FLD* fld, BiasBoss* bias_table, const MismatchTable* mismatch_table);
     
     /**
      * TranscriptTable Destructor

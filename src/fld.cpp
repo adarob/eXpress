@@ -7,6 +7,7 @@
 //
 
 #include "fld.h"
+#include "main.h"
 #include <numeric>
 #include <boost/assign.hpp>
 #include <iostream>
@@ -14,12 +15,12 @@
 
 using namespace std;
 
-const vector<long double> KERNEL = boost::assign::list_of(0.0625)(0.25)(0.375)(0.25)(0.0625); 
+const vector<double> KERNEL = boost::assign::list_of(-1.20411998)(-0.602059991)(-0.425968732)(-0.602059991)(-1.20411998); 
 
-FLD::FLD(long double alpha, size_t max_val) : 
-    _hist(max_val+1, alpha),
-    _num_obs(max_val * alpha), 
-    _sum((max_val)*(max_val+1)*alpha/2),
+FLD::FLD(double alpha, size_t max_val) : 
+    _hist(max_val+1, log(alpha)),
+    _num_obs(log(max_val * alpha)), 
+    _sum(log((max_val)*(max_val+1)*alpha/2)),
     _min(max_val)
 {
     assert(KERNEL.size() % 2 == 1);
@@ -30,7 +31,7 @@ size_t FLD::max_val() const
     return _hist.size()-1;
 }
 
-void FLD::add_val(size_t len, long double mass)
+void FLD::add_val(size_t len, double mass)
 {
     if (len > max_val()) return;
     if (len < _min) _min = len;
@@ -39,38 +40,28 @@ void FLD::add_val(size_t len, long double mass)
     
     for (size_t i = 0; i < KERNEL.size(); i++)
     {
-        long double k_mass = mass * KERNEL[i];
-        _hist[offset] += k_mass;
-        _sum += (offset++)*k_mass;
+        double k_mass = mass + KERNEL[i];
+        _hist[offset] = log_sum(_hist[offset], k_mass);
+        _sum = log_sum(_sum, log(offset++)+k_mass);
     }
-    _num_obs += mass;
+    _num_obs = log_sum(_num_obs, mass);
 }
 
-long double FLD::pdf(size_t len) const
+double FLD::pdf(size_t len) const
 {
     if (len > max_val())
-        return 0.0;
-    return _hist[len]/_num_obs;
+        return HUGE_VAL;
+    return _hist[len]-_num_obs;
 }
 
-long double FLD::cdf(size_t len) const 
-{
-    return accumulate(_hist.begin(),_hist.begin()+len+1,0.0)/_num_obs;
-}
-
-long double FLD::npdf(size_t len, size_t max) const
-{
-    return _hist[len]/accumulate(_hist.begin(),_hist.begin()+max+1,0.0);
-}
-
-long double FLD::num_obs() const
+double FLD::num_obs() const
 {
     return _num_obs;
 }
 
-long double FLD::mean() const
+double FLD::mean() const
 {
-    return _sum/num_obs();
+    return _sum - num_obs();
 }
 
 void FLD::output(string path) const
@@ -80,7 +71,7 @@ void FLD::output(string path) const
     outfile<<"Length\tMass\n";
     for(size_t i = 0; i < max_val()+1; i++)
     {
-      outfile << i << '\t' << _hist[i] << '\n'; 
+      outfile << i << '\t' << sexp(_hist[i]) << '\n'; 
     }
     outfile.close();
 }

@@ -41,11 +41,11 @@
 		0A5C762F136F2EF10095365C /* fragments.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = fragments.h; sourceTree = "<group>"; };
 		0A5C7630136F2EF10095365C /* frequencymatrix.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = frequencymatrix.cpp; sourceTree = "<group>"; };
 		0A5C7631136F2EF10095365C /* frequencymatrix.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = frequencymatrix.h; sourceTree = "<group>"; };
-		0A5C7632136F2EF10095365C /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
-		0A5C7633136F2EF10095365C /* main.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = main.h; sourceTree = "<group>"; };
-		0A5C7634136F2EF10095365C /* mismatchmodel.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = mismatchmodel.cpp; sourceTree = "<group>"; };
+		0A5C7632136F2EF10095365C /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; lineEnding = 0; path = main.cpp; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.cpp; };
+		0A5C7633136F2EF10095365C /* main.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = main.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
+		0A5C7634136F2EF10095365C /* mismatchmodel.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; lineEnding = 0; path = mismatchmodel.cpp; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.cpp; };
 		0A5C7635136F2EF10095365C /* mismatchmodel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mismatchmodel.h; sourceTree = "<group>"; };
-		0A5C7636136F2EF10095365C /* transcripts.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = transcripts.cpp; sourceTree = "<group>"; };
+		0A5C7636136F2EF10095365C /* transcripts.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; lineEnding = 0; path = transcripts.cpp; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.cpp; };
 		0A5C7637136F2EF10095365C /* transcripts.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = transcripts.h; sourceTree = "<group>"; };
 		0A60597213A170A400B5C9BA /* libboost_thread-mt.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libboost_thread-mt.a"; path = "../../../../../../opt/local/lib/libboost_thread-mt.a"; sourceTree = "<group>"; };
 		0A60597413A170AD00B5C9BA /* libboost_filesystem.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libboost_filesystem.a; path = ../../../../../../opt/local/lib/libboost_filesystem.a; sourceTree = "<group>"; };

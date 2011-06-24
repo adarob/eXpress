@@ -131,39 +131,6 @@ void Fragment::add_open_mate(FragMap* new_p)
         _open_mates.push_back(&nm);
 }
 
-//void Fragment::add_open_mate(FragMap* om)
-//    {
-//    if (!_om)
-//    {
-//        _om = pm;
-//    }
-//    else if (pm->trans_id == _om->trans_id && pm->mate_l == _om->left && _om->mate_l == pm->left)
-//    {
-//        if (pm->left < _om->left)
-//        {
-//            pm->right = _om->right;
-//            pm->seq_r = _om->seq_r;
-//            _frag_maps.push_back(pm);
-//            _om = NULL;
-//            delete _om;
-//        }
-//        else
-//        {
-//            _om->right = pm->right;
-//            _om->seq_r = pm->seq_r;
-//            _frag_maps.push_back(_om);
-//            delete pm;
-//        }
-//        assert(_frag_maps.back().pair_status() == PAIRED);
-//        _om = NULL;
-//    }
-//    else
-//    {
-//        delete _om;
-//        _om = pm;
-//    }
-//}
-
 const size_t BUFF_SIZE = 9999;
 const char* MISMATCH_TAG = "MD:Z:";
 
