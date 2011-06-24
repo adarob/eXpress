@@ -20,10 +20,10 @@ class MismatchTable
     size_t ctoi(const char c) const;
     size_t ctoi_r(const char c) const;
 public:
-    MismatchTable(double alpha);
-    double likelihood(const FragMap& f, const Transcript& t) const;
-    double log_likelihood(const FragMap& f, const Transcript& t) const;
-    void update(const FragMap& f, const Transcript& t, double mass);
+    MismatchTable(long double alpha);
+    long double likelihood(const FragMap& f, const Transcript& t) const;
+    long double log_likelihood(const FragMap& f, const Transcript& t) const;
+    void update(const FragMap& f, const Transcript& t, long double mass);
     void output(std::string filename);
 };
 

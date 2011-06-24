@@ -13,19 +13,19 @@
 
 class FrequencyMatrix
 {
-    std::vector<double> _array;
-    std::vector<double> _colsums;
+    std::vector<long double> _array;
+    std::vector<long double> _colsums;
     size_t _M;
     size_t _N;
     
 public:
     FrequencyMatrix(){};
-    FrequencyMatrix(size_t m, size_t n, double alpha);
+    FrequencyMatrix(size_t m, size_t n, long double alpha);
     
-    double operator()(size_t i, size_t j) const;
-    double operator()(size_t i) const;
-    void increment(size_t i, size_t j, double incr_amt);
-    void increment(size_t i, double incr_amt);
+    long double operator()(size_t i, size_t j) const;
+    long double operator()(size_t i) const;
+    void increment(size_t i, size_t j, long double incr_amt);
+    void increment(size_t i, long double incr_amt);
 };
 
 #endif

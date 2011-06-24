@@ -20,32 +20,32 @@
 using namespace std;
 
 
-Transcript::Transcript(const std::string& name, const std::string& seq, double alpha, const FLD* fld, const BiasBoss* bias_table, const MismatchTable* mismatch_table)
+Transcript::Transcript(const std::string& name, const std::string& seq, long double alpha, const FLD* fld, const BiasBoss* bias_table, const MismatchTable* mismatch_table)
 :_name(name),
 _id(hash_trans_name(name.c_str())),
 _seq(seq),
 _len(seq.length()),
 _counts(seq.length()*alpha),
-_start_bias(std::vector<double>(seq.length(),1.0)),
-_end_bias(std::vector<double>(seq.length(),1.0)),
+_start_bias(std::vector<long double>(seq.length(),1.0)),
+_end_bias(std::vector<long double>(seq.length(),1.0)),
 _avg_bias(1),
 _fld(fld),
 _bias_table(bias_table),
 _mismatch_table(mismatch_table)
 { }
 
-double Transcript::log_likelihood(const FragMap& frag) const
+long double Transcript::log_likelihood(const FragMap& frag) const
 {
     boost::mutex::scoped_lock lock(_bias_lock);
 
-    double ll = log(frag_count());
+    long double ll = log(frag_count());
     ll += _mismatch_table->log_likelihood(frag, *this);
     
     switch(frag.pair_status())
     {
         case PAIRED:
         {
-            double len_prob = _fld->pdf(frag.length());
+            long double len_prob = _fld->pdf(frag.length());
             if (len_prob == 0) return 0.0;
             ll += log(_start_bias[frag.left] * _end_bias[frag.right-1]);
             ll += log(len_prob);
@@ -70,9 +70,9 @@ double Transcript::log_likelihood(const FragMap& frag) const
     return ll;
 }
 
-double Transcript::effective_length() const
+long double Transcript::effective_length() const
 {
-    double eff_len = 0.0;
+    long double eff_len = 0.0;
     
     for(size_t l = 1; l <= min(length(), _fld->max_val()); l++)
     {
@@ -84,7 +84,7 @@ double Transcript::effective_length() const
     return eff_len;
 }
 
-double Transcript::total_bias_for_length(size_t l) const
+long double Transcript::total_bias_for_length(size_t l) const
 {
     assert(l <= _fld->max_val());
     return _avg_bias * (length() - l + 1);
@@ -98,7 +98,7 @@ void Transcript::update_transcript_bias()
     _avg_bias = _bias_table->get_transcript_bias(_start_bias, _end_bias, *this);
 }
 
-TranscriptTable::TranscriptTable(const string& trans_fasta_file, double alpha, const FLD* fld, BiasBoss* bias_table, const MismatchTable* mismatch_table)
+TranscriptTable::TranscriptTable(const string& trans_fasta_file, long double alpha, const FLD* fld, BiasBoss* bias_table, const MismatchTable* mismatch_table)
 {
     _alpha = alpha;
     ifstream infile (trans_fasta_file.c_str());
@@ -216,20 +216,20 @@ void TranscriptTable::output_header(ofstream& runexpr_file)
 
 void TranscriptTable::output_current(ofstream& runexpr_file)
 {    
-    double sum = 0;
+    long double sum = 0;
     for( TransMap::iterator it = _trans_map.begin(); it != _trans_map.end(); ++it)
     {
         Transcript& trans = *(it->second);
-        double counts = trans.frag_count();
-        double fpkm = counts/trans.length();
+        long double counts = trans.frag_count();
+        long double fpkm = counts/trans.length();
         sum += fpkm;
     }   
     
     for( TransMap::iterator it = _trans_map.begin(); it != _trans_map.end(); ++it)
     {
         Transcript& trans = *(it->second);
-        double counts = trans.frag_count();
-        double fpkm = counts/trans.length();
+        long double counts = trans.frag_count();
+        long double fpkm = counts/trans.length();
         runexpr_file << fpkm/sum << '\t';
     }   
     runexpr_file << '\n';
@@ -244,10 +244,10 @@ void TranscriptTable::output_expression(string output_dir)
     for( TransMap::iterator it = _trans_map.begin(); it != _trans_map.end(); ++it)
     {
         Transcript& trans = *(it->second);
-        double M = trans.fld()->num_obs();
+        long double M = trans.fld()->num_obs();
         trans.update_transcript_bias();
-        double counts = trans.frag_count();
-        double fpkm = (counts/trans.effective_length())*(1000000000/M);
+        long double counts = trans.frag_count();
+        long double fpkm = (counts/trans.effective_length())*(1000000000/M);
         expr_file << trans.name() << '\t' << fpkm << '\t' << counts << '\n';
     }   
     expr_file.close();

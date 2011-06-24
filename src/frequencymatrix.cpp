@@ -12,7 +12,7 @@
 
 using namespace std;
 
-FrequencyMatrix::FrequencyMatrix(size_t m, size_t n, double alpha)
+FrequencyMatrix::FrequencyMatrix(size_t m, size_t n, long double alpha)
 : _array(m*n, alpha),
   _colsums(m,n*alpha),
   _M(m),
@@ -20,7 +20,7 @@ FrequencyMatrix::FrequencyMatrix(size_t m, size_t n, double alpha)
 {}
 
 
-double FrequencyMatrix::operator()(size_t i, size_t j) const
+long double FrequencyMatrix::operator()(size_t i, size_t j) const
 {
     assert(i*_N+j < _M*_N);
     assert(_array[i*_N+j] > 0);
@@ -28,12 +28,12 @@ double FrequencyMatrix::operator()(size_t i, size_t j) const
     return _array[i*_N+j]/_colsums[i];
 }
 
-double FrequencyMatrix::operator()(size_t i) const
+long double FrequencyMatrix::operator()(size_t i) const
 {
     return operator()(0, i);
 }
 
-void FrequencyMatrix::increment(size_t i, size_t j, double incr_amt)
+void FrequencyMatrix::increment(size_t i, size_t j, long double incr_amt)
 {
     assert(i*_N+j < _M*_N);
     assert(!isnan(incr_amt) && !isinf(incr_amt));
@@ -41,7 +41,7 @@ void FrequencyMatrix::increment(size_t i, size_t j, double incr_amt)
     _colsums[i] += incr_amt;
 }
 
-void FrequencyMatrix::increment(size_t i, double incr_amt)
+void FrequencyMatrix::increment(size_t i, long double incr_amt)
 {
     increment(0, i, incr_amt);
 }

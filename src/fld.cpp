@@ -14,9 +14,9 @@
 
 using namespace std;
 
-const vector<double> KERNEL = boost::assign::list_of(0.0625)(0.25)(0.375)(0.25)(0.0625); 
+const vector<long double> KERNEL = boost::assign::list_of(0.0625)(0.25)(0.375)(0.25)(0.0625); 
 
-FLD::FLD(double alpha, size_t max_val) : 
+FLD::FLD(long double alpha, size_t max_val) : 
     _hist(max_val+1, alpha),
     _num_obs(max_val * alpha), 
     _sum((max_val)*(max_val+1)*alpha/2),
@@ -30,7 +30,7 @@ size_t FLD::max_val() const
     return _hist.size()-1;
 }
 
-void FLD::add_val(size_t len, double mass)
+void FLD::add_val(size_t len, long double mass)
 {
     if (len > max_val()) return;
     if (len < _min) _min = len;
@@ -39,36 +39,36 @@ void FLD::add_val(size_t len, double mass)
     
     for (size_t i = 0; i < KERNEL.size(); i++)
     {
-        double k_mass = mass * KERNEL[i];
+        long double k_mass = mass * KERNEL[i];
         _hist[offset] += k_mass;
         _sum += (offset++)*k_mass;
     }
     _num_obs += mass;
 }
 
-double FLD::pdf(size_t len) const
+long double FLD::pdf(size_t len) const
 {
     if (len > max_val())
         return 0.0;
     return _hist[len]/_num_obs;
 }
 
-double FLD::cdf(size_t len) const 
+long double FLD::cdf(size_t len) const 
 {
     return accumulate(_hist.begin(),_hist.begin()+len+1,0.0)/_num_obs;
 }
 
-double FLD::npdf(size_t len, size_t max) const
+long double FLD::npdf(size_t len, size_t max) const
 {
     return _hist[len]/accumulate(_hist.begin(),_hist.begin()+max+1,0.0);
 }
 
-double FLD::num_obs() const
+long double FLD::num_obs() const
 {
     return _num_obs;
 }
 
-double FLD::mean() const
+long double FLD::mean() const
 {
     return _sum/num_obs();
 }

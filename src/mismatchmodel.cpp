@@ -58,16 +58,16 @@ inline size_t MismatchTable::ctoi_r(const char c) const
     }
 }
 
-MismatchTable::MismatchTable(double alpha)
+MismatchTable::MismatchTable(long double alpha)
 {
     _first_read_mm = vector<FrequencyMatrix>(MAX_READ_LEN, FrequencyMatrix(16, 4, alpha));
     _second_read_mm = vector<FrequencyMatrix>(MAX_READ_LEN, FrequencyMatrix(16, 4, alpha));
 }
 
-double MismatchTable::likelihood(const FragMap& f, const Transcript& t) const
+long double MismatchTable::likelihood(const FragMap& f, const Transcript& t) const
 {
     const string& t_seq = t.seq();
-    double p = 1.0;
+    long double p = 1.0;
     
     const vector<FrequencyMatrix>& left_mm = (f.left_first) ? _first_read_mm : _second_read_mm;
     const vector<FrequencyMatrix>& right_mm = (!f.left_first) ? _first_read_mm : _second_read_mm;
@@ -105,10 +105,10 @@ double MismatchTable::likelihood(const FragMap& f, const Transcript& t) const
     return p;
 }
 
-double MismatchTable::log_likelihood(const FragMap& f, const Transcript& t) const
+long double MismatchTable::log_likelihood(const FragMap& f, const Transcript& t) const
 {
     const string& t_seq = t.seq();
-    double ll = 0;
+    long double ll = 0;
     
     const vector<FrequencyMatrix>& left_mm = (f.left_first) ? _first_read_mm : _second_read_mm;
     const vector<FrequencyMatrix>& right_mm = (!f.left_first) ? _first_read_mm : _second_read_mm;
@@ -148,7 +148,7 @@ double MismatchTable::log_likelihood(const FragMap& f, const Transcript& t) cons
 }
 
 
-void MismatchTable::update(const FragMap& f, const Transcript& t, double mass)
+void MismatchTable::update(const FragMap& f, const Transcript& t, long double mass)
 {
     const string& t_seq = t.seq();
     

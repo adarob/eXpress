@@ -23,13 +23,13 @@
 
 using namespace std;
 
-double ff_param = 1;
+long double ff_param = 1;
 
 string output_dir = ".";
-double expr_alpha = .001;
-double fld_alpha = 1;
-double bias_alpha = 1;
-double mm_alpha = 1;
+long double expr_alpha = .001;
+long double fld_alpha = 1;
+long double bias_alpha = 1;
+long double mm_alpha = 1;
 
 int def_fl_max = 800;
 int def_fl_mean = 200;
@@ -164,12 +164,12 @@ int parse_options(int argc, char** argv)
     return 0;
 }
 
-double log_sum(double x, double y)
+long double log_sum(long double x, long double y)
 {
     return x+log(1+exp(y-x));
 }
 
-void process_fragment(double mass_n, Fragment* frag_p, TranscriptTable* trans_table, FLD* fld, BiasBoss* bias_table, MismatchTable* mismatch_table)
+void process_fragment(long double mass_n, Fragment* frag_p, TranscriptTable* trans_table, FLD* fld, BiasBoss* bias_table, MismatchTable* mismatch_table)
 {
     Fragment& frag = *frag_p;
     
@@ -197,9 +197,9 @@ void process_fragment(double mass_n, Fragment* frag_p, TranscriptTable* trans_ta
         return;
     }
     
-    vector<double> likelihoods(frag.num_maps());
+    vector<long double> likelihoods(frag.num_maps());
     vector<Transcript*> transcripts(frag.num_maps());
-    double total_likelihood = 0.0;
+    long double total_likelihood = 0.0;
     for(size_t i = 0; i < frag.num_maps(); ++i)
     {
         const FragMap& m = *frag.maps()[i];
@@ -216,7 +216,7 @@ void process_fragment(double mass_n, Fragment* frag_p, TranscriptTable* trans_ta
         delete frag_p;
         return;
     }
-    double total_p = 0.0;
+    long double total_p = 0.0;
     for(size_t i = 0; i < frag.num_maps(); ++i)
     {
         if (!likelihoods[i])
@@ -224,8 +224,8 @@ void process_fragment(double mass_n, Fragment* frag_p, TranscriptTable* trans_ta
         
         const FragMap& m = *frag.maps()[i];
         Transcript* t  = transcripts[i];
-        double p = exp(likelihoods[i]-total_likelihood);
-        double mass_t = mass_n * p;
+        long double p = exp(likelihoods[i]-total_likelihood);
+        long double mass_t = mass_n * p;
         
         assert(!isnan(mass_t));
 
@@ -249,8 +249,8 @@ void threaded_calc_abundances(MapParser& map_parser, TranscriptTable* trans_tabl
     boost::thread parse(&MapParser::threaded_parse, &map_parser, &ts);
     
     size_t n = 0;
-    double mass_n = 1.0;
-    double prev_n_to_ff = 1.0;
+    long double mass_n = 1.0;
+    long double prev_n_to_ff = 1.0;
     
     // For outputting rhos on log scale
     ofstream running_expr_file((output_dir + "/running.expr").c_str());
@@ -283,7 +283,7 @@ void threaded_calc_abundances(MapParser& map_parser, TranscriptTable* trans_tabl
         // Update mass_n based on forgetting factor
         if (n > 1)
         {
-            double n_to_ff = pow(n, ff_param);
+            long double n_to_ff = pow(n, ff_param);
             mass_n = mass_n * prev_n_to_ff / (n_to_ff - 1);
             prev_n_to_ff = n_to_ff;
         }
