@@ -16,6 +16,8 @@
 #include <boost/thread.hpp>
 
 typedef uint64_t TransID;
+class Transcript;
+class TranscriptTable;
 
 enum PairStatus { PAIRED, LEFT_ONLY, RIGHT_ONLY };
 
@@ -23,6 +25,7 @@ struct FragMap
 {
     std::string name;
     TransID trans_id;
+    Transcript* mapped_trans;
     std::string seq_l;
     std::string seq_r;
     int left;
@@ -79,7 +82,7 @@ public:
     MapParser(std::string sam_file);
     ~MapParser(){ delete _line_buff; }
     void spawn_thread(ParseThreadSafety* thread_safety);
-    void threaded_parse(ParseThreadSafety* thread_safety);
+    void threaded_parse(ParseThreadSafety* thread_safety, TranscriptTable* trans_table);
     bool next_fragment(Fragment& f);
 };
 

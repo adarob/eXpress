@@ -198,7 +198,7 @@ MapParser::MapParser(string sam_file)
     
 }
 
-void MapParser::threaded_parse(ParseThreadSafety* thread_safety)
+void MapParser::threaded_parse(ParseThreadSafety* thread_safety, TranscriptTable* trans_table)
 {
     ParseThreadSafety& ts = *thread_safety;
     bool fragments_remain = true;
@@ -206,6 +206,13 @@ void MapParser::threaded_parse(ParseThreadSafety* thread_safety)
     {
         Fragment* frag = new Fragment(); 
         fragments_remain = next_fragment(*frag);
+        for (size_t i = 0; i < frag->maps().size(); ++i)
+        {
+            FragMap& m = *(frag->maps()[i]);
+            Transcript* t = trans_table->get_trans(m.trans_id);
+            m.mapped_trans = t;
+            assert(t->id() == m.trans_id);
+        }
         ts.next_frag = frag;
         ts.proc_lk.unlock();
         ts.parse_lk.lock();

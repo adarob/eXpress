@@ -169,7 +169,7 @@ long double log_sum(long double x, long double y)
     return x+log(1+exp(y-x));
 }
 
-void process_fragment(long double mass_n, Fragment* frag_p, TranscriptTable* trans_table, FLD* fld, BiasBoss* bias_table, MismatchTable* mismatch_table)
+void process_fragment(long double mass_n, Fragment* frag_p, FLD* fld, BiasBoss* bias_table, MismatchTable* mismatch_table)
 {
     Fragment& frag = *frag_p;
     
@@ -182,7 +182,7 @@ void process_fragment(long double mass_n, Fragment* frag_p, TranscriptTable* tra
     if (frag.num_maps()==1)
     {
         const FragMap& m = *frag.maps()[0];
-        Transcript* t  = trans_table->get_trans(m.trans_id);
+        Transcript* t  = m.mapped_trans;
         if (!t)
         {
             cerr << "ERROR: Transcript " << m.name << " not found in reference fasta.";
@@ -198,14 +198,11 @@ void process_fragment(long double mass_n, Fragment* frag_p, TranscriptTable* tra
     }
     
     vector<long double> likelihoods(frag.num_maps());
-    vector<Transcript*> transcripts(frag.num_maps());
     long double total_likelihood = 0.0;
     for(size_t i = 0; i < frag.num_maps(); ++i)
     {
         const FragMap& m = *frag.maps()[i];
-        Transcript* t = trans_table->get_trans(m.trans_id);
-        transcripts[i] = t;
-        assert(t->id() == m.trans_id);
+        Transcript* t = m.mapped_trans;
         likelihoods[i] = t->log_likelihood(m);
         if (!likelihoods[i])
             continue;
@@ -223,7 +220,7 @@ void process_fragment(long double mass_n, Fragment* frag_p, TranscriptTable* tra
             continue;
         
         const FragMap& m = *frag.maps()[i];
-        Transcript* t  = transcripts[i];
+        Transcript* t  = m.mapped_trans;
         long double p = exp(likelihoods[i]-total_likelihood);
         long double mass_t = mass_n * p;
         
@@ -246,7 +243,7 @@ void threaded_calc_abundances(MapParser& map_parser, TranscriptTable* trans_tabl
     ParseThreadSafety ts;
     ts.proc_lk.lock();
     ts.parse_lk.lock();
-    boost::thread parse(&MapParser::threaded_parse, &map_parser, &ts);
+    boost::thread parse(&MapParser::threaded_parse, &map_parser, &ts, trans_table);
     
     size_t n = 0;
     long double mass_n = 1.0;
@@ -262,6 +259,7 @@ void threaded_calc_abundances(MapParser& map_parser, TranscriptTable* trans_tabl
     {
         ts.proc_lk.lock();
         Fragment* frag = ts.next_frag;
+        
         ts.parse_lk.unlock();
         if (!frag)
         {
@@ -289,7 +287,7 @@ void threaded_calc_abundances(MapParser& map_parser, TranscriptTable* trans_tabl
         }
         assert(!isinf(mass_n) && !isnan(mass_n));
         
-        process_fragment(mass_n, frag, trans_table, fld, bias_table, mismatch_table);
+        process_fragment(mass_n, frag, fld, bias_table, mismatch_table);
     }
     running_expr_file.close();
 }
