@@ -49,6 +49,10 @@
       <CommandLineArguments>
          <CommandLineArgument
             argument = "--no-bias-correct -o /Users/adarob/projects/tuxedo/devel/cuffexpress/test_data/temp /Users/adarob/projects/tuxedo/devel/cuffexpress/test_data/mtg_out.fa /Users/adarob/projects/tuxedo/devel/cuffexpress/test_data/mapped.sam"
+            isEnabled = "NO">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "--no-bias-correct -f 0.65 -o /Volumes/lmcb.math.berkeley.edu/experiments/cexpress/simulation/ugt3a2 /Volumes/lmcb.math.berkeley.edu/experiments/cexpress/simulation/ugt3a2/indexes/mtg_out.fa /Volumes/lmcb.math.berkeley.edu/experiments/cexpress/simulation/ugt3a2/mapped.sam"
             isEnabled = "YES">
          </CommandLineArgument>
       </CommandLineArguments>

@@ -275,6 +275,13 @@ void threaded_calc_abundances(MapParser& map_parser, TranscriptTable* trans_tabl
             i = (i==9) ? 1 : (i+1);
         }
         
+        // Output progress
+        if (n % 10000 == 0)
+        {
+            cout << n << '\n';
+        }
+        
+        
         // Update mass_n based on forgetting factor
         if (n > 1)
         {

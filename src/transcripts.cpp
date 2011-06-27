@@ -85,7 +85,7 @@ double Transcript::effective_length() const
 double Transcript::total_bias_for_length(size_t l) const
 {
     assert(l <= _fld->max_val());
-    return sexp(_avg_bias) * (length() - l + 1);
+    return _avg_bias + log(length() - l + 1);
 }
 
 void Transcript::update_transcript_bias()
