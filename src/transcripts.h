@@ -16,6 +16,7 @@
 #include <boost/thread.hpp>
 #include <iostream>
 #include <fstream>
+#include "main.h"
 
 
 class FLD;
@@ -126,7 +127,7 @@ public:
      */
     void add_mass(double mass) 
     { 
-        _counts += mass;
+        _counts = log_sum(_counts, mass);
         _var += mass*(1-mass);
     }  
     

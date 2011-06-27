@@ -86,6 +86,7 @@ double MismatchTable::log_likelihood(const FragMap& f, const Transcript& t) cons
         {
             index = (prev << 2) + ref;
             ll += left_mm[i](index, cur);
+            assert(!isnan(ll));
         }
         prev = ref;
     }
@@ -100,6 +101,7 @@ double MismatchTable::log_likelihood(const FragMap& f, const Transcript& t) cons
         {
             index = (prev << 2) + ref;
             ll += right_mm[i](index, cur);
+            assert(!isnan(ll));
         }
         prev = ref;
     }

@@ -24,6 +24,7 @@ FrequencyMatrix::FrequencyMatrix(size_t m, size_t n, double alpha)
 double FrequencyMatrix::operator()(size_t i, size_t j) const
 {
     assert(i*_N+j < _M*_N);
+    assert(!isnan(_array[i*_N+j]-_colsums[i]));
     return _array[i*_N+j]-_colsums[i];
 }
 
@@ -37,6 +38,7 @@ void FrequencyMatrix::increment(size_t i, size_t j, double incr_amt)
     assert(i*_N+j < _M*_N);
     _array[i*_N+j] = log_sum(_array[i*_N+j], incr_amt);
     _colsums[i] = log_sum(_colsums[i], incr_amt);
+    assert(!isnan(_colsums[i]) && !isinf(_colsums[i]));
 }
 
 void FrequencyMatrix::increment(size_t i, double incr_amt)

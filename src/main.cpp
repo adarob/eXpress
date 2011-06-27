@@ -204,21 +204,24 @@ void process_fragment(double mass_n, Fragment* frag_p, FLD* fld, BiasBoss* bias_
         likelihoods[i] = t->log_likelihood(m);
         total_likelihood = (i) ? log_sum(total_likelihood, likelihoods[i]):likelihoods[i];
     }
-    if (fabs(total_likelihood) == HUGE_VAL)
+    if (sexp(total_likelihood) == 0)
     {
         delete frag_p;
         return;
     }
-//    double total_p = 0.0;
+
+    double total_p = 0.0;
     for(size_t i = 0; i < frag.num_maps(); ++i)
     {
-        if (fabs(likelihoods[i]) == HUGE_VAL)
+        if (sexp(likelihoods[i]) == 0)
             continue;
         
         const FragMap& m = *frag.maps()[i];
         Transcript* t  = m.mapped_trans;
         double p = likelihoods[i]-total_likelihood;
         double mass_t = mass_n + p;
+        
+        assert(!isinf(sexp(mass_t)) && !isinf(mass_t) && !isnan(mass_t));
         
         t->add_mass(mass_t);
         fld->add_val(m.length(), mass_t);
@@ -227,9 +230,8 @@ void process_fragment(double mass_n, Fragment* frag_p, FLD* fld, BiasBoss* bias_
             bias_table->update_observed(m, *t, mass_t);
         mismatch_table->update(m, *t, mass_t);
         
-//        log_sum(total_p, p);
+        log_sum(total_p, p);
     }
-//    assert(abs(sexp(total_p) - 1) < .0001);
     delete frag_p;
 }
 
@@ -263,7 +265,7 @@ void threaded_calc_abundances(MapParser& map_parser, TranscriptTable* trans_tabl
         }
         
         n++;
-        
+
         // Output rhos on log scale
         if (n == i * pow(10.,m))
         {
@@ -277,9 +279,10 @@ void threaded_calc_abundances(MapParser& map_parser, TranscriptTable* trans_tabl
         if (n > 1)
         {
             double n_to_ff = ff_param*log(n);
-            mass_n += prev_n_to_ff - log_sum(n_to_ff, -1);
+            mass_n += prev_n_to_ff - log(exp(n_to_ff) - 1);
             prev_n_to_ff = n_to_ff;
         }
+        assert(!isnan(mass_n));
         
         process_fragment(mass_n, frag, fld, bias_table, mismatch_table);
     }
