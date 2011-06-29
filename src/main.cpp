@@ -8,6 +8,7 @@
 
 #define PACKAGE_VERSION "INTERNAL"
 
+#include <boost/math/distributions/geometric.hpp>
 #include <boost/filesystem.hpp>
 #include <getopt.h>
 #include <boost/thread.hpp>
@@ -37,8 +38,10 @@ int def_fl_mean = 200;
 int def_fl_stddev = 80;
 bool user_provided_fld = false;
 
-bool bias_correct = true;
+bool bias_correct = false;
 bool upper_quart_norm = false;
+
+bool in_between = false;
 
 void print_usage()
 {
@@ -59,6 +62,7 @@ void print_usage()
 
 #define OPT_UPPER_QUARTILE_NORM 200
 #define OPT_NO_BIAS_CORRECT 201
+#define OPT_IN_BETWEEN 202
 
 const char *short_options = "o:f:m:s";
 
@@ -70,6 +74,7 @@ static struct option long_options[] = {
     {"frag-len-std-dev",	required_argument,       0,          's'},
     {"upper-quartile-norm",     no_argument,             0,          OPT_UPPER_QUARTILE_NORM},
     {"no-bias-correct",         no_argument,             0,          OPT_NO_BIAS_CORRECT},
+    {"in-between",              no_argument,             0,          OPT_IN_BETWEEN},
     {0, 0, 0, 0} // terminator
 };
 
@@ -156,6 +161,9 @@ int parse_options(int argc, char** argv)
             case OPT_NO_BIAS_CORRECT:
                 bias_correct = false;
                 break;
+	case OPT_IN_BETWEEN:
+	  in_between = true;
+	  break;
 			default:
 				print_usage();
 				return 1;
@@ -243,15 +251,18 @@ void threaded_calc_abundances(MapParser& map_parser, TranscriptTable* trans_tabl
     boost::thread parse(&MapParser::threaded_parse, &map_parser, &ts, trans_table);
     
     size_t n = 0;
+    size_t fake_n = 0;
     double mass_n = 0;
-    double prev_n_to_ff = 1.0;
     
     // For outputting rhos on log scale
-    ofstream running_expr_file((output_dir + "/running.expr").c_str());
+    ofstream running_expr_file((output_dir + "/ce_running.expr").c_str());
     trans_table->output_header(running_expr_file);    
     int m = 0;
     int i = 1;
-    
+
+    srand ( time(NULL) );
+    boost::math::geometric geom(.00002);
+    cout.precision(20);
     while(true)
     {
         ts.proc_lk.lock();
@@ -266,29 +277,33 @@ void threaded_calc_abundances(MapParser& map_parser, TranscriptTable* trans_tabl
         
         n++;
 
-        // Output rhos on log scale
+        //Output rhos on log scale
         if (n == i * pow(10.,m))
         {
             running_expr_file << n << '\t';  
             trans_table->output_current(running_expr_file);
-            m += (i==9);
+            running_expr_file.flush();
+	    m += (i==9);
             i = (i==9) ? 1 : (i+1);
         }
         
         // Output progress
-        if (n % 10000 == 0)
+        if (n % 1000000 == 0)
         {
-            cout << n << '\n';
+	  cout << n << '\t' << scientific << mass_n << '\n';
         }
         
         
         // Update mass_n based on forgetting factor
-        if (n > 1)
-        {
-            double n_to_ff = ff_param*log(n);
-            mass_n += prev_n_to_ff - log(exp(n_to_ff) - 1);
-            prev_n_to_ff = n_to_ff;
-        }
+	int k = (in_between) ? quantile(geom, rand()/double(RAND_MAX)) : 1;
+
+	for (int j = 0; j < k; ++j)
+	{
+	    if (++fake_n > 1)
+	    {
+	      mass_n += ff_param*log(fake_n-1) - log(pow(fake_n,ff_param) - 1);
+	    }
+       }
         assert(!isnan(mass_n));
         
         process_fragment(mass_n, frag, fld, bias_table, mismatch_table);

@@ -214,21 +214,19 @@ void TranscriptTable::output_header(ofstream& runexpr_file)
 
 void TranscriptTable::output_current(ofstream& runexpr_file)
 {    
-    double sum = 0;
+    double sum = HUGE_VAL;
     for( TransMap::iterator it = _trans_map.begin(); it != _trans_map.end(); ++it)
     {
         Transcript& trans = *(it->second);
-        double counts = sexp(trans.frag_count());
-        double fpkm = counts/trans.length();
-        sum += fpkm;
+        double log_fpkm = trans.frag_count() - log(trans.length());
+        sum = log_sum(sum, log_fpkm);
     }   
     
     for( TransMap::iterator it = _trans_map.begin(); it != _trans_map.end(); ++it)
     {
-        Transcript& trans = *(it->second);
-        double counts = sexp(trans.frag_count());
-        double fpkm = counts/trans.length();
-        runexpr_file << fpkm/sum << '\t';
+      Transcript& trans = *(it->second);
+        double log_fpkm = trans.frag_count() - log(trans.length());
+        runexpr_file << sexp(log_fpkm - sum) << '\t';
     }   
     runexpr_file << '\n';
 }
@@ -238,15 +236,15 @@ void TranscriptTable::output_expression(string output_dir)
 {
     ofstream expr_file((output_dir + "/transcripts.expr").c_str());
     expr_file << "Transcript\tFPKM\tCount\n";
+    double log_bil = log(1000000000);
 
     for( TransMap::iterator it = _trans_map.begin(); it != _trans_map.end(); ++it)
     {
         Transcript& trans = *(it->second);
-        double M = sexp(trans.fld()->num_obs());
+        double M = trans.fld()->num_obs();
         trans.update_transcript_bias();
-        double counts = sexp(trans.frag_count());
-        double fpkm = (counts/trans.effective_length())*(1000000000/M);
-        expr_file << trans.name() << '\t' << fpkm << '\t' << counts << '\n';
+        double fpkm = trans.frag_count() - trans.effective_length() + log_bil - M;
+        expr_file << trans.name() << '\t' << sexp(fpkm) << '\t' << sexp(trans.frag_count()) << '\n';
     }   
     expr_file.close();
 }
