@@ -1343,8 +1343,8 @@
 		<string>PrimaryDocumentVisibleCharacterRange</string>
 		<string>HideAllIssues</string>
 		<string>PrimaryDocumentSelectedCharacterRange</string>
-		<real>333319488.05412602</real>
-		<string>{788, 1027}</string>
+		<real>333319851.83110601</real>
+		<string>{788, 1022}</string>
 		<false/>
 		<string>{1720, 0}</string>
 		<string>Transcript::log_likelihood(const FragMap&amp; frag)</string>
@@ -3410,8 +3410,8 @@
 				</dict>
 			</array>
 		</dict>
-		<real>333319488.05360001</real>
-		<string>{5216, 600}</string>
+		<real>333319851.83051503</real>
+		<string>{5207, 399}</string>
 		<string>{6613, 8}</string>
 		<string>process_fragment(double mass_n, Fragment* frag_p, FLD* fld, BiasBoss* bias_table, MismatchTable* mismatch_table)</string>
 		<dict>
@@ -3841,7 +3841,7 @@
 		<string>IDEBatchFindNavigatorSelectedRowIndexes</string>
 		<string>IDEBatchFindNavigatorFindMode</string>
 		<string>IDEBatchFindNavigatorCollapsedGroups</string>
-		<string>add_mass</string>
+		<string>*(it-&gt;second)</string>
 		<dict>
 			<key>$class</key>
 			<dict>
@@ -7313,9 +7313,9 @@
 				</dict>
 			</array>
 		</dict>
-		<real>333319488.05129898</real>
-		<string>{7616, 1000}</string>
-		<string>{9087, 0}</string>
+		<real>333319851.82812899</real>
+		<string>{5207, 399}</string>
+		<string>{6613, 8}</string>
 		<dict>
 			<key>$class</key>
 			<dict>
@@ -7455,8 +7455,8 @@
 				</dict>
 			</array>
 		</dict>
-		<real>333319454.98367</real>
-		<string>{2241, 1345}</string>
+		<real>333319660.72418898</real>
+		<string>{2876, 675}</string>
 		<dict>
 			<key>$class</key>
 			<dict>
@@ -8262,9 +8262,9 @@
 				</dict>
 			</array>
 		</dict>
-		<real>333319488.05141097</real>
-		<string>{788, 1027}</string>
-		<string>{1720, 0}</string>
+		<real>333319851.82823598</real>
+		<string>{5159, 1257}</string>
+		<string>{6028, 0}</string>
 		<dict>
 			<key>$class</key>
 			<dict>
@@ -11071,7 +11071,7 @@
 				</dict>
 				<dict>
 					<key>CF$UID</key>
-					<integer>835</integer>
+					<integer>836</integer>
 				</dict>
 				<dict>
 					<key>CF$UID</key>
@@ -11116,7 +11116,7 @@
 				<integer>831</integer>
 			</dict>
 		</dict>
-		<string>file://localhost/Users/adarob/Projects/Tuxedo/devel/cuffexpress/src/main.cpp</string>
+		<string>file://localhost/Users/adarob/Projects/Tuxedo/devel/cuffexpress/src/transcripts.cpp</string>
 		<dict>
 			<key>$class</key>
 			<dict>
@@ -11132,6 +11132,24 @@
 			<dict>
 				<key>CF$UID</key>
 				<integer>833</integer>
+			</dict>
+		</dict>
+		<string>file://localhost/Users/adarob/Projects/Tuxedo/devel/cuffexpress/src/main.cpp</string>
+		<dict>
+			<key>$class</key>
+			<dict>
+				<key>CF$UID</key>
+				<integer>139</integer>
+			</dict>
+			<key>NS.base</key>
+			<dict>
+				<key>CF$UID</key>
+				<integer>0</integer>
+			</dict>
+			<key>NS.relative</key>
+			<dict>
+				<key>CF$UID</key>
+				<integer>835</integer>
 			</dict>
 		</dict>
 		<string>file://localhost/Users/adarob/Projects/Tuxedo/devel/cuffexpress/src/transcripts.h</string>
@@ -11166,7 +11184,7 @@
 			<key>NS.relative</key>
 			<dict>
 				<key>CF$UID</key>
-				<integer>836</integer>
+				<integer>838</integer>
 			</dict>
 		</dict>
 		<string>file://localhost/opt/local/include/boost/date_time/date.hpp</string>
@@ -11184,28 +11202,10 @@
 			<key>NS.relative</key>
 			<dict>
 				<key>CF$UID</key>
-				<integer>838</integer>
-			</dict>
-		</dict>
-		<string>file://localhost/Developer/SDKs/MacOSX10.7.sdk/usr/include/i386/_types.h</string>
-		<dict>
-			<key>$class</key>
-			<dict>
-				<key>CF$UID</key>
-				<integer>139</integer>
-			</dict>
-			<key>NS.base</key>
-			<dict>
-				<key>CF$UID</key>
-				<integer>0</integer>
-			</dict>
-			<key>NS.relative</key>
-			<dict>
-				<key>CF$UID</key>
 				<integer>840</integer>
 			</dict>
 		</dict>
-		<string>file://localhost/Users/adarob/Projects/Tuxedo/devel/cuffexpress/src/transcripts.cpp</string>
+		<string>file://localhost/Developer/SDKs/MacOSX10.7.sdk/usr/include/i386/_types.h</string>
 		<dict>
 			<key>$class</key>
 			<dict>
@@ -20615,7 +20615,7 @@
 				</dict>
 			</array>
 		</dict>
-		<string>main.cpp</string>
+		<string>transcripts.cpp</string>
 		<dict>
 			<key>$class</key>
 			<dict>
@@ -20897,8 +20897,12 @@
 				<key>CF$UID</key>
 				<integer>195</integer>
 			</dict>
+			<key>NSLength</key>
+			<integer>1</integer>
+			<key>NSLocation</key>
+			<integer>3</integer>
 			<key>NSRangeCount</key>
-			<integer>0</integer>
+			<integer>1</integer>
 		</dict>
 		<dict>
 			<key>$class</key>
@@ -21830,7 +21834,7 @@
 			<key>Identifier</key>
 			<dict>
 				<key>CF$UID</key>
-				<integer>179</integer>
+				<integer>51</integer>
 			</dict>
 		</dict>
 		<dict>
@@ -21882,7 +21886,7 @@
 				<integer>61</integer>
 			</dict>
 			<key>NS.string</key>
-			<string>file://localhost/Users/adarob/Projects/Tuxedo/devel/cuffexpress/src/main.cpp</string>
+			<string>file://localhost/Users/adarob/Projects/Tuxedo/devel/cuffexpress/src/transcripts.cpp</string>
 		</dict>
 		<dict>
 			<key>$class</key>
@@ -22383,7 +22387,7 @@
 				</dict>
 				<dict>
 					<key>CF$UID</key>
-					<integer>179</integer>
+					<integer>51</integer>
 				</dict>
 				<dict>
 					<key>CF$UID</key>
@@ -22453,7 +22457,7 @@
 			<key>Identifier</key>
 			<dict>
 				<key>CF$UID</key>
-				<integer>179</integer>
+				<integer>51</integer>
 			</dict>
 		</dict>
 		<dict>
@@ -22526,10 +22530,10 @@
 				</dict>
 			</array>
 		</dict>
-		<real>333319488.05307198</real>
-		<string>{7616, 1000}</string>
-		<string>{9087, 0}</string>
-		<string>main (int argc, char ** argv)</string>
+		<real>333319851.829983</real>
+		<string>{5159, 1257}</string>
+		<string>{6028, 0}</string>
+		<string>TranscriptTable::output_current(ofstream&amp; runexpr_file)</string>
 		<dict>
 			<key>$class</key>
 			<dict>
@@ -22547,7 +22551,7 @@
 				<integer>1478</integer>
 			</dict>
 		</dict>
-		<string>file://localhost/Users/adarob/Projects/Tuxedo/devel/cuffexpress/src/main.cpp</string>
+		<string>file://localhost/Users/adarob/Projects/Tuxedo/devel/cuffexpress/src/transcripts.cpp</string>
 		<dict>
 			<key>$class</key>
 			<dict>
@@ -23611,8 +23615,8 @@
 				</dict>
 			</array>
 		</dict>
-		<real>333319488.05254</real>
-		<string>{788, 1027}</string>
+		<real>333319851.82948202</real>
+		<string>{788, 1022}</string>
 		<string>{1720, 0}</string>
 		<dict>
 			<key>$class</key>
@@ -30841,8 +30845,8 @@
 				</dict>
 			</array>
 		</dict>
-		<real>333319488.051992</real>
-		<string>{5216, 600}</string>
+		<real>333319851.828843</real>
+		<string>{5207, 399}</string>
 		<string>{6613, 8}</string>
 		<dict>
 			<key>$class</key>
