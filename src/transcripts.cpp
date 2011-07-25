@@ -228,6 +228,7 @@ void TranscriptTable::output_current(ofstream& runexpr_file)
         Transcript& trans = *(it->second);
         double counts = sexp(trans.frag_count());
         double fpkm = counts/trans.length();
+        assert(!isnan(fpkm/sum));
         runexpr_file << fpkm/sum << '\t';
     }   
     runexpr_file << '\n';

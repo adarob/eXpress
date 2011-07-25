@@ -124,11 +124,14 @@ public:
     /**
      * a member function that increases the expected fragment counts by a given mass
      * @param mass a double to increase the expected fragment counts by
+     * @param the probabilistic assignment of the 
      */
-    void add_mass(double mass) 
+    void add_mass(double p, double mass) 
     { 
-        _counts = log_sum(_counts, mass);
-        _var += mass*(1-mass);
+        assert(sexp(p) != 0);
+        _counts = log_sum(_counts, p+mass);
+        if (p != 0.0)
+            _var = log_sum(_var, mass + p + log(1-sexp(p)));
     }  
     
     void set_counts(double counts)
