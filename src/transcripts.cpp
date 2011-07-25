@@ -224,7 +224,8 @@ void TranscriptTable::output_current(ofstream& runexpr_file)
     
     for( TransMap::iterator it = _trans_map.begin(); it != _trans_map.end(); ++it)
     {
-      Transcript& trans = *(it->second);
+
+        Transcript& trans = *(it->second);
         double log_fpkm = trans.frag_count() - log(trans.length());
         runexpr_file << sexp(log_fpkm - sum) << '\t';
     }   

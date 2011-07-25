@@ -194,7 +194,7 @@ void process_fragment(double mass_n, Fragment* frag_p, FLD* fld, BiasBoss* bias_
             cerr << "ERROR: Transcript " << m.name << " not found in reference fasta.";
             exit(1);
         }
-        t->add_mass(mass_n);
+        t->add_mass(0, mass_n);
         fld->add_val(m.length(), mass_n);
         if (bias_table)
             bias_table->update_observed(m, *t, mass_n);
@@ -231,7 +231,7 @@ void process_fragment(double mass_n, Fragment* frag_p, FLD* fld, BiasBoss* bias_
         
         assert(!isinf(sexp(mass_t)) && !isinf(mass_t) && !isnan(mass_t));
         
-        t->add_mass(mass_t);
+        t->add_mass(p, mass_n);
         fld->add_val(m.length(), mass_t);
  
         if (bias_table)
@@ -317,6 +317,7 @@ void threaded_calc_abundances(MapParser& map_parser, TranscriptTable* trans_tabl
 
 int main (int argc, char ** argv)
 {
+        
     int parse_ret = parse_options(argc,argv);
     if (parse_ret)
         return parse_ret;
