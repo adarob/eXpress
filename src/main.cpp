@@ -291,7 +291,7 @@ void threaded_calc_abundances(MapParser& map_parser, TranscriptTable* trans_tabl
         if (!frag)
         {
             ts.proc_lk.unlock();
-            return;
+            break;
         }
         
         n++;
@@ -327,6 +327,10 @@ void threaded_calc_abundances(MapParser& map_parser, TranscriptTable* trans_tabl
         
         process_fragment(mass_n, frag, fld, bias_table, mismatch_table, trans_table);
     }
+
+    cout << "END: " << n << "\n";
+    running_expr_file << n << '\t';
+    trans_table->output_current(running_expr_file);
     running_expr_file.close();
 }
 
