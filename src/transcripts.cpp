@@ -23,7 +23,7 @@ using namespace std;
 
 Transcript::Transcript(const std::string& name, const std::string& seq, double alpha, const FLD* fld, const BiasBoss* bias_table, const MismatchTable* mismatch_table)
 :_name(name),
-_id(hash_trans_name(name.c_str())),
+_id(hash_trans_name(name)),
 _seq(seq),
 _len(seq.length()),
 _counts(log(seq.length()*alpha)),
@@ -183,6 +183,20 @@ Transcript* TranscriptTable::get_trans(TransID id)
         return it->second;
     return NULL;
 }
+
+void TranscriptTable::update_covar(TransID trans1, TransID trans2, double covar)
+{
+    size_t pair_id = hash_trans_pair(trans1, trans2);
+    if (_covar_map.count(pair_id))
+    {
+        _covar_map[pair_id] = log_sum(covar, _covar_map[pair_id]);
+    }
+    else
+    {
+        _covar_map[pair_id] = covar;
+    }
+}
+
 
 void TranscriptTable::threaded_bias_update()
 {

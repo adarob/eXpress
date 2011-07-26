@@ -40,6 +40,7 @@ bool user_provided_fld = false;
 
 bool bias_correct = false;
 bool upper_quart_norm = false;
+bool calc_covar = false;
 
 bool in_between = false;
 
@@ -57,22 +58,25 @@ void print_usage()
     fprintf(stderr, " -m/--frag-len-mean    average fragment length (unpaired reads only)         [ default:    200 ]\n");
     fprintf(stderr, " -s/--frag-len-std-dev fragment length std deviation (unpaired reads only)   [ default:     80 ]\n");
     fprintf(stderr, " --upper-quartile-norm use upper-quartile normalization                      [ default:  FALSE ]\n");
+    fprintf(stderr, " --calc-covar          calculate covariance matrix                           [ default:  FALSE ]\n");
     fprintf(stderr, " --no-bias-correct     do not correct for fragment bias                      [ default:  FALSE ]\n");
 }
 
 #define OPT_UPPER_QUARTILE_NORM 200
 #define OPT_NO_BIAS_CORRECT 201
 #define OPT_IN_BETWEEN 202
+#define OPT_CALC_COVAR 203
 
 const char *short_options = "o:f:m:s";
 
 static struct option long_options[] = {
     // general options
-    {"output-dir",              required_argument,	 0,	     'o'},
+    {"output-dir",              required_argument,	     0,	         'o'},
     {"forget-param",            required_argument,       0,          'f'},
-    {"frag-len-mean",		required_argument,       0,          'm'},
-    {"frag-len-std-dev",	required_argument,       0,          's'},
+    {"frag-len-mean",		    required_argument,       0,          'm'},
+    {"frag-len-std-dev",	    required_argument,       0,          's'},
     {"upper-quartile-norm",     no_argument,             0,          OPT_UPPER_QUARTILE_NORM},
+    {"calc-covar",              no_argument,             0,          OPT_CALC_COVAR},
     {"no-bias-correct",         no_argument,             0,          OPT_NO_BIAS_CORRECT},
     {"in-between",              no_argument,             0,          OPT_IN_BETWEEN},
     {0, 0, 0, 0} // terminator
@@ -158,6 +162,9 @@ int parse_options(int argc, char** argv)
 			case OPT_UPPER_QUARTILE_NORM:
                 upper_quart_norm = true;
                 break;
+            case OPT_CALC_COVAR:
+                calc_covar = true;
+                break;
             case OPT_NO_BIAS_CORRECT:
                 bias_correct = false;
                 break;
@@ -175,7 +182,7 @@ int parse_options(int argc, char** argv)
 
 
 
-void process_fragment(double mass_n, Fragment* frag_p, FLD* fld, BiasBoss* bias_table, MismatchTable* mismatch_table)
+void process_fragment(double mass_n, Fragment* frag_p, FLD* fld, BiasBoss* bias_table, MismatchTable* mismatch_table, TranscriptTable* trans_table)
 {
     Fragment& frag = *frag_p;
     
@@ -218,7 +225,6 @@ void process_fragment(double mass_n, Fragment* frag_p, FLD* fld, BiasBoss* bias_
         return;
     }
 
-    double total_p = 0.0;
     for(size_t i = 0; i < frag.num_maps(); ++i)
     {
         const FragMap& m = *frag.maps()[i];
@@ -238,8 +244,21 @@ void process_fragment(double mass_n, Fragment* frag_p, FLD* fld, BiasBoss* bias_
             bias_table->update_observed(m, *t, mass_t);
         mismatch_table->update(m, *t, mass_t);
         
-        log_sum(total_p, p);
+        if (calc_covar)
+        {
+            for(size_t j = i+1; j < frag.num_maps(); ++j)
+            {
+                const FragMap& m2 = *frag.maps()[j];
+                double p2 = likelihoods[j]-total_likelihood;
+                if (sexp(p2) == 0)
+                    continue;
+                
+                double covar = 2*mass_n + p + p2;
+                trans_table -> update_covar(m.trans_id, m2.trans_id, covar); 
+            }
+        }
     }
+        
     delete frag_p;
 }
 
@@ -288,9 +307,9 @@ void threaded_calc_abundances(MapParser& map_parser, TranscriptTable* trans_tabl
         }
         
         // Output progress
-        if (n % 1000000 == 0)
+        if (n % 10000 == 0)
         {
-	  cout << n << '\t' << scientific << mass_n << '\n';
+            cout << n << '\t' << scientific << mass_n << '\t' << trans_table->covar_size() <<'\n';
         }
         
         
@@ -306,14 +325,13 @@ void threaded_calc_abundances(MapParser& map_parser, TranscriptTable* trans_tabl
        }
         assert(!isnan(mass_n));
         
-        process_fragment(mass_n, frag, fld, bias_table, mismatch_table);
+        process_fragment(mass_n, frag, fld, bias_table, mismatch_table, trans_table);
     }
     running_expr_file.close();
 }
 
 int main (int argc, char ** argv)
-{
-        
+{    
     int parse_ret = parse_options(argc,argv);
     if (parse_ret)
         return parse_ret;

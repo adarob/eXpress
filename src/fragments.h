@@ -15,7 +15,7 @@
 #include <fstream>
 #include <boost/thread.hpp>
 
-typedef uint64_t TransID;
+typedef size_t TransID;
 class Transcript;
 class TranscriptTable;
 

@@ -11,7 +11,8 @@
 
 #include <string>
 #include <map>
-#include <tr1/unordered_map>
+#include <boost/unordered_map.hpp>
+#include <boost/functional/hash.hpp>
 #include <vector>
 #include <boost/thread.hpp>
 #include <iostream>
@@ -24,19 +25,15 @@ class FragMap;
 class BiasBoss;
 class MismatchTable;
 
-typedef uint64_t TransID;
+typedef size_t TransID;
 
-// This is FNV-1, see http://en.wikipedia.org/wiki/Fowler_Noll_Vo_hash
-inline TransID hash_trans_name(const char* name)
+static boost::hash<std::string> hash_trans_name;
+
+static size_t hash_trans_pair(TransID trans1, TransID trans2)
 {
-    const char * __s = name;
-    uint64_t hash = 0xcbf29ce484222325ull;
-    for ( ; *__s; ++__s)
-    {
-        hash *= 1099511628211ull;
-        hash ^= *__s;
-    }
-    return hash;
+    size_t seed = std::min(trans1, trans2);
+    boost::hash_combine(seed, std::max(trans1, trans2));
+    return seed;
 }
 
 /**
@@ -131,7 +128,7 @@ public:
         assert(sexp(p) != 0);
         _counts = log_sum(_counts, p+mass);
         if (p != 0.0)
-            _var = log_sum(_var, 2*mass + p + log(1-sexp(p)));
+            _var = log_sum(_var, mass + p + log(1-sexp(p)));
     }  
     
     void set_counts(double counts)
@@ -153,7 +150,8 @@ public:
     const FLD* fld() { return _fld; }
 };
 
-typedef std::tr1::unordered_map<TransID, Transcript*> TransMap;
+typedef boost::unordered_map<TransID, Transcript*> TransMap;
+typedef boost::unordered_map<size_t, double> TransPairMap;
 
 /**
  * TranscriptTable class.  This class is used to keep track of the Transcript objects for a run.
@@ -166,7 +164,7 @@ class TranscriptTable
      * a map to look up pointers to Transcript objects by their string id
      */
     TransMap _trans_map;
-    
+    TransPairMap _covar_map;
     double _alpha;
     
     /**
@@ -200,7 +198,10 @@ public:
      * a member function that returns the number of transcripts in the table
      * @return number of transcripts in the table
      */
-    size_t size() { return _trans_map.size(); }
+    size_t size() const { return _trans_map.size(); }
+    
+    void update_covar(TransID trans1, TransID trans2, double covar);
+    size_t covar_size() const { return _covar_map.size(); }
     
     void threaded_bias_update();
     
