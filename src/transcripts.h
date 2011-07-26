@@ -131,7 +131,7 @@ public:
         assert(sexp(p) != 0);
         _counts = log_sum(_counts, p+mass);
         if (p != 0.0)
-            _var = log_sum(_var, mass + p + log(1-sexp(p)));
+            _var = log_sum(_var, 2*mass + p + log(1-sexp(p)));
     }  
     
     void set_counts(double counts)

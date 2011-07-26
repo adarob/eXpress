@@ -221,13 +221,13 @@ void process_fragment(double mass_n, Fragment* frag_p, FLD* fld, BiasBoss* bias_
     double total_p = 0.0;
     for(size_t i = 0; i < frag.num_maps(); ++i)
     {
-        if (sexp(likelihoods[i]) == 0)
-            continue;
-        
         const FragMap& m = *frag.maps()[i];
         Transcript* t  = m.mapped_trans;
         double p = likelihoods[i]-total_likelihood;
         double mass_t = mass_n + p;
+        
+        if (sexp(p) == 0)
+            continue;
         
         assert(!isinf(sexp(mass_t)) && !isinf(mass_t) && !isnan(mass_t));
         
