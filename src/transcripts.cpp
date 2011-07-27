@@ -97,8 +97,9 @@ void Transcript::update_transcript_bias()
 }
 
 TranscriptTable::TranscriptTable(const string& trans_fasta_file, double alpha, const FLD* fld, BiasBoss* bias_table, const MismatchTable* mismatch_table)
+: _alpha(alpha),
+  _partition(_rank, _parent)
 {
-    _alpha = alpha;
     ifstream infile (trans_fasta_file.c_str());
     string line;
     string seq = "";
@@ -174,6 +175,7 @@ void TranscriptTable::add_trans(Transcript* trans)
     }
     
     _trans_map.insert(make_pair(trans->id(), trans));
+    _partition.make_set(trans->id());
 }
 
 Transcript* TranscriptTable::get_trans(TransID id)

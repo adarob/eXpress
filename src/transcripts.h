@@ -13,6 +13,7 @@
 #include <map>
 #include <boost/unordered_map.hpp>
 #include <boost/functional/hash.hpp>
+#include <boost/pending/disjoint_sets.hpp>
 #include <vector>
 #include <boost/thread.hpp>
 #include <iostream>
@@ -153,6 +154,10 @@ public:
 typedef boost::unordered_map<TransID, Transcript*> TransMap;
 typedef boost::unordered_map<size_t, double> TransPairMap;
 
+typedef boost::unordered_map<TransID, size_t> Rank;
+typedef boost::unordered_map<TransID, TransID> Parent;
+typedef boost::disjoint_sets<Rank, Parent> TransPartition;
+
 /**
  * TranscriptTable class.  This class is used to keep track of the Transcript objects for a run.
  * The constructor parses a fasta file to generate the Transcript objects and store them in a map
@@ -165,6 +170,11 @@ class TranscriptTable
      */
     TransMap _trans_map;
     TransPairMap _covar_map;
+    
+    Rank _rank;
+    Parent _parent;
+    TransPartition _partition;
+    
     double _alpha;
     
     /**
