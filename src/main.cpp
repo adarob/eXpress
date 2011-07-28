@@ -225,6 +225,7 @@ void process_fragment(double mass_n, Fragment* frag_p, FLD* fld, BiasBoss* bias_
         return;
     }
 
+    TransID bundle_rep = trans_table->get_trans_rep(frag.maps()[0]->trans_id);
     for(size_t i = 0; i < frag.num_maps(); ++i)
     {
         const FragMap& m = *frag.maps()[i];
@@ -232,11 +233,16 @@ void process_fragment(double mass_n, Fragment* frag_p, FLD* fld, BiasBoss* bias_
         double p = likelihoods[i]-total_likelihood;
         double mass_t = mass_n + p;
         
+        if (i > 0)
+        {
+            TransID m_rep = trans_table->get_trans_rep(m.trans_id);
+            if (m_rep != bundle_rep)
+                bundle_rep = trans_table->merge_bundles(bundle_rep, m_rep);
+        }
+        
         if (sexp(p) == 0)
             continue;
-        
-        assert(!isinf(sexp(mass_t)) && !isinf(mass_t) && !isnan(mass_t));
-        
+                
         t->add_mass(p, mass_n);
         fld->add_val(m.length(), mass_t);
  
@@ -307,9 +313,9 @@ void threaded_calc_abundances(MapParser& map_parser, TranscriptTable* trans_tabl
         }
         
         // Output progress
-        if (n % 10000 == 0)
+        if (n == 1 || n % 10000 == 0)
         {
-            cout << n << '\t' << scientific << mass_n << '\t' << trans_table->covar_size() <<'\n';
+            cout << n << '\t' << scientific << mass_n << '\t' << trans_table->covar_size() << '\t' << trans_table->num_bundles() <<'\n';
         }
         
         
@@ -372,6 +378,7 @@ int main (int argc, char ** argv)
     
     fld.output(output_dir);
     mismatch_table.output(output_dir);
+    trans_table.output_bundles(output_dir);
     trans_table.output_expression(output_dir);
     return 0;
 }

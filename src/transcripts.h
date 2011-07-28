@@ -154,8 +154,10 @@ public:
 typedef boost::unordered_map<TransID, Transcript*> TransMap;
 typedef boost::unordered_map<size_t, double> TransPairMap;
 
-typedef boost::unordered_map<TransID, size_t> Rank;
-typedef boost::unordered_map<TransID, TransID> Parent;
+typedef boost::unordered_map<TransID, size_t> RankMap;
+typedef boost::unordered_map<TransID, TransID> ParentMap;
+typedef boost::associative_property_map<RankMap> Rank;
+typedef boost::associative_property_map<ParentMap> Parent;
 typedef boost::disjoint_sets<Rank, Parent> TransPartition;
 
 /**
@@ -171,9 +173,11 @@ class TranscriptTable
     TransMap _trans_map;
     TransPairMap _covar_map;
     
+    RankMap _rank_map;
+    ParentMap _parent_map;
     Rank _rank;
     Parent _parent;
-    TransPartition _partition;
+    TransPartition _bundles;
     
     double _alpha;
     
@@ -213,11 +217,15 @@ public:
     void update_covar(TransID trans1, TransID trans2, double covar);
     size_t covar_size() const { return _covar_map.size(); }
     
+    TransID get_trans_rep(TransID trans);
+    TransID merge_bundles(TransID rep1, TransID rep2);
+    size_t num_bundles();
+    void output_bundles(std::string output_dir);
+    
     void threaded_bias_update();
     
     void output_header(std::ofstream& runexpr_file);
     void output_current(std::ofstream& runexpr_file);
-
     void output_expression(std::string output_dir);
 };
 

@@ -17,7 +17,6 @@
 #include <math.h>
 #include <assert.h>
 
-
 using namespace std;
 
 
@@ -98,7 +97,9 @@ void Transcript::update_transcript_bias()
 
 TranscriptTable::TranscriptTable(const string& trans_fasta_file, double alpha, const FLD* fld, BiasBoss* bias_table, const MismatchTable* mismatch_table)
 : _alpha(alpha),
-  _partition(_rank, _parent)
+  _rank(Rank(_rank_map)),
+  _parent(Parent(_parent_map)),
+  _bundles(_rank, _parent)
 {
     ifstream infile (trans_fasta_file.c_str());
     string line;
@@ -175,7 +176,7 @@ void TranscriptTable::add_trans(Transcript* trans)
     }
     
     _trans_map.insert(make_pair(trans->id(), trans));
-    _partition.make_set(trans->id());
+    _bundles.make_set(trans->id());
 }
 
 Transcript* TranscriptTable::get_trans(TransID id)
@@ -199,6 +200,48 @@ void TranscriptTable::update_covar(TransID trans1, TransID trans2, double covar)
     }
 }
 
+TransID TranscriptTable::get_trans_rep(TransID trans)
+{
+    return _bundles.find_set(trans);
+}
+
+
+TransID TranscriptTable::merge_bundles(TransID rep1, TransID rep2)
+{
+    _bundles.link(rep1, rep2);
+    return _bundles.find_set(rep1);
+}
+
+size_t TranscriptTable::num_bundles()
+{
+    size_t count = 0;
+    for(TransMap::const_iterator it = _trans_map.begin(); it != _trans_map.end(); ++it)
+    {
+        if (_bundles.find_set(it->first) == it->first)
+            count ++;
+    }
+    return count;
+}
+
+void TranscriptTable::output_bundles(string output_dir)
+{
+    ofstream bundle_file((output_dir + "/bundles.tab").c_str());
+    
+    typedef boost::unordered_map<TransID, string> BundleMap;
+    BundleMap b_map;
+    for( TransMap::iterator it = _trans_map.begin(); it != _trans_map.end(); ++it)
+    {
+        TransID rep = _bundles.find_set(it->first);
+        b_map[rep] += '\t' + (it->second)->name();
+    }
+    
+    for (BundleMap::iterator it = b_map.begin(); it != b_map.end(); ++it)
+    {
+        bundle_file << it->second << '\n';
+    }
+    
+    bundle_file.close();
+}
 
 void TranscriptTable::threaded_bias_update()
 {
