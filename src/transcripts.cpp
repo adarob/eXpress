@@ -300,7 +300,7 @@ void TranscriptTable::output_current(ofstream& runexpr_file)
 void TranscriptTable::output_expression(string output_dir, size_t tot_counts)
 {
     FILE * expr_file = fopen((output_dir + "/transcripts.expr").c_str(), "w");
-    fprintf(expr_file, "Transcript\tFPKM\tCount\n");
+    fprintf(expr_file, "bundle_id\ttranscript_id\texp_counts\tbundle_frac\trho\n");
     double l_bil = log(1000000000);
     double l_tot_counts = log(tot_counts);
 
@@ -327,17 +327,29 @@ void TranscriptTable::output_expression(string output_dir, size_t tot_counts)
             bundle_counts += bundle_trans[i]->bundle_counts();
             l_bundle_mass = log_sum(l_bundle_mass, bundle_trans[i]->mass()); 
         }
-        double l_bundle_counts = log(bundle_counts);
-        double l_bundle_rho = l_bundle_counts - l_tot_counts;;
         
-        // Calculate individual counts and rhos
-        for (size_t i = 0; i < bundle_trans.size(); ++i)
+        if (bundle_counts)
         {
-            Transcript& trans = *bundle_trans[i];
-            double l_trans_frac = trans.mass() - l_bundle_mass;
-            double l_trans_rho = l_trans_frac + l_bundle_rho;
-            double l_trans_counts = l_trans_frac + l_bundle_counts;
-            fprintf(expr_file, "%z\t%s\t%f\t%f\t%f\n", bundle_id, trans.name().c_str(), sexp(l_trans_counts), sexp(l_trans_frac), sexp(l_trans_rho));
+            double l_bundle_counts = log(bundle_counts);
+            double l_bundle_rho = l_bundle_counts - l_tot_counts;;
+            
+            // Calculate individual counts and rhos
+            for (size_t i = 0; i < bundle_trans.size(); ++i)
+            {
+                Transcript& trans = *bundle_trans[i];
+                double l_trans_frac = trans.mass() - l_bundle_mass;
+                double l_trans_rho = l_trans_frac + l_bundle_rho;
+                double l_trans_counts = l_trans_frac + l_bundle_counts;
+                fprintf(expr_file, "%z\t%s\t%f\t%f\t%f\n", bundle_id, trans.name().c_str(), sexp(l_trans_counts), sexp(l_trans_frac), sexp(l_trans_rho));
+            }
+        }
+        else
+        {
+            for (size_t i = 0; i < bundle_trans.size(); ++i)
+            {
+                Transcript& trans = *bundle_trans[i];
+                fprintf(expr_file, "%z\t%s\t%f\t%f\t%f\n", bundle_id, trans.name().c_str(), 0.0, 0.0, 0.0);
+            }   
         }
 
     }
