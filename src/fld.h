@@ -21,7 +21,7 @@ class FLD
     /**
      * a private double that stores the total observed counts
      */
-    double _num_obs;
+    double _tot_mass;
     
     /**
      * a private double that stores the sum of the observations for quick mean calculations
@@ -71,7 +71,7 @@ public:
      * a member function that returns the number of observed fragmaps (including pseudo-counts)
      * @return number of observed fragments
      */ 
-    double num_obs() const;
+    double tot_mass() const;
     
     void output(std::string path) const;
 

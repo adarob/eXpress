@@ -19,7 +19,7 @@ const vector<double> KERNEL = boost::assign::list_of(-1.20411998)(-0.602059991)(
 
 FLD::FLD(double alpha, size_t max_val) : 
     _hist(max_val+1, log(alpha)),
-    _num_obs(log(max_val * alpha)), 
+    _tot_mass(log(max_val * alpha)), 
     _sum(log((max_val)*(max_val+1)*alpha/2)),
     _min(max_val)
 {
@@ -44,24 +44,24 @@ void FLD::add_val(size_t len, double mass)
         _hist[offset] = log_sum(_hist[offset], k_mass);
         _sum = log_sum(_sum, log(offset++)+k_mass);
     }
-    _num_obs = log_sum(_num_obs, mass);
+    _tot_mass = log_sum(_tot_mass, mass);
 }
 
 double FLD::pdf(size_t len) const
 {
     if (len > max_val())
         return HUGE_VAL;
-    return _hist[len]-_num_obs;
+    return _hist[len]-_tot_mass;
 }
 
-double FLD::num_obs() const
+double FLD::tot_mass() const
 {
-    return _num_obs;
+    return _tot_mass;
 }
 
 double FLD::mean() const
 {
-    return _sum - num_obs();
+    return _sum - tot_mass();
 }
 
 void FLD::output(string path) const

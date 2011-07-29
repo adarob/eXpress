@@ -186,12 +186,9 @@ void process_fragment(double mass_n, Fragment* frag_p, FLD* fld, BiasBoss* bias_
 {
     Fragment& frag = *frag_p;
     
-    if (frag.num_maps()==0)
-    {
-        delete frag_p;
-        return;
-    }
-
+    assert(frag.num_maps());
+    
+    frag.maps()[0]->mapped_trans->incr_bundle_counts();
     if (frag.num_maps()==1)
     {
         const FragMap& m = *frag.maps()[0];
@@ -268,7 +265,7 @@ void process_fragment(double mass_n, Fragment* frag_p, FLD* fld, BiasBoss* bias_
     delete frag_p;
 }
 
-void threaded_calc_abundances(MapParser& map_parser, TranscriptTable* trans_table, FLD* fld, BiasBoss* bias_table, MismatchTable* mismatch_table)
+size_t threaded_calc_abundances(MapParser& map_parser, TranscriptTable* trans_table, FLD* fld, BiasBoss* bias_table, MismatchTable* mismatch_table)
 {
     ParseThreadSafety ts;
     ts.proc_lk.lock();
@@ -302,13 +299,13 @@ void threaded_calc_abundances(MapParser& map_parser, TranscriptTable* trans_tabl
         
         n++;
 
-        //Output rhos on log scale
+        //Output current values on log scale
         if (n == i * pow(10.,m))
         {
             running_expr_file << n << '\t';  
             trans_table->output_current(running_expr_file);
             running_expr_file.flush();
-	    m += (i==9);
+            m += (i==9);
             i = (i==9) ? 1 : (i+1);
         }
         
@@ -320,15 +317,15 @@ void threaded_calc_abundances(MapParser& map_parser, TranscriptTable* trans_tabl
         
         
         // Update mass_n based on forgetting factor
-	int k = (in_between) ? quantile(geom, rand()/double(RAND_MAX)) : 1;
+        int k = (in_between) ? quantile(geom, rand()/double(RAND_MAX)) : 1;
 
-	for (int j = 0; j < k; ++j)
-	{
-	    if (++fake_n > 1)
-	    {
-	      mass_n += ff_param*log(fake_n-1) - log(pow(fake_n,ff_param) - 1);
-	    }
-       }
+        for (int j = 0; j < k; ++j)
+        {
+            if (++fake_n > 1)
+            {
+                mass_n += ff_param*log(fake_n-1) - log(pow(fake_n,ff_param) - 1);
+            }
+        }
         assert(!isnan(mass_n));
         
         process_fragment(mass_n, frag, fld, bias_table, mismatch_table, trans_table);
@@ -338,6 +335,8 @@ void threaded_calc_abundances(MapParser& map_parser, TranscriptTable* trans_tabl
     running_expr_file << n << '\t';
     trans_table->output_current(running_expr_file);
     running_expr_file.close();
+    
+    return n;
 }
 
 int main (int argc, char ** argv)
@@ -374,11 +373,11 @@ int main (int argc, char ** argv)
 
     if (bias_table)
         boost::thread bias_update(&TranscriptTable::threaded_bias_update, &trans_table);
-    threaded_calc_abundances(map_parser, &trans_table, &fld, bias_table, &mismatch_table);
+    size_t tot_counts = threaded_calc_abundances(map_parser, &trans_table, &fld, bias_table, &mismatch_table);
     
     fld.output(output_dir);
     mismatch_table.output(output_dir);
     trans_table.output_bundles(output_dir);
-    trans_table.output_expression(output_dir);
+    trans_table.output_expression(output_dir, tot_counts);
     return 0;
 }

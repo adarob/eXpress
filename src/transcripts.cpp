@@ -16,6 +16,7 @@
 #include <fstream>
 #include <math.h>
 #include <assert.h>
+#include <stdio.h>
 
 using namespace std;
 
@@ -25,7 +26,7 @@ Transcript::Transcript(const std::string& name, const std::string& seq, double a
 _id(hash_trans_name(name)),
 _seq(seq),
 _len(seq.length()),
-_counts(log(seq.length()*alpha)),
+_mass(log(seq.length()*alpha)),
 _start_bias(std::vector<double>(seq.length(),0)),
 _end_bias(std::vector<double>(seq.length(),0)),
 _avg_bias(0),
@@ -38,7 +39,7 @@ double Transcript::log_likelihood(const FragMap& frag) const
 {
     boost::mutex::scoped_lock lock(_bias_lock);
 
-    double ll = frag_count();
+    double ll = mass();
     ll += _mismatch_table->log_likelihood(frag, *this);
     
     switch(frag.pair_status())
@@ -208,8 +209,11 @@ TransID TranscriptTable::get_trans_rep(TransID trans)
 
 TransID TranscriptTable::merge_bundles(TransID rep1, TransID rep2)
 {
+    assert(rep1 != rep2);
     _bundles.link(rep1, rep2);
-    return _bundles.find_set(rep1);
+    
+    TransID new_rep = _bundles.find_set(rep1);
+    return new_rep;
 }
 
 size_t TranscriptTable::num_bundles()
@@ -277,7 +281,7 @@ void TranscriptTable::output_current(ofstream& runexpr_file)
     for( TransMap::iterator it = _trans_map.begin(); it != _trans_map.end(); ++it)
     {
         Transcript& trans = *(it->second);
-        double log_fpkm = trans.frag_count() - log(trans.length());
+        double log_fpkm = trans.mass() - log(trans.length());
         sum = log_sum(sum, log_fpkm);
     }   
     
@@ -285,26 +289,67 @@ void TranscriptTable::output_current(ofstream& runexpr_file)
     {
 
         Transcript& trans = *(it->second);
-        double log_fpkm = trans.frag_count() - log(trans.length());
+        double log_fpkm = trans.mass() - log(trans.length());
         runexpr_file << sexp(log_fpkm - sum) << '\t';
     }   
     runexpr_file << '\n';
 }
 
 
-void TranscriptTable::output_expression(string output_dir)
+void TranscriptTable::output_expression(string output_dir, size_t tot_counts)
 {
-    ofstream expr_file((output_dir + "/transcripts.expr").c_str());
-    expr_file << "Transcript\tFPKM\tCount\n";
-    double log_bil = log(1000000000);
+    FILE * expr_file = fopen((output_dir + "/transcripts.expr").c_str(), "w");
+    fprintf(expr_file, "Transcript\tFPKM\tCount\n");
+    double l_bil = log(1000000000);
+    double l_tot_counts = log(tot_counts);
 
+    // Bundle transcripts based on partition
+    typedef boost::unordered_map<TransID, vector<Transcript*> > BundleMap;
+    BundleMap b_map;
     for( TransMap::iterator it = _trans_map.begin(); it != _trans_map.end(); ++it)
     {
-        Transcript& trans = *(it->second);
-        double M = trans.fld()->num_obs();
-        trans.update_transcript_bias();
-        double fpkm = trans.frag_count() - trans.effective_length() + log_bil - M;
-        expr_file << trans.name() << '\t' << sexp(fpkm) << '\t' << sexp(trans.frag_count()) << '\n';
-    }   
-    expr_file.close();
+        TransID rep = _bundles.find_set(it->first);
+        b_map[rep].push_back(it->second);
+    }
+    
+    size_t bundle_id = 0;
+    for (BundleMap::iterator it = b_map.begin(); it != b_map.end(); ++it)
+    {
+        ++bundle_id;
+        vector<Transcript*> bundle_trans = it->second;
+        
+        // Calculate total counts for bundle and bundle-level rho
+        size_t bundle_counts = 0;
+        double l_bundle_mass = HUGE_VAL;
+        for (size_t i = 0; i < bundle_trans.size(); ++i)
+        {
+            bundle_counts += bundle_trans[i]->bundle_counts();
+            l_bundle_mass = log_sum(l_bundle_mass, bundle_trans[i]->mass()); 
+        }
+        double l_bundle_counts = log(bundle_counts);
+        double l_bundle_rho = l_bundle_counts - l_tot_counts;;
+        
+        // Calculate individual counts and rhos
+        for (size_t i = 0; i < bundle_trans.size(); ++i)
+        {
+            Transcript& trans = *bundle_trans[i];
+            double l_trans_frac = trans.mass() - l_bundle_mass;
+            double l_trans_rho = l_trans_frac + l_bundle_rho;
+            double l_trans_counts = l_trans_frac + l_bundle_counts;
+            fprintf(expr_file, "%d\t%s\t%f\t%f", bundle_id, trans.name().c_str(), sexp(l_trans_frac), sexp(l_trans_rho));
+        }
+
+    }
+    
+    
+    
+//    for( TransMap::iterator it = _trans_map.begin(); it != _trans_map.end(); ++it)
+//    {
+//        Transcript& trans = *(it->second);
+//        double M = trans.fld()->tot_mass();
+//        trans.update_transcript_bias();
+//        double fpkm = trans.mass() - trans.effective_length() + log_bil - M;
+//        expr_file << trans.name() << '\t' << sexp(fpkm) << '\t' << sexp(trans.mass()) << '\n';
+//    }   
+//    expr_file.close();
 }
