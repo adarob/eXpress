@@ -340,7 +340,7 @@ void TranscriptTable::output_expression(string output_dir, size_t tot_counts)
                 double l_trans_frac = trans.mass() - l_bundle_mass;
                 double l_trans_rho = l_trans_frac + l_bundle_rho;
                 double l_trans_counts = l_trans_frac + l_bundle_counts;
-                fprintf(expr_file, "%z\t%s\t%f\t%f\t%f\n", bundle_id, trans.name().c_str(), sexp(l_trans_counts), sexp(l_trans_frac), sexp(l_trans_rho));
+                fprintf(expr_file, "%zu\t%s\t%f\t%f\t%f\n", bundle_id, trans.name().c_str(), sexp(l_trans_counts), sexp(l_trans_frac), sexp(l_trans_rho));
             }
         }
         else
@@ -348,7 +348,7 @@ void TranscriptTable::output_expression(string output_dir, size_t tot_counts)
             for (size_t i = 0; i < bundle_trans.size(); ++i)
             {
                 Transcript& trans = *bundle_trans[i];
-                fprintf(expr_file, "%z\t%s\t%f\t%f\t%f\n", bundle_id, trans.name().c_str(), 0.0, 0.0, 0.0);
+                fprintf(expr_file, "%zu\t%s\t%f\t%f\t%f\n", bundle_id, trans.name().c_str(), 0.0, 0.0, 0.0);
             }   
         }
 
