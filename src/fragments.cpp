@@ -172,15 +172,16 @@ void MapParser::threaded_parse(ParseThreadSafety* thread_safety, TranscriptTable
     while (fragments_remain)
     {
         Fragment * frag;
-        while (true)
+        while (fragments_remain)
         {
             frag = new Fragment(); 
             fragments_remain = next_fragment(*frag);
-            if (frag->num_maps() > 0)
+            if (frag->num_maps())
                 break;
             delete frag;
+            frag = NULL;
         }
-        for (size_t i = 0; i < frag->maps().size(); ++i)
+        for (size_t i = 0; frag && i < frag->maps().size(); ++i)
         {
             FragMap& m = *(frag->maps()[i]);
             Transcript* t = trans_table->get_trans(m.trans_id);
