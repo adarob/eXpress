@@ -56,7 +56,7 @@
             isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "--calc-covar -f 0.65 -o /Users/adarob/desktop /Volumes/lmcb.math.berkeley.edu/experiments/cexpress/hg18/mtg_out/mtg_out.fa /Volumes/lmcb.math.berkeley.edu/experiments/cexpress/hg18/mtg_out/hits_1M.sam"
+            argument = "--calc-covar -v -f 0.65 -o /Users/adarob/desktop /Volumes/lmcb.math.berkeley.edu/experiments/cexpress/hg18/mtg_out/mtg_out.fa /Volumes/lmcb.math.berkeley.edu/experiments/cexpress/hg18/mtg_out/hits_1M.sam"
             isEnabled = "YES">
          </CommandLineArgument>
       </CommandLineArguments>

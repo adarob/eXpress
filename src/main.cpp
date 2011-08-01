@@ -325,7 +325,6 @@ size_t threaded_calc_abundances(MapParser& map_parser, TranscriptTable* trans_ta
                 cout << "1 " << mismatch_table->to_string() << '\n';
                 cout << "2 " << bias_table->to_string() << '\n';
                 cout << "3 " << n << '\n';
-                cout << '\n';
             }
             else
             {

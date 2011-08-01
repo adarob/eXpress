@@ -48,7 +48,7 @@ void SeqWeightTable::increment_observed(string& seq, double normalized_mass)
     {
         size_t index = ctoi(seq[i]);
         if (index != 4)
-            _observed.increment(index, normalized_mass);
+            _observed.increment(i, index, normalized_mass);
     }
 }
 
