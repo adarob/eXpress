@@ -349,7 +349,7 @@ void TranscriptTable::output_expression(string output_dir, size_t tot_counts)
             for (size_t i = 0; i < bundle_trans.size(); ++i)
             {
                 Transcript& trans = *bundle_trans[i];
-                fprintf(expr_file, "%zu\t%s\t%zu\t%f%e\t%e\t%e\n", bundle_id, trans.name().c_str(), trans.length(), trans.effective_length(), 0.0, 0.0, 0.0);
+                fprintf(expr_file, "%zu\t%s\t%zu\t%f\t%e\t%e\t%e\n", bundle_id, trans.name().c_str(), trans.length(), trans.effective_length(), 0.0, 0.0, 0.0);
             }   
         }
 
