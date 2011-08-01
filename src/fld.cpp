@@ -64,14 +64,15 @@ double FLD::mean() const
     return _sum - tot_mass();
 }
 
-void FLD::output(string path) const
+string FLD::to_string() const
 {
-    string filename = path + "/frag_len_hist.tab";
-    ofstream outfile(filename.c_str());
-    outfile<<"Length\tMass\n";
+    string s = "";
+    char buffer[50];
     for(size_t i = 0; i < max_val()+1; i++)
     {
-      outfile << i << '\t' << sexp(_hist[i]) << '\n'; 
+        sprintf(buffer, "%e,",sexp(_hist[i]));
+        s += buffer; 
     }
-    outfile.close();
+    s.erase(s.length()-1,1);
+    return s;
 }

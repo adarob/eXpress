@@ -375,7 +375,6 @@ int main (int argc, char ** argv)
         boost::thread bias_update(&TranscriptTable::threaded_bias_update, &trans_table);
     size_t tot_counts = threaded_calc_abundances(map_parser, &trans_table, &fld, bias_table, &mismatch_table);
     
-    fld.output(output_dir);
     mismatch_table.output(output_dir);
     trans_table.output_bundles(output_dir);
     trans_table.output_expression(output_dir, tot_counts);

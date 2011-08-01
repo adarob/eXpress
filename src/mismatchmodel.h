@@ -17,13 +17,13 @@ class MismatchTable
 {
     std::vector<FrequencyMatrix> _first_read_mm;
     std::vector<FrequencyMatrix> _second_read_mm;
-    size_t ctoi(const char c) const;
-    size_t ctoi_r(const char c) const;
+
 public:
     MismatchTable(double alpha);
     double likelihood(const FragMap& f, const Transcript& t) const;
     double log_likelihood(const FragMap& f, const Transcript& t) const;
     void update(const FragMap& f, const Transcript& t, double mass);
+    std::string to_string() const;
     void output(std::string filename);
 };
 

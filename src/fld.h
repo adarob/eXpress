@@ -73,7 +73,7 @@ public:
      */ 
     double tot_mass() const;
     
-    void output(std::string path) const;
+    std::string to_string() const;
 
 };
 

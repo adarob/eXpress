@@ -33,6 +33,7 @@ double FrequencyMatrix::operator()(size_t i) const
     return operator()(0, i);
 }
 
+
 void FrequencyMatrix::increment(size_t i, size_t j, double incr_amt)
 {
     assert(i*_N+j < _M*_N);

@@ -15,50 +15,6 @@
 
 using namespace std;
 
-const size_t MAX_READ_LEN = 200;
-
-inline size_t MismatchTable::ctoi(const char c) const
-{
-    switch(c)
-    {
-        case 'A':
-        case 'a':
-            return 0;
-        case 'C':
-        case 'c':
-            return 1;
-        case 'G':
-        case 'g':
-            return 2;
-        case 'T':
-        case 't':
-            return 3;
-        default:
-            return 4;
-    }
-}
-
-inline size_t MismatchTable::ctoi_r(const char c) const
-{
-    switch(c)
-    {
-        case 'A':
-        case 'a':
-            return 3;
-        case 'C':
-        case 'c':
-            return 2;
-        case 'G':
-        case 'g':
-            return 1;
-        case 'T':
-        case 't':
-            return 0;
-        default:
-            return 4;
-    }
-}
-
 MismatchTable::MismatchTable(double alpha)
 {
     _first_read_mm = vector<FrequencyMatrix>(MAX_READ_LEN, FrequencyMatrix(16, 4, alpha));
@@ -146,6 +102,38 @@ void MismatchTable::update(const FragMap& f, const Transcript& t, double mass)
         }
         prev = ref;
     }
+}
+
+string MismatchTable::to_string() const
+{
+    string s = "";
+    char buff[50];
+    for (size_t k = 0; k < MAX_READ_LEN; k++)
+    {
+        for (size_t ref = 0; ref < NUM_NUCS; ref++)
+        {
+            vector<double> mass(4, HUGE_VAL);
+            double tot = HUGE_VAL;
+            for (size_t prev = 0; prev < NUM_NUCS; prev++)
+            {
+                size_t col_i = prev << 2 + ref;
+                for (size_t obs = 0; obs < NUM_NUCS; obs++)
+                {
+                    size_t arr_i = col_i << 2 + obs;
+                    double val =  _first_read_mm[k].arr(arr_i);
+                    mass[obs] = log_sum(mass[obs], val);
+                    tot = log_sum(tot, val);
+                }
+            }
+            for (size_t obs = 0; obs < NUM_NUCS; obs++)
+            {
+                sprintf(buff, "%e,", sexp(mass[obs]-tot));
+                s += buff;
+            }
+        }
+    }
+    s.erase(s.length()-1,1);
+    return s;
 }
 
 void MismatchTable::output(string path)

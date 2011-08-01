@@ -339,7 +339,7 @@ void TranscriptTable::output_expression(string output_dir, size_t tot_counts)
                 Transcript& trans = *bundle_trans[i];
                 double l_trans_frac = trans.mass() - l_bundle_mass;
                 double l_trans_counts = l_trans_frac + l_bundle_counts;
-                double l_trans_fpkm = l_bil + l_trans_counts - log(trans.length()) - l_tot_counts;
+                double l_trans_fpkm = l_bil + l_trans_counts - log(trans.effective_length()) - l_tot_counts;
                 fprintf(expr_file, "%zu\t%s\t%e\t%e\t%e\n", bundle_id, trans.name().c_str(), sexp(l_trans_counts), sexp(l_trans_frac), sexp(l_trans_fpkm));
             }
         }

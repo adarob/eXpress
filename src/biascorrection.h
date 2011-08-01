@@ -42,12 +42,6 @@ class SeqWeightTable
      */
     mutable boost::mutex _lock;
     
-    /**
-     * a private function that converts a nucleotide character into an integer representation
-     * @param c a char representing a nucleotide
-     * @return an unsigned integer representing the nucleotide (0-3) or 4 if not a nucleotide
-     */
-    size_t ctoi(char c) const;
 public:
     
     /**
@@ -77,6 +71,8 @@ public:
      * @return the bias weight for the bias window which is the product of the individual nucleotide bias weights
      */
     double get_weight(const std::string& seq, size_t i) const;
+    
+    std::string to_string() const;
 };
 
 /**
@@ -234,6 +230,8 @@ public:
      * @return the product of the average 5' and 3' bias
      */
     double get_transcript_bias(std::vector<double>& start_bias, std::vector<double>& end_bias, const Transcript& trans) const;
+    
+    std::string to_string() const;
 };
 
 

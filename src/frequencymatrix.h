@@ -26,6 +26,9 @@ public:
     double operator()(size_t i) const;
     void increment(size_t i, size_t j, double incr_amt);
     void increment(size_t i, double incr_amt);
+    
+    double arr(size_t i) const { return _array[i]; }
+    double col(size_t j) const { return _colsums[j]; } 
 };
 
 #endif

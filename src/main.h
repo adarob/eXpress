@@ -12,6 +12,10 @@
 #include <cassert>
 #include <algorithm>
 
+
+const size_t MAX_READ_LEN = 200;
+const int NUM_NUCS = 4;
+
 inline double log_sum(double x, double y)
 {
     if (fabs(x) == HUGE_VAL)
@@ -37,5 +41,50 @@ inline double sexp(double x)
         return 0.0;
     return exp(x);
 }
+
+inline size_t ctoi(const char c)
+{
+    switch(c)
+    {
+        case 'A':
+        case 'a':
+            return 0;
+        case 'C':
+        case 'c':
+            return 1;
+        case 'G':
+        case 'g':
+            return 2;
+        case 'T':
+        case 't':
+            return 3;
+        default:
+            return 4;
+    }
+}
+
+
+inline size_t ctoi_r(const char c)
+{
+    switch(c)
+    {
+        case 'A':
+        case 'a':
+            return 3;
+        case 'C':
+        case 'c':
+            return 2;
+        case 'G':
+        case 'g':
+            return 1;
+        case 'T':
+        case 't':
+            return 0;
+        default:
+            return 4;
+    }
+}
+
+
 
 #endif

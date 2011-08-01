@@ -18,7 +18,6 @@
 
 using namespace std;
 
-const int NUM_NUCS = 4;
 const vector<size_t> LEN_BINS = boost::assign::list_of(791)(1265)(1707)(2433)(999999999); 
 const vector<double> POS_BINS = boost::assign::list_of(0.1)(0.2)(0.3)(0.4)(0.5)(0.6)(0.7)(0.8)(0.9)(1.0);
 
@@ -32,26 +31,26 @@ SeqWeightTable::SeqWeightTable(size_t window_size, double alpha)
  _expected(1, NUM_NUCS, 0) 
 {}
 
-inline size_t SeqWeightTable::ctoi(char c) const
-{
-    switch(c)
-    {
-        case 'A':
-        case 'a':
-            return 0;
-        case 'C':
-        case 'c':
-            return 1;
-        case 'G':
-        case 'g':
-            return 2;
-        case 'T':
-        case 't':
-            return 3;
-        default:
-            return 4;
-    }
-}
+//inline size_t SeqWeightTable::ctoi(char c) const
+//{
+//    switch(c)
+//    {
+//        case 'A':
+//        case 'a':
+//            return 0;
+//        case 'C':
+//        case 'c':
+//            return 1;
+//        case 'G':
+//        case 'g':
+//            return 2;
+//        case 'T':
+//        case 't':
+//            return 3;
+//        default:
+//            return 4;
+//    }
+//}
 
 void SeqWeightTable::increment_expected(char c)
 {
@@ -85,6 +84,22 @@ double SeqWeightTable::get_weight(const string& seq, size_t i) const
             weight += _observed(j, index) - _expected(index);
     }
     return weight;
+}
+
+string SeqWeightTable::to_string() const
+{
+    char buffer[50];
+    string s = "";
+    for(size_t i = 0; i < WINDOW; ++i)
+    {
+        for (size_t j = 0; j < NUM_NUCS; ++j)
+        {
+            sprintf(buffer, "%e,", sexp(_observed(i, j) - _expected(i)));
+            s += buffer;
+        }
+    }
+    s.erase(s.length()-1,1);
+    return s;
 }
 
 PosWeightTable::PosWeightTable(const vector<size_t>& len_bins, const vector<double>& pos_bins, double alpha)
@@ -228,4 +243,10 @@ double BiasBoss::get_transcript_bias(std::vector<double>& start_bias, std::vecto
     double avg_bias = tot_start + tot_end - 2*log(trans.length());
     return avg_bias;
 }
+
+string BiasBoss::to_string() const
+{
+    return _5_seq_bias.to_string();
+}
+
 
