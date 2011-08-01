@@ -38,11 +38,14 @@ int def_fl_mean = 200;
 int def_fl_stddev = 80;
 bool user_provided_fld = false;
 
-bool bias_correct = false;
+bool bias_correct = true;
 bool upper_quart_norm = false;
 bool calc_covar = false;
+bool vis = false;
 
 bool in_between = false;
+
+bool running = true;
 
 void print_usage()
 {
@@ -67,7 +70,7 @@ void print_usage()
 #define OPT_IN_BETWEEN 202
 #define OPT_CALC_COVAR 203
 
-const char *short_options = "o:f:m:s";
+const char *short_options = "o:f:m:s:v";
 
 static struct option long_options[] = {
     // general options
@@ -75,6 +78,7 @@ static struct option long_options[] = {
     {"forget-param",            required_argument,       0,          'f'},
     {"frag-len-mean",		    required_argument,       0,          'm'},
     {"frag-len-std-dev",	    required_argument,       0,          's'},
+    {"visualize",       	    no_argument,             0,          'v'},
     {"upper-quartile-norm",     no_argument,             0,          OPT_UPPER_QUARTILE_NORM},
     {"calc-covar",              no_argument,             0,          OPT_CALC_COVAR},
     {"no-bias-correct",         no_argument,             0,          OPT_NO_BIAS_CORRECT},
@@ -159,6 +163,9 @@ int parse_options(int argc, char** argv)
             case 'o':
                 output_dir = optarg;
 				break;
+            case 'v':
+                vis = true;
+                break;
 			case OPT_UPPER_QUARTILE_NORM:
                 upper_quart_norm = true;
                 break;
@@ -312,8 +319,18 @@ size_t threaded_calc_abundances(MapParser& map_parser, TranscriptTable* trans_ta
         // Output progress
         if (n == 1 || n % 10000 == 0)
         {
-            cout << n << '\t' << scientific << mass_n << '\t' << trans_table->covar_size() << '\t' << trans_table->num_bundles() <<'\n';
-            //cout << fld->to_string() <<'\n';
+            if (vis)
+            {
+                cout << "0 " << fld->to_string() << '\n';
+                cout << "1 " << mismatch_table->to_string() << '\n';
+                cout << "2 " << bias_table->to_string() << '\n';
+                cout << "3 " << n << '\n';
+                cout << '\n';
+            }
+            else
+            {
+                cout << n << '\t' << scientific << mass_n << '\t' << trans_table->covar_size() << '\t' << trans_table->num_bundles() <<'\n';
+            }
         }
         
         
@@ -332,7 +349,8 @@ size_t threaded_calc_abundances(MapParser& map_parser, TranscriptTable* trans_ta
         process_fragment(mass_n, frag, fld, bias_table, mismatch_table, trans_table);
     }
 
-    cout << "END: " << n << "\n";
+    //cout << "END: " << n << "\n";
+    cout << "99\n";
     running_expr_file << n << '\t';
     trans_table->output_current(running_expr_file);
     running_expr_file.close();
@@ -375,6 +393,8 @@ int main (int argc, char ** argv)
     if (bias_table)
         boost::thread bias_update(&TranscriptTable::threaded_bias_update, &trans_table);
     size_t tot_counts = threaded_calc_abundances(map_parser, &trans_table, &fld, bias_table, &mismatch_table);
+    
+    running = false;
     
     mismatch_table.output(output_dir);
     trans_table.output_bundles(output_dir);

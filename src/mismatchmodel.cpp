@@ -108,30 +108,32 @@ string MismatchTable::to_string() const
 {
     string s = "";
     char buff[50];
-    for (size_t k = 0; k < MAX_READ_LEN; k++)
+
+    for (size_t ref = 0; ref < NUM_NUCS; ref++)
     {
-        for (size_t ref = 0; ref < NUM_NUCS; ref++)
+        vector<double> mass(4, HUGE_VAL);
+        double tot = HUGE_VAL;
+        for (size_t prev = 0; prev < NUM_NUCS; prev++)
         {
-            vector<double> mass(4, HUGE_VAL);
-            double tot = HUGE_VAL;
-            for (size_t prev = 0; prev < NUM_NUCS; prev++)
+            size_t col_i = (prev << 2) + ref;
+            for (size_t obs = 0; obs < NUM_NUCS; obs++)
             {
-                size_t col_i = prev << 2 + ref;
-                for (size_t obs = 0; obs < NUM_NUCS; obs++)
+                size_t arr_i = (col_i << 2) + obs;
+                for (size_t k = 0; k < MAX_READ_LEN; k++)
                 {
-                    size_t arr_i = col_i << 2 + obs;
                     double val =  _first_read_mm[k].arr(arr_i);
                     mass[obs] = log_sum(mass[obs], val);
                     tot = log_sum(tot, val);
                 }
             }
-            for (size_t obs = 0; obs < NUM_NUCS; obs++)
-            {
-                sprintf(buff, "%e,", sexp(mass[obs]-tot));
-                s += buff;
-            }
+        }
+        for (size_t obs = 0; obs < NUM_NUCS; obs++)
+        {
+            sprintf(buff, "%e ", sexp(mass[obs]-tot));
+            s += buff;
         }
     }
+    
     s.erase(s.length()-1,1);
     return s;
 }

@@ -70,7 +70,7 @@ string FLD::to_string() const
     char buffer[50];
     for(size_t i = 1; i < max_val()+1; i++)
     {
-        sprintf(buffer, "%e,",sexp(pdf(i)));
+        sprintf(buffer, "%e ",sexp(pdf(i)));
         s += buffer; 
     }
     s.erase(s.length()-1,1);

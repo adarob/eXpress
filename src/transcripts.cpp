@@ -250,18 +250,19 @@ void TranscriptTable::output_bundles(string output_dir)
 
 void TranscriptTable::threaded_bias_update()
 {
-    while(true)
+    while(running)
     {
-        size_t count = 0;
+        //size_t count = 0;
         for( TransMap::iterator it = _trans_map.begin(); it != _trans_map.end(); ++it)
         {  
             Transcript& trans = *(it->second);
             trans.update_transcript_bias();
-            if (++count%1000 == 0)
-                cout << "*"<<count<<"\n";
-
+            //if (++count%10000 == 0)
+            //    cout << "*"<<count<<"\n";
+            if (!running)
+                break;
         }
-        cout << "*\n";
+        //cout << "*\n";
     }
 }
 

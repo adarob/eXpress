@@ -31,27 +31,6 @@ SeqWeightTable::SeqWeightTable(size_t window_size, double alpha)
  _expected(1, NUM_NUCS, 0) 
 {}
 
-//inline size_t SeqWeightTable::ctoi(char c) const
-//{
-//    switch(c)
-//    {
-//        case 'A':
-//        case 'a':
-//            return 0;
-//        case 'C':
-//        case 'c':
-//            return 1;
-//        case 'G':
-//        case 'g':
-//            return 2;
-//        case 'T':
-//        case 't':
-//            return 3;
-//        default:
-//            return 4;
-//    }
-//}
-
 void SeqWeightTable::increment_expected(char c)
 {
     boost::mutex::scoped_lock lock(_lock);
@@ -88,13 +67,14 @@ double SeqWeightTable::get_weight(const string& seq, size_t i) const
 
 string SeqWeightTable::to_string() const
 {
+    boost::mutex::scoped_lock lock(_lock);
     char buffer[50];
     string s = "";
     for(size_t i = 0; i < WINDOW; ++i)
     {
         for (size_t j = 0; j < NUM_NUCS; ++j)
         {
-            sprintf(buffer, "%e,", sexp(_observed(i, j) - _expected(i)));
+            sprintf(buffer, "%e ", sexp(_observed(i, j)));
             s += buffer;
         }
     }

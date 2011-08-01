@@ -13,6 +13,7 @@
 #include <algorithm>
 
 
+extern bool running;
 const size_t MAX_READ_LEN = 200;
 const int NUM_NUCS = 4;
 
