@@ -15,7 +15,7 @@
 
 using namespace std;
 
-const vector<double> KERNEL = boost::assign::list_of(-1.20411998)(-0.602059991)(-0.425968732)(-0.602059991)(-1.20411998); 
+const vector<double> KERNEL = boost::assign::list_of(-2.7725887222397811)(-1.3862943611198906)(-0.98082925301172619)(-1.3862943611198906)(-2.7725887222397811); 
 
 FLD::FLD(double alpha, size_t max_val) : 
     _hist(max_val+1, log(alpha)),
@@ -68,9 +68,9 @@ string FLD::to_string() const
 {
     string s = "";
     char buffer[50];
-    for(size_t i = 0; i < max_val()+1; i++)
+    for(size_t i = 1; i < max_val()+1; i++)
     {
-        sprintf(buffer, "%e,",sexp(_hist[i]));
+        sprintf(buffer, "%e,",sexp(pdf(i)));
         s += buffer; 
     }
     s.erase(s.length()-1,1);

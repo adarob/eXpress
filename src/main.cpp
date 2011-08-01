@@ -313,6 +313,7 @@ size_t threaded_calc_abundances(MapParser& map_parser, TranscriptTable* trans_ta
         if (n == 1 || n % 10000 == 0)
         {
             cout << n << '\t' << scientific << mass_n << '\t' << trans_table->covar_size() << '\t' << trans_table->num_bundles() <<'\n';
+            //cout << fld->to_string() <<'\n';
         }
         
         

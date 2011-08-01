@@ -300,7 +300,7 @@ void TranscriptTable::output_current(ofstream& runexpr_file)
 void TranscriptTable::output_expression(string output_dir, size_t tot_counts)
 {
     FILE * expr_file = fopen((output_dir + "/transcripts.expr").c_str(), "w");
-    fprintf(expr_file, "bundle_id\ttranscript_id\texp_counts\tbundle_frac\tfpkm\n");
+    fprintf(expr_file, "bundle_id\ttranscript_id\tlength\teff_len\texp_counts\tbundle_frac\tfpkm\n");
     double l_bil = log(1000000000);
     double l_tot_counts = log(tot_counts);
 
@@ -349,7 +349,7 @@ void TranscriptTable::output_expression(string output_dir, size_t tot_counts)
             for (size_t i = 0; i < bundle_trans.size(); ++i)
             {
                 Transcript& trans = *bundle_trans[i];
-                fprintf(expr_file, "%zu\t%s\t%e\t%e\t%e\n", bundle_id, trans.name().c_str(), 0.0, 0.0, 0.0);
+                fprintf(expr_file, "%zu\t%s\t%zu\t%f%e\t%e\t%e\n", bundle_id, trans.name().c_str(), trans.length(), trans.effective_length(), 0.0, 0.0, 0.0);
             }   
         }
 
