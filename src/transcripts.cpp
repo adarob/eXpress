@@ -283,7 +283,7 @@ void TranscriptTable::output_current(ofstream& runexpr_file)
     for( TransMap::iterator it = _trans_map.begin(); it != _trans_map.end(); ++it)
     {
         Transcript& trans = *(it->second);
-        double log_fpkm = trans.mass() - log(trans.length());
+        double log_fpkm = trans.mass() - log(trans.effective_length());
         sum = log_sum(sum, log_fpkm);
     }   
     
@@ -291,7 +291,7 @@ void TranscriptTable::output_current(ofstream& runexpr_file)
     {
 
         Transcript& trans = *(it->second);
-        double log_fpkm = trans.mass() - log(trans.length());
+        double log_fpkm = trans.mass() - log(trans.effective_length());
         runexpr_file << sexp(log_fpkm - sum) << '\t';
     }   
     runexpr_file << '\n';
