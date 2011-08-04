@@ -12,18 +12,30 @@
 #include <boost/assign.hpp>
 #include <iostream>
 #include <fstream>
+#include <boost/math/distributions/normal.hpp>
 
 using namespace std;
 
 const vector<double> KERNEL = boost::assign::list_of(-2.7725887222397811)(-1.3862943611198906)(-0.98082925301172619)(-1.3862943611198906)(-2.7725887222397811); 
 
-FLD::FLD(double alpha, size_t max_val) : 
-    _hist(max_val+1, log(alpha)),
-    _tot_mass(log(max_val * alpha)), 
-    _sum(log((max_val)*(max_val+1)*alpha/2)),
+FLD::FLD(double alpha, size_t max_val, size_t mean, size_t std_dev) : 
+    _hist(max_val+1),
+    _tot_mass(HUGE_VAL), 
+    _sum(HUGE_VAL),
     _min(max_val)
 {
     assert(KERNEL.size() % 2 == 1);
+    boost::math::normal norm(mean, std_dev);
+    
+    double tot = log(alpha*max_val);
+    
+    for (size_t i = 1; i <= max_val; ++i)
+    {  
+        double mass = tot + log(boost::math::cdf(norm,i+0.5) - boost::math::cdf(norm,i-0.5));
+        _hist[i] = mass;
+        _sum = log_sum(_sum, log(i)+mass);
+        _tot_mass = log_sum(_tot_mass, mass);
+    }
 }
 
 size_t FLD::max_val() const

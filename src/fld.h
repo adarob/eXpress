@@ -36,10 +36,12 @@ class FLD
 public:
     /**
      * FLD Constructor
-     * @param alpha an integer that sets the initial uniform pseudo-counts
+     * @param alpha double that sets the average pseudo-counts
      * @param max_val an integer that sets the maximum allowable FragMap length
+     * @param mean a size_t for the mean of the prior gaussian dist
+     * @param std_dev a size_t for the std dev of the prior gaussian dist
      */
-    FLD(double alpha, size_t max_val);
+    FLD(double alpha, size_t max_val, size_t mean, size_t std_dev);
     
     /**
      * a member function that returns the maximum allowed FragMap length

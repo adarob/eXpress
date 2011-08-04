@@ -26,7 +26,6 @@ Transcript::Transcript(const std::string& name, const std::string& seq, double a
 _id(hash_trans_name(name)),
 _seq(seq),
 _len(seq.length()),
-_mass(log(seq.length()*alpha)),
 _bundle_counts(0),
 _start_bias(std::vector<double>(seq.length(),0)),
 _end_bias(std::vector<double>(seq.length(),0)),
@@ -34,7 +33,7 @@ _avg_bias(0),
 _fld(fld),
 _bias_table(bias_table),
 _mismatch_table(mismatch_table)
-{ }
+{ _mass = log(effective_length()*alpha); }
 
 double Transcript::log_likelihood(const FragMap& frag) const
 {

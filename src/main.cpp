@@ -35,7 +35,7 @@ double mm_alpha = 1;
 
 int def_fl_max = 800;
 int def_fl_mean = 200;
-int def_fl_stddev = 80;
+int def_fl_stddev = 60;
 bool user_provided_fld = false;
 
 bool bias_correct = true;
@@ -348,8 +348,11 @@ size_t threaded_calc_abundances(MapParser& map_parser, TranscriptTable* trans_ta
         process_fragment(mass_n, frag, fld, bias_table, mismatch_table, trans_table);
     }
 
-    //cout << "END: " << n << "\n";
-    cout << "99\n";
+    if (vis)
+        cout << "99\n";
+    else
+        cout << "END: " << n << "\n";
+        
     running_expr_file << n << '\t';
     trans_table->output_current(running_expr_file);
     running_expr_file.close();
@@ -383,7 +386,7 @@ int main (int argc, char ** argv)
     string trans_fasta_file_name = argv[optind++];
     string sam_hits_file_name = (optind >= argc) ? "" : argv[optind++];
         
-    FLD fld(fld_alpha, def_fl_max);
+    FLD fld(fld_alpha, def_fl_max, def_fl_mean, def_fl_stddev);
     BiasBoss* bias_table = (bias_correct) ? new BiasBoss(bias_alpha):NULL;
     MismatchTable mismatch_table(mm_alpha);
     MapParser map_parser(sam_hits_file_name);
