@@ -232,6 +232,8 @@ bool MapParser::map_end_from_line()
                 break;
             case 1:
                 sam_flag = atoi(p);
+                if (sam_flag & 0x4)
+                    goto stop;
                 paired = sam_flag & 0x1;
                 f.left_first = ((sam_flag & 0x40) && (sam_flag & 0x10)) || (!(sam_flag & 0x40) && !(sam_flag & 0x10));
                 break;

@@ -300,7 +300,7 @@ void TranscriptTable::output_current(ofstream& runexpr_file)
 void TranscriptTable::output_expression(string output_dir, size_t tot_counts)
 {
     FILE * expr_file = fopen((output_dir + "/transcripts.expr").c_str(), "w");
-    fprintf(expr_file, "bundle_id\ttranscript_id\tlength\teff_len\texp_counts\tbundle_frac\tfpkm\n");
+    fprintf(expr_file, "bundle_id\ttranscript_id\tlength\teff_len\tbundle_frac\test_counts\test_counts_var\tfpkm\n");
     double l_bil = log(1000000000);
     double l_tot_counts = log(tot_counts);
 
@@ -339,9 +339,10 @@ void TranscriptTable::output_expression(string output_dir, size_t tot_counts)
                 Transcript& trans = *bundle_trans[i];
                 double l_trans_frac = trans.mass() - l_bundle_mass;
                 double l_trans_counts = l_trans_frac + l_bundle_counts;
+                double l_trans_var = trans.var() + 2*(l_bundle_counts - l_bundle_mass);
                 double eff_len = trans.effective_length();
                 double l_trans_fpkm = l_bil + l_trans_counts - log(eff_len) - l_tot_counts;
-                fprintf(expr_file, "%zu\t%s\t%zu\t%f\t%e\t%e\t%e\n", bundle_id, trans.name().c_str(), trans.length(), eff_len, sexp(l_trans_counts), sexp(l_trans_frac), sexp(l_trans_fpkm));
+                fprintf(expr_file, "%zu\t%s\t%zu\t%f\t%f\t%f\t%f\t%e\n", bundle_id, trans.name().c_str(), trans.length(), eff_len, sexp(l_trans_frac), sexp(l_trans_counts), sexp(l_trans_var), sexp(l_trans_fpkm));
             }
         }
         else
@@ -349,7 +350,7 @@ void TranscriptTable::output_expression(string output_dir, size_t tot_counts)
             for (size_t i = 0; i < bundle_trans.size(); ++i)
             {
                 Transcript& trans = *bundle_trans[i];
-                fprintf(expr_file, "%zu\t%s\t%zu\t%f\t%e\t%e\t%e\n", bundle_id, trans.name().c_str(), trans.length(), trans.effective_length(), 0.0, 0.0, 0.0);
+                fprintf(expr_file, "%zu\t%s\t%zu\t%f\t%f\t%f\t%f\t%e\n", bundle_id, trans.name().c_str(), trans.length(), trans.effective_length(), 0.0, 0.0, 0.0, 0.0);
             }   
         }
 
