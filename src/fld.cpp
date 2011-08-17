@@ -61,7 +61,7 @@ void FLD::add_val(size_t len, double mass)
 
 double FLD::pdf(size_t len) const
 {
-    if (len > max_val())
+    if (len < 1 || len > max_val())
         return HUGE_VAL;
     return _hist[len]-_tot_mass;
 }
@@ -80,7 +80,7 @@ string FLD::to_string() const
 {
     string s = "";
     char buffer[50];
-    for(size_t i = 1; i < max_val()+1; i++)
+    for(size_t i = 0; i <= max_val(); i++)
     {
         sprintf(buffer, "%e ",sexp(pdf(i)));
         s += buffer; 

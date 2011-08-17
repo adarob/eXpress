@@ -398,7 +398,11 @@ int main (int argc, char ** argv)
     
     running = false;
     
-    mismatch_table.output(output_dir);
+    //mismatch_table.output(output_dir);
+    ofstream fld_out((output_dir + "/fld.pdf").c_str());
+    fld_out << fld.to_string() << '\n';
+    fld_out.close();
+
     trans_table.output_bundles(output_dir);
     trans_table.output_expression(output_dir, tot_counts);
     return 0;
