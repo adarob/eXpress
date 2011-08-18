@@ -32,7 +32,8 @@ _end_bias(std::vector<double>(seq.length(),0)),
 _avg_bias(0),
 _fld(fld),
 _bias_table(bias_table),
-_mismatch_table(mismatch_table)
+_mismatch_table(mismatch_table),
+_var(HUGE_VAL)
 { _mass = log(effective_length()*alpha); }
 
 double Transcript::log_likelihood(const FragMap& frag) const
