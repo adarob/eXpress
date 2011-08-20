@@ -83,6 +83,7 @@ void ThreadedMapParser::threaded_parse(ParseThreadSafety* thread_safety, Transcr
     while (fragments_remain)
     {
         Fragment * frag;
+        Fragment frag2;
         while (fragments_remain)
         {
             frag = new Fragment(); 
@@ -110,22 +111,31 @@ void ThreadedMapParser::threaded_parse(ParseThreadSafety* thread_safety, Transcr
 BAMParser::BAMParser(BamTools::BamReader* reader)
 {
     _reader = reader;
+    _reader->GetNextAlignment(_align_buff);
 }
 
 bool BAMParser::next_fragment(Fragment& nf)
 {    
     _frag_buff = new FragMap();
-    BamTools::BamAlignment alignment;
-    while(_reader->GetNextAlignment(alignment))
+    while(true)
     {        
-        if (!map_end_from_alignment(alignment))
-            continue;
-        if (!nf.add_map_end(_frag_buff))
-            break;
-        _frag_buff = new FragMap();
+        if (!map_end_from_alignment(_align_buff))
+        {
+            if (!_reader->GetNextAlignment(_align_buff))
+                return false;
+        }
+        else if (!nf.add_map_end(_frag_buff))
+        {
+            return true;
+        }
+        else
+        {
+            _frag_buff = new FragMap();
+            if (!_reader->GetNextAlignment(_align_buff))
+                return false;
+        }
+        
     }
-    
-    return _reader->IsOpen();
 }
 
 bool BAMParser::map_end_from_alignment(BamTools::BamAlignment& a)
