@@ -1,6 +1,6 @@
 /*
  *  biascorrection.h
- *  cufflinks
+ *  express
  *
  *  Created by Adam Roberts on 4/5/11.
  *  Copyright 2011 Adam Roberts. All rights reserved.
@@ -156,9 +156,11 @@ void BiasBoss::update_expectations(const Transcript& trans)
     }
 }
 
-void BiasBoss::update_observed(const FragMap& frag, const Transcript& trans, double normalized_mass)
+void BiasBoss::update_observed(const FragMap& frag, double normalized_mass)
 {
     assert (frag.length() > WINDOW);
+    
+    const string t_seq = frag.mapped_trans->seq();
     
     if (frag.pair_status() != RIGHT_ONLY)
     {
@@ -167,29 +169,29 @@ void BiasBoss::update_observed(const FragMap& frag, const Transcript& trans, dou
         if (left_window < 0)
         {
             seq_5 = PADDING.substr(0, -left_window);
-            seq_5 += trans.seq().substr(0, WINDOW + left_window);
+            seq_5 += t_seq.substr(0, WINDOW + left_window);
         }
         else
         {
-            seq_5 = trans.seq().substr(left_window, WINDOW); 
+            seq_5 = t_seq.substr(left_window, WINDOW); 
         }
         
         _5_seq_bias.increment_observed(seq_5, normalized_mass);
-        _5_pos_bias.increment_observed(trans.length(), (double)frag.left/trans.length(), normalized_mass);
+        _5_pos_bias.increment_observed(t_seq.length(), (double)frag.left/t_seq.length(), normalized_mass);
     }
     
     if (frag.pair_status() != LEFT_ONLY)
     {
         int left_window = frag.right - CENTER;
-        string seq_3 = trans.seq().substr(left_window, WINDOW);
-        int overhang =left_window + WINDOW - trans.length();
+        string seq_3 = t_seq.substr(left_window, WINDOW);
+        int overhang =left_window + WINDOW - t_seq.length();
         if (overhang > 0)
         {
             seq_3 += PADDING.substr(0, overhang);
         }
         
         _3_seq_bias.increment_observed(seq_3, normalized_mass);
-        _3_pos_bias.increment_observed(trans.length(), (double)(frag.right-1)/trans.length(), normalized_mass);
+        _3_pos_bias.increment_observed(t_seq.length(), (double)(frag.right-1)/t_seq.length(), normalized_mass);
     }
        
 

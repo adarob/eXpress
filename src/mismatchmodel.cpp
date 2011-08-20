@@ -1,9 +1,9 @@
 //
 //  mismatchmodel.cpp
-//  expressionline2
+//  express
 //
 //  Created by Adam Roberts on 4/23/11.
-//  Copyright 2011 __MyCompanyName__. All rights reserved.
+//  Copyright 2011 Adam Roberts. All rights reserved.
 //
 
 #include "main.h"
@@ -21,9 +21,9 @@ MismatchTable::MismatchTable(double alpha)
     _second_read_mm = vector<FrequencyMatrix>(MAX_READ_LEN, FrequencyMatrix(16, 4, alpha));
 }
 
-double MismatchTable::log_likelihood(const FragMap& f, const Transcript& t) const
+double MismatchTable::log_likelihood(const FragMap& f) const
 {
-    const string& t_seq = t.seq();
+    const string& t_seq = f.mapped_trans->seq();
     double ll = 0;
     
     const vector<FrequencyMatrix>& left_mm = (f.left_first) ? _first_read_mm : _second_read_mm;
@@ -65,9 +65,9 @@ double MismatchTable::log_likelihood(const FragMap& f, const Transcript& t) cons
 }
 
 
-void MismatchTable::update(const FragMap& f, const Transcript& t, double mass)
+void MismatchTable::update(const FragMap& f, double mass)
 {
-    const string& t_seq = t.seq();
+    const string& t_seq = f.mapped_trans->seq();
     
     vector<FrequencyMatrix>& left_mm = (f.left_first) ? _first_read_mm : _second_read_mm;
     vector<FrequencyMatrix>& right_mm = (!f.left_first) ? _first_read_mm : _second_read_mm;
@@ -150,7 +150,7 @@ void MismatchTable::output(string path)
         {
             for (size_t j = 0; j < 4; j++)
             {
-                outfile << sexp(_first_read_mm[k](i,j))<<"\t";
+                outfile << scientific << sexp(_first_read_mm[k](i,j))<<"\t";
             }
         }
         outfile<<"\n";
@@ -164,7 +164,7 @@ void MismatchTable::output(string path)
         {
             for (size_t j = 0; j < 4; j++)
             {
-                outfile << sexp(_second_read_mm[k](i,j))<<"\t";
+                outfile << scientific << sexp(_second_read_mm[k](i,j))<<"\t";
             }
         }
         outfile<<"\n";

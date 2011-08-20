@@ -1,6 +1,6 @@
 //
 //  transcripts.cpp
-//  expressionline
+//  express
 //
 //  Created by Adam Roberts on 3/20/11.
 //  Copyright 2011 Adam Roberts. All rights reserved.
@@ -41,7 +41,7 @@ double Transcript::log_likelihood(const FragMap& frag) const
     boost::mutex::scoped_lock lock(_bias_lock);
 
     double ll = mass();
-    ll += _mismatch_table->log_likelihood(frag, *this);
+    ll += _mismatch_table->log_likelihood(frag);
     
     switch(frag.pair_status())
     {
@@ -356,16 +356,4 @@ void TranscriptTable::output_expression(string output_dir, size_t tot_counts)
         }
 
     }
-    
-    
-    
-//    for( TransMap::iterator it = _trans_map.begin(); it != _trans_map.end(); ++it)
-//    {
-//        Transcript& trans = *(it->second);
-//        double M = trans.fld()->tot_mass();
-//        trans.update_transcript_bias();
-//        double fpkm = trans.mass() - trans.effective_length() + log_bil - M;
-//        expr_file << trans.name() << '\t' << sexp(fpkm) << '\t' << sexp(trans.mass()) << '\n';
-//    }   
-//    expr_file.close();
 }

@@ -1,9 +1,9 @@
 //
 //  main.cpp
-//  expressionline2
+//  express
 //
 //  Created by Adam Roberts on 3/23/11.
-//  Copyright 2011 __MyCompanyName__. All rights reserved.
+//  Copyright 2011 Adam Roberts. All rights reserved.
 //
 
 #define PACKAGE_VERSION "INTERNAL"
@@ -12,37 +12,40 @@
 #include <boost/filesystem.hpp>
 #include <getopt.h>
 #include <boost/thread.hpp>
-#include <cassert>
 #include <iostream>
 #include <fstream>
-#include <cmath>
 #include "main.h"
 #include "transcripts.h"
 #include "fld.h"
 #include "fragments.h"
 #include "biascorrection.h"
 #include "mismatchmodel.h"
+#include "mapparser.h"
 
 using namespace std;
 
+// the forgetting factor parameter controls the growth of the fragment mass
 double ff_param = 1;
 
 string output_dir = ".";
+
+// intial pseudo-count parameters (non-logged)
 double expr_alpha = .001;
 double fld_alpha = 1;
 double bias_alpha = 1;
 double mm_alpha = 1;
 
+// fragment length parameters
 int def_fl_max = 800;
 int def_fl_mean = 200;
 int def_fl_stddev = 60;
 bool user_provided_fld = false;
 
+// option parameters
 bool bias_correct = true;
 bool upper_quart_norm = false;
 bool calc_covar = false;
 bool vis = false;
-
 bool in_between = false;
 
 bool running = true;
@@ -50,7 +53,7 @@ bool running = true;
 void print_usage()
 {
     
-    fprintf(stderr, "cuffexpress v%s\n", PACKAGE_VERSION);
+    fprintf(stderr, "express v%s\n", PACKAGE_VERSION);
 //    fprintf(stderr, "linked against Boost version %d\n", BOOST_VERSION);
     fprintf(stderr, "-----------------------------\n"); 
     fprintf(stderr, "File Usage:   cuffexpress [options] <transcripts.fasta> <hits.sam>\n");
@@ -139,6 +142,9 @@ float parseFloat(float lower, float upper, const char *errmsg, void (*print_usag
   return -1;
 }
 
+/**
+ * Parse the options and set global variables appropriately.
+ */
 int parse_options(int argc, char** argv)
 {
     int option_index = 0;
@@ -188,7 +194,16 @@ int parse_options(int argc, char** argv)
 }
 
 
-
+/**
+ * This function handles the probabilistic assignment of multi-mapped reads.  The marginal likelihoods are calculated for each mapping,
+ * and the mass of the fragment is divided based on the normalized marginals to update the model parameters.
+ * @param mass_n double specifying the logged fragment mass
+ * @param frag_p pointer to the fragment to probabilistically assign
+ * @param fld pointer to the fragment length distribution
+ * @param bias_table pointer to the bias parameter table
+ * @param mismatch_table pointer to the erorr model table
+ * @param trans_table pointer to the transcript table
+ */
 void process_fragment(double mass_n, Fragment* frag_p, FLD* fld, BiasBoss* bias_table, MismatchTable* mismatch_table, TranscriptTable* trans_table)
 {
     Fragment& frag = *frag_p;
@@ -196,7 +211,9 @@ void process_fragment(double mass_n, Fragment* frag_p, FLD* fld, BiasBoss* bias_
     assert(frag.num_maps());
     
     frag.maps()[0]->mapped_trans->incr_bundle_counts();
+    
     if (frag.num_maps()==1)
+    // maps to a single location
     {
         const FragMap& m = *frag.maps()[0];
         Transcript* t  = m.mapped_trans;
@@ -205,15 +222,24 @@ void process_fragment(double mass_n, Fragment* frag_p, FLD* fld, BiasBoss* bias_
             cerr << "ERROR: Transcript " << m.name << " not found in reference fasta.";
             exit(1);
         }
+        
+        //update parameters
         t->add_mass(0, mass_n);
-        fld->add_val(m.length(), mass_n);
+        if (m.pair_status() == PAIRED)
+                fld->add_val(m.length(), mass_n);
+        
         if (bias_table)
-            bias_table->update_observed(m, *t, mass_n);
-        mismatch_table->update(m, *t, mass_n);
+            bias_table->update_observed(m, mass_n);
+        
+        mismatch_table->update(m, mass_n);
+       
         delete frag_p;
         return;
     }
     
+    // maps to multiple locations
+    
+    // calculate marginal likelihoods
     vector<double> likelihoods(frag.num_maps());
     double total_likelihood = 0.0;
     for(size_t i = 0; i < frag.num_maps(); ++i)
@@ -229,6 +255,7 @@ void process_fragment(double mass_n, Fragment* frag_p, FLD* fld, BiasBoss* bias_
         return;
     }
 
+    // normalize marginal likelihoods
     TransID bundle_rep = trans_table->get_trans_rep(frag.maps()[0]->trans_id);
     for(size_t i = 0; i < frag.num_maps(); ++i)
     {
@@ -246,13 +273,16 @@ void process_fragment(double mass_n, Fragment* frag_p, FLD* fld, BiasBoss* bias_
         
         if (sexp(p) == 0)
             continue;
-                
+        
+        // update parameters
         t->add_mass(p, mass_n);
-        fld->add_val(m.length(), mass_t);
+        
+        if (m.pair_status() == PAIRED)
+            fld->add_val(m.length(), mass_t);
  
         if (bias_table)
-            bias_table->update_observed(m, *t, mass_t);
-        mismatch_table->update(m, *t, mass_t);
+            bias_table->update_observed(m, mass_t);
+        mismatch_table->update(m, mass_t);
         
         if (calc_covar)
         {
@@ -272,12 +302,22 @@ void process_fragment(double mass_n, Fragment* frag_p, FLD* fld, BiasBoss* bias_
     delete frag_p;
 }
 
-size_t threaded_calc_abundances(MapParser& map_parser, TranscriptTable* trans_table, FLD* fld, BiasBoss* bias_table, MismatchTable* mismatch_table)
+/**
+ * This is the driver function for the main processing thread.  This function keeps track of the current fragment mass and sends fragments to be
+ * processed once they are passed by the parsing thread.
+ * @param map_parser the parsing object
+ * @param trans_table pointer to the transcript table
+ * @param fld pointer to the fragment length distribution
+ * @param bias_table pointer to the bias parameter table
+ * @param mismatch_table pointer to the erorr model table
+ * @return the total number of fragments processed
+ */
+size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TranscriptTable* trans_table, FLD* fld, BiasBoss* bias_table, MismatchTable* mismatch_table)
 {
     ParseThreadSafety ts;
     ts.proc_lk.lock();
     ts.parse_lk.lock();
-    boost::thread parse(&MapParser::threaded_parse, &map_parser, &ts, trans_table);
+    boost::thread parse(&ThreadedMapParser::threaded_parse, &map_parser, &ts, trans_table);
     
     size_t n = 0;
     size_t fake_n = 0;
@@ -289,6 +329,7 @@ size_t threaded_calc_abundances(MapParser& map_parser, TranscriptTable* trans_ta
     int m = 0;
     int i = 1;
 
+    // Geometric distribution used for 'in-between' tests
     srand ( time(NULL) );
     boost::math::geometric geom(.00002);
     cout.precision(20);
@@ -335,7 +376,6 @@ size_t threaded_calc_abundances(MapParser& map_parser, TranscriptTable* trans_ta
         
         // Update mass_n based on forgetting factor
         int k = (in_between) ? quantile(geom, rand()/double(RAND_MAX)) : 1;
-
         for (int j = 0; j < k; ++j)
         {
             if (++fake_n > 1)
@@ -389,7 +429,7 @@ int main (int argc, char ** argv)
     FLD fld(fld_alpha, def_fl_max, def_fl_mean, def_fl_stddev);
     BiasBoss* bias_table = (bias_correct) ? new BiasBoss(bias_alpha):NULL;
     MismatchTable mismatch_table(mm_alpha);
-    MapParser map_parser(sam_hits_file_name);
+    ThreadedMapParser map_parser(sam_hits_file_name);
     TranscriptTable trans_table(trans_fasta_file_name, expr_alpha, &fld, bias_table, &mismatch_table);
 
     if (bias_table)
