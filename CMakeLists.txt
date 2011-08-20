@@ -21,6 +21,6 @@ find_package(Boost 1.41
     REQUIRED)
 
 include_directories(${Boost_INCLUDE_DIRS} "bamtools/include")
-link_directories ("bamtools/lib") 
+link_directories ("../../bamtools/lib") 
 
 add_subdirectory(src)
