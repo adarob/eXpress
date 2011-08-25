@@ -222,7 +222,7 @@ double BiasBoss::get_transcript_bias(std::vector<double>& start_bias, std::vecto
         tot_end = log_sum(tot_start, end_bias[i]);
     }
     
-    double avg_bias = tot_start + tot_end - 2*log(trans.length());
+    double avg_bias = tot_start + tot_end - 2*log((double)trans.length());
     return avg_bias;
 }
 

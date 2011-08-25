@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0A2D58911405F128008891E7 /* libboost_program_options.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A2D58901405F128008891E7 /* libboost_program_options.a */; };
 		0A5C7638136F2EF10095365C /* biascorrection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0A5C762A136F2EF10095365C /* biascorrection.cpp */; };
 		0A5C7639136F2EF10095365C /* fld.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0A5C762C136F2EF10095365C /* fld.cpp */; };
 		0A5C763A136F2EF10095365C /* fragments.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0A5C762E136F2EF10095365C /* fragments.cpp */; };
@@ -34,6 +35,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		0A2D58901405F128008891E7 /* libboost_program_options.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libboost_program_options.a; path = ../../../../../../opt/local/lib/libboost_program_options.a; sourceTree = "<group>"; };
 		0A5C7608136F2E850095365C /* express */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = express; sourceTree = BUILT_PRODUCTS_DIR; };
 		0A5C762A136F2EF10095365C /* biascorrection.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = biascorrection.cpp; sourceTree = "<group>"; };
 		0A5C762B136F2EF10095365C /* biascorrection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = biascorrection.h; sourceTree = "<group>"; };
@@ -66,6 +68,7 @@
 				0A60597513A170AD00B5C9BA /* libboost_filesystem.a in Frameworks */,
 				0A60597713A1753B00B5C9BA /* libboost_system.a in Frameworks */,
 				0AD5969113FF304E00EEBDD7 /* libbamtools.a in Frameworks */,
+				0A2D58911405F128008891E7 /* libboost_program_options.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -75,6 +78,7 @@
 		0A5C75FD136F2E850095365C = {
 			isa = PBXGroup;
 			children = (
+				0A2D58901405F128008891E7 /* libboost_program_options.a */,
 				0AD5969013FF304E00EEBDD7 /* libbamtools.a */,
 				0A60597613A1753B00B5C9BA /* libboost_system.a */,
 				0A60597413A170AD00B5C9BA /* libboost_filesystem.a */,

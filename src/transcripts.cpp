@@ -27,6 +27,8 @@ _id(hash_trans_name(name)),
 _seq(seq),
 _len(seq.length()),
 _bundle_counts(0),
+_uniq_counts(0),
+_tot_counts(0),
 _start_bias(std::vector<double>(seq.length(),0)),
 _end_bias(std::vector<double>(seq.length(),0)),
 _avg_bias(0),
@@ -35,6 +37,22 @@ _bias_table(bias_table),
 _mismatch_table(mismatch_table),
 _var(HUGE_VAL)
 { _mass = log(effective_length()*alpha); }
+
+void Transcript::add_mass(double p, double mass) 
+{ 
+    assert(sexp(p) != 0);
+    _mass = log_sum(_mass, p+mass);
+    _tot_counts++;
+    if (p == 0.0)
+        // probabilitiy of 1
+    {
+        _uniq_counts++;
+    }
+    else
+    {
+        _var = log_sum(_var, mass + p + log(1-sexp(p)));
+    }
+}  
 
 double Transcript::log_likelihood(const FragMap& frag) const
 {
@@ -103,6 +121,7 @@ TranscriptTable::TranscriptTable(const string& trans_fasta_file, double alpha, c
   _parent(Parent(_parent_map)),
   _bundles(_rank, _parent)
 {
+    cout << "Loading target sequences from" << trans_fasta_file << "...\n";
     ifstream infile (trans_fasta_file.c_str());
     string line;
     string seq = "";
@@ -147,7 +166,7 @@ TranscriptTable::TranscriptTable(const string& trans_fasta_file, double alpha, c
     
     if (size() == 0)
     {
-        cerr << "No transcripts found in MultiFASTA file '" << trans_fasta_file << "'.\n" ; 
+        cerr << "No targets found in MultiFASTA file '" << trans_fasta_file << "'.\n" ; 
         exit(1);        
     }
     
@@ -168,7 +187,7 @@ void TranscriptTable::add_trans(Transcript* trans)
     {
         if (trans->name() == ret->name())
         {
-            cerr << "ERROR: Repeated transcript ID in multi-fasta input (" << ret->name() << ").\n";
+            cerr << "ERROR: Repeated target ID in multi-fasta input (" << ret->name() << ").\n";
         }
         else
         {
@@ -300,8 +319,8 @@ void TranscriptTable::output_current(ofstream& runexpr_file)
 
 void TranscriptTable::output_expression(string output_dir, size_t tot_counts)
 {
-    FILE * expr_file = fopen((output_dir + "/transcripts.expr").c_str(), "w");
-    fprintf(expr_file, "bundle_id\ttranscript_id\tlength\teff_len\tbundle_frac\test_counts\test_counts_var\tfpkm\n");
+    FILE * expr_file = fopen((output_dir + "/results.expr").c_str(), "w");
+    fprintf(expr_file, "bundle_id\ttarget_id\tlength\teff_length\tbundle_frac\ttot_counts\tuniq_counts\test_counts\test_counts_var\tfpkm\n");
     double l_bil = log(1000000000);
     double l_tot_counts = log(tot_counts);
 
@@ -343,7 +362,7 @@ void TranscriptTable::output_expression(string output_dir, size_t tot_counts)
                 double l_trans_var = trans.var() + 2*(l_bundle_counts - l_bundle_mass);
                 double eff_len = trans.effective_length();
                 double l_trans_fpkm = l_bil + l_trans_counts - log(eff_len) - l_tot_counts;
-                fprintf(expr_file, "%zu\t%s\t%zu\t%f\t%f\t%f\t%f\t%e\n", bundle_id, trans.name().c_str(), trans.length(), eff_len, sexp(l_trans_frac), sexp(l_trans_counts), sexp(l_trans_var), sexp(l_trans_fpkm));
+                fprintf(expr_file, "%zu\t%s\t%zu\t%f\t%f\t%zu\t%zu\t%f\t%f\t%e\n", bundle_id, trans.name().c_str(), trans.length(), eff_len, sexp(l_trans_frac), trans.tot_counts(), trans.uniq_counts(), sexp(l_trans_counts), sexp(l_trans_var), sexp(l_trans_fpkm));
             }
         }
         else
@@ -351,7 +370,7 @@ void TranscriptTable::output_expression(string output_dir, size_t tot_counts)
             for (size_t i = 0; i < bundle_trans.size(); ++i)
             {
                 Transcript& trans = *bundle_trans[i];
-                fprintf(expr_file, "%zu\t%s\t%zu\t%f\t%f\t%f\t%f\t%e\n", bundle_id, trans.name().c_str(), trans.length(), trans.effective_length(), 0.0, 0.0, 0.0, 0.0);
+                fprintf(expr_file, "%zu\t%s\t%zu\t%f\t%f\t%zu\t%zu\t%f\t%f\t%e\n", bundle_id, trans.name().c_str(), trans.length(), trans.effective_length(), 0.0, 0, 0, 0.0, 0.0, 0.0);
             }   
         }
 

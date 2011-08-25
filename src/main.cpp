@@ -10,7 +10,7 @@
 
 #include <boost/math/distributions/geometric.hpp>
 #include <boost/filesystem.hpp>
-#include <getopt.h>
+#include <boost/program_options.hpp>
 #include <boost/thread.hpp>
 #include <iostream>
 #include <fstream>
@@ -23,11 +23,15 @@
 #include "mapparser.h"
 
 using namespace std;
+namespace po = boost::program_options;
 
 // the forgetting factor parameter controls the growth of the fragment mass
-double ff_param = 1;
+double ff_param = 0.9;
 
 string output_dir = ".";
+string fasta_file_name = "";
+string sam_file_name = "";
+
 
 // intial pseudo-count parameters (non-logged)
 double expr_alpha = .001;
@@ -39,157 +43,97 @@ double mm_alpha = 1;
 int def_fl_max = 800;
 int def_fl_mean = 200;
 int def_fl_stddev = 60;
-bool user_provided_fld = false;
 
 // option parameters
 bool bias_correct = true;
-bool upper_quart_norm = false;
 bool calc_covar = false;
 bool vis = false;
 bool in_between = false;
+enum Direction{ BOTH, FR, RF };
+Direction direction = BOTH;
 
 bool running = true;
 
-void print_usage()
+bool parse_options(int ac, char ** av)
 {
+    po::options_description generic("Allowed options");
+    generic.add_options()
+    ("help,h", "produce help message")
+    ("output-dir,o", po::value<string>(&output_dir)->default_value("."), "write all output files to this directory")
+    ("frag-len-mean,m", po::value<int>(&def_fl_mean)->default_value(200), "prior estimate for average fragment length")
+    ("frag-len-stddev,s", po::value<int>(&def_fl_stddev)->default_value(60), "prior estimate for fragment length std deviation")
+    ("fr-stranded", "accept only forward->reverse alignments")
+    ("rf-stranded", "accept only reverse->forward alignments")
+    ("calc-covar", "calculate and output covariance matrix")
+    ;
     
-    fprintf(stderr, "express v%s\n", PACKAGE_VERSION);
-//    fprintf(stderr, "linked against Boost version %d\n", BOOST_VERSION);
-    fprintf(stderr, "-----------------------------\n"); 
-    fprintf(stderr, "File Usage:   cuffexpress [options] <transcripts.fasta> <hits.sam>\n");
-    fprintf(stderr, "Piped Usage:  bowtie [options] -S <reads.fastq> | cuffexpress [options] <transcripts.fasta>\n");
-    fprintf(stderr, "General Options:\n");
-    fprintf(stderr, " -o/--output-dir       write all output files to this directory              [ default:     ./ ]\n");
-    fprintf(stderr, " -f/--forget-param     forgetting factor exponent parameter                  [ default:    1.0 ]\n");
-    fprintf(stderr, " -m/--frag-len-mean    average fragment length (unpaired reads only)         [ default:    200 ]\n");
-    fprintf(stderr, " -s/--frag-len-std-dev fragment length std deviation (unpaired reads only)   [ default:     80 ]\n");
-    fprintf(stderr, " --upper-quartile-norm use upper-quartile normalization                      [ default:  FALSE ]\n");
-    fprintf(stderr, " --calc-covar          calculate covariance matrix                           [ default:  FALSE ]\n");
-    fprintf(stderr, " --no-bias-correct     do not correct for fragment bias                      [ default:  FALSE ]\n");
-}
-
-#define OPT_UPPER_QUARTILE_NORM 200
-#define OPT_NO_BIAS_CORRECT 201
-#define OPT_IN_BETWEEN 202
-#define OPT_CALC_COVAR 203
-
-const char *short_options = "o:f:m:s:v";
-
-static struct option long_options[] = {
-    // general options
-    {"output-dir",              required_argument,	     0,	         'o'},
-    {"forget-param",            required_argument,       0,          'f'},
-    {"frag-len-mean",		    required_argument,       0,          'm'},
-    {"frag-len-std-dev",	    required_argument,       0,          's'},
-    {"visualize",       	    no_argument,             0,          'v'},
-    {"upper-quartile-norm",     no_argument,             0,          OPT_UPPER_QUARTILE_NORM},
-    {"calc-covar",              no_argument,             0,          OPT_CALC_COVAR},
-    {"no-bias-correct",         no_argument,             0,          OPT_NO_BIAS_CORRECT},
-    {"in-between",              no_argument,             0,          OPT_IN_BETWEEN},
-    {0, 0, 0, 0} // terminator
-};
-
-/**
- * Parse an int out of optarg and enforce that it be at least 'lower';
- * if it is less than 'lower', than output the given error message and
- * exit with an error and a usage message.
- */
-int parseInt(int lower, const char *errmsg, void (*print_usage)()) {
-    long l;
-    char *endPtr= NULL;
-    l = strtol(optarg, &endPtr, 10);
-    if (endPtr != NULL) {
-        if (l < lower) {
-            cerr << errmsg << endl;
-            print_usage();
-            exit(1);
-        }
-        return (int32_t)l;
-    }
-    cerr << errmsg << endl;
-    print_usage();
-    exit(1);
-    return -1;
-}
-
-/**
- * Parse an float out of optarg and enforce that is between 'lower' and 'upper';
- * if it is not, output the given error message and
- * exit with an error and a usage message.
- */
-float parseFloat(float lower, float upper, const char *errmsg, void (*print_usage)()) {
-  float l;
-  l = (float)atof(optarg);
-  
-  if (l < lower) {
-    cerr << errmsg << endl;
-    print_usage();
-    exit(1);
-  }
-  
-  if (l > upper)
+    po::options_description hidden("Hidden options");
+    hidden.add_options()
+    ("no-bias-correct","")
+    ("in-between","")
+    ("visualizer-output,v","")
+    ("forget-param,f", po::value<double>(&ff_param)->default_value(0.9),"")
+    ("sam-file", po::value<string>(&sam_file_name)->default_value(""),"")
+    ("fasta-file", po::value<string>(&fasta_file_name)->default_value(""),"")
+    ;
+    
+    po::positional_options_description positional;
+    positional.add("fasta-file",1).add("sam-file",1);
+    
+    po::options_description cmdline_options;
+    cmdline_options.add(generic).add(hidden);
+    
+    bool error = false;
+    po::variables_map vm;
+    try 
     {
-      cerr << errmsg << endl;
-      print_usage();
-      exit(1);
+        po::store(po::command_line_parser(ac, av).options(cmdline_options).positional(positional).run(), vm);
     }
-  
-  return l;
-  
-  cerr << errmsg << endl;
-  print_usage();
-  exit(1);
-  return -1;
-}
+    catch (po::error& e)
+    {
+        cerr << "Command-Line Argument Error: "<< e.what() << endl;
+        error = true;
+    }
+    po::notify(vm);
+    
+    if (fasta_file_name == "")
+    {
+        cerr << "Command-Line Argument Error: target sequence fasta file required\n\n";
+        error = true;
+    }
+    
+    if (error || vm.count("help")) 
+    {
+        fprintf(stderr, "express v%s\n", PACKAGE_VERSION);
+        fprintf(stderr, "-----------------------------\n"); 
+        fprintf(stderr, "File Usage:  express [options] <target_seqs.fa> <hits.(sam/bam)>\n");
+        fprintf(stderr, "Piped Usage: bowtie [options] -S <index> <reads.fq> | express [options] <target_seqs.fa>\n");
+        cout << generic << "\n";
+        return 1;
+    }
+    
 
-/**
- * Parse the options and set global variables appropriately.
- */
-int parse_options(int argc, char** argv)
-{
-    int option_index = 0;
-    int next_option;
-	
-    do {
-        next_option = getopt_long(argc, argv, short_options, long_options, &option_index);
-        switch (next_option) {
-			case -1:     /* Done with options. */
-				break;
-	                case 'f':
-			  ff_param = parseFloat(0.5, 1, "-f/--forget-param arg must be between 0.5 and 1", print_usage);
-			  break;
-			case 'm':
-                user_provided_fld = true;
-				def_fl_mean = (uint32_t)parseInt(0, "-m/--frag-len-mean arg must be at least 0", print_usage);
-				break;
-			case 's':
-                user_provided_fld = true;
-                def_fl_stddev = (uint32_t)parseInt(0, "-s/--frag-len-std-dev arg must be at least 0", print_usage);
-				break;
-            case 'o':
-                output_dir = optarg;
-				break;
-            case 'v':
-                vis = true;
-                break;
-			case OPT_UPPER_QUARTILE_NORM:
-                upper_quart_norm = true;
-                break;
-            case OPT_CALC_COVAR:
-                calc_covar = true;
-                break;
-            case OPT_NO_BIAS_CORRECT:
-                bias_correct = false;
-                break;
-	case OPT_IN_BETWEEN:
-	  in_between = true;
-	  break;
-			default:
-				print_usage();
-				return 1;
+    
+    if (vm.count("fr-stranded"))
+    {
+        direction = FR;
+    }
+    
+    if (vm.count("rf-stranded"))
+    {
+        if (direction != BOTH)
+        {
+            cerr << "fr-stranded and rf-stranded flags cannot both be specified in the same run.\n";
+            return 1;
         }
-    } while(next_option != -1);
-	
+        direction = RF;
+    }
+    
+    calc_covar = vm.count("calc-covar");
+    bias_correct = !(vm.count("no-bias-correct"));
+    in_between = vm.count("in-between");
+    vis = vm.count("visualizer-output");
+        
     return 0;
 }
 
@@ -400,18 +344,12 @@ size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TranscriptTable* 
     return n;
 }
 
+
 int main (int argc, char ** argv)
 {    
     int parse_ret = parse_options(argc,argv);
     if (parse_ret)
         return parse_ret;
-	
-    
-    if(optind >= argc)
-    {
-        print_usage();
-        return 1;
-    }
     
     if (output_dir != ".")
     {
@@ -422,15 +360,12 @@ int main (int argc, char ** argv)
         cerr << "Error: cannot create directory " << output_dir << ".\n";
         exit(1);
     }
-    
-    string trans_fasta_file_name = argv[optind++];
-    string sam_hits_file_name = (optind >= argc) ? "" : argv[optind++];
-        
+            
     FLD fld(fld_alpha, def_fl_max, def_fl_mean, def_fl_stddev);
     BiasBoss* bias_table = (bias_correct) ? new BiasBoss(bias_alpha):NULL;
     MismatchTable mismatch_table(mm_alpha);
-    ThreadedMapParser map_parser(sam_hits_file_name);
-    TranscriptTable trans_table(trans_fasta_file_name, expr_alpha, &fld, bias_table, &mismatch_table);
+    ThreadedMapParser map_parser(sam_file_name);
+    TranscriptTable trans_table(fasta_file_name, expr_alpha, &fld, bias_table, &mismatch_table);
 
     if (bias_table)
         boost::thread bias_update(&TranscriptTable::threaded_bias_update, &trans_table);
@@ -439,7 +374,7 @@ int main (int argc, char ** argv)
     running = false;
     
     //mismatch_table.output(output_dir);
-    ofstream fld_out((output_dir + "/fld.pdf").c_str());
+    ofstream fld_out((output_dir + "/fld.out").c_str());
     fld_out << fld.to_string() << '\n';
     fld_out.close();
 

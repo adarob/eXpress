@@ -59,12 +59,13 @@ ThreadedMapParser::ThreadedMapParser(string file_name)
         BamTools::BamReader* reader = new BamTools::BamReader();
         if (reader->Open(file_name))
         {
+            cout << "No alignment file specified. Expecting streaming input from stdin...\n";
             _parser = new BAMParser(reader);
         }
         else
         {
             delete reader;
-            
+            cout << "Input is not in BAM format. Trying SAM...\n";
             ifstream* ifs = new ifstream(file_name.c_str());
             _parser = new SAMParser(ifs);
             if(!ifs->is_open())
@@ -83,7 +84,6 @@ void ThreadedMapParser::threaded_parse(ParseThreadSafety* thread_safety, Transcr
     while (fragments_remain)
     {
         Fragment * frag;
-        Fragment frag2;
         while (fragments_remain)
         {
             frag = new Fragment(); 

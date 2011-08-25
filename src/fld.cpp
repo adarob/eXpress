@@ -33,7 +33,7 @@ FLD::FLD(double alpha, size_t max_val, size_t mean, size_t std_dev) :
     {  
         double mass = tot + log(boost::math::cdf(norm,i+0.5) - boost::math::cdf(norm,i-0.5));
         _hist[i] = mass;
-        _sum = log_sum(_sum, log(i)+mass);
+        _sum = log_sum(_sum, log((double)i)+mass);
         _tot_mass = log_sum(_tot_mass, mass);
     }
 }
@@ -54,7 +54,7 @@ void FLD::add_val(size_t len, double mass)
     {
         double k_mass = mass + KERNEL[i];
         _hist[offset] = log_sum(_hist[offset], k_mass);
-        _sum = log_sum(_sum, log(offset++)+k_mass);
+        _sum = log_sum(_sum, log((double)offset++)+k_mass);
     }
     _tot_mass = log_sum(_tot_mass, mass);
 }
