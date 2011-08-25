@@ -52,7 +52,7 @@
             isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "--no-bias-correct -f 0.65 -o /Users/adarob/desktop /Volumes/lmcb.math.berkeley.edu/experiments/cexpress/simulation/ugt3a2_2/indexes/mtg_out.fa /Volumes/lmcb.math.berkeley.edu/experiments/cexpress/simulation/ugt3a2_2/final.bam"
+            argument = "--no-bias-correct -f 0.65 -o /Users/adarob/desktop /Volumes/lmcb.math.berkeley.edu/experiments/cexpress/simulation/ugt3a2_2/indexes/mtg_out.fa /Volumes/lmcb.math.berkeley.edu/experiments/cexpress/simulation/ugt3a2/final.bam"
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument

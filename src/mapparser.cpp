@@ -127,16 +127,14 @@ bool BAMParser::next_fragment(Fragment& nf)
 {    
     nf.add_map_end(_frag_buff);
     
-    _frag_buff = new FragMap();
     BamTools::BamAlignment a;
+    if (!_reader->GetNextAlignment(a))
+        return false;
+    _frag_buff = new FragMap();
     
     while(true)
     {   
-        if (!_reader->GetNextAlignment(a))
-        {
-            return false;
-        }
-        else if (!map_end_from_alignment(a))
+        if (!map_end_from_alignment(a))
         {
             continue;
         }
