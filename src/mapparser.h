@@ -39,8 +39,6 @@ class BAMParser : public Parser
 {
     BamTools::BamReader* _reader;
     
-    BamTools::BamAlignment _align_buff;
-    
     /**
      * a private pointer to the current fragment mapping being parsed
      */

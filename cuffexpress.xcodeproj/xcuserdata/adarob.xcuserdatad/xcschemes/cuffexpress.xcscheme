@@ -52,8 +52,8 @@
             isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "--no-bias-correct -f 0.65 -o /Users/adarob/desktop /Volumes/lmcb.math.berkeley.edu/experiments/cexpress/simulation/ugt3a2_2/indexes/mtg_out.fa /Volumes/lmcb.math.berkeley.edu/experiments/cexpress/simulation/ugt3a2_2/final"
-            isEnabled = "NO">
+            argument = "--no-bias-correct -f 0.65 -o /Users/adarob/desktop /Volumes/lmcb.math.berkeley.edu/experiments/cexpress/simulation/ugt3a2_2/indexes/mtg_out.fa /Volumes/lmcb.math.berkeley.edu/experiments/cexpress/simulation/ugt3a2_2/final.bam"
+            isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
             argument = "-m -f asd"
@@ -61,7 +61,7 @@
          </CommandLineArgument>
          <CommandLineArgument
             argument = "--calc-covar -v -f 0.65 -o /Users/adarob/desktop /Volumes/lmcb.math.berkeley.edu/experiments/cexpress/hg18/mtg_out/mtg_out.fa /Volumes/lmcb.math.berkeley.edu/experiments/cexpress/hg18/mtg_out/hits_1M.sam"
-            isEnabled = "YES">
+            isEnabled = "NO">
          </CommandLineArgument>
       </CommandLineArguments>
       <AdditionalOptions>

@@ -52,6 +52,7 @@ ThreadedMapParser::ThreadedMapParser(string file_name)
 {
     if (file_name.size() == 0)
     {
+        cout << "No alignment file specified. Expecting streaming input on stdin...\n";
         _parser = new SAMParser(&cin);
     }
     else
@@ -59,7 +60,6 @@ ThreadedMapParser::ThreadedMapParser(string file_name)
         BamTools::BamReader* reader = new BamTools::BamReader();
         if (reader->Open(file_name))
         {
-            cout << "No alignment file specified. Expecting streaming input from stdin...\n";
             _parser = new BAMParser(reader);
         }
         else
@@ -111,18 +111,34 @@ void ThreadedMapParser::threaded_parse(ParseThreadSafety* thread_safety, Transcr
 BAMParser::BAMParser(BamTools::BamReader* reader)
 {
     _reader = reader;
-    _reader->GetNextAlignment(_align_buff);
+    BamTools::BamAlignment a;
+    
+    // Get first valid FragMap
+    _frag_buff = new FragMap();
+    do {
+        if (!_reader->GetNextAlignment(a))
+        {
+            cerr << "Error: Input BAM file contains no valid alignments." << endl;
+        }
+    } while(!map_end_from_alignment(a));
 }
 
 bool BAMParser::next_fragment(Fragment& nf)
 {    
+    nf.add_map_end(_frag_buff);
+    
     _frag_buff = new FragMap();
+    BamTools::BamAlignment a;
+    
     while(true)
-    {        
-        if (!map_end_from_alignment(_align_buff))
+    {   
+        if (!_reader->GetNextAlignment(a))
         {
-            if (!_reader->GetNextAlignment(_align_buff))
-                return false;
+            return false;
+        }
+        else if (!map_end_from_alignment(a))
+        {
+            continue;
         }
         else if (!nf.add_map_end(_frag_buff))
         {
@@ -130,9 +146,9 @@ bool BAMParser::next_fragment(Fragment& nf)
         }
         else
         {
-            _frag_buff = new FragMap();
-            if (!_reader->GetNextAlignment(_align_buff))
+            if (!_reader->GetNextAlignment(a))
                 return false;
+            _frag_buff = new FragMap();
         }
         
     }
