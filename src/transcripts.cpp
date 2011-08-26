@@ -104,7 +104,7 @@ double Transcript::effective_length() const
 double Transcript::total_bias_for_length(size_t l) const
 {
     assert(l <= _fld->max_val());
-    return _avg_bias + log(length() - l + 1);
+    return _avg_bias + log((double)(length() - l + 1));
 }
 
 void Transcript::update_transcript_bias()
@@ -321,8 +321,8 @@ void TranscriptTable::output_expression(string output_dir, size_t tot_counts)
 {
     FILE * expr_file = fopen((output_dir + "/results.expr").c_str(), "w");
     fprintf(expr_file, "bundle_id\ttarget_id\tlength\teff_length\tbundle_frac\ttot_counts\tuniq_counts\test_counts\test_counts_var\tfpkm\n");
-    double l_bil = log(1000000000);
-    double l_tot_counts = log(tot_counts);
+    double l_bil = log(1000000000.);
+    double l_tot_counts = log((double)tot_counts);
 
     // Bundle transcripts based on partition
     typedef boost::unordered_map<TransID, vector<Transcript*> > BundleMap;
@@ -350,7 +350,7 @@ void TranscriptTable::output_expression(string output_dir, size_t tot_counts)
         
         if (bundle_counts)
         {
-            double l_bundle_counts = log(bundle_counts);
+            double l_bundle_counts = log((double)bundle_counts);
             double l_bundle_frac = l_bundle_counts - l_tot_counts;
             
             // Calculate individual counts and rhos
