@@ -69,11 +69,6 @@ class Transcript
     std::string _seq;
     
     /**
-     * a private unsigned integer that stores the transcript length
-     */
-    size_t _len;
-    
-    /**
      * a private double that stores the (logged) mass based on observed fragment mappings
      */
     double _mass;
@@ -177,7 +172,7 @@ public:
      * a member function that returns the transcript length
      * @return transcript length
      */
-    size_t length() const { return _len; }
+    size_t length() const { return _seq.length(); }
     
     /**
      * a member function that returns the current (logged) fragment mass

@@ -25,17 +25,16 @@ Transcript::Transcript(const std::string& name, const std::string& seq, double a
 :_name(name),
 _id(hash_trans_name(name)),
 _seq(seq),
-_len(seq.length()),
-_bundle_counts(0),
+_var(HUGE_VAL),
 _uniq_counts(0),
 _tot_counts(0),
+_bundle_counts(0),
 _start_bias(std::vector<double>(seq.length(),0)),
 _end_bias(std::vector<double>(seq.length(),0)),
 _avg_bias(0),
 _fld(fld),
 _bias_table(bias_table),
-_mismatch_table(mismatch_table),
-_var(HUGE_VAL)
+_mismatch_table(mismatch_table)
 { _mass = log(effective_length()*alpha); }
 
 void Transcript::add_mass(double p, double mass) 
