@@ -8,7 +8,7 @@
 
 #define PACKAGE_VERSION "INTERNAL"
 
-#include <boost/math/distributions/geometric.hpp>
+//#include <boost/math/distributions/geometric.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/program_options.hpp>
 #include <boost/thread.hpp>
@@ -48,7 +48,7 @@ int def_fl_stddev = 60;
 bool bias_correct = true;
 bool calc_covar = false;
 bool vis = false;
-bool in_between = false;
+//bool in_between = false;
 enum Direction{ BOTH, FR, RF };
 Direction direction = BOTH;
 
@@ -70,7 +70,7 @@ bool parse_options(int ac, char ** av)
     po::options_description hidden("Hidden options");
     hidden.add_options()
     ("no-bias-correct","")
-    ("in-between","")
+      //    ("in-between","")
     ("visualizer-output,v","")
     ("forget-param,f", po::value<double>(&ff_param)->default_value(0.9),"")
     ("sam-file", po::value<string>(&sam_file_name)->default_value(""),"")
@@ -131,7 +131,7 @@ bool parse_options(int ac, char ** av)
     
     calc_covar = vm.count("calc-covar");
     bias_correct = !(vm.count("no-bias-correct"));
-    in_between = vm.count("in-between");
+    //  in_between = vm.count("in-between");
     vis = vm.count("visualizer-output");
         
     return 0;
@@ -274,8 +274,8 @@ size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TranscriptTable* 
     int i = 1;
 
     // Geometric distribution used for 'in-between' tests
-    srand ( time(NULL) );
-    boost::math::geometric geom(.00002);
+    //srand ( time(NULL) );
+    //    boost::math::geometric geom(.00002);
     cout.precision(20);
     while(true)
     {
@@ -319,8 +319,9 @@ size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TranscriptTable* 
         
         
         // Update mass_n based on forgetting factor
-        int k = (in_between) ? quantile(geom, rand()/double(RAND_MAX)) : 1;
-        for (int j = 0; j < k; ++j)
+        //int k = (in_between) ? quantile(geom, rand()/double(RAND_MAX)) : 1;
+        int k = 1;
+	for (int j = 0; j < k; ++j)
         {
             if (++fake_n > 1)
             {
