@@ -216,8 +216,8 @@ bool SAMParser::map_end_from_line(char* line)
 {
     FragMap& f = *_frag_buff;
     char *p = strtok(line, "\t");
-    int sam_flag;    
-    bool paired;
+    int sam_flag=0;    
+    bool paired=0;
     
     int i = 0;
     while (p && i <= 9) 

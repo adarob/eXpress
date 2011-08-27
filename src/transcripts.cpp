@@ -350,7 +350,6 @@ void TranscriptTable::output_expression(string output_dir, size_t tot_counts)
         if (bundle_counts)
         {
             double l_bundle_counts = log((double)bundle_counts);
-            double l_bundle_frac = l_bundle_counts - l_tot_counts;
             
             // Calculate individual counts and rhos
             for (size_t i = 0; i < bundle_trans.size(); ++i)
