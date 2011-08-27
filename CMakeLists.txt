@@ -21,6 +21,8 @@ find_package(Boost 1.41
     program_options
     REQUIRED)
 
+find_package(zlib)
+
 include_directories(${Boost_INCLUDE_DIRS} "bamtools/include")
 link_directories ("../../bamtools/lib") 
 

@@ -496,7 +496,7 @@
 			</dict>
 		</dict>
 		<string>file://localhost/Users/adarob/Projects/Tuxedo/devel/cuffexpress/cuffexpress.xcodeproj/</string>
-		<real>336029425.21445203</real>
+		<real>336098718.112782</real>
 		<dict>
 			<key>$class</key>
 			<dict>
@@ -5862,9 +5862,9 @@
 				</dict>
 			</array>
 		</dict>
-		<real>336029425.21433097</real>
-		<string>{2688, 984}</string>
-		<string>{3536, 0}</string>
+		<real>336098713.038212</real>
+		<string>{1773, 967}</string>
+		<string>{1515, 0}</string>
 		<dict>
 			<key>$class</key>
 			<dict>
@@ -7045,7 +7045,7 @@
 				</dict>
 			</array>
 		</dict>
-		<real>336029425.21765602</real>
+		<real>336098718.11670601</real>
 		<string>{256, 1600}</string>
 		<string>{2501, 0}</string>
 		<dict>
@@ -7376,9 +7376,9 @@
 				</dict>
 			</array>
 		</dict>
-		<real>336006605.63364601</real>
-		<string>{4332, 793}</string>
-		<string>{8434, 0}</string>
+		<real>336098718.11264598</real>
+		<string>{5228, 688}</string>
+		<string>{5731, 0}</string>
 		<dict>
 			<key>$class</key>
 			<dict>
@@ -7709,7 +7709,7 @@
 				</dict>
 			</array>
 		</dict>
-		<real>336029425.21772802</real>
+		<real>336098718.11678398</real>
 		<string>{672, 671}</string>
 		<string>{1037, 7}</string>
 		<dict>
@@ -11690,7 +11690,7 @@
 				<integer>845</integer>
 			</dict>
 			<key>NS.time</key>
-			<real>336029407.874915</real>
+			<real>336066956.56263</real>
 		</dict>
 		<dict>
 			<key>$classes</key>
@@ -11701,7 +11701,7 @@
 			<key>$classname</key>
 			<string>NSDate</string>
 		</dict>
-		<string>Today at 10:30 PM</string>
+		<string>Today at 8:55 AM</string>
 		<integer>234</integer>
 		<string>cuffexpress</string>
 		<dict>
@@ -11785,7 +11785,7 @@
 				<integer>852</integer>
 			</dict>
 		</dict>
-		<string>file://localhost/Users/adarob/Projects/Tuxedo/devel/cuffexpress/src/mapparser.cpp</string>
+		<string>file://localhost/Users/adarob/Projects/Tuxedo/devel/cuffexpress/src/transcripts.cpp</string>
 		<dict>
 			<key>$class</key>
 			<dict>
@@ -11803,7 +11803,7 @@
 				<integer>854</integer>
 			</dict>
 		</dict>
-		<string>file://localhost/Users/adarob/Projects/Tuxedo/devel/cuffexpress/src/mismatchmodel.cpp</string>
+		<string>file://localhost/Users/adarob/Projects/Tuxedo/devel/cuffexpress/src/mapparser.cpp</string>
 		<dict>
 			<key>$class</key>
 			<dict>
@@ -11821,7 +11821,7 @@
 				<integer>856</integer>
 			</dict>
 		</dict>
-		<string>file://localhost/Users/adarob/Projects/Tuxedo/devel/cuffexpress/src/main.cpp</string>
+		<string>file://localhost/Users/adarob/Projects/Tuxedo/devel/cuffexpress/src/mismatchmodel.cpp</string>
 		<dict>
 			<key>$class</key>
 			<dict>
@@ -11839,7 +11839,7 @@
 				<integer>858</integer>
 			</dict>
 		</dict>
-		<string>file://localhost/opt/local/include/boost/thread/pthread/mutex.hpp</string>
+		<string>file://localhost/Users/adarob/Projects/Tuxedo/devel/cuffexpress/src/main.cpp</string>
 		<dict>
 			<key>$class</key>
 			<dict>
@@ -11857,7 +11857,7 @@
 				<integer>860</integer>
 			</dict>
 		</dict>
-		<string>file://localhost/Users/adarob/Projects/Tuxedo/devel/cuffexpress/src/fragments.cpp</string>
+		<string>file://localhost/opt/local/include/boost/thread/pthread/mutex.hpp</string>
 		<dict>
 			<key>$class</key>
 			<dict>
@@ -11875,7 +11875,7 @@
 				<integer>862</integer>
 			</dict>
 		</dict>
-		<string>file://localhost/Users/adarob/Projects/Tuxedo/devel/cuffexpress/src/fragments.h</string>
+		<string>file://localhost/Users/adarob/Projects/Tuxedo/devel/cuffexpress/src/fragments.cpp</string>
 		<dict>
 			<key>$class</key>
 			<dict>
@@ -11893,7 +11893,7 @@
 				<integer>864</integer>
 			</dict>
 		</dict>
-		<string>file://localhost/Users/adarob/Projects/Tuxedo/devel/cuffexpress/src/transcripts.cpp</string>
+		<string>file://localhost/Users/adarob/Projects/Tuxedo/devel/cuffexpress/src/fragments.h</string>
 		<dict>
 			<key>$class</key>
 			<dict>
@@ -17948,7 +17948,7 @@
 				<integer>1329</integer>
 			</dict>
 		</dict>
-		<real>336029425.21827298</real>
+		<real>336098718.11746001</real>
 		<dict>
 			<key>$class</key>
 			<dict>
@@ -39666,7 +39666,7 @@
 			<key>NS.objects</key>
 			<array/>
 		</dict>
-		<string>{{69, 0}, {1611, 1028}}</string>
+		<string>{{309, 300}, {1611, 878}}</string>
 		<dict>
 			<key>$class</key>
 			<dict>
@@ -44047,7 +44047,7 @@
 				</dict>
 			</array>
 		</dict>
-		<real>336029425.222902</real>
+		<real>336098718.12306398</real>
 		<string>{672, 671}</string>
 		<string>{1037, 7}</string>
 		<string>map_end_from_alignment(BamTools::BamAlignment&amp; alignment)</string>
@@ -45155,7 +45155,7 @@
 			<key>DocumentLocation</key>
 			<dict>
 				<key>CF$UID</key>
-				<integer>2744</integer>
+				<integer>2745</integer>
 			</dict>
 			<key>DomainIdentifier</key>
 			<dict>
@@ -45187,11 +45187,11 @@
 				</dict>
 				<dict>
 					<key>CF$UID</key>
-					<integer>2741</integer>
+					<integer>2742</integer>
 				</dict>
 				<dict>
 					<key>CF$UID</key>
-					<integer>2742</integer>
+					<integer>2743</integer>
 				</dict>
 			</array>
 		</dict>
@@ -45204,9 +45204,10 @@
 			<key>Identifier</key>
 			<dict>
 				<key>CF$UID</key>
-				<integer>2722</integer>
+				<integer>2741</integer>
 			</dict>
 		</dict>
+		<string>transcripts.cpp</string>
 		<dict>
 			<key>$class</key>
 			<dict>
@@ -45228,7 +45229,7 @@
 			<key>Identifier</key>
 			<dict>
 				<key>CF$UID</key>
-				<integer>2743</integer>
+				<integer>2744</integer>
 			</dict>
 		</dict>
 		<string>cuffexpress</string>
@@ -45241,22 +45242,13 @@
 			<key>documentURL</key>
 			<dict>
 				<key>CF$UID</key>
-				<integer>2745</integer>
+				<integer>336</integer>
 			</dict>
 			<key>timestamp</key>
 			<dict>
 				<key>CF$UID</key>
 				<integer>0</integer>
 			</dict>
-		</dict>
-		<dict>
-			<key>$class</key>
-			<dict>
-				<key>CF$UID</key>
-				<integer>26</integer>
-			</dict>
-			<key>NS.string</key>
-			<string>file://localhost/Users/adarob/Projects/Tuxedo/devel/cuffexpress/src/mapparser.cpp</string>
 		</dict>
 		<dict>
 			<key>$class</key>
@@ -45757,7 +45749,7 @@
 				</dict>
 				<dict>
 					<key>CF$UID</key>
-					<integer>2722</integer>
+					<integer>2741</integer>
 				</dict>
 				<dict>
 					<key>CF$UID</key>
@@ -45779,7 +45771,7 @@
 			<key>DocumentLocation</key>
 			<dict>
 				<key>CF$UID</key>
-				<integer>2744</integer>
+				<integer>2745</integer>
 			</dict>
 			<key>DomainIdentifier</key>
 			<dict>
@@ -45828,7 +45820,7 @@
 			<key>Identifier</key>
 			<dict>
 				<key>CF$UID</key>
-				<integer>2722</integer>
+				<integer>2741</integer>
 			</dict>
 		</dict>
 		<dict>
@@ -45901,10 +45893,10 @@
 				</dict>
 			</array>
 		</dict>
-		<real>336029425.224388</real>
-		<string>{2688, 984}</string>
-		<string>{3536, 0}</string>
-		<string>BAMParser::next_fragment(Fragment&amp; nf)</string>
+		<real>336098718.12482202</real>
+		<string>{5228, 688}</string>
+		<string>{5731, 0}</string>
+		<string>TranscriptTable::merge_bundles(TransID rep1, TransID rep2)</string>
 		<dict>
 			<key>$class</key>
 			<dict>
@@ -45922,7 +45914,7 @@
 				<integer>2781</integer>
 			</dict>
 		</dict>
-		<string>file://localhost/Users/adarob/Projects/Tuxedo/devel/cuffexpress/src/mapparser.cpp</string>
+		<string>file://localhost/Users/adarob/Projects/Tuxedo/devel/cuffexpress/src/transcripts.cpp</string>
 		<dict>
 			<key>$class</key>
 			<dict>
@@ -45937,7 +45929,7 @@
 				</dict>
 			</array>
 		</dict>
-		<string>{{0, 0}, {1351, 586}}</string>
+		<string>{{0, 0}, {1351, 436}}</string>
 		<dict>
 			<key>$class</key>
 			<dict>
@@ -46006,7 +45998,7 @@
 				</dict>
 			</array>
 		</dict>
-		<real>608</real>
+		<real>458</real>
 		<dict>
 			<key>$class</key>
 			<dict>
@@ -46116,7 +46108,7 @@
 				</dict>
 			</array>
 		</dict>
-		<real>608</real>
+		<real>458</real>
 		<dict>
 			<key>$class</key>
 			<dict>
@@ -46200,7 +46192,7 @@
 				</dict>
 				<dict>
 					<key>CF$UID</key>
-					<integer>1547</integer>
+					<integer>1549</integer>
 				</dict>
 				<dict>
 					<key>CF$UID</key>
@@ -46558,7 +46550,7 @@
 				</dict>
 			</array>
 		</dict>
-		<string>{{0, 0}, {259, 886}}</string>
+		<string>{{0, 0}, {259, 736}}</string>
 		<dict>
 			<key>$class</key>
 			<dict>
@@ -46591,7 +46583,7 @@
 				</dict>
 				<dict>
 					<key>CF$UID</key>
-					<integer>2722</integer>
+					<integer>2741</integer>
 				</dict>
 			</array>
 		</dict>
@@ -46779,7 +46771,7 @@
 			</array>
 		</dict>
 		<real>260</real>
-		<string>mapparser.cpp</string>
+		<string>transcripts.cpp</string>
 		<dict>
 			<key>$class</key>
 			<dict>
@@ -53689,7 +53681,7 @@
 				</dict>
 			</array>
 		</dict>
-		<real>336029425.22362602</real>
+		<real>336098718.12385601</real>
 		<string>{256, 1600}</string>
 		<string>{2501, 0}</string>
 		<dict>
