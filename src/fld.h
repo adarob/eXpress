@@ -10,6 +10,7 @@
 #define FLD_H
 
 #include <vector>
+#include <string>
 
 /**
  * FLD class.  This class keeps track of the observed fragment length distribution.  It starts with

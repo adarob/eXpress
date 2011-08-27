@@ -496,7 +496,7 @@
 			</dict>
 		</dict>
 		<string>file://localhost/Users/adarob/Projects/Tuxedo/devel/cuffexpress/cuffexpress.xcodeproj/</string>
-		<real>336098718.112782</real>
+		<real>336100527.94174099</real>
 		<dict>
 			<key>$class</key>
 			<dict>
@@ -5862,8 +5862,8 @@
 				</dict>
 			</array>
 		</dict>
-		<real>336098713.038212</real>
-		<string>{1773, 967}</string>
+		<real>336100523.01134598</real>
+		<string>{1773, 965}</string>
 		<string>{1515, 0}</string>
 		<dict>
 			<key>$class</key>
@@ -7045,7 +7045,7 @@
 				</dict>
 			</array>
 		</dict>
-		<real>336098718.11670601</real>
+		<real>336100527.94649601</real>
 		<string>{256, 1600}</string>
 		<string>{2501, 0}</string>
 		<dict>
@@ -7376,9 +7376,9 @@
 				</dict>
 			</array>
 		</dict>
-		<real>336098718.11264598</real>
-		<string>{5228, 688}</string>
-		<string>{5731, 0}</string>
+		<real>336100527.94157499</real>
+		<string>{9163, 1686}</string>
+		<string>{10690, 0}</string>
 		<dict>
 			<key>$class</key>
 			<dict>
@@ -7709,7 +7709,7 @@
 				</dict>
 			</array>
 		</dict>
-		<real>336098718.11678398</real>
+		<real>336100527.94658601</real>
 		<string>{672, 671}</string>
 		<string>{1037, 7}</string>
 		<dict>
@@ -17948,7 +17948,7 @@
 				<integer>1329</integer>
 			</dict>
 		</dict>
-		<real>336098718.11746001</real>
+		<real>336100527.94725698</real>
 		<dict>
 			<key>$class</key>
 			<dict>
@@ -44047,7 +44047,7 @@
 				</dict>
 			</array>
 		</dict>
-		<real>336098718.12306398</real>
+		<real>336100527.95286298</real>
 		<string>{672, 671}</string>
 		<string>{1037, 7}</string>
 		<string>map_end_from_alignment(BamTools::BamAlignment&amp; alignment)</string>
@@ -45893,10 +45893,10 @@
 				</dict>
 			</array>
 		</dict>
-		<real>336098718.12482202</real>
-		<string>{5228, 688}</string>
-		<string>{5731, 0}</string>
-		<string>TranscriptTable::merge_bundles(TransID rep1, TransID rep2)</string>
+		<real>336100527.954588</real>
+		<string>{9163, 1686}</string>
+		<string>{10690, 0}</string>
+		<string>TranscriptTable::output_expression(string output_dir, size_t tot_counts)</string>
 		<dict>
 			<key>$class</key>
 			<dict>
@@ -53681,7 +53681,7 @@
 				</dict>
 			</array>
 		</dict>
-		<real>336098718.12385601</real>
+		<real>336100527.95369399</real>
 		<string>{256, 1600}</string>
 		<string>{2501, 0}</string>
 		<dict>
