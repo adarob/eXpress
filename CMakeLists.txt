@@ -21,7 +21,8 @@ find_package(Boost 1.41
     program_options
     REQUIRED)
 
-include_directories(${Boost_INCLUDE_DIRS} "bamtools/include")
-link_directories ("../../bamtools/lib") 
+find_package(zlib)
+
+include_directories(${Boost_INCLUDE_DIRS} "${CMAKE_CURRENT_SOURCE_DIR}/bamtools/include") 
 
 add_subdirectory(src)
