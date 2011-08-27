@@ -324,7 +324,7 @@ size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TranscriptTable* 
         {
             if (++fake_n > 1)
             {
-                mass_n += ff_param*log(fake_n-1) - log(pow(fake_n,ff_param) - 1);
+                mass_n += ff_param*log((double)fake_n-1) - log(pow(fake_n,ff_param) - 1);
             }
         }
         assert(!isnan(mass_n));
