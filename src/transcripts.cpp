@@ -115,10 +115,10 @@ void Transcript::update_transcript_bias()
 }
 
 TranscriptTable::TranscriptTable(const string& trans_fasta_file, double alpha, const FLD* fld, BiasBoss* bias_table, const MismatchTable* mismatch_table)
-: _alpha(alpha),
-  _rank(Rank(_rank_map)),
+: _rank(Rank(_rank_map)),
   _parent(Parent(_parent_map)),
-  _bundles(_rank, _parent)
+  _bundles(_rank, _parent),
+  _alpha(alpha)
 {
     cout << "Loading target sequences from" << trans_fasta_file << "...\n";
     ifstream infile (trans_fasta_file.c_str());
@@ -369,7 +369,7 @@ void TranscriptTable::output_expression(string output_dir, size_t tot_counts)
             for (size_t i = 0; i < bundle_trans.size(); ++i)
             {
                 Transcript& trans = *bundle_trans[i];
-                fprintf(expr_file, "%zu\t%s\t%zu\t%f\t%f\t%zu\t%zu\t%f\t%f\t%e\n", bundle_id, trans.name().c_str(), trans.length(), trans.effective_length(), 0.0, 0, 0, 0.0, 0.0, 0.0);
+                fprintf(expr_file, "%zu\t%s\t%zu\t%f\t%f\t%d\t%d\t%f\t%f\t%e\n", bundle_id, trans.name().c_str(), trans.length(), trans.effective_length(), 0.0, 0, 0, 0.0, 0.0, 0.0);
             }   
         }
 
