@@ -1,6 +1,9 @@
 #!/bin/bash
 
-VERSION=$(cat version)
+VERSION=0_9_0-BETA
+MAC = express-$VERSION-OSX_x86_64
+LINUX = express-$VERSION-linux_x86_64
+SRC = express-$VERSION-src
 
 #make version header file
 echo "#define PACKAGE_VERSION $VERSION" > src/version.h
@@ -20,32 +23,32 @@ rm -r html/doc/latex
 
 #Create new download directories
 mkdir html/downloads/express-$VERSION
-mkdir html/downloads/express-$VERSION/express-$VERSION-macosx
-mkdir html/downloads/express-$VERSION/express-$VERSION-linux
-mkdir html/downloads/express-$VERSION/express-$VERSION-src
+mkdir html/downloads/express-$VERSION/$MAC
+mkdir html/downloads/express-$VERSION/$LINUX
+mkdir html/downloads/express-$VERSION/$SRC
 
 #Populate download directories
 #macosx
-cp osx_build/src/express html/downloads/express-$VERSION/express-$VERSION-macosx
-cp README html/downloads/express-$VERSION/express-$VERSION-macosx/README
-cp LICENSE html/downloads/express-$VERSION/express-$VERSION-macosx/LICENSE
+cp osx_build/src/express html/downloads/express-$VERSION/$MAC
+cp README html/downloads/express-$VERSION/$MAC/README
+cp LICENSE html/downloads/express-$VERSION/$MAC/LICENSE
 #linux
-cp linux_build/src/express html/downloads/express-$VERSION/express-$VERSION-linux
-cp README html/downloads/express-$VERSION/express-$VERSION-linux/README
-cp LICENSE html/downloads/express-$VERSION/express-$VERSION-linux/LICENSE
+cp linux_build/src/express html/downloads/express-$VERSION/$LINUX
+cp README html/downloads/express-$VERSION/$LINUX/README
+cp LICENSE html/downloads/express-$VERSION/$LINUX/LICENSE
 #src
-cp -R src html/downloads/express-$VERSION/express-$VERSION-src/src
-cp README html/downloads/express-$VERSION/express-$VERSION-src/README
-cp LICENSE html/downloads/express-$VERSION/express-$VERSION-src/LICENSE
+cp -R src html/downloads/express-$VERSION/$SRC/src
+cp README html/downloads/express-$VERSION/$SRC/README
+cp LICENSE html/downloads/express-$VERSION/$SRC/LICENSE
 
 #Tar download directories
 cd html/downloads/express-$VERSION
-tar -czf express-$VERSION-macosx.tgz express-$VERSION-macosx 
-tar -czf express-$VERSION-linux.tgz express-$VERSION-linux
-tar -czf express-$VERSION-src.tgz express-$VERSION-src
-rm -r express-$VERSION-macosx
-rm -r express-$VERSION-linux
-rm -r express-$VERSION-src
+tar -czf $MAC.tgz $MAC 
+tar -czf $LINUX.tgz $LINUX
+tar -czf $SRC.tgz $SRC
+rm -r $MAC
+rm -r $LINUX
+rm -r $SRC
 
 #add new files to git
 git add .
