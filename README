@@ -1,0 +1,67 @@
+--------------------------------------------------------------------------------
+README : EXPRESS
+--------------------------------------------------------------------------------
+
+eXpress is a streaming DNA/RNA sequence quantification tool, primarily developed for application to RNA-Seq transcript-level abundance estimation.
+
+More details, installation instructions, and the manual can be found at http://bio.math.berkeley.edu/eXpress.
+
+--------------------------------------------------------------------------------
+I.   Authors:
+--------------------------------------------------------------------------------
+
+Adam Roberts designed and wrote eXpress, with substantial technical input 
+from Lior Pachter. 
+
+--------------------------------------------------------------------------------
+II.  Requirements:
+--------------------------------------------------------------------------------
+
+eXpress is a standalone tool that requires gcc 4.0 or greater, and runs on Linux and OS X.   It depends on Boost (http://www.boost.org) and BamTools (https://github.com/pezmaster31/bamtools).
+
+--------------------------------------------------------------------------------
+III. Learn More (Installation, Manual, etc.):
+--------------------------------------------------------------------------------
+
+Installation steps, tutorial, manual, documentation, etc. are all available 
+through the eXpress website:
+http://bio.math.berkeley.edu/eXpress
+
+Join the mailing list to stay informed of updates and announcements:
+http://groups.google.com/group/express-announcements
+
+--------------------------------------------------------------------------------
+IV.  License:
+--------------------------------------------------------------------------------
+
+eXpress is distributed under the Artistic License 2.0.
+Copyright (c) 2011 Adam Roberts and Lior Pachter.
+
+See included file LICENSE for details.
+
+--------------------------------------------------------------------------------
+V.   Acknowledgements:
+--------------------------------------------------------------------------------
+
+* Cole Trapnell, developer of Cufflinks
+* Derek Barnett, author if the BamTools API
+
+--------------------------------------------------------------------------------
+VI.  References:
+--------------------------------------------------------------------------------
+
+eXpress builds upon many ideas, including some proposed in the following papers:
+
+Trapnell C, Williams BA, Pertea G, Mortazavi AM, Kwan G, van Baren MJ, Salzberg SL, Wold B,  Pachter L (2010). Transcript assembly and quantification by RNA-Seq reveals unannotated transcripts and isoform switching during cell differentiation. Nature Biotechnology.
+
+Cappé O and Moulines E (2009).  On-line expectation–maximization algorithm for latent data models. Journal of the Royal Statistical Society.
+
+Pachter, L (2011). Models for transcript quantification from RNA-Seq. arXiv:1104.3889v2. 
+
+Roberts A, Trapnell C, Donaghey J, Rinn JL, Pachter L (2011). Improving RNA-Seq expression estimates by correcting for fragment bias. Genome Biology. 
+
+--------------------------------------------------------------------------------
+VII. CONTACT:
+--------------------------------------------------------------------------------
+
+Please send all questions, comments, suggestions and bug reports to ask.xprs@gmail.com.
