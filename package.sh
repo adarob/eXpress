@@ -1,17 +1,17 @@
 #!/bin/bash
 
-VERSION=0_9_0-BETA
-MAC = express-$VERSION-OSX_x86_64
-LINUX = express-$VERSION-linux_x86_64
-SRC = express-$VERSION-src
+VERSION=0_9_0_BETA
+MAC=express-$VERSION-OSX_x86_64
+LINUX=express-$VERSION-linux_x86_64
+SRC=express-$VERSION-src
 
 #make version header file
 echo "#define PACKAGE_VERSION $VERSION" > src/version.h
 
 #Update documentation
 rm -r html/doc
-#/Applications/Doxygen.app/Contents/Resources/doxygen Doxyfile
-# Add logo to manual
+/Applications/Doxygen.app/Contents/Resources/doxygen Doxyfile
+#Add logo to manual
 awk 'NR==43{print "\\includegraphics{../../img/logo.pdf}\\\\"}1' html/doc/latex/refman.tex > html/doc/latex/temp.tex
 awk 'NR==45{print "\\url{http://bio.math.berkeley.edu/eXpress}\\\\"}1' html/doc/latex/temp.tex > html/doc/latex/refman.tex
 make -C html/doc/latex
