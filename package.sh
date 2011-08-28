@@ -10,7 +10,7 @@ echo "#define PACKAGE_VERSION $VERSION" > src/version.h
 
 #Update documentation
 rm -r html/doc
-/Applications/Doxygen.app/Contents/Resources/doxygen Doxyfile
+#/Applications/Doxygen.app/Contents/Resources/doxygen Doxyfile
 # Add logo to manual
 awk 'NR==43{print "\\includegraphics{../../img/logo.pdf}\\\\"}1' html/doc/latex/refman.tex > html/doc/latex/temp.tex
 awk 'NR==45{print "\\url{http://bio.math.berkeley.edu/eXpress}\\\\"}1' html/doc/latex/temp.tex > html/doc/latex/refman.tex
