@@ -20,6 +20,7 @@
 #include "mismatchmodel.h"
 #include "mapparser.h"
 #include "version.h"
+#include "update_check.h"
 
 using namespace std;
 namespace po = boost::program_options;
@@ -47,6 +48,8 @@ int def_fl_stddev = 60;
 bool bias_correct = true;
 bool calc_covar = false;
 bool vis = false;
+bool output_running = false;
+
 //bool in_between = false;
 enum Direction{ BOTH, FR, RF };
 Direction direction = BOTH;
@@ -64,6 +67,7 @@ bool parse_options(int ac, char ** av)
     ("fr-stranded", "accept only forward->reverse alignments")
     ("rf-stranded", "accept only reverse->forward alignments")
     ("calc-covar", "calculate and output covariance matrix")
+    ("no-update-check", "disables auotmatic check for update via web")
     ;
     
     po::options_description hidden("Hidden options");
@@ -71,6 +75,7 @@ bool parse_options(int ac, char ** av)
     ("no-bias-correct","")
       //    ("in-between","")
     ("visualizer-output,v","")
+    ("output-running","")
     ("forget-param,f", po::value<double>(&ff_param)->default_value(0.9),"")
     ("sam-file", po::value<string>(&sam_file_name)->default_value(""),"")
     ("fasta-file", po::value<string>(&fasta_file_name)->default_value(""),"")
@@ -111,8 +116,6 @@ bool parse_options(int ac, char ** av)
         return 1;
     }
     
-
-    
     if (vm.count("fr-stranded"))
     {
         direction = FR;
@@ -132,7 +135,13 @@ bool parse_options(int ac, char ** av)
     bias_correct = !(vm.count("no-bias-correct"));
     //  in_between = vm.count("in-between");
     vis = vm.count("visualizer-output");
-        
+    output_running = vm.count("output-running");
+    
+    if (!vm.count("no-update-check"))
+    {
+        check_version(PACKAGE_VERSION);
+    }
+    
     return 0;
 }
 
@@ -257,6 +266,8 @@ void process_fragment(double mass_n, Fragment* frag_p, FLD* fld, BiasBoss* bias_
  */
 size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TranscriptTable* trans_table, FLD* fld, BiasBoss* bias_table, MismatchTable* mismatch_table)
 {
+    cout << "Processing input fragment alignments...\n";
+    
     ParseThreadSafety ts;
     ts.proc_lk.lock();
     ts.parse_lk.lock();
@@ -267,15 +278,20 @@ size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TranscriptTable* 
     double mass_n = 0;
     
     // For outputting rhos on log scale
-    ofstream running_expr_file((output_dir + "/ce_running.expr").c_str());
-    trans_table->output_header(running_expr_file);    
     int m = 0;
     int i = 1;
-
+    ofstream running_expr_file;
+    if (output_running)
+    {
+        running_expr_file.open((output_dir + "/running.xprs").c_str());
+        trans_table->output_header(running_expr_file);    
+    }
+    
     // Geometric distribution used for 'in-between' tests
     //srand ( time(NULL) );
-    //    boost::math::geometric geom(.00002);
-    cout.precision(20);
+    //boost::math::geometric geom(.00002);
+    cout << setiosflags(ios::left);
+    
     while(true)
     {
         ts.proc_lk.lock();
@@ -291,7 +307,7 @@ size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TranscriptTable* 
         n++;
 
         //Output current values on log scale
-        if (n == i * pow(10.,m))
+        if (output_running && n == i * pow(10.,m))
         {
             running_expr_file << n << '\t';  
             trans_table->output_current(running_expr_file);
@@ -301,7 +317,7 @@ size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TranscriptTable* 
         }
         
         // Output progress
-        if (n == 1 || n % 10000 == 0)
+        if (n == 1 || n % 100000 == 0)
         {
             if (vis)
             {
@@ -312,21 +328,20 @@ size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TranscriptTable* 
             }
             else
             {
-                cout << n << '\t' << scientific << mass_n << '\t' << trans_table->covar_size() << '\t' << trans_table->num_bundles() <<'\n';
+                cout << "Fragments Processed: " << setw(9) << n << "\t Number of Bundles: "<< trans_table->num_bundles() << endl;
             }
         }
         
         
         // Update mass_n based on forgetting factor
         //int k = (in_between) ? quantile(geom, rand()/double(RAND_MAX)) : 1;
-        int k = 1;
-	for (int j = 0; j < k; ++j)
-        {
+        //for (int j = 0; j < k; ++j)
+        //{
             if (++fake_n > 1)
             {
                 mass_n += ff_param*log((double)fake_n-1) - log(pow(fake_n,ff_param) - 1);
             }
-        }
+        //}
         assert(!isnan(mass_n));
         
         process_fragment(mass_n, frag, fld, bias_table, mismatch_table, trans_table);
@@ -335,11 +350,14 @@ size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TranscriptTable* 
     if (vis)
         cout << "99\n";
     else
-        cout << "END: " << n << "\n";
-        
-    running_expr_file << n << '\t';
-    trans_table->output_current(running_expr_file);
-    running_expr_file.close();
+        cout << "COMPLETED: Processed " << setw(9) << n << " fragments, transcripts are in " << trans_table->num_bundles() << endl;
+    
+    if (output_running)
+    {
+        running_expr_file << n << '\t';
+        trans_table->output_current(running_expr_file);
+        running_expr_file.close();
+    }
     
     return n;
 }

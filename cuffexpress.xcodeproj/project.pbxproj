@@ -36,6 +36,8 @@
 
 /* Begin PBXFileReference section */
 		0A2D58901405F128008891E7 /* libboost_program_options.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libboost_program_options.a; path = ../../../../../../opt/local/lib/libboost_program_options.a; sourceTree = "<group>"; };
+		0A4DC484140AC6BA0091CA28 /* version.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = version.h; sourceTree = "<group>"; };
+		0A4DC487140ACC640091CA28 /* update_check.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = update_check.h; sourceTree = "<group>"; };
 		0A5C7608136F2E850095365C /* express */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = express; sourceTree = BUILT_PRODUCTS_DIR; };
 		0A5C762A136F2EF10095365C /* biascorrection.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = biascorrection.cpp; sourceTree = "<group>"; };
 		0A5C762B136F2EF10095365C /* biascorrection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = biascorrection.h; sourceTree = "<group>"; };
@@ -99,6 +101,8 @@
 		0A5C7629136F2EF10095365C /* src */ = {
 			isa = PBXGroup;
 			children = (
+				0A4DC487140ACC640091CA28 /* update_check.h */,
+				0A4DC484140AC6BA0091CA28 /* version.h */,
 				0A5C762A136F2EF10095365C /* biascorrection.cpp */,
 				0A5C762B136F2EF10095365C /* biascorrection.h */,
 				0A5C762C136F2EF10095365C /* fld.cpp */,

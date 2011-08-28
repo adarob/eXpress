@@ -6,7 +6,10 @@ LINUX=express-$VERSION-linux_x86_64
 SRC=express-$VERSION-src
 
 #make version header file
-echo "#define PACKAGE_VERSION $VERSION" > src/version.h
+echo "#define PACKAGE_VERSION \"$VERSION\"" > src/version.h
+
+#make version update check file file
+echo $VERSION > html/curr_xprs_version
 
 #Update documentation
 rm -r html/doc

@@ -120,7 +120,7 @@ TranscriptTable::TranscriptTable(const string& trans_fasta_file, double alpha, c
   _bundles(_rank, _parent),
   _alpha(alpha)
 {
-    cout << "Loading target sequences from" << trans_fasta_file << "...\n";
+    cout << "Loading target sequences from" << trans_fasta_file << "...\n\n";
     ifstream infile (trans_fasta_file.c_str());
     string line;
     string seq = "";

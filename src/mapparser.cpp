@@ -52,7 +52,7 @@ ThreadedMapParser::ThreadedMapParser(string file_name)
 {
     if (file_name.size() == 0)
     {
-        cout << "No alignment file specified. Expecting streaming input on stdin...\n";
+        cout << "No alignment file specified. Expecting streaming input on stdin...\n\n";
         _parser = new SAMParser(&cin);
     }
     else
@@ -65,7 +65,7 @@ ThreadedMapParser::ThreadedMapParser(string file_name)
         else
         {
             delete reader;
-            cout << "Input is not in BAM format. Trying SAM...\n";
+            cout << "Input is not in BAM format. Trying SAM...\n\n";
             ifstream* ifs = new ifstream(file_name.c_str());
             _parser = new SAMParser(ifs);
             if(!ifs->is_open())
