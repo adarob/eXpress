@@ -1,0 +1,287 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+
+<!--  Version: Multiflex-5.4 / About                     -->
+<!--  Type:    Design with sidebar                          -->
+<!--  Date:    March 13, 2008                               -->
+<!--  Design:  www.1234.info                                -->
+<!--  License: Fully open source without restrictions.      -->
+<!--           Please keep footer credits with the words    -->
+<!--           "Design by 1234.info". Thank you!            -->
+
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+  <meta http-equiv="cache-control" content="no-cache" />
+  <meta http-equiv="expires" content="3600" />
+  <meta name="revisit-after" content="2 days" />
+  <meta name="robots" content="index,follow" />
+  <meta name="publisher" content="Your publisher infos here" />
+  <meta name="copyright" content="Your copyright infos here" />
+  <meta name="author" content="Designed by www.1234.info / Modified: Your Name" />
+  <meta name="distribution" content="global" />
+  <meta name="description" content="Your container description here" />
+  <meta name="keywords" content="Your keywords, keywords, keywords, here" />
+  <link rel="stylesheet" type="text/css" media="screen,projection,print" href="./css/mf54_reset.css" />
+  <link rel="stylesheet" type="text/css" media="screen,projection,print" href="./css/mf54_grid.css" />
+  <link rel="stylesheet" type="text/css" media="screen,projection,print" href="./css/mf54_content.css" />
+  <link rel="icon" type="image/x-icon" href="./img/favicon.ico" />
+  <title>eXpress &bull; Getting Started</title>
+</head>
+
+<!-- Global IE fix to avoid layout crash when single word size wider than column width -->
+<!-- Following line MUST remain as a comment to have the proper effect -->
+<!--[if IE]><style type="text/css"> body {word-wrap: break-word;}</style><![endif]-->
+
+<body>
+  <!-- CONTAINER FOR ENTIRE PAGE -->
+  <div class="container">
+
+    <!-- A. HEADER -->         
+    <div class="corner-page-top"></div>        
+    <div class="header">
+      <div class="header-top">
+        
+        <!-- A.1 SITENAME -->    
+        <div class="sitelogo">
+        <ul>
+            <li><a href="#"><img src="img/logo.png"/></a></li>
+        </ul>
+        </div>
+        <div class="sitename">
+          <h1><a href="index.html" title="Home">eXpress</a></h1> 
+          &nbsp;
+          <h2><i>Streaming</i> RNA-Seq Analysis</h2>
+        </div>
+    
+        <!-- A.2 BUTTON NAVIGATION -->
+        <div class="navbutton">
+          <ul>
+            <li><a href="http://www.berkeley.edu"><img src="img/berkeley_seal.gif"/></a></li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- A.4 BREADCRUMB and SEARCHFORM -->
+      <div class="header-bottom">
+
+        <!-- Search form -->    
+<div class="searchform" id="cse-search-form" style="padding-top:4px; width:30%;">Loading</div>
+<script src="http://www.google.com/jsapi" type="text/javascript"></script>
+<script type="text/javascript"> 
+  google.load('search', '1', {language : 'en'});
+  google.setOnLoadCallback(function() {
+    var customSearchControl = new google.search.CustomSearchControl('017113487431020499685:jdftct1emrw');
+    customSearchControl.setResultSetSize(google.search.Search.FILTERED_CSE_RESULTSET);
+    var options = new google.search.DrawOptions();
+    options.enableSearchboxOnly("http://www.google.com/cse?cx=017113487431020499685:jdftct1emrw", null, true);
+    customSearchControl.draw('cse-search-form', options);
+  }, true);
+</script>
+<link rel="stylesheet" href="css/googlesearch.css" type="text/css" />
+
+      </div>
+    </div>      
+    <div class="corner-page-bottom"></div>    
+    
+    <!-- B. NAVIGATION BAR -->
+    <div class="corner-page-top"></div>        
+    <div class="navbar">
+	
+      <!-- Navigation item -->
+      <ul>
+        <li><a href="index.html">Home</a></li>
+      </ul>
+      <!-- Navigation item -->
+      <ul>
+        <li><a href="overview.html">About</a></li>
+      </ul>            
+       <!-- Navigation item -->
+      <ul>
+        <li><a href="tutorial.html">Getting Started</a></li>
+      </ul>
+      <!-- Navigation item -->
+      <ul>
+        <li><a href="manual.html">Manual</a></li>
+      </ul>
+      <ul>
+        <li><a href="faq.html">FAQ</a></li>
+      </ul>
+      </div>
+  
+    <!-- C. MAIN SECTION -->      
+    <div class="main">
+		<h1 class="pagetitle">Getting Started</h1>
+      <!-- C.1 CONTENT -->
+      <div class="content">
+                                    
+        <!-- CONTENT CELL -->                
+        <div class="corner-content-1col-top"></div>                        
+        <div class="content-1col-nobox">
+
+          <h1 id="install">Installation</h1>
+		  <h2 id="precomp">Installing a pre-compiled binary release</h2>
+		  <p>In order to make it easy to install eXpress, we provide a few binary packages that save you the trouble of having to compile from source. To use the binary packages, simply download the appropriate one for your machine, untar it, and make sure the <code>express</code> binary is in a directory in your <tt>PATH</tt> environment variable.
+		  <h2 id="src">Installing from source</h2>
+		  <p>The instructions below include commands that are compatible with Unix/Linux/Mac. If compiling on a Windows machine, use the appropriate DOS commands instead.  Assuming you are using the Visual C++ compiler, you must type your commands from the Visual Studio Command Prompt.
+		  <h4>&bull; Install C++ Compiler (if not already available)</h4>
+		  <p>While most Linux systems will already have GCC installed, Mac OS X and Windows do not have a C++ compiler installed by default.  Free options include <a href=http://developer.apple.com/tools/xcode>XCode</a> for Mac OS X and <a href=http://www.microsoft.com/visualstudio/en-us/products/2010-editions/visual-cpp-express>Visual C++ Express</a> for Windows.</p>
+		  <h4>&bull; Download and extract the source</h4>
+		  <p>First you must download source code using the link on the right side of this page.  Untar the file.  From now on we refer to the path to the directory that is created as <code>&lt;YOUR_EXPRESS_DIR&gt;</code>.
+          <h4>&bull; Install CMake</h4>
+          <p>Fortunately, the developers of CMake provide simple installation packages for most architectures. Find the right package for your system at their <a href=http://www.cmake.org/cmake/resources/software.html>website</a>.</p>
+          <h4>&bull; Install BamTools</h4>
+          <p>With CMake installed, BamTools installation is straightforward.</p>
+          <ol>
+          	<li>Download the source from <a href=https://github.com/pezmaster31/bamtools/tarball/master>here</a> and untar into <code>&lt;YOUR_EXPRESS_DIR&gt;</code>.</li>
+          	<li>Navigate to <code>&lt;YOUR_EXPRESS_DIR&gt;/bamtools</code>.
+          	<pre class="sc"><code>$ cd &lt;YOUR_EXPRESS_DIR&gt;/bamtools</code></pre></li>
+          	<li>Make a new directory called build and navigate to it.
+          	<pre class="sc"><code>$ mkdir build<br />$ cd build</code></pre></li>
+          	<li>Have CMake generate the makefile.
+          	<pre class="sc"><code>$ cmake ..</code></pre></li>
+          	<li>Build the BamTools libraries by calling make.
+          	<pre class="sc"><code>$ make</code></pre></li>
+          </ol>
+          <h4>&bull; Install BOOST</h4>
+          <p>If you have Ports or MacPorts installed, these will probably be the easiest way to install BOOST.  If you are using Windows, you can use the installer found <a href=http://www.boostpro.com/download/>here</a>.  Otherwise, follow the instructions below.</p>
+          			<ol>
+                    <li><a href="http://www.boost.org/users/download/">Download</a>
+                      Boost and the <code>bjam</code> build engine.</li>
+                    <li>Unpack bjam and add it to your <tt>PATH</tt>.</li>
+                    <li>Unpack the Boost tarball and <code>cd</code> to the
+                      Boost source directory. This directory is called
+                      the <code>BOOST_ROOT</code> in some Boost installation
+                      instructions.</li>
+                    <li>Build Boost. Note that you can specify where to
+                      put Boost with the <code>--prefix</code> option. The default
+                      Boost installation directory is <code>/usr/local</code>.
+					</li></ol>
+					<ul><ul>
+
+                    <li>If you are on Mac OS X, type:<br />
+                    <pre class="sc"><code>$ bjam --prefix=&lt;YOUR_BOOST_INSTALL_DIRECTORY&gt; --toolset=darwin architecture=x86 address_model=32_64 link=static runtime-link=static --layout=versioned stage install</code></pre></li>
+                    <li>If you are on a 32-bit Linux system, type:<br />
+                    <pre class="sc"><code>$ bjam --prefix=&lt;YOUR_BOOST_INSTALL_DIRECTORY&gt; --toolset=gcc architecture=x86 address_model=32 link=static runtime-link=static stage install</code></pre></li>
+                      
+                    <li>If you are on a 64-bit Linux system, type:<br />
+                    <pre class="sc"><code>$ bjam --prefix=&lt;YOUR_BOOST_INSTALL_DIRECTORY&gt; --toolset=gcc architecture=x86 address_model=64 link=static runtime-link=static stage install</code></pre></li>
+                    </ul> </ul>                    
+      	<h4>&bull; Install eXpress</h4>
+          <p>We are now ready to build and install eXpress!</p>
+          <ol>
+          	<li>Navigate to <code>&lt;YOUR_EXPRESS_DIR&gt;</code>.
+          	<pre class="sc"><code>$ cd &lt;YOUR_EXPRESS_DIR&gt;</code></pre></li>
+          	<li>Make a new directory called build and navigate to it.
+          	<pre class="sc"><code>$ mkdir build<br />$ cd build</code></pre></li>
+          	<li>Have CMake generate the makefile.
+          	<pre class="sc"><code>$ cmake ..</code></pre></li>
+          	<li>Build the eXpress binary by calling make.
+          	<pre class="sc"><code>$ make</code></pre></li>
+          	<li>Copy the binary to <tt>/usr/lib/bin</tt> (or alternatively to another directory in your <tt>PATH</tt>).
+          	<pre class="sc"><code>$ sudo make
+                    install</code></pre></li>
+         </ol>
+          <p>You should now be able to type <tt>express</tt> from any directory and see a print-out of the usage and options.  If you do not see this and there were no errors in the compilation, double check to see that the binary was copied into a directory in your <tt>PATH</tt>.</p>
+          </div>
+        <div class="corner-content-1col-bottom"></div>                               
+
+        <!-- CONTENT CELL -->                
+        <div class="corner-content-1col-top"></div>                        
+        <div class="content-1col-nobox">
+          <h1 id="usecase">General Use Case: RNA-Seq abundances</h1>
+		  <h2 id="reqin">Required input</h2>
+		  <p>eXpress requires two input files:</p>
+		  <ol>
+		  <li>A multi-FASTA file containing the transcript
+        sequences. If the transcriptome of your organism is not
+        annotated, you can generate this file from your sequencing
+        reads using a <i>de novo</i> transcriptome assembler such as
+        <a href=http://trinityrnaseq.sourceforge.net/>Trinity</a>, <a
+        href=http://www.ebi.ac.uk/~zerbino/oases/>Oases</a>, or <a
+        href=http://www.bcgsc.ca/platform/bioinfo/software/trans-abyss>Trans-ABySS</a>.
+        If your organism has a reference genome you can assemble
+        transcripts directly from mapped reads using <a
+        href="http://cufflinks.cbcb.umd.edu/">Cufflinks</a>. If your genome is already annotated (in
+        GTF/GFF), you can generate a multi-FASTA file using the <a href=http://genome.ucsc.edu/>UCSC Genome Browser</a> by uploading your annotation as a track and downloading the sequences under the "Tables" tab.</li>
+		  <li>Read alignments to the multi-FASTA file in SAM
+        or BAM format.  These can either be stored in a file or
+        streamed directly from an aligner. It is important that you
+        allow as many multi-mappings as possible. You can also allow
+        many mismatches during mapping since eXpress builds an error model to probabalistically assign the reads, although this will increase mapping time.</li>
+		  </ol>
+		  <h2 id="example">An example</h2>
+		  <p>In the following two sub-sections, we will run eXpress on a sample RNA-Seq dataset.  Both the transcript sequences (transcripts.fasta) and raw reads (reads.fastq) can be found in the <tt>&lt;YOUR_EXPRESS_DIR&gt;/sample_data</tt> directory.  For this example to work, you will need to have both <a href=http://bowtie-bio.sourceforge.net>Bowtie</a> and <a href=http://samtools.sf.net>SAMtools</a> installed, but in general any aligner will work and the conversion to BAM is not necessary unless you have insufficient disk space to store the uncompressed SAM.</p>
+		  <p>Before we begin, we must prepare our Bowtie index. Since we wish to allow many multi-mappings, it is useful to build our index with a small offrate (in this case 1).  The smaller the offrate, the larger the index and the faster the mapping.  If you have disk space to spare, always use an offrate of 1. Build the index with the following commands.</p>
+		  <ol><li><pre class="sc"><code>$ cd &lt;YOUR_EXPRESS_DIR&gt;/sample_data <br />$ bowtie-build --offrate 1 transcripts.fasta transcripts</code></pre></li></ol>
+		  <p>We can now map the reads to our transcript sequences using the following Bowtie command, which allows for 3 mismatches and unlimited multi-mappings. The SAM output from Bowtie is piped into SAMtools in order to compress it to BAM format.  This conversion is optional.
+		  <ol><li><pre class="sc"><code>$ bowtie -aS --offrate 1 -v 3 transcripts reads.fastq | samtools view -Sb - > hits.bam </code></pre></li></ol></p>
+		  <h2 id="fromfile">Input from SAM/BAM file</h2>
+		  <p>Once you have aligned your reads to the transcriptome and stored them in a SAM or BAM file, you can run eXpress in default mode with the command:
+ 		  <ol><li><pre class="sc" margin-left:20px;><code>$ express transcripts.fasta hits.bam</code></pre></li></ol></p>
+ 		  <p>The default settings will be sufficient for most users, but please see the <a href=manual.html>Manual</a> for full descriptions of all available options.</p>
+ 		  <h2 id="stream">Streaming input from aligner</h2>
+ 		  <p>If you do not wish to store an intermediate SAM/BAM file, you can pipe the Bowtie output directly into eXpress with the command:</p>
+		  <ol><li><pre class="sc"><code>$ bowtie -aS -offrate 1 -v 3 transcripts reads.fastq | express transcripts.fasta </code></pre></li></ol></p>
+		  <p>This will give you the exact same output as the
+        previous command, while avoiding the need potentially large
+        amounts of disk space for storing the mapped reads.</p>
+   		  <h2 id="output">Understanding the output</h2>
+   		  <p>The output for eXpress is saved in a file called <tt>results.xprs</tt> in an easy-to-parse tab-delimited format.  Since we did not specify an output directory, it is simply placed in our working directory (<tt>&lt;YOUR_EXPRESS_DIR&gt;/sample_data</tt>). We can view the output for our run using the command:
+   		  <ol><li><pre class="sc"><code>$ more results.xprs</code></pre></li></ol></p>
+   		  <p>Your results should look identical to this:</p>
+   		  <p>While it may be difficult to read in your
+        terminal, opening the file with R or Excel should help you to
+        visualize the columns.  The most important column is FPKM,
+        which reports the estimated abundance in expected
+        <b>F</b>ragments <b>P</b>er <b>K</b>ilobase per <b>M</b>illion
+        mapped fragments.  Other fields include the estimated counts (est_counts) and their variance (est_counts_var).  Transcripts are sorted by their bundle_id, which denotes which multi-mapping group the transcript belongs to and can help determine isoforms and gene families.  More details on the output including full descriptions of all columns can be found in the <a href=manual.html>Manual</a>.</p> 
+          </div> 
+        <div class="corner-content-1col-bottom"></div>                               
+	  </div>
+      
+       <!-- C.2 SUBCONTENT -->
+      <div class="subcontent">
+      
+         <!-- SUBCONTENT CELL -->
+        <div class="corner-subcontent-top"></div>                        
+        <div class="subcontent-box">
+          <h1 class="menu">Outline</h1> 
+          <div class="sidemenu1">
+          <!-- CONTENT CELL -->                
+ 		  <ul>
+			  <li><a href="#install">Installation </a></li>
+				  <ul>
+				  <li><a href="#precomp">&rarr;Installing pre-compiled binary</a></li>
+				  <li><a href="#src">&rarr;Installing from source</a></li>
+				  </ul>
+			   <li><a href="#usecase">General Use Case</a></li>
+			   <ul>
+			   <li><a href="#reqin">&rarr;Required input</a></li>
+			   <li><a href="#example">&rarr;An example</a></li>
+			   <li><a href="#fromfile">&rarr;Input from SAM/BAM file</a></li>
+			   <li><a href="#stream">&rarr;Streaming input from aligner</a></li>
+  			   <li><a href="#output">&rarr;Understanding the output</a></li>
+			   </ul>
+		  </ul>          
+          </div> 
+          </div>
+        <div class="corner-subcontent-bottom"></div> 
+
+ 	 </div>
+    </div>
+      
+    <!-- D. FOOTER -->      
+    <div class="footer">
+      <p>Copyright &copy; 2011 Adam Roberts&nbsp;&nbsp;|&nbsp;&nbsp;All Rights Reserved</p>
+      <p class="credits">Design by <a href="http://1234.info/" title="Designer Homepage">1234.info</a> | Modified by <a href="http://cs.berkeley.edu/~adarob/">Adam Roberts</a> | <a href="http://validator.w3.org/check?uri=referer" title="Validate XHTML code">XHTML 1.0</a> | <a href="http://jigsaw.w3.org/css-validator/" title="Validate CSS code">CSS 2.0</a></p>
+      <br />
+      <p>The eXpress project was funded in part by an NSF graduate fellowship to Adam Roberts and NIH grant 1R01HG006129-01</p>
+    </div>
+    <div class="corner-page-bottom"></div>        
+  </div> 
+  
+</body>
+</html>
+
+
+

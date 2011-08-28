@@ -1,0 +1,265 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+
+<!--  Version: Multiflex-5.4 / About                     -->
+<!--  Type:    Design with sidebar                          -->
+<!--  Date:    March 13, 2008                               -->
+<!--  Design:  www.1234.info                                -->
+<!--  License: Fully open source without restrictions.      -->
+<!--           Please keep footer credits with the words    -->
+<!--           "Design by 1234.info". Thank you!            -->
+
+<head> 
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+  <meta http-equiv="cache-control" content="no-cache" />
+  <meta http-equiv="expires" content="3600" />
+  <meta name="revisit-after" content="2 days" />
+  <meta name="robots" content="index,follow" />
+  <meta name="publisher" content="Your publisher infos here" />
+  <meta name="copyright" content="Your copyright infos here" />
+  <meta name="author" content="Designed by www.1234.info / Modified: Your Name" />
+  <meta name="distribution" content="global" />
+  <meta name="description" content="Your container description here" />
+  <meta name="keywords" content="Your keywords, keywords, keywords, here" />
+  <link rel="stylesheet" type="text/css" media="screen,projection,print" href="./css/mf54_reset.css" />
+  <link rel="stylesheet" type="text/css" media="screen,projection,print" href="./css/mf54_grid.css" />
+  <link rel="stylesheet" type="text/css" media="screen,projection,print" href="./css/mf54_content.css" />
+  <link rel="icon" type="image/x-icon" href="./img/favicon.ico" />
+  <title>eXpress &bull; About</title>
+</head>
+
+<!-- Global IE fix to avoid layout crash when single word size wider than column width -->
+<!-- Following line MUST remain as a comment to have the proper effect -->
+<!--[if IE]><style type="text/css"> body {word-wrap: break-word;}</style><![endif]-->
+
+<body>
+  <!-- CONTAINER FOR ENTIRE PAGE -->
+  <div class="container">
+
+    <!-- A. HEADER -->         
+    <div class="corner-page-top"></div>        
+    <div class="header">
+      <div class="header-top">
+        
+        <!-- A.1 SITENAME -->      
+        <div class="sitelogo">
+        <ul>
+            <li><a href="#"><img src="img/logo.png"/></a></li>
+        </ul>
+        </div>
+        <div class="sitename">
+          <h1><a href="index.html" title="Home">eXpress</a></h1> 
+          &nbsp;
+          <h2><i>Streaming</i> RNA-Seq Analysis</h2>
+        </div>
+    
+        <!-- A.2 BUTTON NAVIGATION -->
+        <div class="navbutton">
+          <ul>
+            <li><a href="http://www.berkeley.edu"><img src="img/berkeley_seal.gif"/></a></li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- A.4 BREADCRUMB and SEARCHFORM -->
+      <div class="header-bottom">
+
+		
+
+        <!-- Search form -->    
+<div class="searchform" id="cse-search-form" style="padding-top:4px; width:30%;">Loading</div>
+<script src="http://www.google.com/jsapi" type="text/javascript"></script>
+<script type="text/javascript"> 
+  google.load('search', '1', {language : 'en'});
+  google.setOnLoadCallback(function() {
+    var customSearchControl = new google.search.CustomSearchControl('017113487431020499685:jdftct1emrw');
+    customSearchControl.setResultSetSize(google.search.Search.FILTERED_CSE_RESULTSET);
+    var options = new google.search.DrawOptions();
+    options.enableSearchboxOnly("http://www.google.com/cse?cx=017113487431020499685:jdftct1emrw", null, true);
+    customSearchControl.draw('cse-search-form', options);
+  }, true);
+</script>
+<link rel="stylesheet" href="css/googlesearch.css" type="text/css" />
+
+      </div>
+    </div>      
+    <div class="corner-page-bottom"></div>    
+    
+    <!-- B. NAVIGATION BAR -->
+    <div class="corner-page-top"></div>        
+    <div class="navbar">
+	
+      <!-- Navigation item -->
+      <ul>
+        <li><a href="index.html">Home</a></li>
+      </ul>
+      <!-- Navigation item -->
+      <ul>
+        <li><a href="overview.html">About</a></li>
+      </ul>            
+       <!-- Navigation item -->
+      <ul>
+        <li><a href="tutorial.html">Getting Started</a></li>
+      </ul>
+      <!-- Navigation item -->
+      <ul>
+        <li><a href="manual.html">Manual</a></li>
+      </ul>
+      <ul>
+        <li><a href="faq.html">FAQ</a></li>
+      </ul>      
+    </div>    
+  
+    <!-- C. MAIN SECTION -->      
+    <div class="main">
+    	<h1 class="pagetitle">About</h1>
+
+      <!-- C.1 CONTENT -->
+      <div class="content">
+
+        <!-- CONTENT CELL -->                
+        <div class="corner-content-1col-top"></div>                        
+        <div class="content-1col-nobox">
+        <h1 id="description">Description</h1>
+			<p>eXpress is a streaming transcript-level
+        RNA-Seq quantification tool. It is based on an online-EM
+        algorithm that results in space (memory) requirements
+        proportional to the size of the transcriptome and time
+        requirements that are proportional to the number of sequenced
+        fragments. Thus, eXpress can accurately quantify much larger
+        samples at the transcript-level than other currently available
+        tools greatly reducing infrastructure requirements for
+        RNA-Seq analysis. eXpress can be used to build lightweight
+			RNA-Seq processing pipelines when coupled with
+			a streaming aligner (such as Bowtie), as
+			output can be piped directly into eXpress, effectively eliminating the need to store alignments in either memory or disk.</p>
+
+	  <p>Our analysis has shown that this efficiency does not come
+			at a cost of accuracy. eXpress is more accurate
+			than other available tools, even when limited
+			to smaller datasets that do not require such
+			efficiency [<a href="#ref1">1</a>]. Moreover, like the Cufflinks
+			program [<a href="#ref2">2</a>], eXpress can be used to
+			estimate transcript abundances in
+			multi-isoform genes. eXpress is also able
+			to resolve multi-mappings of reads across gene
+			families, and does not require a reference
+			genome so that it can be used in conjunction
+			with <i>de novo</i> assemblers such as <a href=http://trinityrnaseq.sourceforge.net/>Trinity</a>, <a
+        href=http://www.ebi.ac.uk/~zerbino/oases/>Oases</a>, or <a
+        href=http://www.bcgsc.ca/platform/bioinfo/software/trans-abyss>Trans-ABySS</a>. The underlying model is based on previously described probabilistic
+			models for RNA-Seq [<a href="#ref3">3</a>], and includes
+			parameters for fragment length distributions,
+			errors in reads, and fragment bias [<a href="#ref4">4</a>].
+	  </p>
+
+			<p>eXpress can be used as a mapping tool in
+			other high-throughput sequencing based applications where ambiguously mapping
+			reads need to be resolved. The only required
+			inputs to eXpress are a set of reference
+			sequences and a set of sequenced fragments
+			multiply-aligned to them.  While these
+			reference sequences will often be gene
+			isoforms, they need not be.  Haplotypes could
+			be used as the reference for allele-specific
+			expression analysis or target genomes may be
+			used in a metagenomics experiments.  eXpress will be useful in any analysis where reads multi-map to sequences that differ in abundance.</p>
+      	</div>      
+
+        <div class="corner-content-1col-bottom"></div>                               
+        <!-- CONTENT CELL -->                
+        <div class="corner-content-1col-top"></div>                        
+        <div class="content-1col-nobox">
+		  	<h1 id="features">Features</h1>
+		  	<ul>
+		  	<li>Transcript-level abundance estimation.</li>
+		  	<li>Time proportional to number of reads, memory proportional to transcriptome size.</li>
+		  	<li>Maximum of 3 free processor cores required (2 without bias
+		  	correction). Try it on your laptop!</li>
+		  	<li>Outputs FPKM, estimated counts, and count
+		  	variance/covariance for differential
+		  	expression analysis.</li>
+		  	<li>Supports alignments with unlimited multi-mappings and errors.</li>
+			<li>Can be used for allele-specific expression estimates.</li>
+		    <li>Corrects for both positional and sequence-specific fragment biases.</li>
+   		    <li>Learns first-order Markov model for sequencing errors for use in probablistic read assignment.</li>
+   		    <li>Learns fragment length distribution for use in probablistic assignment of paired-end reads.</li>
+   		    <li>Supports both directional and non-directional sequencing.</li>
+		  	<li>Written in C++ and runs on Mac, Linux, and Windows.</li>
+		  	</ul>
+      	</div>      
+
+        <div class="corner-content-1col-bottom"></div>                               
+        <!-- CONTENT CELL -->                
+        <div class="corner-content-1col-top"></div>                        
+        <div class="content-1col-nobox">
+
+			<h1 id="methods">Methods</h1>
+			<p>A complete description of the eXpress method will be found in the forthcoming manuscript [<a href="ref1">1</a>].
+			      	</div>      
+
+        <div class="corner-content-1col-bottom"></div>                               
+        <!-- CONTENT CELL -->                
+        <div class="corner-content-1col-top"></div>                        
+        <div class="content-1col-nobox">
+			<h1 id="references">References</h1>
+	  		<ol>
+	  		<li id="ref1">Roberts A and Pachter L (2011).
+	  		<b>Efficient and accurate transcript-level abundance estimation from RNA-Seq reads using the online EM algorithm.</b>
+	  		<i>In preparation.</i></li>
+	  	  <li id="ref2">Trapnell C, Williams BA, Pertea G, Mortazavi AM, Kwan G, van Baren MJ, Salzberg SL, Wold B,&nbsp; Pachter L (2010).
+	  	  <b>Transcript assembly and quantification by RNA-Seq reveals unannotated transcripts and isoform switching during cell differentiation.</b>
+	  	  <i>Nature Biotechnology</i>
+	  	  <br />&rarr;<a href=http://dx.doi.org/10.1038/nbt.1621>doi:10.1038/nbt.162</a></li>
+	  	  <li id="ref3">Pachter, L (2011).
+	  	  <b>Models for transcript quantification from RNA-Seq.</b>
+	  	  <i>Submitted.</i>
+          <br />&rarr;<a href="http://arxiv.org/abs/1104.3889">arXiv:1104.3889v2</a></font></li>
+	  	  </li>
+         <li id="ref4">Roberts A, Trapnell C, Donaghey J, Rinn JL, Pachter L (2011).
+          <b>Improving RNA-Seq expression estimates by correcting for fragment bias.</b>
+          <i>Genome Biology.</i>
+          <br />&rarr;<a href="http://genomebiology.com/2011/12/3/R22/abstract">doi:10.1186/gb-2011-12-3-r22</a></font></li>
+      	</ol>
+      </div>      
+
+        <div class="corner-content-1col-bottom"></div>                               
+      </div>
+                
+       <!-- C.2 SUBCONTENT -->
+      <div class="subcontent">
+      
+         <!-- SUBCONTENT CELL -->
+        <div class="corner-subcontent-top"></div>                        
+        <div class="subcontent-box">
+          <h1 class="menu">Outline</h1> 
+          <div class="sidemenu1">
+          <!-- CONTENT CELL -->                
+ 		  <ul>
+			  <li><a href="#description">Description</a></li>
+			  <li><a href="#features">Features</a></li>
+			  <li><a href="#method">Method</a></li>
+			  <li><a href="#references">References</a></li>
+
+		  </ul>
+          </div> 
+          </div>
+        <div class="corner-subcontent-bottom"></div> 
+	</div>
+ 	 </div>
+      
+    <!-- D. FOOTER -->      
+    <div class="footer">
+      <p>Copyright &copy; 2011 Adam Roberts&nbsp;&nbsp;|&nbsp;&nbsp;All Rights Reserved</p>
+      <p class="credits">Design by <a href="http://1234.info/" title="Designer Homepage">1234.info</a> | Modified by <a href="http://cs.berkeley.edu/~adarob/">Adam Roberts</a> | <a href="http://validator.w3.org/check?uri=referer" title="Validate XHTML code">XHTML 1.0</a> | <a href="http://jigsaw.w3.org/css-validator/" title="Validate CSS code">CSS 2.0</a></p>
+      <br />
+      <p>The eXpress project was funded in part by an NSF graduate fellowship to Adam Roberts and NIH grant 1R01HG006129-01</p>
+    </div>
+    <div class="corner-page-bottom"></div>        
+  </div> 
+  
+</body>
+</html>
+
+
+
