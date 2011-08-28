@@ -26,11 +26,20 @@
   <link rel="stylesheet" type="text/css" media="screen,projection,print" href="./css/mf54_content.css" />
   <link rel="icon" type="image/x-icon" href="./img/favicon.ico" />
   <title>eXpress &bull; Manual</title>
+   <script language="Javascript">
+        logo1=new Image
+        logo1.src="img/logo.gif"
+        logo2=new Image
+        logo2.src="img/logo_white.gif"
+ </script>
+  <title>eXpress &bull; Home</title>
 </head>
 
 <!-- Global IE fix to avoid layout crash when single word size wider than column width -->
 <!-- Following line MUST remain as a comment to have the proper effect -->
 <!--[if IE]><style type="text/css"> body {word-wrap: break-word;}</style><![endif]-->
+
+
 
 <body>
   <!-- CONTAINER FOR ENTIRE PAGE -->
@@ -44,11 +53,11 @@
         <!-- A.1 SITENAME -->    
         <div class="sitelogo">
         <ul>
-            <li><a href="#"><img src="img/logo.png"/></a></li>
+            <li><a href="#" onMouseOver="document.logo.src=logo2.src" onMouseOut="document.logo.src=logo1.src"><img name="logo" src="img/logo.gif"/></a></li>
         </ul>
         </div>
         <div class="sitename">
-          <h1><a href="index.html" title="Home">eXpress</a></h1> 
+          <h1><a href="#">eXpress</a></h1> 
           &nbsp;
           <h2><i>Streaming</i> RNA-Seq Analysis</h2>
         </div>
@@ -119,7 +128,16 @@
         <div class="corner-content-1col-top"></div>                        
         <div class="content-1col-nobox">
 		
-		  <h1 id="usage">Usage</h1>
+		  <h1 id="usage">Documentation</h1>
+		  <p>Complete documentation for the source code is available in both <a href=doc/html>html</a> and <a href=doc/express-doc.pdf>pdf</a> formats.</p>
+     			          </div> 
+           <div class="corner-content-1col-bottom"></div> 
+     	<!-- CONTENT CELL -->                
+        <div class="corner-content-1col-top"></div>                        
+        <div class="content-1col-nobox">
+		
+     	  
+     	  <h1 id="usage">Usage</h1>
 		  <h2 id="prereq">Prerequisites</h2>
 		  <p>eXpress runs on intel-based computers running Linux, Mac OS X, or Windows.  You can install pre-compiled binaries or build eXpress from the source code. If you wish to build eXpress yourself, you must have a C++ compiler installed (for example, <a href=http://developer.apple.com/tools/xcode>XCode</a> for Mac OS X, <a href=http://www.microsoft.com/visualstudio/en-us/products/2010-editions/visual-cpp-express>Visual C++ Express</a> for Windows 7) as well as <a href=http://www.cmake.org>CMake</a>, <a href=https://github.com/pezmaster31/bamtools>BamTools</a>, and the <a href="http://www.boost.org">Boost C++ libraries</a>.  See the <a href="tutorial.html#install">Installation</a> section on the Getting Started page for detailed instruction.</p> 
 		  <h2 id="running">Running eXpress</h2>

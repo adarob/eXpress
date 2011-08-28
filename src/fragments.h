@@ -28,8 +28,11 @@ class TranscriptTable;
 enum PairStatus { PAIRED, LEFT_ONLY, RIGHT_ONLY };
 
 /**
- * FragMap struct.  This struct stores the information for a single (multi-)mapping of a fragment.
- */
+ *  The FragMap struct stores the information for a single (multi-)mapping of a fragment.
+ *  @author    Adam Roberts
+ *  @date      2011
+ *  @copyright Artistic License 2.0
+ **/
 struct FragMap
 {
     /**
@@ -111,10 +114,13 @@ struct FragMap
 };
 
 /**
- * Fragment class.  This class stores information for all multi-mappings of a single fragment.
+ * The Fragment class stores information for all multi-mappings of a single fragment.
  * By design, only paired-end mappings of paired-end reads will be accepted.  All mappings
  * of single-end reads will be accepted.
- */
+ *  @author    Adam Roberts
+ *  @date      2011
+ *  @copyright Artistic License 2.0
+ **/
 class Fragment
 {
     

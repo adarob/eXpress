@@ -19,10 +19,13 @@ class Transcript;
 class FragMap;
 
 /**
- * SeqWeightTable class.  This class keeps track of sequence-specific bias parameters.
+ * The SeqWeightTable class keeps track of sequence-specific bias parameters.
  * It allows for the bias associated with a given sequence to be calculated, and for the bias
  * parameters to be updated based on additional observations.  All values stored in log space.
- */
+ *  @author    Adam Roberts
+ *  @date      2011
+ *  @copyright Artistic License 2.0
+ **/
 class SeqWeightTable
 {
     /**
@@ -80,10 +83,13 @@ public:
 };
 
 /**
- * PosWeightTable class.  This class keeps track of fractional position bias parameters in log space.
+ * The PosWeightTable class keeps track of fractional position bias parameters in log space.
  * It allows for the bias associated with a given fractional position to be calculated, and for the bias
  * parameters to be updated based on additional fragment observations.
- */
+ *  @author    Adam Roberts
+ *  @date      2011
+ *  @copyright Artistic License 2.0
+ **/
 class PosWeightTable
 {
     /**
@@ -175,11 +181,14 @@ public:
 };
 
 /**
- * BiasBoss class.  This class keeps track of sequence-specific and positional bias.
+ * The BiasBoss class keeps track of sequence-specific and positional bias.
  * It allows for the bias associated with a given fragment end to be calculated, and 
  * for the bias parameters to be updated based on additional observations.  All stored
  * and returned values are in log space.
- */
+ *  @author    Adam Roberts
+ *  @date      2011
+ *  @copyright Artistic License 2.0
+ **/
 class BiasBoss
 {
     /**

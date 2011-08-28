@@ -13,7 +13,7 @@
 #include <string>
 
 /**
- * FLD class.  This class keeps track of the observed fragment length distribution.  It starts with
+ * The FLD class keeps track of the observed fragment length distribution.  It starts with
  * a Gaussian prior with parameters specified by the arguments.  A small "Gaussian" kernel is added
  * for each observation.  All mass values and probabilities are stored and returned in log space 
  * (except in to_string).

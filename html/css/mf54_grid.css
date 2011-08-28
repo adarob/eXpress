@@ -40,7 +40,7 @@
 .sitename h1 {font-family:"trebuchet ms",arial,sans serif; margin-top:-5px; font-weight:normal; font-size:300% !important /*Non-IE6*/; font-weight:bold; font-size:300% /*IE6*/;}
 .sitename h2 {font-family:verdana,arial,sans serif; margin-top:-5px; padding-bottom:2px; color:rgb(210,150,0); height:20px; font-weight:normal; font-size:150% !important /*Non-IE6*/; font-size:150% /*IE6*/;}
 .sitename a{text-decoration:none; color:rgb(240,240,240);}
-.sitename a:hover {color:rgb(210,150,0)}
+/*.sitename a:hover {color:rgb(210,150,0)}*/
 
 /* BUTTON NAVIGATION */
 .navbutton {width:400px; position:absolute; z-index:2; margin-top:10px; margin-left:547px !important /*Non-IE6*/; margin-left:550px /*IE6*/;}

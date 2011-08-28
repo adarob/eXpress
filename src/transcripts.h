@@ -44,13 +44,16 @@ static size_t hash_trans_pair(TransID trans1, TransID trans2)
 }
 
 /**
- * Transcript class.  This class is used to store objects for the transcripts
+ * The Transcript class is used to store objects for the transcripts
  * being mapped to.  Besides storing basic information about the object
  * (id, length), it also stores a mass based on the number of 
  * fragments mapping to the object.  To help with updating this number,
  * it returns the likelihood that a given fragment originated from it.
  * These values are stored and returned in log space.
- */
+ *  @author    Adam Roberts
+ *  @date      2011
+ *  @copyright Artistic License 2.0
+ **/
 class Transcript
 {
     /**
@@ -255,10 +258,13 @@ typedef boost::associative_property_map<ParentMap> Parent;
 typedef boost::disjoint_sets<Rank, Parent> TransPartition;
 
 /**
- * TranscriptTable class.  This class is used to keep track of the Transcript objects for a run.
+ * The TranscriptTable class is used to keep track of the Transcript objects for a run.
  * The constructor parses a fasta file to generate the Transcript objects and store them in a map
  * that allows them to be looked up based on their string id.
- */
+ *  @author    Adam Roberts
+ *  @date      2011
+ *  @copyright Artistic License 2.0
+ **/
 class TranscriptTable
 {
     /**

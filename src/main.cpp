@@ -6,8 +6,6 @@
 //  Copyright 2011 Adam Roberts. All rights reserved.
 //
 
-#define PACKAGE_VERSION "INTERNAL"
-
 //#include <boost/math/distributions/geometric.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/program_options.hpp>
@@ -21,6 +19,7 @@
 #include "biascorrection.h"
 #include "mismatchmodel.h"
 #include "mapparser.h"
+#include "version.h"
 
 using namespace std;
 namespace po = boost::program_options;

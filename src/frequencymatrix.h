@@ -12,12 +12,15 @@
 #include <vector>
 
 /**
- * FrequencyMatrix class. This class keeps track of the frequency parameters
+ * The FrequencyMatrix class keeps track of the frequency parameters
  * in order to allow for constant-time probability look-ups and updates.
  * The table is rectangular to allow for multiple distributions to be
  * stored in one FrequencyMatrix.  Rows are distributions. All values 
  * are stored and returned in log space.
- */
+ *  @author    Adam Roberts
+ *  @date      2011
+ *  @copyright Artistic License 2.0
+ **/
 class FrequencyMatrix
 {
    /**

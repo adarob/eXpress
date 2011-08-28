@@ -13,11 +13,14 @@
 class FragMap;
 class Transcript;
 
-/**
- * MismatchTable class.  This class is used to store and update mismatch (error) parameters using a first-order
+/** 
+ * The MismatchTable class is used to store and update mismatch (error) parameters using a first-order
  * Markov model based on nucleotide and position in a ride and to return likelihoods of mismatches in given reads.  
  * All values are stored and returned in log space. 
- */
+ *  @author    Adam Roberts
+ *  @date      2011
+ *  @copyright Artistic License 2.0
+ **/
 class MismatchTable
 {
     /**

@@ -18,6 +18,12 @@ class Fragment;
 class FragMap;
 class TranscriptTable;
 
+/**
+ * The Parser class is an abstract class that can be a SAMParser or BAMParser.
+ *  @author    Adam Roberts
+ *  @date      2011
+ *  @copyright Artistic License 2.0
+ **/
 class Parser
 {
 public:
@@ -32,9 +38,11 @@ public:
 
 
 /**
- * BAMParser class.
- *
- */
+ * The BAMParser class fills Fragment objects by parsing an input file in BAM format.
+ *  @author    Adam Roberts
+ *  @date      2011
+ *  @copyright Artistic License 2.0
+ **/
 class BAMParser : public Parser
 {
     BamTools::BamReader* _reader;
@@ -68,9 +76,12 @@ public:
 };
 
 /**
- * SAMParser class.  This class produces Fragment objects by parsing an input in SAM format.
+ * The SAMParser class fills Fragment objects by parsing an input in SAM format.
  * The input may come from a file or stdin.
- */
+ *  @author    Adam Roberts
+ *  @date      2011
+ *  @copyright Artistic License 2.0
+ **/
 class SAMParser : public Parser
 {
     /**
@@ -97,6 +108,8 @@ public:
     
     /**
      * a member function that loads all mappings of the next fragment
+     * when the next fragment is reached, the current alignment is left in the
+     * _frag_buff for the next call
      * @param f the empty Fragment to add mappings to
      * @return true if more reads remain in the SAM file, false otherwise
      */
@@ -104,9 +117,12 @@ public:
 };
 
 /**
- * ParseThreadSafety struct.  This struct stores objects to allow for parsing to safely occur
+ * The ParseThreadSafety struct stores objects to allow for parsing to safely occur
  * on a separate thread from processing.
- */
+ *  @author    Adam Roberts
+ *  @date      2011
+ *  @copyright Artistic License 2.0
+ **/
 struct ParseThreadSafety
 {
     /**
@@ -126,8 +142,15 @@ struct ParseThreadSafety
 };
 
 /**
- * ThreadedMapParser class.
- */
+ * The ThreadedMapParser class is meant to be run on as a separate thread from the main processing.
+ * Once started, this thread will read input from a file or stream in SAM/BAM format, parse, and collect 
+ * read alignments into fragment alignments, and fragment alignments into fragments, which are placed on a
+ * buffer for the processing thread.  Once the processing thread copies the fragment address from the buffer,
+ * the parser is unlocked to load the next fragment.  The process stops when EOF is reached
+ *  @author    Adam Roberts
+ *  @date      2011
+ *  @copyright Artistic License 2.0
+ **/
 class ThreadedMapParser
 {
     Parser* _parser;
