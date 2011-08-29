@@ -58,7 +58,7 @@
 		0A60597613A1753B00B5C9BA /* libboost_system.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libboost_system.a; path = ../../../../../../opt/local/lib/libboost_system.a; sourceTree = "<group>"; };
 		0AD5968713FF20B900EEBDD7 /* mapparser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mapparser.h; sourceTree = "<group>"; };
 		0AD5968813FF20C700EEBDD7 /* mapparser.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = mapparser.cpp; sourceTree = "<group>"; };
-		0AD5969013FF304E00EEBDD7 /* libbamtools.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libbamtools.a; path = ../bamtools/lib/libbamtools.a; sourceTree = "<group>"; };
+		0AD5969013FF304E00EEBDD7 /* libbamtools.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libbamtools.a; path = /usr/local/lib/bamtools/libbamtools.a; sourceTree = "<absolute>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -126,9 +126,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		0A5C7607136F2E850095365C /* cuffexpress */ = {
+		0A5C7607136F2E850095365C /* express */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 0A5C7611136F2E850095365C /* Build configuration list for PBXNativeTarget "cuffexpress" */;
+			buildConfigurationList = 0A5C7611136F2E850095365C /* Build configuration list for PBXNativeTarget "express" */;
 			buildPhases = (
 				0A5C7604136F2E850095365C /* Sources */,
 				0A5C7605136F2E850095365C /* Frameworks */,
@@ -138,7 +138,7 @@
 			);
 			dependencies = (
 			);
-			name = cuffexpress;
+			name = express;
 			productName = cuffexpress;
 			productReference = 0A5C7608136F2E850095365C /* express */;
 			productType = "com.apple.product-type.tool";
@@ -151,7 +151,7 @@
 			attributes = {
 				LastUpgradeCheck = 0410;
 			};
-			buildConfigurationList = 0A5C7602136F2E850095365C /* Build configuration list for PBXProject "cuffexpress" */;
+			buildConfigurationList = 0A5C7602136F2E850095365C /* Build configuration list for PBXProject "express" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
@@ -163,7 +163,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				0A5C7607136F2E850095365C /* cuffexpress */,
+				0A5C7607136F2E850095365C /* express */,
 			);
 		};
 /* End PBXProject section */
@@ -229,15 +229,14 @@
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				HEADER_SEARCH_PATHS = (
-					/Users/adarob/projects/tuxedo/devel/bamtools/include,
+					"\"$(SRCROOT)/bamtools/include\"",
 					/usr/local/include,
 					/opt/local/include,
 				);
 				LIBRARY_SEARCH_PATHS = (
-					/Users/adarob/projects/tuxedo/devel/bamtools/lib,
 					/usr/local/lib,
 					/opt/local/lib,
-					"\"$(SRCROOT)/../bamtools/lib\"",
+					"\"$(SRCROOT)/bamtools/lib\"",
 				);
 				PRODUCT_NAME = express;
 			};
@@ -269,7 +268,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		0A5C7602136F2E850095365C /* Build configuration list for PBXProject "cuffexpress" */ = {
+		0A5C7602136F2E850095365C /* Build configuration list for PBXProject "express" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				0A5C760F136F2E850095365C /* Debug */,
@@ -278,7 +277,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		0A5C7611136F2E850095365C /* Build configuration list for PBXNativeTarget "cuffexpress" */ = {
+		0A5C7611136F2E850095365C /* Build configuration list for PBXNativeTarget "express" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				0A5C7612136F2E850095365C /* Debug */,
