@@ -129,7 +129,11 @@
         <div class="corner-content-1col-top"></div>                        
         <div class="content-1col-nobox">
           <h1>Coming Soon</h1>
-		  <p>Frequently Asked Questions coming soon! (Once you start asking questions...)</p>
+		  <p>Frequently Asked Questions coming soon! (Once you start asking questions...)<br>
+1. Can eXpress be used for finding differentially expressed genes in RNA-Seq analysis? eXpress does not test for differential expression but the "estimated counts" in the results.xprs file can be used in downstream count-based analysis tools such as DEGSeq, DESeq, etc. We recommend Cuffdiff for isoform level differential expression analysis <br>
+2. Can eXpress be used to perform genome or transcriptome assembly? No, eXpress is solely a <i>quantification</i> tool and cannot be used for assembly. However we believe the streaming algorithms underlying eXpress can be adapted for use in assembly as well and we are currently exploring ideas for low-memory streaming based assembly. For now we recommend Cufflinks for reference-based transcriptome assembly. Trinity and Trans-abyss can be used for de novo transcriptome assembly. There are numerous new short-read assembly tools that can be used for DNA assembly. <br>
+3. Is eXpress restricted to RNA-Seq analysis? The methods in eXpress are general and can be used in any application where it is necessary to quantify the relative abundances of sequences that have been sampled using short reads. RNA-Seq is the application that we have focused on in initial testing because of the large amount of available data.<br>
+</p>
           </div> 
         <div class="corner-content-1col-bottom"></div>                               
       </div>
