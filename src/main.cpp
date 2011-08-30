@@ -400,12 +400,12 @@ int main (int argc, char ** argv)
     if (bias_table)
         boost::thread bias_update(&TranscriptTable::threaded_bias_update, &trans_table);
 
-    size_t tot_counts = threaded_calc_abundances(map_parser, &trans_table, &fld, bias_table, &mismatch_table);
+    size_t tot_counts = threaded_calc_abundances(map_parser, &trans_table, &fld, bias_table, mismatch_table);
 	running = false;
 
 	cout << "Outputting final results...\n";
     
-    //mismatch_table.output(output_dir);
+    //mismatch_table->output(output_dir);
     //ofstream fld_out((output_dir + "/fld.out").c_str());
     //fld_out << fld.to_string() << '\n';
     //fld_out.close();
