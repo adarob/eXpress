@@ -236,10 +236,16 @@ public:
     
     /**
      * a member function that calcualtes and returns the effective length of the transcript (non-logged)
-     * @return the effective length of the transcript calculated as \f$ \tilde{l} = \bar{bias}\sum_{l=1}^{L(t)} D(l)(L(t) - l + 1) \f$
+     * @return the effective length of the transcript calculated as \f$ \tilde{l} = \sum_{l=1}^{L(t)}\sum{i=1}^{L(t)} D(l)b_5[i]*b_3[i+l] \f$
      */
     double effective_length() const;
     
+    /**
+     * a member function that calcualtes and returns the estimated effective length of the transcript (non-logged) using the avg bias
+     * @return the estimated effective length of the transcript calculated as \f$ \tilde{l} = \bar{bias}\sum_{l=1}^{L(t)} D(l)(L(t) - l + 1) \f$
+     */
+    double est_effective_length() const;
+
     /**
      * a member function that causes the transcript bias to be re-calculated by the _bias_table based on curent parameters
      */

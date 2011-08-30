@@ -35,7 +35,7 @@ _avg_bias(0),
 _fld(fld),
 _bias_table(bias_table),
 _mismatch_table(mismatch_table)
-{ _mass = log(effective_length()*alpha); }
+{ _mass = log(est_effective_length()*alpha); }
 
 void Transcript::add_mass(double p, double mass) 
 { 
@@ -85,6 +85,20 @@ double Transcript::log_likelihood(const FragMap& frag) const
     }
     
     return ll;
+}
+
+double Transcript::est_effective_length() const
+{
+    double eff_len = 0.0;
+    
+    for(size_t l = 1; l <= min(length(), _fld->max_val()); l++)
+    {
+        eff_len += sexp(_fld->pdf(l))*(length()-l+1);
+    }
+    
+    boost::mutex::scoped_lock lock(_bias_lock);
+    eff_len *= sexp(_avg_bias);
+    return eff_len;
 }
 
 double Transcript::effective_length() const
@@ -307,7 +321,7 @@ void TranscriptTable::output_current(ofstream& runexpr_file)
     for( TransMap::iterator it = _trans_map.begin(); it != _trans_map.end(); ++it)
     {
         Transcript& trans = *(it->second);
-        double log_fpkm = trans.mass() - log(trans.effective_length());
+        double log_fpkm = trans.mass() - log(trans.est_effective_length());
         sum = log_sum(sum, log_fpkm);
     }   
     
@@ -315,7 +329,7 @@ void TranscriptTable::output_current(ofstream& runexpr_file)
     {
 
         Transcript& trans = *(it->second);
-        double log_fpkm = trans.mass() - log(trans.effective_length());
+        double log_fpkm = trans.mass() - log(trans.est_effective_length());
         runexpr_file << sexp(log_fpkm - sum) << '\t';
     }   
     runexpr_file << '\n';
