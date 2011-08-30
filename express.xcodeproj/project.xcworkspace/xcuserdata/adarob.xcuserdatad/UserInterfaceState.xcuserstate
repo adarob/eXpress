@@ -6530,7 +6530,7 @@
 		<string>PrimaryDocumentVisibleCharacterRange</string>
 		<string>HideAllIssues</string>
 		<string>PrimaryDocumentSelectedCharacterRange</string>
-		<real>336359917.46416402</real>
+		<real>336359928.16056198</real>
 		<string>{0, 1903}</string>
 		<string>{2467, 6}</string>
 		<dict>
@@ -8382,7 +8382,7 @@
 				</dict>
 			</array>
 		</dict>
-		<real>336359917.46425498</real>
+		<real>336359928.160761</real>
 		<string>{5118, 2117}</string>
 		<string>{7100, 0}</string>
 		<dict>
@@ -13694,19 +13694,19 @@
 			YnBsaXN0MDDUAQIDBAUGOzxYJHZlcnNpb25YJG9iamVjdHNZJGFy
 			Y2hpdmVyVCR0b3ASAAGGoK0HCA8QGhscJCUrMTQ3VSRudWxs0wkK
 			CwwNDlxOU0F0dHJpYnV0ZXNWJGNsYXNzWE5TU3RyaW5ngAOADIAC
-			WENhbmNlbGVk0woREhMUF1dOUy5rZXlzWk5TLm9iamVjdHOAC6IV
-			FoAEgAWiGBmABoAJVk5TRm9udFdOU0NvbG9y1AodHh8gISIjVk5T
-			TmFtZVZOU1NpemVYTlNmRmxhZ3OACIAHI0AmAAAAAAAAEQ0QXxAR
-			THVjaWRhR3JhbmRlLUJvbGTSJicoKVokY2xhc3NuYW1lWCRjbGFz
-			c2VzVk5TRm9udKIoKlhOU09iamVjdNMKLC0uLzBcTlNDb2xvclNw
-			YWNlV05TV2hpdGWAChADQjAA0iYnMjNXTlNDb2xvcqIyKtImJzU2
-			XE5TRGljdGlvbmFyeaI1KtImJzg5XxASTlNBdHRyaWJ1dGVkU3Ry
-			aW5nojoqXxASTlNBdHRyaWJ1dGVkU3RyaW5nXxAPTlNLZXllZEFy
-			Y2hpdmVy0T0+VHJvb3SAAQAIABEAGgAjAC0AMgA3AEUASwBSAF8A
-			ZgBvAHEAcwB1AH4AhQCNAJgAmgCdAJ8AoQCkAKYAqACvALcAwADH
-			AM4A1wDZANsA5ADnAPsBAAELARQBGwEeAScBLgE7AUMBRQFHAUoB
-			TwFXAVoBXwFsAW8BdAGJAYwBoQGzAbYBuwAAAAAAAAIBAAAAAAAA
-			AD8AAAAAAAAAAAAAAAAAAAG9
+			WVN1Y2NlZWRlZNMKERITFBdXTlMua2V5c1pOUy5vYmplY3RzgAui
+			FRaABIAFohgZgAaACVZOU0ZvbnRXTlNDb2xvctQKHR4fICEiI1ZO
+			U05hbWVWTlNTaXplWE5TZkZsYWdzgAiAByNAJgAAAAAAABENEF8Q
+			EUx1Y2lkYUdyYW5kZS1Cb2xk0iYnKClaJGNsYXNzbmFtZVgkY2xh
+			c3Nlc1ZOU0ZvbnSiKCpYTlNPYmplY3TTCiwtLi8wXE5TQ29sb3JT
+			cGFjZVdOU1doaXRlgAoQA0IwANImJzIzV05TQ29sb3KiMirSJic1
+			NlxOU0RpY3Rpb25hcnmiNSrSJic4OV8QEk5TQXR0cmlidXRlZFN0
+			cmluZ6I6Kl8QEk5TQXR0cmlidXRlZFN0cmluZ18QD05TS2V5ZWRB
+			cmNoaXZlctE9PlRyb290gAEACAARABoAIwAtADIANwBFAEsAUgBf
+			AGYAbwBxAHMAdQB/AIYAjgCZAJsAngCgAKIApQCnAKkAsAC4AMEA
+			yADPANgA2gDcAOUA6AD8AQEBDAEVARwBHwEoAS8BPAFEAUYBSAFL
+			AVABWAFbAWABbQFwAXUBigGNAaIBtAG3AbwAAAAAAAACAQAAAAAA
+			AAA/AAAAAAAAAAAAAAAAAAABvg==
 			</data>
 		</dict>
 		<dict>
@@ -13782,7 +13782,7 @@
 				<integer>996</integer>
 			</dict>
 			<key>NS.time</key>
-			<real>336359912.45742798</real>
+			<real>336359923.15814602</real>
 		</dict>
 		<dict>
 			<key>$classes</key>
@@ -19979,7 +19979,7 @@
 				</dict>
 			</array>
 		</dict>
-		<real>336359917.46481901</real>
+		<real>336359928.16191798</real>
 		<string>{5118, 2117}</string>
 		<string>{7100, 0}</string>
 		<string>BiasBoss::get_transcript_bias(std::vector&lt;double&gt;&amp; start_bias, std::vector&lt;double&gt;&amp; end_bias, const Transcript&amp; trans)</string>
@@ -51375,7 +51375,7 @@
 				</dict>
 			</array>
 		</dict>
-		<real>336359917.46584398</real>
+		<real>336359928.16517597</real>
 		<string>{0, 1903}</string>
 		<string>{2467, 6}</string>
 		<string>class MismatchTable</string>
