@@ -25,7 +25,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <table cellspacing="0" cellpadding="0">
  <tbody>
  <tr style="height: 56px;">
-  <td id="projectlogo"><img alt="Logo" src="logo.png"></td>
+  <td id="projectlogo"><img alt="Logo" src="logo_small.png"></td>
   <td style="padding-left: 0.5em;">
    <div id="projectname">eXpress&#160;<span id="projectnumber">0.90 BETA</span></div>
    <div id="projectbrief"><a href=http://bio.math.berkeley.edu/eXpress>http://bio.math.berkeley.edu/eXpress</a></div>
@@ -141,328 +141,330 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00058"></a>00058     boost::mutex::scoped_lock lock(_bias_lock);
 <a name="l00059"></a>00059 
 <a name="l00060"></a>00060     <span class="keywordtype">double</span> ll = <a class="code" href="class_transcript.html#a468c9bc39e15f7cdf76c5a46ea1ef70c">mass</a>();
-<a name="l00061"></a>00061     ll += _mismatch_table-&gt;<a class="code" href="class_mismatch_table.html#a395ed48fbb48467c7ae20558e482b159">log_likelihood</a>(frag);
-<a name="l00062"></a>00062     
-<a name="l00063"></a>00063     <span class="keywordflow">switch</span>(frag.<a class="code" href="struct_frag_map.html#a1113cf78dff88915963e9cf7f5a525c7">pair_status</a>())
-<a name="l00064"></a>00064     {
-<a name="l00065"></a>00065         <span class="keywordflow">case</span> PAIRED:
-<a name="l00066"></a>00066         {
-<a name="l00067"></a>00067             ll += _start_bias[frag.<a class="code" href="struct_frag_map.html#ad8028c435a0ff9aebcc03cb7d05c91c3">left</a>] + _end_bias[frag.<a class="code" href="struct_frag_map.html#af9b896df4add2a71c6023ec077a4bdd0">right</a>-1];
-<a name="l00068"></a>00068             ll += _fld-&gt;<a class="code" href="class_f_l_d.html#a5cebe7ff0e8b8127485374db714287f7">pdf</a>(frag.<a class="code" href="struct_frag_map.html#ad127d0430b4ab03f35118680a60788f5">length</a>());
-<a name="l00069"></a>00069             ll -= total_bias_for_length(frag.<a class="code" href="struct_frag_map.html#ad127d0430b4ab03f35118680a60788f5">length</a>());
-<a name="l00070"></a>00070             <span class="keywordflow">break</span>;
-<a name="l00071"></a>00071         }
-<a name="l00072"></a>00072         <span class="keywordflow">case</span> LEFT_ONLY:
-<a name="l00073"></a>00073         {
-<a name="l00074"></a>00074             ll += _start_bias[frag.<a class="code" href="struct_frag_map.html#ad8028c435a0ff9aebcc03cb7d05c91c3">left</a>];
-<a name="l00075"></a>00075             ll -= total_bias_for_length(min((<span class="keywordtype">int</span>)<a class="code" href="class_transcript.html#ae20e7dbb485307ba815584c45e54e4d5">length</a>()-frag.<a class="code" href="struct_frag_map.html#ad8028c435a0ff9aebcc03cb7d05c91c3">left</a>, (<span class="keywordtype">int</span>)sexp(_fld-&gt;<a class="code" href="class_f_l_d.html#ac4cc93c389045e5cfcc4af363ebba5b9">mean</a>())));
-<a name="l00076"></a>00076             <span class="keywordflow">break</span>;
-<a name="l00077"></a>00077         }
-<a name="l00078"></a>00078         <span class="keywordflow">case</span> RIGHT_ONLY:
-<a name="l00079"></a>00079         {
-<a name="l00080"></a>00080             ll += _end_bias[frag.<a class="code" href="struct_frag_map.html#af9b896df4add2a71c6023ec077a4bdd0">right</a>-1];
-<a name="l00081"></a>00081             ll -= total_bias_for_length(min(frag.<a class="code" href="struct_frag_map.html#af9b896df4add2a71c6023ec077a4bdd0">right</a>, (<span class="keywordtype">int</span>)sexp(_fld-&gt;<a class="code" href="class_f_l_d.html#ac4cc93c389045e5cfcc4af363ebba5b9">mean</a>())));
-<a name="l00082"></a>00082             <span class="keywordflow">break</span>;
-<a name="l00083"></a>00083         }
-<a name="l00084"></a>00084     }
-<a name="l00085"></a>00085     
-<a name="l00086"></a>00086     <span class="keywordflow">return</span> ll;
-<a name="l00087"></a>00087 }
-<a name="l00088"></a>00088 
-<a name="l00089"></a><a class="code" href="class_transcript.html#ae5386809de4d16de33edc72c5d647d8f">00089</a> <span class="keywordtype">double</span> <a class="code" href="class_transcript.html#ae5386809de4d16de33edc72c5d647d8f">Transcript::effective_length</a>()<span class="keyword"> const</span>
-<a name="l00090"></a>00090 <span class="keyword"></span>{
-<a name="l00091"></a>00091     <span class="keywordtype">double</span> eff_len = 0.0;
-<a name="l00092"></a>00092     
-<a name="l00093"></a>00093     <span class="keywordflow">for</span>(<span class="keywordtype">size_t</span> l = 1; l &lt;= min(<a class="code" href="class_transcript.html#ae20e7dbb485307ba815584c45e54e4d5">length</a>(), _fld-&gt;<a class="code" href="class_f_l_d.html#a624f122ba9707476ce3803ad8e611963">max_val</a>()); l++)
-<a name="l00094"></a>00094     {
-<a name="l00095"></a>00095         eff_len += sexp(_fld-&gt;<a class="code" href="class_f_l_d.html#a5cebe7ff0e8b8127485374db714287f7">pdf</a>(l))*(<a class="code" href="class_transcript.html#ae20e7dbb485307ba815584c45e54e4d5">length</a>()-l+1);
-<a name="l00096"></a>00096     }
-<a name="l00097"></a>00097     
-<a name="l00098"></a>00098     boost::mutex::scoped_lock lock(_bias_lock);
-<a name="l00099"></a>00099     eff_len *= sexp(_avg_bias);
-<a name="l00100"></a>00100     <span class="keywordflow">return</span> eff_len;
-<a name="l00101"></a>00101 }
-<a name="l00102"></a>00102 
-<a name="l00103"></a>00103 <span class="keywordtype">double</span> Transcript::total_bias_for_length(<span class="keywordtype">size_t</span> l)<span class="keyword"> const</span>
-<a name="l00104"></a>00104 <span class="keyword"></span>{
-<a name="l00105"></a>00105     assert(l &lt;= _fld-&gt;max_val());
-<a name="l00106"></a>00106     <span class="keywordflow">return</span> _avg_bias + log((<span class="keywordtype">double</span>)(<a class="code" href="class_transcript.html#ae20e7dbb485307ba815584c45e54e4d5">length</a>() - l + 1));
-<a name="l00107"></a>00107 }
-<a name="l00108"></a>00108 
-<a name="l00109"></a><a class="code" href="class_transcript.html#ac4b04bcf651566c7654eaac9499f5a28">00109</a> <span class="keywordtype">void</span> <a class="code" href="class_transcript.html#ac4b04bcf651566c7654eaac9499f5a28">Transcript::update_transcript_bias</a>()
-<a name="l00110"></a>00110 {
-<a name="l00111"></a>00111     <span class="keywordflow">if</span> (!_bias_table)
-<a name="l00112"></a>00112         <span class="keywordflow">return</span>;
-<a name="l00113"></a>00113     boost::mutex::scoped_lock lock(_bias_lock);
-<a name="l00114"></a>00114     _avg_bias = _bias_table-&gt;<a class="code" href="class_bias_boss.html#af215929f1bb48658260104af729c7bfa">get_transcript_bias</a>(_start_bias, _end_bias, *<span class="keyword">this</span>);
-<a name="l00115"></a>00115 }
-<a name="l00116"></a>00116 
-<a name="l00117"></a><a class="code" href="class_transcript_table.html#a44f70fe587ed271ec5d7df3ec4310fee">00117</a> <a class="code" href="class_transcript_table.html#a44f70fe587ed271ec5d7df3ec4310fee">TranscriptTable::TranscriptTable</a>(<span class="keyword">const</span> <span class="keywordtype">string</span>&amp; trans_fasta_file, <span class="keywordtype">double</span> alpha, <span class="keyword">const</span> <a class="code" href="class_f_l_d.html">FLD</a>* fld, <a class="code" href="class_bias_boss.html">BiasBoss</a>* bias_table, <span class="keyword">const</span> <a class="code" href="class_mismatch_table.html">MismatchTable</a>* mismatch_table)
-<a name="l00118"></a>00118 : _rank(Rank(_rank_map)),
-<a name="l00119"></a>00119   _parent(Parent(_parent_map)),
-<a name="l00120"></a>00120   _bundles(_rank, _parent),
-<a name="l00121"></a>00121   _alpha(alpha)
-<a name="l00122"></a>00122 {
-<a name="l00123"></a>00123     cout &lt;&lt; <span class="stringliteral">&quot;Loading target sequences from&quot;</span> &lt;&lt; trans_fasta_file &lt;&lt; <span class="stringliteral">&quot;...\n\n&quot;</span>;
-<a name="l00124"></a>00124     ifstream infile (trans_fasta_file.c_str());
-<a name="l00125"></a>00125     <span class="keywordtype">string</span> line;
-<a name="l00126"></a>00126     <span class="keywordtype">string</span> seq = <span class="stringliteral">&quot;&quot;</span>;
-<a name="l00127"></a>00127     <span class="keywordtype">string</span> name = <span class="stringliteral">&quot;&quot;</span>;
-<a name="l00128"></a>00128     <span class="keywordflow">if</span> (infile.is_open())
-<a name="l00129"></a>00129     {
-<a name="l00130"></a>00130         <span class="keywordflow">while</span> ( infile.good() )
-<a name="l00131"></a>00131         {
-<a name="l00132"></a>00132             getline (infile, line, <span class="charliteral">&#39;\n&#39;</span>);
-<a name="l00133"></a>00133             <span class="keywordflow">if</span> (line[0] == <span class="charliteral">&#39;&gt;&#39;</span>)
-<a name="l00134"></a>00134             {
-<a name="l00135"></a>00135                 <span class="keywordflow">if</span> (!name.empty())
-<a name="l00136"></a>00136                 {
-<a name="l00137"></a>00137                     <a class="code" href="class_transcript.html">Transcript</a>* trans = <span class="keyword">new</span> <a class="code" href="class_transcript.html">Transcript</a>(name, seq, alpha, fld, bias_table, mismatch_table);
-<a name="l00138"></a>00138                     add_trans(trans);
-<a name="l00139"></a>00139                     <span class="keywordflow">if</span> (bias_table)
-<a name="l00140"></a>00140                         bias_table-&gt;<a class="code" href="class_bias_boss.html#a0be8a21ce7edf3206111bf3e8d04910e">update_expectations</a>(*trans);
-<a name="l00141"></a>00141                 }
-<a name="l00142"></a>00142                 name = line.substr(1,line.find(<span class="charliteral">&#39; &#39;</span>)-1);
-<a name="l00143"></a>00143                 seq = <span class="stringliteral">&quot;&quot;</span>;
-<a name="l00144"></a>00144             }
-<a name="l00145"></a>00145             <span class="keywordflow">else</span>
-<a name="l00146"></a>00146             {
-<a name="l00147"></a>00147                 seq += line;
-<a name="l00148"></a>00148             }
-<a name="l00149"></a>00149             
-<a name="l00150"></a>00150         }
-<a name="l00151"></a>00151         <span class="keywordflow">if</span> (!name.empty())
-<a name="l00152"></a>00152         {
-<a name="l00153"></a>00153             <a class="code" href="class_transcript.html">Transcript</a>* trans = <span class="keyword">new</span> <a class="code" href="class_transcript.html">Transcript</a>(name, seq, alpha, fld, bias_table, mismatch_table);
-<a name="l00154"></a>00154             add_trans(trans);
-<a name="l00155"></a>00155             <span class="keywordflow">if</span> (bias_table)
-<a name="l00156"></a>00156                 bias_table-&gt;<a class="code" href="class_bias_boss.html#a0be8a21ce7edf3206111bf3e8d04910e">update_expectations</a>(*trans);
-<a name="l00157"></a>00157         }
-<a name="l00158"></a>00158         infile.close();
-<a name="l00159"></a>00159     }
-<a name="l00160"></a>00160     <span class="keywordflow">else</span> 
-<a name="l00161"></a>00161     {
-<a name="l00162"></a>00162         cerr &lt;&lt; <span class="stringliteral">&quot;Unable to open MultiFASTA file &#39;&quot;</span> &lt;&lt; trans_fasta_file &lt;&lt; <span class="stringliteral">&quot;&#39;.\n&quot;</span> ; 
-<a name="l00163"></a>00163         exit(1);
-<a name="l00164"></a>00164     }
-<a name="l00165"></a>00165     
-<a name="l00166"></a>00166     <span class="keywordflow">if</span> (<a class="code" href="class_transcript_table.html#a2da46293ff47c49bcbae554ae5321451">size</a>() == 0)
-<a name="l00167"></a>00167     {
-<a name="l00168"></a>00168         cerr &lt;&lt; <span class="stringliteral">&quot;No targets found in MultiFASTA file &#39;&quot;</span> &lt;&lt; trans_fasta_file &lt;&lt; <span class="stringliteral">&quot;&#39;.\n&quot;</span> ; 
-<a name="l00169"></a>00169         exit(1);        
-<a name="l00170"></a>00170     }
-<a name="l00171"></a>00171     
-<a name="l00172"></a>00172 }
-<a name="l00173"></a>00173 
-<a name="l00174"></a><a class="code" href="class_transcript_table.html#a04df7d886a51644120470e9b87862818">00174</a> <a class="code" href="class_transcript_table.html#a04df7d886a51644120470e9b87862818">TranscriptTable::~TranscriptTable</a>()
-<a name="l00175"></a>00175 {
-<a name="l00176"></a>00176     <span class="keywordflow">for</span>( TransMap::iterator it = _trans_map.begin(); it != _trans_map.end(); ++it)
-<a name="l00177"></a>00177     {
-<a name="l00178"></a>00178         <span class="keyword">delete</span> it-&gt;second;
-<a name="l00179"></a>00179     }
-<a name="l00180"></a>00180 }
-<a name="l00181"></a>00181 
-<a name="l00182"></a>00182 <span class="keywordtype">void</span> TranscriptTable::add_trans(<a class="code" href="class_transcript.html">Transcript</a>* trans)
-<a name="l00183"></a>00183 {
-<a name="l00184"></a>00184     <a class="code" href="class_transcript.html">Transcript</a>* ret = <a class="code" href="class_transcript_table.html#a56fb211db4ca9ae0f952243d05c80a0d">get_trans</a>(trans-&gt;<a class="code" href="class_transcript.html#a6c2056b337c006b547044b40f5290f10">id</a>());
-<a name="l00185"></a>00185     <span class="keywordflow">if</span> (ret)
-<a name="l00186"></a>00186     {
-<a name="l00187"></a>00187         <span class="keywordflow">if</span> (trans-&gt;<a class="code" href="class_transcript.html#adc5c3d067288ebc864ff9ace98a88944">name</a>() == ret-&gt;<a class="code" href="class_transcript.html#adc5c3d067288ebc864ff9ace98a88944">name</a>())
-<a name="l00188"></a>00188         {
-<a name="l00189"></a>00189             cerr &lt;&lt; <span class="stringliteral">&quot;ERROR: Repeated target ID in multi-fasta input (&quot;</span> &lt;&lt; ret-&gt;<a class="code" href="class_transcript.html#adc5c3d067288ebc864ff9ace98a88944">name</a>() &lt;&lt; <span class="stringliteral">&quot;).\n&quot;</span>;
-<a name="l00190"></a>00190         }
-<a name="l00191"></a>00191         <span class="keywordflow">else</span>
-<a name="l00192"></a>00192         {
-<a name="l00193"></a>00193             cerr &lt;&lt; <span class="stringliteral">&quot;ERROR: Hash collision (&quot;</span> &lt;&lt; ret-&gt;<a class="code" href="class_transcript.html#adc5c3d067288ebc864ff9ace98a88944">name</a>() &lt;&lt; <span class="stringliteral">&quot;).\n&quot;</span>;
-<a name="l00194"></a>00194         }
-<a name="l00195"></a>00195         exit(1);
-<a name="l00196"></a>00196     }
-<a name="l00197"></a>00197     
-<a name="l00198"></a>00198     _trans_map.insert(make_pair(trans-&gt;<a class="code" href="class_transcript.html#a6c2056b337c006b547044b40f5290f10">id</a>(), trans));
-<a name="l00199"></a>00199     _bundles.make_set(trans-&gt;<a class="code" href="class_transcript.html#a6c2056b337c006b547044b40f5290f10">id</a>());
-<a name="l00200"></a>00200 }
-<a name="l00201"></a>00201 
-<a name="l00202"></a><a class="code" href="class_transcript_table.html#a56fb211db4ca9ae0f952243d05c80a0d">00202</a> <a class="code" href="class_transcript.html">Transcript</a>* <a class="code" href="class_transcript_table.html#a56fb211db4ca9ae0f952243d05c80a0d">TranscriptTable::get_trans</a>(TransID <span class="keywordtype">id</span>)
-<a name="l00203"></a>00203 {
-<a name="l00204"></a>00204     TransMap::iterator it = _trans_map.find(<span class="keywordtype">id</span>);
-<a name="l00205"></a>00205     <span class="keywordflow">if</span>(it != _trans_map.end())
-<a name="l00206"></a>00206         <span class="keywordflow">return</span> it-&gt;second;
-<a name="l00207"></a>00207     <span class="keywordflow">return</span> NULL;
-<a name="l00208"></a>00208 }
-<a name="l00209"></a>00209 
-<a name="l00210"></a><a class="code" href="class_transcript_table.html#a31928687dfbb1822473de88c0acdb7f6">00210</a> <span class="keywordtype">void</span> <a class="code" href="class_transcript_table.html#a31928687dfbb1822473de88c0acdb7f6">TranscriptTable::update_covar</a>(TransID trans1, TransID trans2, <span class="keywordtype">double</span> covar)
-<a name="l00211"></a>00211 {
-<a name="l00212"></a>00212     <span class="keywordtype">size_t</span> pair_id = hash_trans_pair(trans1, trans2);
-<a name="l00213"></a>00213     <span class="keywordflow">if</span> (_covar_map.count(pair_id))
-<a name="l00214"></a>00214     {
-<a name="l00215"></a>00215         _covar_map[pair_id] = log_sum(covar, _covar_map[pair_id]);
-<a name="l00216"></a>00216     }
-<a name="l00217"></a>00217     <span class="keywordflow">else</span>
-<a name="l00218"></a>00218     {
-<a name="l00219"></a>00219         _covar_map[pair_id] = covar;
-<a name="l00220"></a>00220     }
-<a name="l00221"></a>00221 }
-<a name="l00222"></a>00222 
-<a name="l00223"></a><a class="code" href="class_transcript_table.html#a1b049144518f10d2bd6a6ac830444ae5">00223</a> TransID <a class="code" href="class_transcript_table.html#a1b049144518f10d2bd6a6ac830444ae5">TranscriptTable::get_trans_rep</a>(TransID trans)
-<a name="l00224"></a>00224 {
-<a name="l00225"></a>00225     <span class="keywordflow">return</span> _bundles.find_set(trans);
-<a name="l00226"></a>00226 }
-<a name="l00227"></a>00227 
+<a name="l00061"></a>00061     <span class="keywordflow">if</span> (_mismatch_table)
+<a name="l00062"></a>00062         ll += _mismatch_table-&gt;<a class="code" href="class_mismatch_table.html#a395ed48fbb48467c7ae20558e482b159">log_likelihood</a>(frag);
+<a name="l00063"></a>00063     
+<a name="l00064"></a>00064     <span class="keywordflow">switch</span>(frag.<a class="code" href="struct_frag_map.html#a1113cf78dff88915963e9cf7f5a525c7">pair_status</a>())
+<a name="l00065"></a>00065     {
+<a name="l00066"></a>00066         <span class="keywordflow">case</span> PAIRED:
+<a name="l00067"></a>00067         {
+<a name="l00068"></a>00068             ll += _start_bias[frag.<a class="code" href="struct_frag_map.html#ad8028c435a0ff9aebcc03cb7d05c91c3">left</a>] + _end_bias[frag.<a class="code" href="struct_frag_map.html#af9b896df4add2a71c6023ec077a4bdd0">right</a>-1];
+<a name="l00069"></a>00069             ll += _fld-&gt;<a class="code" href="class_f_l_d.html#a5cebe7ff0e8b8127485374db714287f7">pdf</a>(frag.<a class="code" href="struct_frag_map.html#ad127d0430b4ab03f35118680a60788f5">length</a>());
+<a name="l00070"></a>00070             ll -= total_bias_for_length(frag.<a class="code" href="struct_frag_map.html#ad127d0430b4ab03f35118680a60788f5">length</a>());
+<a name="l00071"></a>00071             <span class="keywordflow">break</span>;
+<a name="l00072"></a>00072         }
+<a name="l00073"></a>00073         <span class="keywordflow">case</span> LEFT_ONLY:
+<a name="l00074"></a>00074         {
+<a name="l00075"></a>00075             ll += _start_bias[frag.<a class="code" href="struct_frag_map.html#ad8028c435a0ff9aebcc03cb7d05c91c3">left</a>];
+<a name="l00076"></a>00076             ll -= total_bias_for_length(min((<span class="keywordtype">int</span>)<a class="code" href="class_transcript.html#ae20e7dbb485307ba815584c45e54e4d5">length</a>()-frag.<a class="code" href="struct_frag_map.html#ad8028c435a0ff9aebcc03cb7d05c91c3">left</a>, (<span class="keywordtype">int</span>)sexp(_fld-&gt;<a class="code" href="class_f_l_d.html#ac4cc93c389045e5cfcc4af363ebba5b9">mean</a>())));
+<a name="l00077"></a>00077             <span class="keywordflow">break</span>;
+<a name="l00078"></a>00078         }
+<a name="l00079"></a>00079         <span class="keywordflow">case</span> RIGHT_ONLY:
+<a name="l00080"></a>00080         {
+<a name="l00081"></a>00081             ll += _end_bias[frag.<a class="code" href="struct_frag_map.html#af9b896df4add2a71c6023ec077a4bdd0">right</a>-1];
+<a name="l00082"></a>00082             ll -= total_bias_for_length(min(frag.<a class="code" href="struct_frag_map.html#af9b896df4add2a71c6023ec077a4bdd0">right</a>, (<span class="keywordtype">int</span>)sexp(_fld-&gt;<a class="code" href="class_f_l_d.html#ac4cc93c389045e5cfcc4af363ebba5b9">mean</a>())));
+<a name="l00083"></a>00083             <span class="keywordflow">break</span>;
+<a name="l00084"></a>00084         }
+<a name="l00085"></a>00085     }
+<a name="l00086"></a>00086     
+<a name="l00087"></a>00087     <span class="keywordflow">return</span> ll;
+<a name="l00088"></a>00088 }
+<a name="l00089"></a>00089 
+<a name="l00090"></a><a class="code" href="class_transcript.html#ae5386809de4d16de33edc72c5d647d8f">00090</a> <span class="keywordtype">double</span> <a class="code" href="class_transcript.html#ae5386809de4d16de33edc72c5d647d8f">Transcript::effective_length</a>()<span class="keyword"> const</span>
+<a name="l00091"></a>00091 <span class="keyword"></span>{
+<a name="l00092"></a>00092     <span class="keywordtype">double</span> eff_len = 0.0;
+<a name="l00093"></a>00093     
+<a name="l00094"></a>00094     <span class="keywordflow">for</span>(<span class="keywordtype">size_t</span> l = 1; l &lt;= min(<a class="code" href="class_transcript.html#ae20e7dbb485307ba815584c45e54e4d5">length</a>(), _fld-&gt;<a class="code" href="class_f_l_d.html#a624f122ba9707476ce3803ad8e611963">max_val</a>()); l++)
+<a name="l00095"></a>00095     {
+<a name="l00096"></a>00096         eff_len += sexp(_fld-&gt;<a class="code" href="class_f_l_d.html#a5cebe7ff0e8b8127485374db714287f7">pdf</a>(l))*(<a class="code" href="class_transcript.html#ae20e7dbb485307ba815584c45e54e4d5">length</a>()-l+1);
+<a name="l00097"></a>00097     }
+<a name="l00098"></a>00098     
+<a name="l00099"></a>00099     boost::mutex::scoped_lock lock(_bias_lock);
+<a name="l00100"></a>00100     eff_len *= sexp(_avg_bias);
+<a name="l00101"></a>00101     <span class="keywordflow">return</span> eff_len;
+<a name="l00102"></a>00102 }
+<a name="l00103"></a>00103 
+<a name="l00104"></a>00104 <span class="keywordtype">double</span> Transcript::total_bias_for_length(<span class="keywordtype">size_t</span> l)<span class="keyword"> const</span>
+<a name="l00105"></a>00105 <span class="keyword"></span>{
+<a name="l00106"></a>00106     assert(l &lt;= _fld-&gt;max_val());
+<a name="l00107"></a>00107     <span class="keywordflow">return</span> _avg_bias + log((<span class="keywordtype">double</span>)(<a class="code" href="class_transcript.html#ae20e7dbb485307ba815584c45e54e4d5">length</a>() - l + 1));
+<a name="l00108"></a>00108 }
+<a name="l00109"></a>00109 
+<a name="l00110"></a><a class="code" href="class_transcript.html#ac4b04bcf651566c7654eaac9499f5a28">00110</a> <span class="keywordtype">void</span> <a class="code" href="class_transcript.html#ac4b04bcf651566c7654eaac9499f5a28">Transcript::update_transcript_bias</a>()
+<a name="l00111"></a>00111 {
+<a name="l00112"></a>00112     <span class="keywordflow">if</span> (!_bias_table)
+<a name="l00113"></a>00113         <span class="keywordflow">return</span>;
+<a name="l00114"></a>00114     boost::mutex::scoped_lock lock(_bias_lock);
+<a name="l00115"></a>00115     _avg_bias = _bias_table-&gt;<a class="code" href="class_bias_boss.html#af215929f1bb48658260104af729c7bfa">get_transcript_bias</a>(_start_bias, _end_bias, *<span class="keyword">this</span>);
+<a name="l00116"></a>00116 }
+<a name="l00117"></a>00117 
+<a name="l00118"></a><a class="code" href="class_transcript_table.html#a44f70fe587ed271ec5d7df3ec4310fee">00118</a> <a class="code" href="class_transcript_table.html#a44f70fe587ed271ec5d7df3ec4310fee">TranscriptTable::TranscriptTable</a>(<span class="keyword">const</span> <span class="keywordtype">string</span>&amp; trans_fasta_file, <span class="keywordtype">double</span> alpha, <span class="keyword">const</span> <a class="code" href="class_f_l_d.html">FLD</a>* fld, <a class="code" href="class_bias_boss.html">BiasBoss</a>* bias_table, <span class="keyword">const</span> <a class="code" href="class_mismatch_table.html">MismatchTable</a>* mismatch_table)
+<a name="l00119"></a>00119 : _rank(Rank(_rank_map)),
+<a name="l00120"></a>00120   _parent(Parent(_parent_map)),
+<a name="l00121"></a>00121   _bundles(_rank, _parent),
+<a name="l00122"></a>00122   _alpha(alpha)
+<a name="l00123"></a>00123 {
+<a name="l00124"></a>00124     cout &lt;&lt; <span class="stringliteral">&quot;Loading target sequences from &quot;</span> &lt;&lt; trans_fasta_file &lt;&lt; <span class="stringliteral">&quot;...\n\n&quot;</span>;
+<a name="l00125"></a>00125     ifstream infile (trans_fasta_file.c_str());
+<a name="l00126"></a>00126     <span class="keywordtype">string</span> line;
+<a name="l00127"></a>00127     <span class="keywordtype">string</span> seq = <span class="stringliteral">&quot;&quot;</span>;
+<a name="l00128"></a>00128     <span class="keywordtype">string</span> name = <span class="stringliteral">&quot;&quot;</span>;
+<a name="l00129"></a>00129     <span class="keywordflow">if</span> (infile.is_open())
+<a name="l00130"></a>00130     {
+<a name="l00131"></a>00131         <span class="keywordflow">while</span> ( infile.good() )
+<a name="l00132"></a>00132         {
+<a name="l00133"></a>00133             getline (infile, line, <span class="charliteral">&#39;\n&#39;</span>);
+<a name="l00134"></a>00134             <span class="keywordflow">if</span> (line[0] == <span class="charliteral">&#39;&gt;&#39;</span>)
+<a name="l00135"></a>00135             {
+<a name="l00136"></a>00136                 <span class="keywordflow">if</span> (!name.empty())
+<a name="l00137"></a>00137                 {
+<a name="l00138"></a>00138                     <a class="code" href="class_transcript.html">Transcript</a>* trans = <span class="keyword">new</span> <a class="code" href="class_transcript.html">Transcript</a>(name, seq, alpha, fld, bias_table, mismatch_table);
+<a name="l00139"></a>00139                     add_trans(trans);
+<a name="l00140"></a>00140                     <span class="keywordflow">if</span> (bias_table)
+<a name="l00141"></a>00141                         bias_table-&gt;<a class="code" href="class_bias_boss.html#a0be8a21ce7edf3206111bf3e8d04910e">update_expectations</a>(*trans);
+<a name="l00142"></a>00142                 }
+<a name="l00143"></a>00143                 name = line.substr(1,line.find(<span class="charliteral">&#39; &#39;</span>)-1);
+<a name="l00144"></a>00144                 seq = <span class="stringliteral">&quot;&quot;</span>;
+<a name="l00145"></a>00145             }
+<a name="l00146"></a>00146             <span class="keywordflow">else</span>
+<a name="l00147"></a>00147             {
+<a name="l00148"></a>00148                 seq += line;
+<a name="l00149"></a>00149             }
+<a name="l00150"></a>00150             
+<a name="l00151"></a>00151         }
+<a name="l00152"></a>00152         <span class="keywordflow">if</span> (!name.empty())
+<a name="l00153"></a>00153         {
+<a name="l00154"></a>00154             <a class="code" href="class_transcript.html">Transcript</a>* trans = <span class="keyword">new</span> <a class="code" href="class_transcript.html">Transcript</a>(name, seq, alpha, fld, bias_table, mismatch_table);
+<a name="l00155"></a>00155             add_trans(trans);
+<a name="l00156"></a>00156             <span class="keywordflow">if</span> (bias_table)
+<a name="l00157"></a>00157                 bias_table-&gt;<a class="code" href="class_bias_boss.html#a0be8a21ce7edf3206111bf3e8d04910e">update_expectations</a>(*trans);
+<a name="l00158"></a>00158         }
+<a name="l00159"></a>00159         infile.close();
+<a name="l00160"></a>00160     }
+<a name="l00161"></a>00161     <span class="keywordflow">else</span> 
+<a name="l00162"></a>00162     {
+<a name="l00163"></a>00163         cerr &lt;&lt; <span class="stringliteral">&quot;Unable to open MultiFASTA file &#39;&quot;</span> &lt;&lt; trans_fasta_file &lt;&lt; <span class="stringliteral">&quot;&#39;.\n&quot;</span> ; 
+<a name="l00164"></a>00164         exit(1);
+<a name="l00165"></a>00165     }
+<a name="l00166"></a>00166     
+<a name="l00167"></a>00167     <span class="keywordflow">if</span> (<a class="code" href="class_transcript_table.html#a2da46293ff47c49bcbae554ae5321451">size</a>() == 0)
+<a name="l00168"></a>00168     {
+<a name="l00169"></a>00169         cerr &lt;&lt; <span class="stringliteral">&quot;No targets found in MultiFASTA file &#39;&quot;</span> &lt;&lt; trans_fasta_file &lt;&lt; <span class="stringliteral">&quot;&#39;.\n&quot;</span> ; 
+<a name="l00170"></a>00170         exit(1);        
+<a name="l00171"></a>00171     }
+<a name="l00172"></a>00172     
+<a name="l00173"></a>00173 }
+<a name="l00174"></a>00174 
+<a name="l00175"></a><a class="code" href="class_transcript_table.html#a04df7d886a51644120470e9b87862818">00175</a> <a class="code" href="class_transcript_table.html#a04df7d886a51644120470e9b87862818">TranscriptTable::~TranscriptTable</a>()
+<a name="l00176"></a>00176 {
+<a name="l00177"></a>00177     <span class="keywordflow">for</span>( TransMap::iterator it = _trans_map.begin(); it != _trans_map.end(); ++it)
+<a name="l00178"></a>00178     {
+<a name="l00179"></a>00179         <span class="keyword">delete</span> it-&gt;second;
+<a name="l00180"></a>00180     }
+<a name="l00181"></a>00181 }
+<a name="l00182"></a>00182 
+<a name="l00183"></a>00183 <span class="keywordtype">void</span> TranscriptTable::add_trans(<a class="code" href="class_transcript.html">Transcript</a>* trans)
+<a name="l00184"></a>00184 {
+<a name="l00185"></a>00185     <a class="code" href="class_transcript.html">Transcript</a>* ret = <a class="code" href="class_transcript_table.html#a56fb211db4ca9ae0f952243d05c80a0d">get_trans</a>(trans-&gt;<a class="code" href="class_transcript.html#a6c2056b337c006b547044b40f5290f10">id</a>());
+<a name="l00186"></a>00186     <span class="keywordflow">if</span> (ret)
+<a name="l00187"></a>00187     {
+<a name="l00188"></a>00188         <span class="keywordflow">if</span> (trans-&gt;<a class="code" href="class_transcript.html#adc5c3d067288ebc864ff9ace98a88944">name</a>() == ret-&gt;<a class="code" href="class_transcript.html#adc5c3d067288ebc864ff9ace98a88944">name</a>())
+<a name="l00189"></a>00189         {
+<a name="l00190"></a>00190             cerr &lt;&lt; <span class="stringliteral">&quot;ERROR: Repeated target ID in multi-fasta input (&quot;</span> &lt;&lt; ret-&gt;<a class="code" href="class_transcript.html#adc5c3d067288ebc864ff9ace98a88944">name</a>() &lt;&lt; <span class="stringliteral">&quot;).\n&quot;</span>;
+<a name="l00191"></a>00191         }
+<a name="l00192"></a>00192         <span class="keywordflow">else</span>
+<a name="l00193"></a>00193         {
+<a name="l00194"></a>00194             cerr &lt;&lt; <span class="stringliteral">&quot;ERROR: Hash collision (&quot;</span> &lt;&lt; ret-&gt;<a class="code" href="class_transcript.html#adc5c3d067288ebc864ff9ace98a88944">name</a>() &lt;&lt; <span class="stringliteral">&quot;).\n&quot;</span>;
+<a name="l00195"></a>00195         }
+<a name="l00196"></a>00196         exit(1);
+<a name="l00197"></a>00197     }
+<a name="l00198"></a>00198     
+<a name="l00199"></a>00199     _trans_map.insert(make_pair(trans-&gt;<a class="code" href="class_transcript.html#a6c2056b337c006b547044b40f5290f10">id</a>(), trans));
+<a name="l00200"></a>00200     _bundles.make_set(trans-&gt;<a class="code" href="class_transcript.html#a6c2056b337c006b547044b40f5290f10">id</a>());
+<a name="l00201"></a>00201 }
+<a name="l00202"></a>00202 
+<a name="l00203"></a><a class="code" href="class_transcript_table.html#a56fb211db4ca9ae0f952243d05c80a0d">00203</a> <a class="code" href="class_transcript.html">Transcript</a>* <a class="code" href="class_transcript_table.html#a56fb211db4ca9ae0f952243d05c80a0d">TranscriptTable::get_trans</a>(TransID <span class="keywordtype">id</span>)
+<a name="l00204"></a>00204 {
+<a name="l00205"></a>00205     TransMap::iterator it = _trans_map.find(<span class="keywordtype">id</span>);
+<a name="l00206"></a>00206     <span class="keywordflow">if</span>(it != _trans_map.end())
+<a name="l00207"></a>00207         <span class="keywordflow">return</span> it-&gt;second;
+<a name="l00208"></a>00208     <span class="keywordflow">return</span> NULL;
+<a name="l00209"></a>00209 }
+<a name="l00210"></a>00210 
+<a name="l00211"></a><a class="code" href="class_transcript_table.html#a31928687dfbb1822473de88c0acdb7f6">00211</a> <span class="keywordtype">void</span> <a class="code" href="class_transcript_table.html#a31928687dfbb1822473de88c0acdb7f6">TranscriptTable::update_covar</a>(TransID trans1, TransID trans2, <span class="keywordtype">double</span> covar)
+<a name="l00212"></a>00212 {
+<a name="l00213"></a>00213     <span class="keywordtype">size_t</span> pair_id = hash_trans_pair(trans1, trans2);
+<a name="l00214"></a>00214     <span class="keywordflow">if</span> (_covar_map.count(pair_id))
+<a name="l00215"></a>00215     {
+<a name="l00216"></a>00216         _covar_map[pair_id] = log_sum(covar, _covar_map[pair_id]);
+<a name="l00217"></a>00217     }
+<a name="l00218"></a>00218     <span class="keywordflow">else</span>
+<a name="l00219"></a>00219     {
+<a name="l00220"></a>00220         _covar_map[pair_id] = covar;
+<a name="l00221"></a>00221     }
+<a name="l00222"></a>00222 }
+<a name="l00223"></a>00223 
+<a name="l00224"></a><a class="code" href="class_transcript_table.html#a1b049144518f10d2bd6a6ac830444ae5">00224</a> TransID <a class="code" href="class_transcript_table.html#a1b049144518f10d2bd6a6ac830444ae5">TranscriptTable::get_trans_rep</a>(TransID trans)
+<a name="l00225"></a>00225 {
+<a name="l00226"></a>00226     <span class="keywordflow">return</span> _bundles.find_set(trans);
+<a name="l00227"></a>00227 }
 <a name="l00228"></a>00228 
-<a name="l00229"></a><a class="code" href="class_transcript_table.html#a918adb868acb3ecf82b5f1a1ec4230cf">00229</a> TransID <a class="code" href="class_transcript_table.html#a918adb868acb3ecf82b5f1a1ec4230cf">TranscriptTable::merge_bundles</a>(TransID rep1, TransID rep2)
-<a name="l00230"></a>00230 {
-<a name="l00231"></a>00231     assert(rep1 != rep2);
-<a name="l00232"></a>00232     _bundles.link(rep1, rep2);
-<a name="l00233"></a>00233     
-<a name="l00234"></a>00234     TransID new_rep = _bundles.find_set(rep1);
-<a name="l00235"></a>00235     <span class="keywordflow">return</span> new_rep;
-<a name="l00236"></a>00236 }
-<a name="l00237"></a>00237 
-<a name="l00238"></a><a class="code" href="class_transcript_table.html#a79de5edb45941d7a13911004696bcca5">00238</a> <span class="keywordtype">size_t</span> <a class="code" href="class_transcript_table.html#a79de5edb45941d7a13911004696bcca5">TranscriptTable::num_bundles</a>()
-<a name="l00239"></a>00239 {
-<a name="l00240"></a>00240     <span class="keywordtype">size_t</span> count = 0;
-<a name="l00241"></a>00241     <span class="keywordflow">for</span>(TransMap::const_iterator it = _trans_map.begin(); it != _trans_map.end(); ++it)
-<a name="l00242"></a>00242     {
-<a name="l00243"></a>00243         <span class="keywordflow">if</span> (_bundles.find_set(it-&gt;first) == it-&gt;first)
-<a name="l00244"></a>00244             count ++;
-<a name="l00245"></a>00245     }
-<a name="l00246"></a>00246     <span class="keywordflow">return</span> count;
-<a name="l00247"></a>00247 }
-<a name="l00248"></a>00248 
-<a name="l00249"></a><a class="code" href="class_transcript_table.html#add2191aae93ee59cb9f8659c2cab25c8">00249</a> <span class="keywordtype">void</span> <a class="code" href="class_transcript_table.html#add2191aae93ee59cb9f8659c2cab25c8">TranscriptTable::output_bundles</a>(<span class="keywordtype">string</span> output_dir)
-<a name="l00250"></a>00250 {
-<a name="l00251"></a>00251     ofstream bundle_file((output_dir + <span class="stringliteral">&quot;/bundles.tab&quot;</span>).c_str());
-<a name="l00252"></a>00252     
-<a name="l00253"></a>00253     <span class="keyword">typedef</span> boost::unordered_map&lt;TransID, string&gt; BundleMap;
-<a name="l00254"></a>00254     BundleMap b_map;
-<a name="l00255"></a>00255     <span class="keywordflow">for</span>( TransMap::iterator it = _trans_map.begin(); it != _trans_map.end(); ++it)
-<a name="l00256"></a>00256     {
-<a name="l00257"></a>00257         TransID rep = _bundles.find_set(it-&gt;first);
-<a name="l00258"></a>00258         b_map[rep] += <span class="charliteral">&#39;\t&#39;</span> + (it-&gt;second)-&gt;name();
-<a name="l00259"></a>00259     }
-<a name="l00260"></a>00260     
-<a name="l00261"></a>00261     <span class="keywordflow">for</span> (BundleMap::iterator it = b_map.begin(); it != b_map.end(); ++it)
-<a name="l00262"></a>00262     {
-<a name="l00263"></a>00263         bundle_file &lt;&lt; it-&gt;second &lt;&lt; <span class="charliteral">&#39;\n&#39;</span>;
-<a name="l00264"></a>00264     }
-<a name="l00265"></a>00265     
-<a name="l00266"></a>00266     bundle_file.close();
-<a name="l00267"></a>00267 }
-<a name="l00268"></a>00268 
-<a name="l00269"></a><a class="code" href="class_transcript_table.html#aeb0417b05ba8d206cc9f89b1aafbd9dd">00269</a> <span class="keywordtype">void</span> <a class="code" href="class_transcript_table.html#aeb0417b05ba8d206cc9f89b1aafbd9dd">TranscriptTable::threaded_bias_update</a>()
-<a name="l00270"></a>00270 {
-<a name="l00271"></a>00271     <span class="keywordflow">while</span>(running)
-<a name="l00272"></a>00272     {
-<a name="l00273"></a>00273         <span class="comment">//size_t count = 0;</span>
-<a name="l00274"></a>00274         <span class="keywordflow">for</span>( TransMap::iterator it = _trans_map.begin(); it != _trans_map.end(); ++it)
-<a name="l00275"></a>00275         {  
-<a name="l00276"></a>00276             <a class="code" href="class_transcript.html">Transcript</a>&amp; trans = *(it-&gt;second);
-<a name="l00277"></a>00277             trans.<a class="code" href="class_transcript.html#ac4b04bcf651566c7654eaac9499f5a28">update_transcript_bias</a>();
-<a name="l00278"></a>00278             <span class="comment">//if (++count%10000 == 0)</span>
-<a name="l00279"></a>00279             <span class="comment">//    cout &lt;&lt; &quot;*&quot;&lt;&lt;count&lt;&lt;&quot;\n&quot;;</span>
-<a name="l00280"></a>00280             <span class="keywordflow">if</span> (!running)
-<a name="l00281"></a>00281                 <span class="keywordflow">break</span>;
-<a name="l00282"></a>00282         }
-<a name="l00283"></a>00283         <span class="comment">//cout &lt;&lt; &quot;*\n&quot;;</span>
-<a name="l00284"></a>00284     }
-<a name="l00285"></a>00285 }
-<a name="l00286"></a>00286 
-<a name="l00287"></a>00287 <span class="keywordtype">void</span> TranscriptTable::output_header(ofstream&amp; runexpr_file)
-<a name="l00288"></a>00288 {
-<a name="l00289"></a>00289   runexpr_file &lt;&lt; <span class="stringliteral">&quot;Read_Num\t&quot;</span>;
-<a name="l00290"></a>00290     <span class="keywordflow">for</span>( TransMap::iterator it = _trans_map.begin(); it != _trans_map.end(); ++it)
-<a name="l00291"></a>00291     {
-<a name="l00292"></a>00292         <a class="code" href="class_transcript.html">Transcript</a>&amp; trans = *(it-&gt;second);
-<a name="l00293"></a>00293         runexpr_file &lt;&lt; trans.<a class="code" href="class_transcript.html#adc5c3d067288ebc864ff9ace98a88944">name</a>() &lt;&lt; <span class="charliteral">&#39;\t&#39;</span>; 
-<a name="l00294"></a>00294     }   
-<a name="l00295"></a>00295     runexpr_file &lt;&lt; <span class="charliteral">&#39;\n&#39;</span>;
-<a name="l00296"></a>00296 }
-<a name="l00297"></a>00297 
-<a name="l00298"></a>00298 <span class="keywordtype">void</span> TranscriptTable::output_current(ofstream&amp; runexpr_file)
-<a name="l00299"></a>00299 {    
-<a name="l00300"></a>00300     <span class="keywordtype">double</span> sum = HUGE_VAL;
-<a name="l00301"></a>00301     <span class="keywordflow">for</span>( TransMap::iterator it = _trans_map.begin(); it != _trans_map.end(); ++it)
-<a name="l00302"></a>00302     {
-<a name="l00303"></a>00303         <a class="code" href="class_transcript.html">Transcript</a>&amp; trans = *(it-&gt;second);
-<a name="l00304"></a>00304         <span class="keywordtype">double</span> log_fpkm = trans.<a class="code" href="class_transcript.html#a468c9bc39e15f7cdf76c5a46ea1ef70c">mass</a>() - log(trans.<a class="code" href="class_transcript.html#ae5386809de4d16de33edc72c5d647d8f">effective_length</a>());
-<a name="l00305"></a>00305         sum = log_sum(sum, log_fpkm);
-<a name="l00306"></a>00306     }   
-<a name="l00307"></a>00307     
-<a name="l00308"></a>00308     <span class="keywordflow">for</span>( TransMap::iterator it = _trans_map.begin(); it != _trans_map.end(); ++it)
-<a name="l00309"></a>00309     {
-<a name="l00310"></a>00310 
-<a name="l00311"></a>00311         <a class="code" href="class_transcript.html">Transcript</a>&amp; trans = *(it-&gt;second);
-<a name="l00312"></a>00312         <span class="keywordtype">double</span> log_fpkm = trans.<a class="code" href="class_transcript.html#a468c9bc39e15f7cdf76c5a46ea1ef70c">mass</a>() - log(trans.<a class="code" href="class_transcript.html#ae5386809de4d16de33edc72c5d647d8f">effective_length</a>());
-<a name="l00313"></a>00313         runexpr_file &lt;&lt; sexp(log_fpkm - sum) &lt;&lt; <span class="charliteral">&#39;\t&#39;</span>;
-<a name="l00314"></a>00314     }   
-<a name="l00315"></a>00315     runexpr_file &lt;&lt; <span class="charliteral">&#39;\n&#39;</span>;
-<a name="l00316"></a>00316 }
-<a name="l00317"></a>00317 
-<a name="l00318"></a>00318 
-<a name="l00319"></a><a class="code" href="class_transcript_table.html#a9e61c8676fd74317d3a2bcbe8f6344c3">00319</a> <span class="keywordtype">void</span> <a class="code" href="class_transcript_table.html#a9e61c8676fd74317d3a2bcbe8f6344c3">TranscriptTable::output_expression</a>(<span class="keywordtype">string</span> output_dir, <span class="keywordtype">size_t</span> tot_counts)
-<a name="l00320"></a>00320 {
-<a name="l00321"></a>00321     FILE * expr_file = fopen((output_dir + <span class="stringliteral">&quot;/results.expr&quot;</span>).c_str(), <span class="stringliteral">&quot;w&quot;</span>);
-<a name="l00322"></a>00322     fprintf(expr_file, <span class="stringliteral">&quot;bundle_id\ttarget_id\tlength\teff_length\tbundle_frac\ttot_counts\tuniq_counts\test_counts\test_counts_var\tfpkm\n&quot;</span>);
-<a name="l00323"></a>00323     <span class="keywordtype">double</span> l_bil = log(1000000000.);
-<a name="l00324"></a>00324     <span class="keywordtype">double</span> l_tot_counts = log((<span class="keywordtype">double</span>)tot_counts);
-<a name="l00325"></a>00325 
-<a name="l00326"></a>00326     <span class="comment">// Bundle transcripts based on partition</span>
-<a name="l00327"></a>00327     <span class="keyword">typedef</span> boost::unordered_map&lt;TransID, vector&lt;Transcript*&gt; &gt; BundleMap;
-<a name="l00328"></a>00328     BundleMap b_map;
-<a name="l00329"></a>00329     <span class="keywordflow">for</span>( TransMap::iterator it = _trans_map.begin(); it != _trans_map.end(); ++it)
-<a name="l00330"></a>00330     {
-<a name="l00331"></a>00331         TransID rep = _bundles.find_set(it-&gt;first);
-<a name="l00332"></a>00332         b_map[rep].push_back(it-&gt;second);
-<a name="l00333"></a>00333     }
-<a name="l00334"></a>00334     
-<a name="l00335"></a>00335     <span class="keywordtype">size_t</span> bundle_id = 0;
-<a name="l00336"></a>00336     <span class="keywordflow">for</span> (BundleMap::iterator it = b_map.begin(); it != b_map.end(); ++it)
-<a name="l00337"></a>00337     {
-<a name="l00338"></a>00338         ++bundle_id;
-<a name="l00339"></a>00339         vector&lt;Transcript*&gt; bundle_trans = it-&gt;second;
-<a name="l00340"></a>00340         
-<a name="l00341"></a>00341         <span class="comment">// Calculate total counts for bundle and bundle-level rho</span>
-<a name="l00342"></a>00342         <span class="keywordtype">size_t</span> bundle_counts = 0;
-<a name="l00343"></a>00343         <span class="keywordtype">double</span> l_bundle_mass = HUGE_VAL;
-<a name="l00344"></a>00344         <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; bundle_trans.size(); ++i)
-<a name="l00345"></a>00345         {
-<a name="l00346"></a>00346             bundle_counts += bundle_trans[i]-&gt;bundle_counts();
-<a name="l00347"></a>00347             l_bundle_mass = log_sum(l_bundle_mass, bundle_trans[i]-&gt;mass()); 
-<a name="l00348"></a>00348         }
-<a name="l00349"></a>00349         
-<a name="l00350"></a>00350         <span class="keywordflow">if</span> (bundle_counts)
-<a name="l00351"></a>00351         {
-<a name="l00352"></a>00352             <span class="keywordtype">double</span> l_bundle_counts = log((<span class="keywordtype">double</span>)bundle_counts);
-<a name="l00353"></a>00353             
-<a name="l00354"></a>00354             <span class="comment">// Calculate individual counts and rhos</span>
-<a name="l00355"></a>00355             <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; bundle_trans.size(); ++i)
-<a name="l00356"></a>00356             {
-<a name="l00357"></a>00357                 <a class="code" href="class_transcript.html">Transcript</a>&amp; trans = *bundle_trans[i];
-<a name="l00358"></a>00358                 <span class="keywordtype">double</span> l_trans_frac = trans.<a class="code" href="class_transcript.html#a468c9bc39e15f7cdf76c5a46ea1ef70c">mass</a>() - l_bundle_mass;
-<a name="l00359"></a>00359                 <span class="keywordtype">double</span> l_trans_counts = l_trans_frac + l_bundle_counts;
-<a name="l00360"></a>00360                 <span class="keywordtype">double</span> l_trans_var = trans.<a class="code" href="class_transcript.html#ad044ec3263fcdb16a015cb374be9893d">var</a>() + 2*(l_bundle_counts - l_bundle_mass);
-<a name="l00361"></a>00361                 <span class="keywordtype">double</span> eff_len = trans.<a class="code" href="class_transcript.html#ae5386809de4d16de33edc72c5d647d8f">effective_length</a>();
-<a name="l00362"></a>00362                 <span class="keywordtype">double</span> l_trans_fpkm = l_bil + l_trans_counts - log(eff_len) - l_tot_counts;
-<a name="l00363"></a>00363                 fprintf(expr_file, <span class="stringliteral">&quot;%zu\t%s\t%zu\t%f\t%f\t%zu\t%zu\t%f\t%f\t%e\n&quot;</span>, bundle_id, trans.<a class="code" href="class_transcript.html#adc5c3d067288ebc864ff9ace98a88944">name</a>().c_str(), trans.<a class="code" href="class_transcript.html#ae20e7dbb485307ba815584c45e54e4d5">length</a>(), eff_len, sexp(l_trans_frac), trans.<a class="code" href="class_transcript.html#a00162b4706b0e9b494b1de6033457243">tot_counts</a>(), trans.<a class="code" href="class_transcript.html#a23108362e439753a49f82bc5916bde9a">uniq_counts</a>(), sexp(l_trans_counts), sexp(l_trans_var), sexp(l_trans_fpkm));
-<a name="l00364"></a>00364             }
-<a name="l00365"></a>00365         }
-<a name="l00366"></a>00366         <span class="keywordflow">else</span>
-<a name="l00367"></a>00367         {
-<a name="l00368"></a>00368             <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; bundle_trans.size(); ++i)
-<a name="l00369"></a>00369             {
-<a name="l00370"></a>00370                 <a class="code" href="class_transcript.html">Transcript</a>&amp; trans = *bundle_trans[i];
-<a name="l00371"></a>00371                 fprintf(expr_file, <span class="stringliteral">&quot;%zu\t%s\t%zu\t%f\t%f\t%d\t%d\t%f\t%f\t%e\n&quot;</span>, bundle_id, trans.<a class="code" href="class_transcript.html#adc5c3d067288ebc864ff9ace98a88944">name</a>().c_str(), trans.<a class="code" href="class_transcript.html#ae20e7dbb485307ba815584c45e54e4d5">length</a>(), trans.<a class="code" href="class_transcript.html#ae5386809de4d16de33edc72c5d647d8f">effective_length</a>(), 0.0, 0, 0, 0.0, 0.0, 0.0);
-<a name="l00372"></a>00372             }   
-<a name="l00373"></a>00373         }
-<a name="l00374"></a>00374 
-<a name="l00375"></a>00375     }
-<a name="l00376"></a>00376 }
+<a name="l00229"></a>00229 
+<a name="l00230"></a><a class="code" href="class_transcript_table.html#a918adb868acb3ecf82b5f1a1ec4230cf">00230</a> TransID <a class="code" href="class_transcript_table.html#a918adb868acb3ecf82b5f1a1ec4230cf">TranscriptTable::merge_bundles</a>(TransID rep1, TransID rep2)
+<a name="l00231"></a>00231 {
+<a name="l00232"></a>00232     assert(rep1 != rep2);
+<a name="l00233"></a>00233     _bundles.link(rep1, rep2);
+<a name="l00234"></a>00234     
+<a name="l00235"></a>00235     TransID new_rep = _bundles.find_set(rep1);
+<a name="l00236"></a>00236     <span class="keywordflow">return</span> new_rep;
+<a name="l00237"></a>00237 }
+<a name="l00238"></a>00238 
+<a name="l00239"></a><a class="code" href="class_transcript_table.html#a79de5edb45941d7a13911004696bcca5">00239</a> <span class="keywordtype">size_t</span> <a class="code" href="class_transcript_table.html#a79de5edb45941d7a13911004696bcca5">TranscriptTable::num_bundles</a>()
+<a name="l00240"></a>00240 {
+<a name="l00241"></a>00241     <span class="keywordtype">size_t</span> count = 0;
+<a name="l00242"></a>00242     <span class="keywordflow">for</span>(TransMap::const_iterator it = _trans_map.begin(); it != _trans_map.end(); ++it)
+<a name="l00243"></a>00243     {
+<a name="l00244"></a>00244         <span class="keywordflow">if</span> (_bundles.find_set(it-&gt;first) == it-&gt;first)
+<a name="l00245"></a>00245             count ++;
+<a name="l00246"></a>00246     }
+<a name="l00247"></a>00247     <span class="keywordflow">return</span> count;
+<a name="l00248"></a>00248 }
+<a name="l00249"></a>00249 
+<a name="l00250"></a><a class="code" href="class_transcript_table.html#add2191aae93ee59cb9f8659c2cab25c8">00250</a> <span class="keywordtype">void</span> <a class="code" href="class_transcript_table.html#add2191aae93ee59cb9f8659c2cab25c8">TranscriptTable::output_bundles</a>(<span class="keywordtype">string</span> output_dir)
+<a name="l00251"></a>00251 {
+<a name="l00252"></a>00252     ofstream bundle_file((output_dir + <span class="stringliteral">&quot;/bundles.tab&quot;</span>).c_str());
+<a name="l00253"></a>00253     
+<a name="l00254"></a>00254     <span class="keyword">typedef</span> boost::unordered_map&lt;TransID, string&gt; BundleMap;
+<a name="l00255"></a>00255     BundleMap b_map;
+<a name="l00256"></a>00256     <span class="keywordflow">for</span>( TransMap::iterator it = _trans_map.begin(); it != _trans_map.end(); ++it)
+<a name="l00257"></a>00257     {
+<a name="l00258"></a>00258         TransID rep = _bundles.find_set(it-&gt;first);
+<a name="l00259"></a>00259         b_map[rep] += <span class="charliteral">&#39;\t&#39;</span> + (it-&gt;second)-&gt;name();
+<a name="l00260"></a>00260     }
+<a name="l00261"></a>00261     
+<a name="l00262"></a>00262     <span class="keywordflow">for</span> (BundleMap::iterator it = b_map.begin(); it != b_map.end(); ++it)
+<a name="l00263"></a>00263     {
+<a name="l00264"></a>00264         bundle_file &lt;&lt; it-&gt;second &lt;&lt; <span class="charliteral">&#39;\n&#39;</span>;
+<a name="l00265"></a>00265     }
+<a name="l00266"></a>00266     
+<a name="l00267"></a>00267     bundle_file.close();
+<a name="l00268"></a>00268 }
+<a name="l00269"></a>00269 
+<a name="l00270"></a><a class="code" href="class_transcript_table.html#aeb0417b05ba8d206cc9f89b1aafbd9dd">00270</a> <span class="keywordtype">void</span> <a class="code" href="class_transcript_table.html#aeb0417b05ba8d206cc9f89b1aafbd9dd">TranscriptTable::threaded_bias_update</a>()
+<a name="l00271"></a>00271 {
+<a name="l00272"></a>00272     <span class="keywordflow">while</span>(running)
+<a name="l00273"></a>00273     {
+<a name="l00274"></a>00274         <span class="comment">//size_t count = 0;</span>
+<a name="l00275"></a>00275         <span class="keywordflow">for</span>( TransMap::iterator it = _trans_map.begin(); it != _trans_map.end(); ++it)
+<a name="l00276"></a>00276         {  
+<a name="l00277"></a>00277             <a class="code" href="class_transcript.html">Transcript</a>&amp; trans = *(it-&gt;second);
+<a name="l00278"></a>00278             trans.<a class="code" href="class_transcript.html#ac4b04bcf651566c7654eaac9499f5a28">update_transcript_bias</a>();
+<a name="l00279"></a>00279             <span class="comment">//if (++count%10000 == 0)</span>
+<a name="l00280"></a>00280             <span class="comment">//    cout &lt;&lt; &quot;*&quot;&lt;&lt;count&lt;&lt;&quot;\n&quot;;</span>
+<a name="l00281"></a>00281             <span class="keywordflow">if</span> (!running)
+<a name="l00282"></a>00282                 <span class="keywordflow">break</span>;
+<a name="l00283"></a>00283         }
+<a name="l00284"></a>00284         <span class="comment">//if (size() &gt; 1000)</span>
+<a name="l00285"></a>00285         <span class="comment">//    cout &lt;&lt; &quot;* Completed bias update of all &quot; &lt;&lt; size() &lt;&lt; &quot; targets.\n&quot;;</span>
+<a name="l00286"></a>00286     }
+<a name="l00287"></a>00287 }
+<a name="l00288"></a>00288 
+<a name="l00289"></a>00289 <span class="keywordtype">void</span> TranscriptTable::output_header(ofstream&amp; runexpr_file)
+<a name="l00290"></a>00290 {
+<a name="l00291"></a>00291   runexpr_file &lt;&lt; <span class="stringliteral">&quot;Read_Num\t&quot;</span>;
+<a name="l00292"></a>00292     <span class="keywordflow">for</span>( TransMap::iterator it = _trans_map.begin(); it != _trans_map.end(); ++it)
+<a name="l00293"></a>00293     {
+<a name="l00294"></a>00294         <a class="code" href="class_transcript.html">Transcript</a>&amp; trans = *(it-&gt;second);
+<a name="l00295"></a>00295         runexpr_file &lt;&lt; trans.<a class="code" href="class_transcript.html#adc5c3d067288ebc864ff9ace98a88944">name</a>() &lt;&lt; <span class="charliteral">&#39;\t&#39;</span>; 
+<a name="l00296"></a>00296     }   
+<a name="l00297"></a>00297     runexpr_file &lt;&lt; <span class="charliteral">&#39;\n&#39;</span>;
+<a name="l00298"></a>00298 }
+<a name="l00299"></a>00299 
+<a name="l00300"></a>00300 <span class="keywordtype">void</span> TranscriptTable::output_current(ofstream&amp; runexpr_file)
+<a name="l00301"></a>00301 {    
+<a name="l00302"></a>00302     <span class="keywordtype">double</span> sum = HUGE_VAL;
+<a name="l00303"></a>00303     <span class="keywordflow">for</span>( TransMap::iterator it = _trans_map.begin(); it != _trans_map.end(); ++it)
+<a name="l00304"></a>00304     {
+<a name="l00305"></a>00305         <a class="code" href="class_transcript.html">Transcript</a>&amp; trans = *(it-&gt;second);
+<a name="l00306"></a>00306         <span class="keywordtype">double</span> log_fpkm = trans.<a class="code" href="class_transcript.html#a468c9bc39e15f7cdf76c5a46ea1ef70c">mass</a>() - log(trans.<a class="code" href="class_transcript.html#ae5386809de4d16de33edc72c5d647d8f">effective_length</a>());
+<a name="l00307"></a>00307         sum = log_sum(sum, log_fpkm);
+<a name="l00308"></a>00308     }   
+<a name="l00309"></a>00309     
+<a name="l00310"></a>00310     <span class="keywordflow">for</span>( TransMap::iterator it = _trans_map.begin(); it != _trans_map.end(); ++it)
+<a name="l00311"></a>00311     {
+<a name="l00312"></a>00312 
+<a name="l00313"></a>00313         <a class="code" href="class_transcript.html">Transcript</a>&amp; trans = *(it-&gt;second);
+<a name="l00314"></a>00314         <span class="keywordtype">double</span> log_fpkm = trans.<a class="code" href="class_transcript.html#a468c9bc39e15f7cdf76c5a46ea1ef70c">mass</a>() - log(trans.<a class="code" href="class_transcript.html#ae5386809de4d16de33edc72c5d647d8f">effective_length</a>());
+<a name="l00315"></a>00315         runexpr_file &lt;&lt; sexp(log_fpkm - sum) &lt;&lt; <span class="charliteral">&#39;\t&#39;</span>;
+<a name="l00316"></a>00316     }   
+<a name="l00317"></a>00317     runexpr_file &lt;&lt; <span class="charliteral">&#39;\n&#39;</span>;
+<a name="l00318"></a>00318 }
+<a name="l00319"></a>00319 
+<a name="l00320"></a>00320 
+<a name="l00321"></a><a class="code" href="class_transcript_table.html#a9e61c8676fd74317d3a2bcbe8f6344c3">00321</a> <span class="keywordtype">void</span> <a class="code" href="class_transcript_table.html#a9e61c8676fd74317d3a2bcbe8f6344c3">TranscriptTable::output_expression</a>(<span class="keywordtype">string</span> output_dir, <span class="keywordtype">size_t</span> tot_counts)
+<a name="l00322"></a>00322 {
+<a name="l00323"></a>00323     FILE * expr_file = fopen((output_dir + <span class="stringliteral">&quot;/results.xprs&quot;</span>).c_str(), <span class="stringliteral">&quot;w&quot;</span>);
+<a name="l00324"></a>00324     fprintf(expr_file, <span class="stringliteral">&quot;bundle_id\ttarget_id\tlength\teff_length\tbundle_frac\ttot_counts\tuniq_counts\test_counts\test_counts_var\tfpkm\n&quot;</span>);
+<a name="l00325"></a>00325     <span class="keywordtype">double</span> l_bil = log(1000000000.);
+<a name="l00326"></a>00326     <span class="keywordtype">double</span> l_tot_counts = log((<span class="keywordtype">double</span>)tot_counts);
+<a name="l00327"></a>00327 
+<a name="l00328"></a>00328     <span class="comment">// Bundle transcripts based on partition</span>
+<a name="l00329"></a>00329     <span class="keyword">typedef</span> boost::unordered_map&lt;TransID, vector&lt;Transcript*&gt; &gt; BundleMap;
+<a name="l00330"></a>00330     BundleMap b_map;
+<a name="l00331"></a>00331     <span class="keywordflow">for</span>( TransMap::iterator it = _trans_map.begin(); it != _trans_map.end(); ++it)
+<a name="l00332"></a>00332     {
+<a name="l00333"></a>00333         TransID rep = _bundles.find_set(it-&gt;first);
+<a name="l00334"></a>00334         b_map[rep].push_back(it-&gt;second);
+<a name="l00335"></a>00335     }
+<a name="l00336"></a>00336     
+<a name="l00337"></a>00337     <span class="keywordtype">size_t</span> bundle_id = 0;
+<a name="l00338"></a>00338     <span class="keywordflow">for</span> (BundleMap::iterator it = b_map.begin(); it != b_map.end(); ++it)
+<a name="l00339"></a>00339     {
+<a name="l00340"></a>00340         ++bundle_id;
+<a name="l00341"></a>00341         vector&lt;Transcript*&gt; bundle_trans = it-&gt;second;
+<a name="l00342"></a>00342         
+<a name="l00343"></a>00343         <span class="comment">// Calculate total counts for bundle and bundle-level rho</span>
+<a name="l00344"></a>00344         <span class="keywordtype">size_t</span> bundle_counts = 0;
+<a name="l00345"></a>00345         <span class="keywordtype">double</span> l_bundle_mass = HUGE_VAL;
+<a name="l00346"></a>00346         <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; bundle_trans.size(); ++i)
+<a name="l00347"></a>00347         {
+<a name="l00348"></a>00348             bundle_counts += bundle_trans[i]-&gt;bundle_counts();
+<a name="l00349"></a>00349             l_bundle_mass = log_sum(l_bundle_mass, bundle_trans[i]-&gt;mass()); 
+<a name="l00350"></a>00350         }
+<a name="l00351"></a>00351         
+<a name="l00352"></a>00352         <span class="keywordflow">if</span> (bundle_counts)
+<a name="l00353"></a>00353         {
+<a name="l00354"></a>00354             <span class="keywordtype">double</span> l_bundle_counts = log((<span class="keywordtype">double</span>)bundle_counts);
+<a name="l00355"></a>00355             
+<a name="l00356"></a>00356             <span class="comment">// Calculate individual counts and rhos</span>
+<a name="l00357"></a>00357             <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; bundle_trans.size(); ++i)
+<a name="l00358"></a>00358             {
+<a name="l00359"></a>00359                 <a class="code" href="class_transcript.html">Transcript</a>&amp; trans = *bundle_trans[i];
+<a name="l00360"></a>00360                 <span class="keywordtype">double</span> l_trans_frac = trans.<a class="code" href="class_transcript.html#a468c9bc39e15f7cdf76c5a46ea1ef70c">mass</a>() - l_bundle_mass;
+<a name="l00361"></a>00361                 <span class="keywordtype">double</span> l_trans_counts = l_trans_frac + l_bundle_counts;
+<a name="l00362"></a>00362                 <span class="keywordtype">double</span> l_trans_var = trans.<a class="code" href="class_transcript.html#ad044ec3263fcdb16a015cb374be9893d">var</a>() + 2*(l_bundle_counts - l_bundle_mass);
+<a name="l00363"></a>00363                 <span class="keywordtype">double</span> eff_len = trans.<a class="code" href="class_transcript.html#ae5386809de4d16de33edc72c5d647d8f">effective_length</a>();
+<a name="l00364"></a>00364                 <span class="keywordtype">double</span> l_trans_fpkm = l_bil + l_trans_counts - log(eff_len) - l_tot_counts;
+<a name="l00365"></a>00365                 fprintf(expr_file, <span class="stringliteral">&quot;%zu\t%s\t%zu\t%f\t%f\t%zu\t%zu\t%f\t%f\t%e\n&quot;</span>, bundle_id, trans.<a class="code" href="class_transcript.html#adc5c3d067288ebc864ff9ace98a88944">name</a>().c_str(), trans.<a class="code" href="class_transcript.html#ae20e7dbb485307ba815584c45e54e4d5">length</a>(), eff_len, sexp(l_trans_frac), trans.<a class="code" href="class_transcript.html#a00162b4706b0e9b494b1de6033457243">tot_counts</a>(), trans.<a class="code" href="class_transcript.html#a23108362e439753a49f82bc5916bde9a">uniq_counts</a>(), sexp(l_trans_counts), sexp(l_trans_var), sexp(l_trans_fpkm));
+<a name="l00366"></a>00366             }
+<a name="l00367"></a>00367         }
+<a name="l00368"></a>00368         <span class="keywordflow">else</span>
+<a name="l00369"></a>00369         {
+<a name="l00370"></a>00370             <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; bundle_trans.size(); ++i)
+<a name="l00371"></a>00371             {
+<a name="l00372"></a>00372                 <a class="code" href="class_transcript.html">Transcript</a>&amp; trans = *bundle_trans[i];
+<a name="l00373"></a>00373                 fprintf(expr_file, <span class="stringliteral">&quot;%zu\t%s\t%zu\t%f\t%f\t%d\t%d\t%f\t%f\t%e\n&quot;</span>, bundle_id, trans.<a class="code" href="class_transcript.html#adc5c3d067288ebc864ff9ace98a88944">name</a>().c_str(), trans.<a class="code" href="class_transcript.html#ae20e7dbb485307ba815584c45e54e4d5">length</a>(), trans.<a class="code" href="class_transcript.html#ae5386809de4d16de33edc72c5d647d8f">effective_length</a>(), 0.0, 0, 0, 0.0, 0.0, 0.0);
+<a name="l00374"></a>00374             }   
+<a name="l00375"></a>00375         }
+<a name="l00376"></a>00376 
+<a name="l00377"></a>00377     }
+<a name="l00378"></a>00378 }
 </pre></div></div>
 </div>
   <div id="nav-path" class="navpath">
     <ul>
       <li class="navelem"><b>transcripts.cpp</b>      </li>
-      <li class="footer">Generated on Mon Aug 29 2011 15:19:07 for eXpress by&#160;
+      <li class="footer">Generated on Mon Aug 29 2011 19:56:30 for eXpress by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </li>
     </ul>

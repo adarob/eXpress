@@ -15,7 +15,7 @@ echo $VERSION > html/curr_xprs_version
 rm -r html/doc
 /Applications/Doxygen.app/Contents/Resources/doxygen Doxyfile
 #Add logo to manual
-awk 'NR==43{print "\\includegraphics{../../img/logo.pdf}\\\\"}1' html/doc/latex/refman.tex > html/doc/latex/temp.tex
+awk 'NR==43{print "\\includegraphics{../../img/logo.png}\\\\"}1' html/doc/latex/refman.tex > html/doc/latex/temp.tex
 awk 'NR==45{print "\\url{http://bio.math.berkeley.edu/eXpress}\\\\"}1' html/doc/latex/temp.tex > html/doc/latex/refman.tex
 make -C html/doc/latex
 mv html/doc/html/* html/doc
