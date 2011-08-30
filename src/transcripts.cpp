@@ -58,7 +58,8 @@ double Transcript::log_likelihood(const FragMap& frag) const
     boost::mutex::scoped_lock lock(_bias_lock);
 
     double ll = mass();
-    ll += _mismatch_table->log_likelihood(frag);
+    if (_mismatch_table)
+        ll += _mismatch_table->log_likelihood(frag);
     
     switch(frag.pair_status())
     {
@@ -120,7 +121,7 @@ TranscriptTable::TranscriptTable(const string& trans_fasta_file, double alpha, c
   _bundles(_rank, _parent),
   _alpha(alpha)
 {
-    cout << "Loading target sequences from" << trans_fasta_file << "...\n\n";
+    cout << "Loading target sequences from " << trans_fasta_file << "...\n\n";
     ifstream infile (trans_fasta_file.c_str());
     string line;
     string seq = "";
@@ -318,7 +319,7 @@ void TranscriptTable::output_current(ofstream& runexpr_file)
 
 void TranscriptTable::output_expression(string output_dir, size_t tot_counts)
 {
-    FILE * expr_file = fopen((output_dir + "/results.expr").c_str(), "w");
+    FILE * expr_file = fopen((output_dir + "/results.xprs").c_str(), "w");
     fprintf(expr_file, "bundle_id\ttarget_id\tlength\teff_length\tbundle_frac\ttot_counts\tuniq_counts\test_counts\test_counts_var\tfpkm\n");
     double l_bil = log(1000000000.);
     double l_tot_counts = log((double)tot_counts);

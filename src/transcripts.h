@@ -376,7 +376,7 @@ public:
     void threaded_bias_update();
     
     /**
-     * a member function that outputs the final expression data in a file called 'results.expr'
+     * a member function that outputs the final expression data in a file called 'results.xprs'
      * in the given output directory
      * @param output_dir the directory to output the expression file to
      * @param tot_counts the total number of observed mapped fragments
