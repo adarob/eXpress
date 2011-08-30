@@ -19,7 +19,7 @@
 		0A60597513A170AD00B5C9BA /* libboost_filesystem.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A60597413A170AD00B5C9BA /* libboost_filesystem.a */; };
 		0A60597713A1753B00B5C9BA /* libboost_system.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A60597613A1753B00B5C9BA /* libboost_system.a */; };
 		0AD5968913FF20C700EEBDD7 /* mapparser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0AD5968813FF20C700EEBDD7 /* mapparser.cpp */; };
-		0ADF037A140C608700D16BBE /* libbamtools.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0ADF0379140C608700D16BBE /* libbamtools.a */; };
+		0ADF037D140C66D500D16BBE /* libbamtools.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0ADF037C140C66D500D16BBE /* libbamtools.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -58,7 +58,7 @@
 		0A60597613A1753B00B5C9BA /* libboost_system.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libboost_system.a; path = ../../../../../../opt/local/lib/libboost_system.a; sourceTree = "<group>"; };
 		0AD5968713FF20B900EEBDD7 /* mapparser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mapparser.h; sourceTree = "<group>"; };
 		0AD5968813FF20C700EEBDD7 /* mapparser.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = mapparser.cpp; sourceTree = "<group>"; };
-		0ADF0379140C608700D16BBE /* libbamtools.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libbamtools.a; sourceTree = "<group>"; };
+		0ADF037C140C66D500D16BBE /* libbamtools.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libbamtools.a; path = ../../../../../../usr/local/lib/bamtools/libbamtools.a; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -70,7 +70,7 @@
 				0A60597513A170AD00B5C9BA /* libboost_filesystem.a in Frameworks */,
 				0A60597713A1753B00B5C9BA /* libboost_system.a in Frameworks */,
 				0A2D58911405F128008891E7 /* libboost_program_options.a in Frameworks */,
-				0ADF037A140C608700D16BBE /* libbamtools.a in Frameworks */,
+				0ADF037D140C66D500D16BBE /* libbamtools.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -80,7 +80,7 @@
 		0A5C75FD136F2E850095365C = {
 			isa = PBXGroup;
 			children = (
-				0ADF0379140C608700D16BBE /* libbamtools.a */,
+				0ADF037C140C66D500D16BBE /* libbamtools.a */,
 				0A2D58901405F128008891E7 /* libboost_program_options.a */,
 				0A60597613A1753B00B5C9BA /* libboost_system.a */,
 				0A60597413A170AD00B5C9BA /* libboost_filesystem.a */,
@@ -238,6 +238,7 @@
 					/opt/local/lib,
 					"\"$(SRCROOT)/bamtools/lib\"",
 					"\"$(SRCROOT)\"",
+					/usr/local/lib/bamtools,
 				);
 				PRODUCT_NAME = express;
 			};
@@ -261,6 +262,7 @@
 					/opt/local/lib,
 					"\"$(SRCROOT)/bamtools/lib\"",
 					"\"$(SRCROOT)\"",
+					/usr/local/lib/bamtools,
 				);
 				PRODUCT_NAME = express;
 			};
