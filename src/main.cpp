@@ -45,6 +45,7 @@ int def_fl_mean = 200;
 int def_fl_stddev = 60;
 
 // option parameters
+bool error_model = true;
 bool bias_correct = true;
 bool calc_covar = false;
 bool vis = false;
@@ -73,6 +74,7 @@ bool parse_options(int ac, char ** av)
     po::options_description hidden("Hidden options");
     hidden.add_options()
     ("no-bias-correct","")
+    ("no-error-model","")
       //    ("in-between","")
     ("visualizer-output,v","")
     ("output-running","")
@@ -108,11 +110,16 @@ bool parse_options(int ac, char ** av)
     
     if (error || vm.count("help")) 
     {
-        fprintf(stderr, "express v%s\n", PACKAGE_VERSION);
-        fprintf(stderr, "-----------------------------\n"); 
-        fprintf(stderr, "File Usage:  express [options] <target_seqs.fa> <hits.(sam/bam)>\n");
-        fprintf(stderr, "Piped Usage: bowtie [options] -S <index> <reads.fq> | express [options] <target_seqs.fa>\n");
-        cout << generic << "\n";
+        cerr << "express v" << PACKAGE_VERSION << endl;
+        cerr << "-----------------------------\n"; 
+        cerr << "File Usage:  express [options] <target_seqs.fa> <hits.(sam/bam)>\n";
+        cerr << "Piped Usage: bowtie [options] -S <index> <reads.fq> | express [options] <target_seqs.fa>\n";
+        cerr << "Required arguments:\n";
+        cerr << " <target_seqs.fa>                     target sequence file in fasta format\n";
+        cerr << " <hits.(sam/bam)>                     read alignment file in SAM or BAM format\n";
+        
+        cerr << generic;
+        
         return 1;
     }
     
@@ -133,6 +140,7 @@ bool parse_options(int ac, char ** av)
     
     calc_covar = vm.count("calc-covar");
     bias_correct = !(vm.count("no-bias-correct"));
+    error_model = !(vm.count("no-error-model"));
     //  in_between = vm.count("in-between");
     vis = vm.count("visualizer-output");
     output_running = vm.count("output-running");
@@ -182,8 +190,8 @@ void process_fragment(double mass_n, Fragment* frag_p, FLD* fld, BiasBoss* bias_
         
         if (bias_table)
             bias_table->update_observed(m, mass_n);
-        
-        mismatch_table->update(m, mass_n);
+        if (error_model)
+            mismatch_table->update(m, mass_n);
        
         delete frag_p;
         return;
@@ -234,7 +242,8 @@ void process_fragment(double mass_n, Fragment* frag_p, FLD* fld, BiasBoss* bias_
  
         if (bias_table)
             bias_table->update_observed(m, mass_t);
-        mismatch_table->update(m, mass_t);
+        if (error_model)
+            mismatch_table->update(m, mass_t);
         
         if (calc_covar)
         {
@@ -350,7 +359,7 @@ size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TranscriptTable* 
     if (vis)
         cout << "99\n";
     else
-        cout << "COMPLETED: Processed " << setw(9) << n << " fragments, transcripts are in " << trans_table->num_bundles() << endl;
+        cout << "COMPLETED: Processed " << n << " fragments, transcripts are in " << trans_table->num_bundles() << " bundles\n";
     
     if (output_running)
     {
@@ -381,17 +390,17 @@ int main (int argc, char ** argv)
             
     FLD fld(fld_alpha, def_fl_max, def_fl_mean, def_fl_stddev);
     BiasBoss* bias_table = (bias_correct) ? new BiasBoss(bias_alpha):NULL;
-    MismatchTable mismatch_table(mm_alpha);
+    MismatchTable* mismatch_table = (error_model) ? new MismatchTable(mm_alpha):NULL;
     ThreadedMapParser map_parser(sam_file_name);
-    TranscriptTable trans_table(fasta_file_name, expr_alpha, &fld, bias_table, &mismatch_table);
+    TranscriptTable trans_table(fasta_file_name, expr_alpha, &fld, bias_table, mismatch_table);
 
     if (bias_table)
         boost::thread bias_update(&TranscriptTable::threaded_bias_update, &trans_table);
-    size_t tot_counts = threaded_calc_abundances(map_parser, &trans_table, &fld, bias_table, &mismatch_table);
+    size_t tot_counts = threaded_calc_abundances(map_parser, &trans_table, &fld, bias_table, mismatch_table);
     
     running = false;
     
-    //mismatch_table.output(output_dir);
+    //mismatch_table->output(output_dir);
     ofstream fld_out((output_dir + "/fld.out").c_str());
     fld_out << fld.to_string() << '\n';
     fld_out.close();
