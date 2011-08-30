@@ -380,7 +380,7 @@ void TranscriptTable::output_expression(string output_dir, size_t tot_counts)
                 double l_trans_var = trans.var() + 2*(l_bundle_counts - l_bundle_mass);
                 double eff_len = trans.effective_length();
                 double l_trans_fpkm = l_bil + l_trans_counts - log(eff_len) - l_tot_counts;
-                fprintf(expr_file, "%zu\t%s\t%zu\t%f\t%f\t%zu\t%zu\t%f\t%f\t%e\n", bundle_id, trans.name().c_str(), trans.length(), eff_len, sexp(l_trans_frac), trans.tot_counts(), trans.uniq_counts(), sexp(l_trans_counts), sexp(l_trans_var), sexp(l_trans_fpkm));
+                fprintf(expr_file, "%zu\t%s\t%zu\t%f\t%f\t%zu\t%zu\t%f\t%e\t%f\n", bundle_id, trans.name().c_str(), trans.length(), eff_len, sexp(l_trans_frac), trans.tot_counts(), trans.uniq_counts(), sexp(l_trans_counts), sexp(l_trans_var), sexp(l_trans_fpkm));
             }
         }
         else
@@ -388,7 +388,7 @@ void TranscriptTable::output_expression(string output_dir, size_t tot_counts)
             for (size_t i = 0; i < bundle_trans.size(); ++i)
             {
                 Transcript& trans = *bundle_trans[i];
-                fprintf(expr_file, "%zu\t%s\t%zu\t%f\t%f\t%d\t%d\t%f\t%f\t%e\n", bundle_id, trans.name().c_str(), trans.length(), trans.effective_length(), 0.0, 0, 0, 0.0, 0.0, 0.0);
+                fprintf(expr_file, "%zu\t%s\t%zu\t%f\t%f\t%d\t%d\t%f\t%f\t%f\n", bundle_id, trans.name().c_str(), trans.length(), trans.effective_length(), 0.0, 0, 0, 0.0, 0.0, 0.0);
             }   
         }
 
