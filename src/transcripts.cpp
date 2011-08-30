@@ -93,11 +93,15 @@ double Transcript::effective_length() const
     
     for(size_t l = 1; l <= min(length(), _fld->max_val()); l++)
     {
-        eff_len += sexp(_fld->pdf(l))*(length()-l+1);
+        double len_bias = 0;
+        for (size_t i = 0; i < length()-l+1; i++)
+        {
+            len_bias += sexp(_start_bias[i] + _end_bias[i+l]);
+        }
+        eff_len += sexp(_fld->pdf(l))*len_bias;
     }
     
     boost::mutex::scoped_lock lock(_bias_lock);
-    eff_len *= sexp(_avg_bias);
     return eff_len;
 }
 

@@ -403,7 +403,7 @@ int main (int argc, char ** argv)
     size_t tot_counts = threaded_calc_abundances(map_parser, &trans_table, &fld, bias_table, mismatch_table);
 	running = false;
 
-	cout << "Outputting final results...\n";
+	cout << "Written results to file...\n";
     
     //mismatch_table->output(output_dir);
     //ofstream fld_out((output_dir + "/fld.out").c_str());
