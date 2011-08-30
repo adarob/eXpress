@@ -281,7 +281,8 @@ void TranscriptTable::threaded_bias_update()
             if (!running)
                 break;
         }
-        //cout << "*\n";
+        if (size() > 1000)
+            cout << "* Completed bias update of all " << size() << " transcripts.\n";
     }
 }
 

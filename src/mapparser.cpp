@@ -94,9 +94,6 @@ void ThreadedMapParser::threaded_parse(ParseThreadSafety* thread_safety, Transcr
             frag = NULL;
         }
 		
-		if (!frag->num_maps())
-			break;
-		
         for (size_t i = 0; frag && i < frag->maps().size(); ++i)
         {
             FragMap& m = *(frag->maps()[i]);
