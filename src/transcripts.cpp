@@ -35,7 +35,8 @@ _avg_bias(0),
 _fld(fld),
 _bias_table(bias_table),
 _mismatch_table(mismatch_table)
-{ _mass = log(est_effective_length()*alpha); }
+{   _ub_eff_len = est_effective_length();
+    _mass = log(_ub_eff_len*alpha); }
 
 void Transcript::add_mass(double p, double mass) 
 { 
@@ -99,6 +100,11 @@ double Transcript::est_effective_length() const
     boost::mutex::scoped_lock lock(_bias_lock);
     eff_len *= sexp(_avg_bias);
     return eff_len;
+}
+
+double Transcript::unbiased_effective_length() const
+{
+    return _ub_eff_len;
 }
 
 double Transcript::effective_length() const

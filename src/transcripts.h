@@ -119,6 +119,8 @@ class Transcript
      */
     double _avg_bias;
     
+    double _ub_eff_len;
+    
     /**
      * a private pointer to the "global" Fragment Length Distribution (FLD) object
      */
@@ -245,6 +247,8 @@ public:
      * @return the estimated effective length of the transcript calculated as \f$ \tilde{l} = \bar{bias}\sum_{l=1}^{L(t)} D(l)(L(t) - l + 1) \f$
      */
     double est_effective_length() const;
+    
+    double unbiased_effective_length() const;
 
     /**
      * a member function that causes the transcript bias to be re-calculated by the _bias_table based on curent parameters
