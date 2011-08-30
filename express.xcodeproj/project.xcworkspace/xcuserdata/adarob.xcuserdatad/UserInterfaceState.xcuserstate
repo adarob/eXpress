@@ -8587,9 +8587,9 @@
 				</dict>
 			</array>
 		</dict>
-		<real>336369441.39132398</real>
-		<string>{5118, 2117}</string>
-		<string>{6918, 0}</string>
+		<real>336369808.99514002</real>
+		<string>{5118, 2119}</string>
+		<string>{6835, 0}</string>
 		<dict>
 			<key>$class</key>
 			<dict>
@@ -20825,9 +20825,9 @@
 				</dict>
 			</array>
 		</dict>
-		<real>336369441.39229602</real>
-		<string>{5118, 2117}</string>
-		<string>{7066, 8}</string>
+		<real>336369808.99588501</real>
+		<string>{5118, 2119}</string>
+		<string>{7068, 8}</string>
 		<string>BiasBoss::get_transcript_bias(std::vector&lt;double&gt;&amp; start_bias, std::vector&lt;double&gt;&amp; end_bias, const Transcript&amp; trans)</string>
 		<string>Xcode.IDEKit.EditorDocument.SourceCode</string>
 		<dict>
@@ -86460,9 +86460,9 @@
 				</dict>
 			</array>
 		</dict>
-		<real>336369441.39552402</real>
-		<string>{5118, 2117}</string>
-		<string>{6918, 0}</string>
+		<real>336369808.99814099</real>
+		<string>{5118, 2119}</string>
+		<string>{6835, 0}</string>
 		<dict>
 			<key>$class</key>
 			<dict>
