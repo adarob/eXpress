@@ -141,13 +141,13 @@ void BiasBoss::update_expectations(const Transcript& trans)
     
     size_t l = upper_bound(_5_pos_bias.len_bins().begin(),_5_pos_bias.len_bins().end(), trans.length()) - _5_pos_bias.len_bins().begin();
     size_t p = 0;
-    double next_bin_start = trans.length() * _5_pos_bias.len_bins()[p];
+    double next_bin_start = trans.length() * _5_pos_bias.pos_bins()[p];
     const string& seq = trans.seq();
     for (size_t i = 0; i < seq.length(); ++i)
     {
         if (i >= next_bin_start)
         {
-            next_bin_start = trans.length() * _5_pos_bias.len_bins()[++p];
+            next_bin_start = trans.length() * _5_pos_bias.pos_bins()[++p];
         }
         _5_pos_bias.increment_expected(l,p);
         _3_pos_bias.increment_expected(l,p);
@@ -205,24 +205,24 @@ double BiasBoss::get_transcript_bias(std::vector<double>& start_bias, std::vecto
     size_t l = upper_bound(_5_pos_bias.len_bins().begin(),_5_pos_bias.len_bins().end(), trans.length()) - _5_pos_bias.len_bins().begin();
     
     size_t p = 0;
-    double next_bin_start = trans.length() * _5_pos_bias.len_bins()[p];
+    double next_bin_start = trans.length() * _5_pos_bias.pos_bins()[p];
     double curr_5_pos_bias = _5_pos_bias.get_weight(l,p);
     double curr_3_pos_bias = _3_pos_bias.get_weight(l,p);
     for (size_t i = 0; i < trans.length(); ++i)
     {
         if (i >= next_bin_start)
         {
-            next_bin_start = trans.length() * _5_pos_bias.len_bins()[++p];
+            next_bin_start = trans.length() * _5_pos_bias.pos_bins()[++p];
             curr_5_pos_bias = _5_pos_bias.get_weight(l,p);
             curr_3_pos_bias = _3_pos_bias.get_weight(l,p);
         }
-        start_bias[i] = _5_seq_bias.get_weight(trans.seq(), i) * curr_5_pos_bias;
-        end_bias[i] = _3_seq_bias.get_weight(trans.seq(), i) * curr_3_pos_bias;
+        start_bias[i] = _5_seq_bias.get_weight(trans.seq(), i) + curr_5_pos_bias;
+        end_bias[i] = _3_seq_bias.get_weight(trans.seq(), i) + curr_3_pos_bias;
         tot_start = log_sum(tot_start, start_bias[i]);
         tot_end = log_sum(tot_start, end_bias[i]);
     }
     
-    double avg_bias = log_sum(tot_start, tot_end) - 2*log((double)trans.length());
+    double avg_bias = (tot_start + tot_end) - (2*log((double)trans.length()));
     return avg_bias;
 }
 
