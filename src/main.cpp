@@ -351,7 +351,7 @@ size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TranscriptTable* 
         cout << "99\n";
     else
         cout << "COMPLETED: Processed " << setw(9) << n << " fragments, transcripts are in " << trans_table->num_bundles() << endl;
-    
+    	
     if (output_running)
     {
         running_expr_file << n << '\t';
@@ -388,15 +388,16 @@ int main (int argc, char ** argv)
     if (bias_table)
         boost::thread bias_update(&TranscriptTable::threaded_bias_update, &trans_table);
     size_t tot_counts = threaded_calc_abundances(map_parser, &trans_table, &fld, bias_table, &mismatch_table);
-    
-    running = false;
+	running = false;
+
+	cout << "Outputting final results...\n";
     
     //mismatch_table.output(output_dir);
-    ofstream fld_out((output_dir + "/fld.out").c_str());
-    fld_out << fld.to_string() << '\n';
-    fld_out.close();
-
-    trans_table.output_bundles(output_dir);
-    trans_table.output_expression(output_dir, tot_counts);
+    //ofstream fld_out((output_dir + "/fld.out").c_str());
+    //fld_out << fld.to_string() << '\n';
+    //fld_out.close();
+	//trans_table.output_bundles(output_dir);
+    
+	trans_table.output_expression(output_dir, tot_counts);
     return 0;
 }
