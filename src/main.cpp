@@ -6,6 +6,9 @@
 //  Copyright 2011 Adam Roberts. All rights reserved.
 //
 
+//TODO: Ouptut covariances
+//TODO: Output confidence intervals
+
 //#include <boost/math/distributions/geometric.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/program_options.hpp>
@@ -65,8 +68,8 @@ bool parse_options(int ac, char ** av)
     ("output-dir,o", po::value<string>(&output_dir)->default_value("."), "write all output files to this directory")
     ("frag-len-mean,m", po::value<int>(&def_fl_mean)->default_value(200), "prior estimate for average fragment length")
     ("frag-len-stddev,s", po::value<int>(&def_fl_stddev)->default_value(60), "prior estimate for fragment length std deviation")
-    ("fr-stranded", "accept only forward->reverse alignments")
-    ("rf-stranded", "accept only reverse->forward alignments")
+    ("fr-stranded", "accept only forward->reverse alignments (second-stranded protocols)")
+    ("rf-stranded", "accept only reverse->forward alignments (first-stranded protocols)")
     ("calc-covar", "calculate and output covariance matrix")
     ("no-update-check", "disables auotmatic check for update via web")
     ;
@@ -190,7 +193,7 @@ void process_fragment(double mass_n, Fragment* frag_p, FLD* fld, BiasBoss* bias_
         
         if (bias_table)
             bias_table->update_observed(m, mass_n);
-        if (error_model)
+        if (mismatch_table)
             mismatch_table->update(m, mass_n);
        
         delete frag_p;
@@ -242,7 +245,7 @@ void process_fragment(double mass_n, Fragment* frag_p, FLD* fld, BiasBoss* bias_
  
         if (bias_table)
             bias_table->update_observed(m, mass_t);
-        if (error_model)
+        if (mismatch_table)
             mismatch_table->update(m, mass_t);
         
         if (calc_covar)

@@ -319,7 +319,7 @@ void TranscriptTable::output_current(ofstream& runexpr_file)
 
 void TranscriptTable::output_expression(string output_dir, size_t tot_counts)
 {
-    FILE * expr_file = fopen((output_dir + "/results.expr").c_str(), "w");
+    FILE * expr_file = fopen((output_dir + "/results.xprs").c_str(), "w");
     fprintf(expr_file, "bundle_id\ttarget_id\tlength\teff_length\tbundle_frac\ttot_counts\tuniq_counts\test_counts\test_counts_var\tfpkm\n");
     double l_bil = log(1000000000.);
     double l_tot_counts = log((double)tot_counts);
