@@ -73,7 +73,7 @@ public:
      * @param i the fragment end point (the central point of the bias window)
      * @return the bias weight for the bias window which is the product of the individual nucleotide bias weights
      */
-    double get_weight(const std::string& seq, size_t i) const;
+    double get_weight(const std::string& seq, int i) const;
     
     /**
      * a member function that returns a string containing the positional nucleotide probabilities in column-major order (A,C,G,T)

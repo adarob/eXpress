@@ -72,12 +72,12 @@ bool get_current_version(char* curr_version)
 	
 	char buffer[1024];
 	strcpy(buffer, "GET /eXpress/curr_xprs_version HTTP/1.1\nHost: bio.math.berkeley.edu\n\n");
-	n = write(sockfd,buffer,1024);
+	n = (int)write(sockfd,buffer,1024);
 	
     if (n < 0) 
 		return error("ERROR writing to socket");
 	bzero(curr_version, sizeof(curr_version));
-    n = read(sockfd,buffer,1024);
+    n = (int)read(sockfd,buffer,1024);
     if (n < 0) 
 		return error("ERROR reading from socket");
 

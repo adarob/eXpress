@@ -21,9 +21,9 @@ using namespace std;
 const vector<size_t> LEN_BINS = boost::assign::list_of(791)(1265)(1707)(2433)(999999999); 
 const vector<double> POS_BINS = boost::assign::list_of(0.1)(0.2)(0.3)(0.4)(0.5)(0.6)(0.7)(0.8)(0.9)(1.0);
 
-const size_t SURROUND = 10;
-const size_t CENTER = 11;
-const size_t WINDOW = 21;
+const int SURROUND = 10;
+const int CENTER = 11;
+const int WINDOW = 21;
 const string PADDING = "NNNNNNNNNN"; 
 
 SeqWeightTable::SeqWeightTable(size_t window_size, double alpha)
@@ -52,11 +52,11 @@ void SeqWeightTable::increment_observed(string& seq, double normalized_mass)
     }
 }
 
-double SeqWeightTable::get_weight(const string& seq, size_t i) const
+double SeqWeightTable::get_weight(const string& seq, int i) const
 {
     boost::mutex::scoped_lock lock(_lock);
     double weight = 0;
-    for (size_t j = max((size_t)0, CENTER-1-i); j < min(WINDOW, CENTER-1+seq.length()-i); ++j)
+    for (int j = max(0, CENTER-1-i); j < min(WINDOW, CENTER-1+(int)seq.length()-i); ++j)
     {
         size_t index = ctoi(seq[i+j-CENTER+1]);
         if (index != 4)
@@ -184,7 +184,7 @@ void BiasBoss::update_observed(const FragMap& frag, double normalized_mass)
     {
         int left_window = frag.right - CENTER;
         string seq_3 = t_seq.substr(left_window, WINDOW);
-        int overhang =left_window + WINDOW - t_seq.length();
+        int overhang =left_window + WINDOW - (int)t_seq.length();
         if (overhang > 0)
         {
             seq_3 += PADDING.substr(0, overhang);
@@ -216,8 +216,8 @@ double BiasBoss::get_transcript_bias(std::vector<double>& start_bias, std::vecto
             curr_5_pos_bias = _5_pos_bias.get_weight(l,p);
             curr_3_pos_bias = _3_pos_bias.get_weight(l,p);
         }
-        start_bias[i] = _5_seq_bias.get_weight(trans.seq(), i);// + curr_5_pos_bias;
-        end_bias[i] = _3_seq_bias.get_weight(trans.seq(), i);// + curr_3_pos_bias;
+        start_bias[i] = _5_seq_bias.get_weight(trans.seq(), (int)i);// + curr_5_pos_bias;
+        end_bias[i] = _3_seq_bias.get_weight(trans.seq(), (int)i);// + curr_3_pos_bias;
         tot_start = log_sum(tot_start, start_bias[i]);
         tot_end = log_sum(tot_start, end_bias[i]);
     }

@@ -29,6 +29,7 @@
 
 using namespace std;
 namespace po = boost::program_options;
+namespace fs = boost::filesystem;
 
 // the forgetting factor parameter controls the growth of the fragment mass
 double ff_param = 0.9;
@@ -378,16 +379,20 @@ size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TranscriptTable* 
 
 
 int main (int argc, char ** argv)
-{    
+{   
     int parse_ret = parse_options(argc,argv);
     if (parse_ret)
         return parse_ret;
     
     if (output_dir != ".")
     {
-        boost::filesystem::create_directories(output_dir);
+        try { fs::create_directories(output_dir); }
+        catch (fs::filesystem_error& e)
+        {
+            cerr << e.what() << endl;; 
+        }
     }
-    if (!boost::filesystem::exists(output_dir))
+    if (!fs::exists(output_dir))
     {
         cerr << "Error: cannot create directory " << output_dir << ".\n";
         exit(1);
