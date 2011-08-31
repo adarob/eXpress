@@ -216,8 +216,8 @@ double BiasBoss::get_transcript_bias(std::vector<double>& start_bias, std::vecto
             curr_5_pos_bias = _5_pos_bias.get_weight(l,p);
             curr_3_pos_bias = _3_pos_bias.get_weight(l,p);
         }
-        start_bias[i] = _5_seq_bias.get_weight(trans.seq(), (int)i);// + curr_5_pos_bias;
-        end_bias[i] = _3_seq_bias.get_weight(trans.seq(), (int)i);// + curr_3_pos_bias;
+        start_bias[i] = _5_seq_bias.get_weight(trans.seq(), (int)i) + curr_5_pos_bias;
+        end_bias[i] = _3_seq_bias.get_weight(trans.seq(), (int)i) + curr_3_pos_bias;
         tot_start = log_sum(tot_start, start_bias[i]);
         tot_end = log_sum(tot_start, end_bias[i]);
     }

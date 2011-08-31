@@ -1,6 +1,6 @@
 #!/bin/bash
 
-VERSION=0_9_0_BETA
+VERSION=0.9.0
 MAC=express-$VERSION-OSX_x86_64
 LINUX=express-$VERSION-linux_x86_64
 SRC=express-$VERSION-src
@@ -9,7 +9,7 @@ SRC=express-$VERSION-src
 echo "#define PACKAGE_VERSION \"$VERSION\"" > src/version.h
 
 #make version update check file file
-echo $VERSION > html/curr_xprs_version
+echo \$$VERSION\$ > html/curr_xprs_version
 
 #Update documentation
 rm -r html/doc

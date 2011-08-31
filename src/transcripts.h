@@ -119,6 +119,9 @@ class Transcript
      */
     double _avg_bias;
     
+    /**
+     * a private double storing the (non-logged) initial effective length of the transcript (based on the prior FLD), ignoring bias
+     */
     double _ub_eff_len;
     
     /**
@@ -248,6 +251,10 @@ public:
      */
     double est_effective_length() const;
     
+    /**
+     * a member function that calcualtes and returns the effective length of the transcript (non-logged) ignoring bias and using the prior FLD distribution
+     * @return the effective length of the transcript calculated as \f$ \tilde{l} = \sum_{l=1}^{L(t)} D_{prior}(l)(L(t) - l + 1) \f$
+     */
     double unbiased_effective_length() const;
 
     /**
@@ -391,7 +398,7 @@ public:
      * @param output_dir the directory to output the expression file to
      * @param tot_counts the total number of observed mapped fragments
      */
-    void output_expression(std::string output_dir, size_t tot_counts);
+    void output_results(std::string output_dir, size_t tot_counts);
     
     // These functions are used to output intermediate values for comparisons and will be deactivated in release
     void output_header(std::ofstream& runexpr_file);

@@ -6,7 +6,6 @@
 //  Copyright 2011 Adam Roberts. All rights reserved.
 //
 
-//TODO: Fix variance
 //TODO: Fix bias correction
 //TODO: Ouptut covariances
 //TODO: Output confidence intervals
@@ -418,6 +417,6 @@ int main (int argc, char ** argv)
     //fld_out.close();
 	//trans_table.output_bundles(output_dir);
     
-	trans_table.output_expression(output_dir, tot_counts);
+	trans_table.output_results(output_dir, tot_counts);
     return 0;
 }
