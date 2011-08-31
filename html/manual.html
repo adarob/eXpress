@@ -153,7 +153,7 @@
 		  <td VALIGN=top>A file of target sequences in <a href=http://en.wikipedia.org/wiki/FASTA_format>multi-FASTA</a> format. See <a href="#fasta">Input Files</a> for more details.</td></tr> 
 		  
 		  <tr><td VALIGN=top nowrap><tt>&lt;aligned_reads.(sam/bam)&gt;</tt></td>
-		  <td VALIGN=top>A file of RNA-Seq read alignments in the <a href="http://samtools.sourceforge.net"> 
+		  <td VALIGN=top>A file of read alignments to the target sequences in the <a href="http://samtools.sourceforge.net"> 
 		  SAM format</a>. See <a href="#sam">Input Files</a> for more details.</td></tr> 
 		  
 		  <tr><td VALIGN=top><b>General Options:</b></td><td VALIGN=top></td></tr>
@@ -209,7 +209,7 @@
         <div class="content-1col-nobox">
 		<h1 id="input">Input Files</h1>
 		<h2 id="fasta">Target Sequences (FASTA)</h2>
-	  	<p>eXpress takes a <a href=http://en.wikipedia.org/wiki/FASTA_format>multi-FASTA</a> file of target sequences to measure the abundance of. In the case of RNA-Seq, these are the transcript sequences.  If
+	  	<p>eXpress requires a <a href=http://en.wikipedia.org/wiki/FASTA_format>multi-FASTA</a> file of target sequences for which the abundances will be measured. In the case of RNA-Seq, these are the transcript sequences.  If
 	  	the transcriptome of your organism is not
         annotated, you can generate this file from your sequencing
         reads using a <i>de novo</i> transcriptome assembler such as
