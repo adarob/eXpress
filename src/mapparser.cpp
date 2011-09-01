@@ -195,12 +195,14 @@ SAMParser::SAMParser(istream* in)
         }
     }
 
-    do {
+     while(!map_end_from_line(line_buff));
+    { 
         if (!_in->good())
         {
             cerr << "ERROR: Input SAM file contains no valid alignments.\n";
         }
-    } while(!map_end_from_line(line_buff));
+        _in->getline(line_buff, BUFF_SIZE-1, '\n');
+    }
     
 }
 
@@ -244,6 +246,8 @@ bool SAMParser::map_end_from_line(char* line)
                 if (sam_flag & 0x4)
                     goto stop;
                 paired = sam_flag & 0x1;
+                if (paired && (sam_flag & 0x8))
+                    goto stop;
                 f.left_first = ((sam_flag & 0x40) && !(sam_flag & 0x10)) || (!(sam_flag & 0x40) && (sam_flag & 0x10));
                 break;
             case 2:
