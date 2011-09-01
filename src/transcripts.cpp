@@ -385,12 +385,12 @@ void TranscriptTable::output_results(string output_dir, size_t tot_counts)
                 double trans_counts = sexp(l_trans_frac + l_bundle_counts);
                 double l_trans_var = trans.var() + 2*(l_bundle_counts - l_bundle_mass);
                 double std_dev = sexp(0.5*l_trans_var);
-                double eff_len = trans.effective_length();
+                double eff_len = trans.est_effective_length();
                 double fpkm_constant = sexp(l_bil - log(eff_len) - l_tot_counts);
                 double trans_fpkm = trans_counts * fpkm_constant;
                 double fpkm_lo = (trans_counts - 2*std_dev) * fpkm_constant;
                 double fpkm_hi = (trans_counts + 2*std_dev) * fpkm_constant;
-                fprintf(expr_file, "%zu\t%s\t%zu\t%f\t%f\t%zu\t%zu\t%f\t%e\t%f\t%f\t%f\n", bundle_id, trans.name().c_str(), trans.length(), eff_len, sexp(l_trans_frac), trans.tot_counts(), trans.uniq_counts(), trans_counts, sexp(l_trans_var), trans_fpkm, fpkm_lo, fpkm_hi);
+                fprintf(expr_file, "%zu\t%s\t%zu\t%f\t%f\t%zu\t%zu\t%f\t%f\t%f\t%f\t%f\n", bundle_id, trans.name().c_str(), trans.length(), eff_len, sexp(l_trans_frac), trans.tot_counts(), trans.uniq_counts(), trans_counts, sexp(l_trans_var), trans_fpkm, fpkm_lo, fpkm_hi);
             }
         }
         else

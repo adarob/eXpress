@@ -43,6 +43,7 @@ cp LICENSE html/downloads/express-$VERSION/$LINUX/LICENSE
 cp -R src html/downloads/express-$VERSION/$SRC/src
 cp README html/downloads/express-$VERSION/$SRC/README
 cp LICENSE html/downloads/express-$VERSION/$SRC/LICENSE
+cp html/doc/express-doc.pdf html/downloads/express-$VERSION/$SRC
 
 #Tar download directories
 cd html/downloads/express-$VERSION

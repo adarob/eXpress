@@ -6,9 +6,9 @@
 //  Copyright 2011 Adam Roberts. All rights reserved.
 //
 
-//TODO: Fix bias correction
+//TODO: Speed up mismatch model?
+//TODO: Speed up bias initialization (using non-logged values)
 //TODO: Ouptut covariances
-//TODO: Output confidence intervals
 
 //#include <boost/math/distributions/geometric.hpp>
 #include <boost/filesystem.hpp>
@@ -194,7 +194,7 @@ void process_fragment(double mass_n, Fragment* frag_p, FLD* fld, BiasBoss* bias_
                 fld->add_val(m.length(), mass_n);
         
         if (bias_table)
-            bias_table->update_observed(m, mass_n - t->mass() + log((double)t->length()));
+            bias_table->update_observed(m, mass_n - t->mass() + log((double)t->unbiased_effective_length()));
         if (mismatch_table)
             mismatch_table->update(m, mass_n);
        
@@ -246,7 +246,7 @@ void process_fragment(double mass_n, Fragment* frag_p, FLD* fld, BiasBoss* bias_
             fld->add_val(m.length(), mass_t);
  
         if (bias_table)
-            bias_table->update_observed(m, mass_t - t->mass() + log((double)t->length()));
+            bias_table->update_observed(m, mass_t - t->mass() + log((double)t->unbiased_effective_length()));
         if (mismatch_table)
             mismatch_table->update(m, mass_t);
         

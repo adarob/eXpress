@@ -104,7 +104,7 @@ Public Member Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_transcript_table.html#a79de5edb45941d7a13911004696bcca5">num_bundles</a> ()</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_transcript_table.html#add2191aae93ee59cb9f8659c2cab25c8">output_bundles</a> (std::string output_dir)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_transcript_table.html#aeb0417b05ba8d206cc9f89b1aafbd9dd">threaded_bias_update</a> ()</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_transcript_table.html#a9e61c8676fd74317d3a2bcbe8f6344c3">output_expression</a> (std::string output_dir, size_t tot_counts)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_transcript_table.html#a04e005bb507ae06b21ef21f49e49ce21">output_results</a> (std::string output_dir, size_t tot_counts)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad5d82595e4fe569c8cb0ae65eaf00e8c"></a><!-- doxytag: member="TranscriptTable::output_header" ref="ad5d82595e4fe569c8cb0ae65eaf00e8c" args="(std::ofstream &amp;runexpr_file)" -->
 void&#160;</td><td class="memItemRight" valign="bottom"><b>output_header</b> (std::ofstream &amp;runexpr_file)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a4df58afc9911369cdef75365651dde6d"></a><!-- doxytag: member="TranscriptTable::output_current" ref="a4df58afc9911369cdef75365651dde6d" args="(std::ofstream &amp;runexpr_file)" -->
@@ -115,7 +115,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>output_current</b> (s
 <dl class="author"><dt><b>Author:</b></dt><dd>Adam Roberts </dd></dl>
 <dl class="date"><dt><b>Date:</b></dt><dd>2011  Artistic License 2.0 </dd></dl>
 
-<p>Definition at line <a class="el" href="transcripts_8h_source.html#l00268">268</a> of file <a class="el" href="transcripts_8h_source.html">transcripts.h</a>.</p>
+<p>Definition at line <a class="el" href="transcripts_8h_source.html#l00285">285</a> of file <a class="el" href="transcripts_8h_source.html">transcripts.h</a>.</p>
 </div><hr/><h2>Constructor &amp; Destructor Documentation</h2>
 <a class="anchor" id="a44f70fe587ed271ec5d7df3ec4310fee"></a><!-- doxytag: member="TranscriptTable::TranscriptTable" ref="a44f70fe587ed271ec5d7df3ec4310fee" args="(const std::string &amp;trans_fasta_file, double alpha, const FLD *fld, BiasBoss *bias_table, const MismatchTable *mismatch_table)" -->
 <div class="memitem">
@@ -171,7 +171,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>output_current</b> (s
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="transcripts_8cpp_source.html#l00118">118</a> of file <a class="el" href="transcripts_8cpp_source.html">transcripts.cpp</a>.</p>
+<p>Definition at line <a class="el" href="transcripts_8cpp_source.html#l00142">142</a> of file <a class="el" href="transcripts_8cpp_source.html">transcripts.cpp</a>.</p>
 
 </div>
 </div>
@@ -190,7 +190,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>output_current</b> (s
 <div class="memdoc">
 <p><a class="el" href="class_transcript_table.html">TranscriptTable</a> Destructor deletes all of the transcript objects in the table </p>
 
-<p>Definition at line <a class="el" href="transcripts_8cpp_source.html#l00175">175</a> of file <a class="el" href="transcripts_8cpp_source.html">transcripts.cpp</a>.</p>
+<p>Definition at line <a class="el" href="transcripts_8cpp_source.html#l00199">199</a> of file <a class="el" href="transcripts_8cpp_source.html">transcripts.cpp</a>.</p>
 
 </div>
 </div>
@@ -211,7 +211,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>output_current</b> (s
 <p>a member function that returns the number of pairs of transcripts with non-zero covariance </p>
 <dl class="return"><dt><b>Returns:</b></dt><dd>the number of transcript pairs with non-zero covariance </dd></dl>
 
-<p>Definition at line <a class="el" href="transcripts_8h_source.html#l00342">342</a> of file <a class="el" href="transcripts_8h_source.html">transcripts.h</a>.</p>
+<p>Definition at line <a class="el" href="transcripts_8h_source.html#l00359">359</a> of file <a class="el" href="transcripts_8h_source.html">transcripts.h</a>.</p>
 
 </div>
 </div>
@@ -238,7 +238,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>output_current</b> (s
 </dl>
 <dl class="return"><dt><b>Returns:</b></dt><dd>pointer to the transcript wit the given id </dd></dl>
 
-<p>Definition at line <a class="el" href="transcripts_8cpp_source.html#l00203">203</a> of file <a class="el" href="transcripts_8cpp_source.html">transcripts.cpp</a>.</p>
+<p>Definition at line <a class="el" href="transcripts_8cpp_source.html#l00227">227</a> of file <a class="el" href="transcripts_8cpp_source.html">transcripts.cpp</a>.</p>
 
 </div>
 </div>
@@ -265,7 +265,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>output_current</b> (s
 </dl>
 <dl class="return"><dt><b>Returns:</b></dt><dd>the TransID of the representative for the bundle the given transcript is in </dd></dl>
 
-<p>Definition at line <a class="el" href="transcripts_8cpp_source.html#l00224">224</a> of file <a class="el" href="transcripts_8cpp_source.html">transcripts.cpp</a>.</p>
+<p>Definition at line <a class="el" href="transcripts_8cpp_source.html#l00248">248</a> of file <a class="el" href="transcripts_8cpp_source.html">transcripts.cpp</a>.</p>
 
 </div>
 </div>
@@ -303,7 +303,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>output_current</b> (s
 </dl>
 <dl class="return"><dt><b>Returns:</b></dt><dd>the TransID of the representative for the new merged bundle </dd></dl>
 
-<p>Definition at line <a class="el" href="transcripts_8cpp_source.html#l00230">230</a> of file <a class="el" href="transcripts_8cpp_source.html">transcripts.cpp</a>.</p>
+<p>Definition at line <a class="el" href="transcripts_8cpp_source.html#l00254">254</a> of file <a class="el" href="transcripts_8cpp_source.html">transcripts.cpp</a>.</p>
 
 </div>
 </div>
@@ -323,7 +323,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>output_current</b> (s
 <p>a member function that returns the number of bundles in the partition </p>
 <dl class="return"><dt><b>Returns:</b></dt><dd>the number of bundles in the partition </dd></dl>
 
-<p>Definition at line <a class="el" href="transcripts_8cpp_source.html#l00239">239</a> of file <a class="el" href="transcripts_8cpp_source.html">transcripts.cpp</a>.</p>
+<p>Definition at line <a class="el" href="transcripts_8cpp_source.html#l00263">263</a> of file <a class="el" href="transcripts_8cpp_source.html">transcripts.cpp</a>.</p>
 
 </div>
 </div>
@@ -349,16 +349,16 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>output_current</b> (s
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="transcripts_8cpp_source.html#l00250">250</a> of file <a class="el" href="transcripts_8cpp_source.html">transcripts.cpp</a>.</p>
+<p>Definition at line <a class="el" href="transcripts_8cpp_source.html#l00274">274</a> of file <a class="el" href="transcripts_8cpp_source.html">transcripts.cpp</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a9e61c8676fd74317d3a2bcbe8f6344c3"></a><!-- doxytag: member="TranscriptTable::output_expression" ref="a9e61c8676fd74317d3a2bcbe8f6344c3" args="(std::string output_dir, size_t tot_counts)" -->
+<a class="anchor" id="a04e005bb507ae06b21ef21f49e49ce21"></a><!-- doxytag: member="TranscriptTable::output_results" ref="a04e005bb507ae06b21ef21f49e49ce21" args="(std::string output_dir, size_t tot_counts)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void TranscriptTable::output_expression </td>
+          <td class="memname">void TranscriptTable::output_results </td>
           <td>(</td>
           <td class="paramtype">std::string&#160;</td>
           <td class="paramname"><em>output_dir</em>, </td>
@@ -386,7 +386,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>output_current</b> (s
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="transcripts_8cpp_source.html#l00321">321</a> of file <a class="el" href="transcripts_8cpp_source.html">transcripts.cpp</a>.</p>
+<p>Definition at line <a class="el" href="transcripts_8cpp_source.html#l00345">345</a> of file <a class="el" href="transcripts_8cpp_source.html">transcripts.cpp</a>.</p>
 
 </div>
 </div>
@@ -406,7 +406,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>output_current</b> (s
 <p>a member function that returns the number of transcripts in the table </p>
 <dl class="return"><dt><b>Returns:</b></dt><dd>number of transcripts in the table </dd></dl>
 
-<p>Definition at line <a class="el" href="transcripts_8h_source.html#l00327">327</a> of file <a class="el" href="transcripts_8h_source.html">transcripts.h</a>.</p>
+<p>Definition at line <a class="el" href="transcripts_8h_source.html#l00344">344</a> of file <a class="el" href="transcripts_8h_source.html">transcripts.h</a>.</p>
 
 </div>
 </div>
@@ -425,7 +425,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>output_current</b> (s
 <div class="memdoc">
 <p>a member function for driving a thread that continuously updates the transcript bias values </p>
 
-<p>Definition at line <a class="el" href="transcripts_8cpp_source.html#l00270">270</a> of file <a class="el" href="transcripts_8cpp_source.html">transcripts.cpp</a>.</p>
+<p>Definition at line <a class="el" href="transcripts_8cpp_source.html#l00294">294</a> of file <a class="el" href="transcripts_8cpp_source.html">transcripts.cpp</a>.</p>
 
 </div>
 </div>
@@ -469,7 +469,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>output_current</b> (s
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="transcripts_8cpp_source.html#l00211">211</a> of file <a class="el" href="transcripts_8cpp_source.html">transcripts.cpp</a>.</p>
+<p>Definition at line <a class="el" href="transcripts_8cpp_source.html#l00235">235</a> of file <a class="el" href="transcripts_8cpp_source.html">transcripts.cpp</a>.</p>
 
 </div>
 </div>
@@ -482,7 +482,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>output_current</b> (s
   <div id="nav-path" class="navpath">
     <ul>
       <li class="navelem"><a class="el" href="class_transcript_table.html">TranscriptTable</a>      </li>
-      <li class="footer">Generated on Mon Aug 29 2011 19:56:31 for eXpress by&#160;
+      <li class="footer">Generated on Thu Sep 1 2011 15:24:31 for eXpress by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </li>
     </ul>

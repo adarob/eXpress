@@ -241,7 +241,7 @@ public:
     
     /**
      * a member function that calcualtes and returns the effective length of the transcript (non-logged)
-     * @return the effective length of the transcript calculated as \f$ \tilde{l} = \sum_{l=1}^{L(t)}\sum{i=1}^{L(t)} D(l)b_5[i]*b_3[i+l] \f$
+     * @return the effective length of the transcript calculated as \f$ \tilde{l} = \sum_{l=1}^{L(t)}\sum_{i=1}^{L(t)} D(l)b_5[i]*b_3[i+l] \f$
      */
     double effective_length() const;
     

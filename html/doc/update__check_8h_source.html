@@ -149,12 +149,12 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00072"></a>00072    
 <a name="l00073"></a>00073    <span class="keywordtype">char</span> buffer[1024];
 <a name="l00074"></a>00074    strcpy(buffer, <span class="stringliteral">&quot;GET /eXpress/curr_xprs_version HTTP/1.1\nHost: bio.math.berkeley.edu\n\n&quot;</span>);
-<a name="l00075"></a>00075    n = write(sockfd,buffer,1024);
+<a name="l00075"></a>00075    n = (int)write(sockfd,buffer,1024);
 <a name="l00076"></a>00076    
 <a name="l00077"></a>00077     <span class="keywordflow">if</span> (n &lt; 0) 
 <a name="l00078"></a>00078       <span class="keywordflow">return</span> error(<span class="stringliteral">&quot;ERROR writing to socket&quot;</span>);
 <a name="l00079"></a>00079    bzero(curr_version, <span class="keyword">sizeof</span>(curr_version));
-<a name="l00080"></a>00080     n = read(sockfd,buffer,1024);
+<a name="l00080"></a>00080     n = (int)read(sockfd,buffer,1024);
 <a name="l00081"></a>00081     <span class="keywordflow">if</span> (n &lt; 0) 
 <a name="l00082"></a>00082       <span class="keywordflow">return</span> error(<span class="stringliteral">&quot;ERROR reading from socket&quot;</span>);
 <a name="l00083"></a>00083 
@@ -191,7 +191,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div id="nav-path" class="navpath">
     <ul>
       <li class="navelem"><b>update_check.h</b>      </li>
-      <li class="footer">Generated on Mon Aug 29 2011 19:56:31 for eXpress by&#160;
+      <li class="footer">Generated on Thu Sep 1 2011 15:24:30 for eXpress by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </li>
     </ul>

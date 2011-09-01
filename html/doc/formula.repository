@@ -1,2 +1,4 @@
 \form#0:$ B = \bar{bias}(L(t) - l + 1) $
-\form#1:$ \tilde{l} = \bar{bias}\sum_{l=1}^{L(t)} D(l)(L(t) - l + 1) $
+\form#1:$ \tilde{l} = \sum_{l=1}^{L(t)}\sum_{i=1}^{L(t)} D(l)b_5[i]*b_3[i+l] $
+\form#2:$ \tilde{l} = \bar{bias}\sum_{l=1}^{L(t)} D(l)(L(t) - l + 1) $
+\form#3:$ \tilde{l} = \sum_{l=1}^{L(t)} D_{prior}(l)(L(t) - l + 1) $

@@ -104,9 +104,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00021"></a>00021 <span class="keyword">const</span> vector&lt;size_t&gt; LEN_BINS = boost::assign::list_of(791)(1265)(1707)(2433)(999999999); 
 <a name="l00022"></a>00022 <span class="keyword">const</span> vector&lt;double&gt; POS_BINS = boost::assign::list_of(0.1)(0.2)(0.3)(0.4)(0.5)(0.6)(0.7)(0.8)(0.9)(1.0);
 <a name="l00023"></a>00023 
-<a name="l00024"></a>00024 <span class="keyword">const</span> <span class="keywordtype">size_t</span> SURROUND = 10;
-<a name="l00025"></a>00025 <span class="keyword">const</span> <span class="keywordtype">size_t</span> CENTER = 11;
-<a name="l00026"></a>00026 <span class="keyword">const</span> <span class="keywordtype">size_t</span> WINDOW = 21;
+<a name="l00024"></a>00024 <span class="keyword">const</span> <span class="keywordtype">int</span> SURROUND = 10;
+<a name="l00025"></a>00025 <span class="keyword">const</span> <span class="keywordtype">int</span> CENTER = 11;
+<a name="l00026"></a>00026 <span class="keyword">const</span> <span class="keywordtype">int</span> WINDOW = 21;
 <a name="l00027"></a>00027 <span class="keyword">const</span> <span class="keywordtype">string</span> PADDING = <span class="stringliteral">&quot;NNNNNNNNNN&quot;</span>; 
 <a name="l00028"></a>00028 
 <a name="l00029"></a><a class="code" href="class_seq_weight_table.html#a9c086928447f2c5af25355d1ac37f236">00029</a> <a class="code" href="class_seq_weight_table.html#a9c086928447f2c5af25355d1ac37f236">SeqWeightTable::SeqWeightTable</a>(<span class="keywordtype">size_t</span> window_size, <span class="keywordtype">double</span> alpha)
@@ -135,11 +135,11 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00052"></a>00052     }
 <a name="l00053"></a>00053 }
 <a name="l00054"></a>00054 
-<a name="l00055"></a><a class="code" href="class_pos_weight_table.html#afa712a55e26cb1f55318f9e91218defc">00055</a> <span class="keywordtype">double</span> <a class="code" href="class_seq_weight_table.html#ac0b0aac697e4eeab0fa16a93b8edb0be">SeqWeightTable::get_weight</a>(<span class="keyword">const</span> <span class="keywordtype">string</span>&amp; seq, <span class="keywordtype">size_t</span> i)<span class="keyword"> const</span>
+<a name="l00055"></a><a class="code" href="class_pos_weight_table.html#afa712a55e26cb1f55318f9e91218defc">00055</a> <span class="keywordtype">double</span> <a class="code" href="class_seq_weight_table.html#a82ab529aaad5e124b2cf4591af1b3a4a">SeqWeightTable::get_weight</a>(<span class="keyword">const</span> <span class="keywordtype">string</span>&amp; seq, <span class="keywordtype">int</span> i)<span class="keyword"> const</span>
 <a name="l00056"></a>00056 <span class="keyword"></span>{
 <a name="l00057"></a>00057     boost::mutex::scoped_lock lock(_lock);
 <a name="l00058"></a>00058     <span class="keywordtype">double</span> weight = 0;
-<a name="l00059"></a>00059     <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> j = max((<span class="keywordtype">size_t</span>)0, CENTER-1-i); j &lt; min(WINDOW, CENTER-1+seq.length()-i); ++j)
+<a name="l00059"></a>00059     <span class="keywordflow">for</span> (<span class="keywordtype">int</span> j = max(0, CENTER-1-i); j &lt; min(WINDOW, CENTER-1+(<span class="keywordtype">int</span>)seq.length()-i); ++j)
 <a name="l00060"></a>00060     {
 <a name="l00061"></a>00061         <span class="keywordtype">size_t</span> index = ctoi(seq[i+j-CENTER+1]);
 <a name="l00062"></a>00062         <span class="keywordflow">if</span> (index != 4)
@@ -267,7 +267,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00184"></a>00184     {
 <a name="l00185"></a>00185         <span class="keywordtype">int</span> left_window = frag.<a class="code" href="struct_frag_map.html#af9b896df4add2a71c6023ec077a4bdd0">right</a> - CENTER;
 <a name="l00186"></a>00186         <span class="keywordtype">string</span> seq_3 = t_seq.substr(left_window, WINDOW);
-<a name="l00187"></a>00187         <span class="keywordtype">int</span> overhang =left_window + WINDOW - t_seq.length();
+<a name="l00187"></a>00187         <span class="keywordtype">int</span> overhang =left_window + WINDOW - (int)t_seq.length();
 <a name="l00188"></a>00188         <span class="keywordflow">if</span> (overhang &gt; 0)
 <a name="l00189"></a>00189         {
 <a name="l00190"></a>00190             seq_3 += PADDING.substr(0, overhang);
@@ -299,8 +299,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00216"></a>00216             curr_5_pos_bias = _5_pos_bias.<a class="code" href="class_pos_weight_table.html#aee234ee1eaf81c9050922133403b42e5">get_weight</a>(l,p);
 <a name="l00217"></a>00217             curr_3_pos_bias = _3_pos_bias.<a class="code" href="class_pos_weight_table.html#aee234ee1eaf81c9050922133403b42e5">get_weight</a>(l,p);
 <a name="l00218"></a>00218         }
-<a name="l00219"></a>00219         start_bias[i] = _5_seq_bias.<a class="code" href="class_seq_weight_table.html#ac0b0aac697e4eeab0fa16a93b8edb0be">get_weight</a>(trans.<a class="code" href="class_transcript.html#abdf9e6054e345ed9f1a49f0be3a0ccc7">seq</a>(), i) + curr_5_pos_bias;
-<a name="l00220"></a>00220         end_bias[i] = _3_seq_bias.<a class="code" href="class_seq_weight_table.html#ac0b0aac697e4eeab0fa16a93b8edb0be">get_weight</a>(trans.<a class="code" href="class_transcript.html#abdf9e6054e345ed9f1a49f0be3a0ccc7">seq</a>(), i) + curr_3_pos_bias;
+<a name="l00219"></a>00219         start_bias[i] = _5_seq_bias.<a class="code" href="class_seq_weight_table.html#a82ab529aaad5e124b2cf4591af1b3a4a">get_weight</a>(trans.<a class="code" href="class_transcript.html#abdf9e6054e345ed9f1a49f0be3a0ccc7">seq</a>(), (int)i) + curr_5_pos_bias;
+<a name="l00220"></a>00220         end_bias[i] = _3_seq_bias.<a class="code" href="class_seq_weight_table.html#a82ab529aaad5e124b2cf4591af1b3a4a">get_weight</a>(trans.<a class="code" href="class_transcript.html#abdf9e6054e345ed9f1a49f0be3a0ccc7">seq</a>(), (int)i) + curr_3_pos_bias;
 <a name="l00221"></a>00221         tot_start = log_sum(tot_start, start_bias[i]);
 <a name="l00222"></a>00222         tot_end = log_sum(tot_start, end_bias[i]);
 <a name="l00223"></a>00223     }
@@ -320,7 +320,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div id="nav-path" class="navpath">
     <ul>
       <li class="navelem"><b>biascorrection.cpp</b>      </li>
-      <li class="footer">Generated on Mon Aug 29 2011 19:56:30 for eXpress by&#160;
+      <li class="footer">Generated on Thu Sep 1 2011 15:24:30 for eXpress by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </li>
     </ul>
