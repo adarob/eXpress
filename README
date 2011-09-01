@@ -14,8 +14,8 @@ http://bio.math.berkeley.edu/eXpress/
 I.   Authors:
 --------------------------------------------------------------------------------
 
-The methods and algorithms used in eXpress were developed by Adam Roberts and Lior 
-Pachter. Adam Roberts designed and wrote eXpress. 
+The methods and algorithms used in eXpress were developed by Adam Roberts and 
+Lior Pachter. Adam Roberts designed and wrote eXpress. 
 
 --------------------------------------------------------------------------------
 II.  Requirements:
@@ -24,7 +24,8 @@ II.  Requirements:
 eXpress is a standalone tool that requires gcc 4.0 or greater, and runs on Linux 
 and OS X.  
 
-It depends on Boost (http://www.boost.org) and BamTools (https://github.com/pezmaster31/bamtools).
+It depends on Boost (http://www.boost.org) and 
+BamTools (https://github.com/pezmaster31/bamtools).
 
 --------------------------------------------------------------------------------
 III. Learn More (Installation, Manual, etc.):
@@ -80,4 +81,4 @@ data with or without a reference genome. BMC Bioinformatics.
 VII. CONTACT:
 --------------------------------------------------------------------------------
 
-Please send all questions, comments, suggestions and bug reports to ask.xprs@gmail.com.
+Please send all questions, comments, and suggestions to ask.xprs@gmail.com.
