@@ -195,7 +195,7 @@ SAMParser::SAMParser(istream* in)
         }
     }
 
-     while(!map_end_from_line(line_buff));
+    while(!map_end_from_line(line_buff))
     { 
         if (!_in->good())
         {

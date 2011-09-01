@@ -11398,7 +11398,7 @@
 				</dict>
 			</array>
 		</dict>
-		<real>336548716.68875098</real>
+		<real>336549467.14813101</real>
 		<string>{7872, 3456}</string>
 		<string>{4093, 10}</string>
 		<dict>
@@ -12771,9 +12771,9 @@
 				</dict>
 			</array>
 		</dict>
-		<real>336548716.68888903</real>
-		<string>{4294, 1420}</string>
-		<string>{4928, 0}</string>
+		<real>336549467.14824498</real>
+		<string>{3975, 1116}</string>
+		<string>{4744, 0}</string>
 		<dict>
 			<key>$class</key>
 			<dict>
@@ -12961,7 +12961,7 @@
 				</dict>
 			</array>
 		</dict>
-		<real>336548716.68903601</real>
+		<real>336549467.14839298</real>
 		<string>{6880, 10}</string>
 		<dict>
 			<key>$class</key>
@@ -13197,8 +13197,8 @@
 				</dict>
 			</array>
 		</dict>
-		<real>336548524.95599699</real>
-		<string>{770, 2033}</string>
+		<real>336549145.94653201</real>
+		<string>{863, 1053}</string>
 		<dict>
 			<key>$class</key>
 			<dict>
@@ -15189,7 +15189,7 @@
 				</dict>
 			</array>
 		</dict>
-		<real>336548716.688972</real>
+		<real>336549467.14832503</real>
 		<string>{832, 2012}</string>
 		<string>{2501, 0}</string>
 		<dict>
@@ -18360,7 +18360,7 @@
 				<integer>1310</integer>
 			</dict>
 			<key>NS.time</key>
-			<real>336547820.97468501</real>
+			<real>336549036.15292197</real>
 		</dict>
 		<dict>
 			<key>$classes</key>
@@ -18371,7 +18371,7 @@
 			<key>$classname</key>
 			<string>NSDate</string>
 		</dict>
-		<string>Today at 10:30 PM</string>
+		<string>Today at 10:50 PM</string>
 		<integer>234</integer>
 		<string>express</string>
 		<dict>
@@ -20055,7 +20055,7 @@
 				</dict>
 			</array>
 		</dict>
-		<real>336548716.68967301</real>
+		<real>336549467.14903003</real>
 		<string>{7872, 3456}</string>
 		<string>{4093, 10}</string>
 		<string>TranscriptTable::TranscriptTable(const string&amp; trans_fasta_file, double alpha, const FLD* fld, BiasBoss* bias_table, const MismatchTable* mismatch_table)</string>
@@ -20588,7 +20588,7 @@
 		<string>IDEBatchFindNavigatorSelectedRowIndexes</string>
 		<string>IDEBatchFindNavigatorFindMode</string>
 		<string>IDEBatchFindNavigatorCollapsedGroups</string>
-		<string>ERROR</string>
+		<string>in-&gt;good</string>
 		<dict>
 			<key>$class</key>
 			<dict>
@@ -31175,7 +31175,7 @@
 				</dict>
 				<dict>
 					<key>CF$UID</key>
-					<integer>131</integer>
+					<integer>140</integer>
 				</dict>
 			</array>
 		</dict>
@@ -31982,9 +31982,9 @@
 				</dict>
 			</array>
 		</dict>
-		<real>336548716.69131601</real>
-		<string>{4294, 1420}</string>
-		<string>{4928, 0}</string>
+		<real>336549467.15063798</real>
+		<string>{3975, 1116}</string>
+		<string>{4744, 0}</string>
 		<string>SAMParser::SAMParser(istream* in)</string>
 		<dict>
 			<key>$class</key>
@@ -32018,7 +32018,7 @@
 				</dict>
 			</array>
 		</dict>
-		<string>{{0, 0}, {1351, 930}}</string>
+		<string>{{0, 0}, {1351, 632}}</string>
 		<dict>
 			<key>$class</key>
 			<dict>
@@ -32087,7 +32087,7 @@
 				</dict>
 			</array>
 		</dict>
-		<real>529</real>
+		<real>654</real>
 		<dict>
 			<key>$class</key>
 			<dict>
@@ -32117,7 +32117,7 @@
 				</dict>
 			</array>
 		</dict>
-		<real>401</real>
+		<real>276</real>
 		<dict>
 			<key>$class</key>
 			<dict>
@@ -32281,7 +32281,7 @@
 				</dict>
 				<dict>
 					<key>CF$UID</key>
-					<integer>1501</integer>
+					<integer>1496</integer>
 				</dict>
 				<dict>
 					<key>CF$UID</key>
@@ -32375,7 +32375,7 @@
 			<key>NSLength</key>
 			<integer>1</integer>
 			<key>NSLocation</key>
-			<integer>5</integer>
+			<integer>1</integer>
 			<key>NSRangeCount</key>
 			<integer>1</integer>
 		</dict>
@@ -58539,7 +58539,7 @@
 				</dict>
 			</array>
 		</dict>
-		<real>336548716.69207901</real>
+		<real>336549467.15125799</real>
 		<string>{832, 2012}</string>
 		<string>{2501, 0}</string>
 		<dict>
@@ -86806,7 +86806,7 @@
 				</dict>
 			</array>
 		</dict>
-		<real>336548716.69285798</real>
+		<real>336549467.15201199</real>
 		<string>{6880, 10}</string>
 		<string>BiasBoss::get_transcript_bias(std::vector&lt;double&gt;&amp; start_bias, std::vector&lt;double&gt;&amp; end_bias, const Transcript&amp; trans)</string>
 		<dict>
