@@ -130,20 +130,19 @@
         <div class="corner-content-1col-top"></div>                        
         <div class="content-1col-nobox">
         <h1 id="description">Description</h1>
-			<p>eXpress is a streaming transcript-level
-        RNA-Seq quantification tool. It is based on an online-EM
+			<p>eXpress is a streaming tool for quantifying the abundances of a set of target sequences from sampled subsequences. An example of an application is transcript-level
+        RNA-Seq quantification. It is based on an online-EM
         algorithm [<a href="ref1">1</a>] that results in space (memory) requirements
-        proportional to the size of the transcriptome and time
-        requirements that are proportional to the number of sequenced
-        fragments. Thus, eXpress can accurately quantify much larger
-        samples at the transcript-level than other currently available
-        tools greatly reducing infrastructure requirements for
-        RNA-Seq analysis. eXpress can be used to build lightweight
-			RNA-Seq processing pipelines when coupled with
+        proportional to the total size of the target sequences  and time
+        requirements that are proportional to the number of sampled
+        fragments. Thus, in applications such as RNA-Seq, eXpress can accurately quantify much larger
+        samples than other currently available
+        tools greatly reducing computing infrastructure requirements. eXpress can be used to build lightweight
+			high-throughput sequencing  processing pipelines when coupled with
 			a streaming aligner (such as Bowtie), as
-			output can be piped directly into eXpress, effectively eliminating the need to store alignments in either memory or disk.</p>
+			output can be piped directly into eXpress, effectively eliminating the need to store read alignments in either memory or disk.</p>
 
-	  <p>Our analysis has shown that this efficiency does not come
+	  <p>In an analysis of the performance of eXpress for RNA-Seq analysis, we have observed that this efficiency does not come
 			at a cost of accuracy. eXpress is more accurate
 			than other available tools, even when limited
 			to smaller datasets that do not require such
@@ -157,17 +156,17 @@
 			with <i>de novo</i> assemblers such as <a href=http://trinityrnaseq.sourceforge.net/>Trinity</a>, <a
         href=http://www.ebi.ac.uk/~zerbino/oases/>Oases</a>, or <a
         href=http://www.bcgsc.ca/platform/bioinfo/software/trans-abyss>Trans-ABySS</a>. The underlying model is based on previously described probabilistic
-			models for RNA-Seq [<a href="#ref4">4</a>], and includes
+			models developed for RNA-Seq [<a href="#ref4">4</a>] but is applicable to other settings where target sequences are sampled, and includes
 			parameters for fragment length distributions,
 			errors in reads, and fragment bias [<a href="#ref5">5</a>].
 	  </p>
 
 			<p>eXpress can be used as to resolve ambiguous mappings in
 			other high-throughput sequencing based applications. The only required
-			inputs to eXpress are a set of reference
+			inputs to eXpress are a set of target
 			sequences and a set of sequenced fragments
 			multiply-aligned to them.  While these
-			reference sequences will often be gene
+			target sequences will often be gene
 			isoforms, they need not be.  Haplotypes could
 			be used as the reference for allele-specific
 			expression analysis or target genomes may be
@@ -181,15 +180,15 @@
         <div class="content-1col-nobox">
 		  	<h1 id="features">Features</h1>
 		  	<ul>
-		  	<li>Transcript-level abundance estimation.</li>
 		  	<li>Time proportional to number of reads, memory proportional to transcriptome size.</li>
 		  	<li>Maximum of 3 free processor cores required (2 without bias
 		  	correction). Try it on your laptop!</li>
-		  	<li>Outputs FPKM, estimated counts, and count
+		  	<li>Outputs <a href="http://cufflinks.cbcb.umd.edu/howitworks.html#hqua">FPKM</a>, estimated counts, and count
 		  	variance/covariance for differential
-		  	expression analysis.</li>
+		  	abundance analysis.</li>
 		  	<li>Supports alignments with unlimited multi-mappings and errors.</li>
-			<li>Can be used for allele-specific expression estimates.</li>
+		  	<li>Transcript-level abundance estimation when used for RNA-Seq.</li>
+			<li>Can be used for allele-specific expression estimates in RNA-Seq.</li>
 		    <li>Corrects for both positional and sequence-specific fragment biases.</li>
    		    <li>Learns first-order Markov model for sequencing errors for use in probablistic read assignment.</li>
    		    <li>Learns fragment length distribution for use in probablistic assignment of paired-end reads.</li>
