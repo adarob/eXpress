@@ -73,7 +73,7 @@ bool parse_options(int ac, char ** av)
     ("fr-stranded", "accept only forward->reverse alignments (second-stranded protocols)")
     ("rf-stranded", "accept only reverse->forward alignments (first-stranded protocols)")
     ("calc-covar", "calculate and output covariance matrix")
-    ("no-update-check", "disables auotmatic check for update via web")
+    ("no-update-check", "disables automatic check for update via web")
     ;
     
     po::options_description hidden("Hidden options");
@@ -393,7 +393,7 @@ int main (int argc, char ** argv)
     }
     if (!fs::exists(output_dir))
     {
-        cerr << "Error: cannot create directory " << output_dir << ".\n";
+        cerr << "ERROR: cannot create directory " << output_dir << ".\n";
         exit(1);
     }
             

@@ -98,6 +98,11 @@ void ThreadedMapParser::threaded_parse(ParseThreadSafety* thread_safety, Transcr
         {
             FragMap& m = *(frag->maps()[i]);
             Transcript* t = trans_table->get_trans(m.trans_id);
+            if (!t)
+            {
+                cerr << "ERROR: Target sequence not found. Input same FASTA file used in alignment.\n";
+                exit(1);
+            }
             m.mapped_trans = t;
             assert(t->id() == m.trans_id);
         }
@@ -119,7 +124,7 @@ BAMParser::BAMParser(BamTools::BamReader* reader)
     do {
         if (!_reader->GetNextAlignment(a))
         {
-            cerr << "Error: Input BAM file contains no valid alignments." << endl;
+            cerr << "ERROR: Input BAM file contains no valid alignments.\n";
         }
     } while(!map_end_from_alignment(a));
 }
@@ -186,10 +191,16 @@ SAMParser::SAMParser(istream* in)
         _in->getline(line_buff, BUFF_SIZE-1, '\n');
         if (line_buff[0] != '@')
         {
-            map_end_from_line(line_buff);
             break;
         }
     }
+
+    do {
+        if (!_in->good())
+        {
+            cerr << "ERROR: Input SAM file contains no valid alignments.\n";
+        }
+    } while(!map_end_from_line(line_buff));
     
 }
 
