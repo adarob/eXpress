@@ -10,17 +10,31 @@
 <!--           "Design by 1234.info". Thank you!            -->
 
 <head>
+  <script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-25486066-1']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
   <meta http-equiv="content-type" content="text/html; charset=utf-8" />
   <meta http-equiv="cache-control" content="no-cache" />
   <meta http-equiv="expires" content="3600" />
   <meta name="revisit-after" content="2 days" />
   <meta name="robots" content="index,follow" />
   <meta name="publisher" content="Your publisher infos here" />
-  <meta name="copyright" content="Your copyright infos here" />
-  <meta name="author" content="Designed by www.1234.info / Modified: Your Name" />
+  <meta name="copyright" content="Copyright (c) 2011 Adam Roberts" />
+  <meta name="author" content="Designed by www.1234.info / Modified: Adam Roberts" />
   <meta name="distribution" content="global" />
-  <meta name="description" content="Your container description here" />
-  <meta name="keywords" content="Your keywords, keywords, keywords, here" />
+  <meta name="image" content="http://bio.math.berkeley.edu/eXpress/img/logo.png" />
+  <meta name="description" content="eXpress is a general quantification tool for target DNA/RNA sequences. While its primary use currently is RNA-Seq it has the potential for applications in many other areas including as allele-specific expression and metgenomics. What makes eXpress different is that it is an online (or streaming) algorithm, meaning it only makes one pass through the data. This allows it to be very light-weight and efficient using a constant amount of memory and time linear in the number of sequenced fragments being processed. Furthermore, it accepts piped SAM/BAM input, allowing users to avoid storing extremely large alignment files. eXpress models fragment biases (sequence-specific and positional), fragment lengths, and errors, allowing it to also be one of the most accurate quantification methods available." />
+  <meta name="keywords" content="RNA-Seq, Genomics, transcript,quantification" />
   <link rel="stylesheet" type="text/css" media="screen,projection,print" href="./css/mf54_reset.css" />
   <link rel="stylesheet" type="text/css" media="screen,projection,print" href="./css/mf54_grid.css" />
   <link rel="stylesheet" type="text/css" media="screen,projection,print" href="./css/mf54_content.css" />
@@ -106,6 +120,18 @@
       <ul>
         <li><a href="overview.html">About</a></li>
       </ul>            
+      <!-- Navigation item -->
+      <ul>
+        <li><a href="#">Download<!--[if IE 7]><!--></a><!--<![endif]-->
+          <!--[if lte IE 6]><table><tr><td><![endif]-->
+            <ul>
+              <li><a href=downloads/express-0.9.0/express-0.9.0-src.tgz onClick="_gaq.push(['_trackEvent', 'Downloads', 'Source', 'home-menu']);">Source</a></li>
+              <li><a href=downloads/express-0.9.0/express-0.9.0-macosx_x86_64.tgz onClick="_gaq.push(['_trackEvent', 'Downloads', 'Mac', 'home-menu']);">Mac OS X (64-bit)</a></li>
+              <li><a href=downloads/express-0.9.0/express-0.9.0-linux_x86_64.tgz onClick="_gaq.push(['_trackEvent', 'Downloads', 'Linux', 'home-menu']);">Linux (64-bit)</a></li>
+            </ul>
+          <!--[if lte IE 6]></td></tr></table></a><![endif]-->
+        </li>
+      </ul>                  
        <!-- Navigation item -->
       <ul>
         <li><a href="tutorial.html">Getting Started</a></li>
@@ -131,7 +157,7 @@
           <h1>News</h1>
 		  <h2>09.01.2011 &bull; eXpress 0.9.0 BETA release</h2>
           <p>We are pleased to announce the release of the first public beta of
-      eXpress! The software is freely available under the OSI-approved Artistic License 2.0.  
+      eXpress! The software is freely available under the <a href=http://www.opensource.org>OSI</a>-approved <a href=http://www.opensource.org/licenses/artistic-license-2.0.php>Artistic License 2.0</a>.  
       <br /><br />Please send us any comments, suggestions, and bug fixes to <a href=mailto:ask.xprs@gmail.com>ask.xprs@gmail.com</a>.
  </p>
           </div> 
@@ -147,9 +173,9 @@
           <h1>Current Release</h1>                    
           <h5>eXpress 0.9.0 BETA</h5>
           <p>First public beta release.
-          <br />&rarr; <a href="downloads/express-0.9.0/express-0.9.0-src.tgz">Source</a>
-          <br />&rarr; <a href="downloads/express-0.9.0/express-0.9.0-osx_x86_64.tgz">Mac OS X (64-bit) Binary</a>
-          <br />&rarr; <a href="downloads/express-0.9.0/express-0.9.0-linux_x86_64.tgz">Linux (64-bit) Binary</a>
+          <br />&rarr; <a href="downloads/express-0.9.0/express-0.9.0-src.tgz" onClick="_gaq.push(['_trackEvent', 'Downloads', 'Source', 'home-side']);">Source</a>
+          <br />&rarr; <a href="downloads/express-0.9.0/express-0.9.0-macosx_x86_64.tgz" onClick="_gaq.push(['_trackEvent', 'Downloads', 'Mac', 'home-side']);">Mac OS X (64-bit) Binary</a>
+          <br />&rarr; <a href="downloads/express-0.9.0/express-0.9.0-linux_x86_64.tgz" onClick="_gaq.push(['_trackEvent', 'Downloads', 'Linux', 'home-side']);">Linux (64-bit) Binary</a>
         </div>  
         <div class="corner-subcontent-bottom"></div>
       
