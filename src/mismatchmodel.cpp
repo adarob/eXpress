@@ -23,6 +23,9 @@ MismatchTable::MismatchTable(double alpha)
 
 double MismatchTable::log_likelihood(const FragMap& f) const
 {
+    if (!_active)
+        return 0;
+    
     const string& t_seq = f.mapped_trans->seq();
     double ll = 0;
     

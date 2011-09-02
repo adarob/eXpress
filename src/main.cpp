@@ -33,10 +33,14 @@ namespace fs = boost::filesystem;
 // the forgetting factor parameter controls the growth of the fragment mass
 double ff_param = 0.9;
 
+// the burn-in parameter determines how many reads are required before the 
+// error and bias models are applied to probabilistic assignment 
+size_t burn_in = 100000;
+
+// file location parameters
 string output_dir = ".";
 string fasta_file_name = "";
 string sam_file_name = "";
-
 
 // intial pseudo-count parameters (non-logged)
 double expr_alpha = .001;
@@ -57,6 +61,7 @@ bool vis = false;
 bool output_running = false;
 
 //bool in_between = false;
+
 enum Direction{ BOTH, FR, RF };
 Direction direction = BOTH;
 
@@ -320,6 +325,14 @@ size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TranscriptTable* 
         
         n++;
 
+        if (n == burn_in)
+        {
+            if (bias_table)
+                boost::thread bias_update(&TranscriptTable::threaded_bias_update, trans_table);
+            if (mismatch_table)
+                mismatch_table->activate();
+        }
+        
         //Output current values on log scale
         if (output_running && n == i * pow(10.,m))
         {
@@ -360,6 +373,8 @@ size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TranscriptTable* 
         
         process_fragment(mass_n, frag, fld, bias_table, mismatch_table, trans_table);
     }
+    
+	running = false;
 
     if (vis)
         cout << "99\n";
@@ -403,11 +418,7 @@ int main (int argc, char ** argv)
     ThreadedMapParser map_parser(sam_file_name);
     TranscriptTable trans_table(fasta_file_name, expr_alpha, &fld, bias_table, mismatch_table);
 
-    if (bias_table)
-        boost::thread bias_update(&TranscriptTable::threaded_bias_update, &trans_table);
-
     size_t tot_counts = threaded_calc_abundances(map_parser, &trans_table, &fld, bias_table, mismatch_table);
-	running = false;
 
 	cout << "Writing results to file...\n";
     

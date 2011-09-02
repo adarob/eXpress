@@ -32,6 +32,11 @@ class MismatchTable
      * a vector of FrequencyMatrix objects to store the Markov model parameters for each position in the second ("right") read 
      */
     std::vector<FrequencyMatrix> _second_read_mm;
+    
+    /**
+     * a boolean specifying whether or not the table values should be used return a log-likelihood 
+     */
+    bool _active;
 
 public:
    
@@ -40,6 +45,13 @@ public:
      * @param alpha a double containing the non-logged pseudo-counts for parameter initialization
      */
     MismatchTable(double alpha);
+    
+    /**
+     * member function that 'activates' the table to allow its values to be used in calculating log-likelihoods
+     * when it is sufficiently burned-in
+     * @param active a boolean specifying whether to activate (true) or deactivate (false)
+     */
+    void activate(bool active = true) { _active = active; }
     
     /**
      * member function returns the log likeihood of mismatches in the mapping given the current error model paramaters
