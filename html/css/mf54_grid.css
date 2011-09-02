@@ -179,3 +179,6 @@
 
 /* SOURCE CODE */
 .sc{font-family: Andale Mono, Lucida Console, Monaco, fixed, monospace, code; color: #000000; background-color: #eee;font-size: 12px;border: 1px dashed #999999;line-height: 14px; padding: 5px; white-space:nowrap; overflow:auto; width: 95%}
+
+/* FILE OUTPUT */
+.output{font-family: Andale Mono, Lucida Console, Monaco, fixed, monospace, code; color: #000000; background-color: #eee;font-size: 12px;border: 1px dashed #999999;line-height: 14px; padding: 5px; overflow:auto; width: 95%}

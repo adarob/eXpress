@@ -35,14 +35,17 @@ mkdir html/downloads/express-$VERSION/$SRC
 cp osx_build/src/express html/downloads/express-$VERSION/$MAC
 cp README html/downloads/express-$VERSION/$MAC/README
 cp LICENSE html/downloads/express-$VERSION/$MAC/LICENSE
+cp -r sample_data html/downloads/express-$VERSION/$MAC/sample_data
 #linux
 cp linux_build/src/express html/downloads/express-$VERSION/$LINUX
 cp README html/downloads/express-$VERSION/$LINUX/README
 cp LICENSE html/downloads/express-$VERSION/$LINUX/LICENSE
+cp -r sample_data html/downloads/express-$VERSION/$LINUX/sample_data
 #src
-cp -R src html/downloads/express-$VERSION/$SRC/src
+cp -r src html/downloads/express-$VERSION/$SRC/src
 cp README html/downloads/express-$VERSION/$SRC/README
 cp LICENSE html/downloads/express-$VERSION/$SRC/LICENSE
+cp -r sample_data html/downloads/express-$VERSION/$SRC/sample_data
 cp html/doc/express-doc.pdf html/downloads/express-$VERSION/$SRC
 
 #Tar download directories

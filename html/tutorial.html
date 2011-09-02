@@ -246,7 +246,7 @@
         many mismatches during mapping since eXpress builds an error model to probabalistically assign the reads, although this will increase mapping time.</li>
 		  </ol>
 		  <h2 id="example">An example</h2>
-		  <p>In the following two sub-sections, we will run eXpress on a sample RNA-Seq dataset.  Both the transcript sequences (transcripts.fasta) and raw reads (reads.fastq) can be found in the <tt>&lt;YOUR_EXPRESS_DIR&gt;/sample_data</tt> directory.  For this example to work, you will need to have both <a href=http://bowtie-bio.sourceforge.net>Bowtie</a> and <a href=http://samtools.sf.net>SAMtools</a> installed, but in general any aligner will work and the conversion to BAM is not necessary unless you have insufficient disk space to store the uncompressed SAM.</p>
+		  <p>In the following two sub-sections, we will run eXpress on a sample RNA-Seq dataset with simulated reads from UGT3A2 and the HOXC cluster using the human genome build hg18.  Both the transcript sequences (transcripts.fasta) and raw reads (reads_1fastq, reads_2.fastq) can be found in the <tt>&lt;YOUR_EXPRESS_DIR&gt;/sample_data</tt> directory.  For this example to work, you will need to have both <a href=http://bowtie-bio.sourceforge.net>Bowtie</a> and <a href=http://samtools.sf.net>SAMtools</a> installed, but in general any aligner will work and the conversion to BAM is not necessary unless you have insufficient disk space to store the uncompressed SAM.</p>
 		  <p>Before we begin, we must prepare our Bowtie index. Since we wish to allow many multi-mappings, it is useful to build our index with a small offrate (in this case 1).  The smaller the offrate, the larger the index and the faster the mapping.  If you have disk space to spare, always use an offrate of 1. Build the index with the following commands.</p>
 		  <ol><li><pre class="sc"><code>$ cd &lt;YOUR_EXPRESS_DIR&gt;/sample_data <br />$ bowtie-build --offrate 1 transcripts.fasta transcripts</code></pre></li></ol>
 		  <p>We can now map the reads to our transcript sequences using the following Bowtie command, which outputs in SAM (<code>-S</code>), allows for unlimited multi-mappings (<code>-a</code>), a maximum insert distance of 800 bp between the paired-ends (<code>-X 800</code>), and 3 mismatches (<code>-v 3</code>). The first three options (<code>a,S,X</code>) are highly recommended for best results.  You should also allow for many mismatches, since eXpress models sequencing errors.  The SAM output from Bowtie is piped into SAMtools in order to compress it to BAM format.  This conversion is optional.
@@ -254,7 +254,7 @@
 		  <h2 id="fromfile">Input from SAM/BAM file</h2>
 		  <p>Once you have aligned your reads to the transcriptome and stored them in a SAM or BAM file, you can run eXpress in default mode with the command:
  		  <ol><li><pre class="sc" margin-left:20px;><code>$ express transcripts.fasta hits.bam</code></pre></li></ol></p>
- 		  <p>The default settings will be sufficient for most users, but please see the <a href=manual.html>Manual</a> for full descriptions of all available options.</p>
+ 		  <p>The default settings will be sufficient for most users, but please see the <a href=manual.html#running>Manual</a> for full descriptions of all available options.</p>
  		  <h2 id="stream">Streaming input from aligner</h2>
  		  <p>If you do not wish to store an intermediate SAM/BAM file, you can pipe the Bowtie output directly into eXpress with the command:</p>
 		  <ol><li><pre class="sc"><code>$ bowtie -aS -X 800 --offrate 1 -v 3 transcripts -1 reads_1.fastq -2 reads_2.fastq | express transcripts.fasta </code></pre></li></ol></p>
@@ -265,12 +265,28 @@
    		  <p>The output for eXpress is saved in a file called <tt>results.xprs</tt> in an easy-to-parse tab-delimited format.  Since we did not specify an output directory, it is simply placed in our working directory (<tt>&lt;YOUR_EXPRESS_DIR&gt;/sample_data</tt>). We can view the output for our run using the command:
    		  <ol><li><pre class="sc"><code>$ more results.xprs</code></pre></li></ol></p>
    		  <p>Your results should look identical to this:</p>
+   		  <ol><li><pre class="output"><code>bundle_id       target_id       length  eff_length      bundle_frac     tot_counts      uniq_counts     est_counts      est_counts_var  fpkm    fpkm_conf_low   fpkm_conf_high
+1       NM_018953       1612    1435.345862     0.132919        228     91      210.676950      20.210096       14677.782957    14051.374481    15304.191433
+1       NM_153633       1666    1489.345862     0.243212        762     10      385.490714      286.207200      25883.223229    23611.399087    28155.047370
+1       NM_153693       2072    1895.345862     0.049299        481     5       78.139173       95.923278       4122.686743     3089.203286     5156.170200
+1       NR_003084       1640    1463.345862     0.013535        266     0       21.453309       29.299371       1466.045028     726.248723      2205.841333
+1       NM_014620       2300    2123.345862     0.352532        958     77      558.763369      315.131772      26315.231038    24643.157587    27987.304488
+1       NM_004503       1681    1504.345862     0.208503        384     37      330.476484      73.573120       21968.118688    20827.758922    23108.478454
+2       NM_006897       1541    1364.345862     1.000000        664     664     664.000000      0.000000        48668.011426    48668.011426    48668.011426
+3       NM_017410       2396    2219.345862     1.000000        42      42      42.000000       0.000000        1892.449515     1892.449515     1892.449515
+4       NR_031764       1853    1676.345862     0.176883        1244    16      312.021225      338.894839      18613.177134    16416.840798    20809.513470
+4       NM_001168316    2283    2106.345862     0.290079        1546    11      511.698937      504.771713      24293.205911    22159.926134    26426.485689
+4       NM_174914       2385    2208.345862     0.533038        1737    37      940.279838      632.249048      42578.468077    40301.237557    44855.698597
+5       NM_022658       2288    2111.345862     1.000000        4881    4881    4881.000000     0.000000        231179.556505   231179.556505   231179.556505
+6       NM_173860       849     672.345862      1.000000        962     962     962.000000      0.000000        143081.121548   143081.121548   143081.121548
+7       NM_017409       1959    1782.345862     1.000000        47      47      47.000000       0.000000        2636.974170     2636.974170     2636.974170
+8       NM_014212       2037    1860.345862     1.000000        55      55      55.000000       0.000000        2956.439505     2956.439505     2956.439505</code></pre></li></ol>
    		  <p>While it may be difficult to read in your
         terminal, opening the file with R or Excel should help you to
         visualize the columns.  The most important column is FPKM,
         which reports the estimated abundance in expected
         <b>F</b>ragments <b>P</b>er <b>K</b>ilobase per <b>M</b>illion
-        mapped fragments.  Other fields include the estimated counts (est_counts) and their variance (est_counts_var).  Transcripts are sorted by their bundle_id, which denotes which multi-mapping group the transcript belongs to and can help determine isoforms and gene families.  More details on the output including full descriptions of all columns can be found in the <a href=manual.html>Manual</a>.</p> 
+        mapped fragments.  Other fields include the estimated counts (est_counts) and their variance (est_counts_var).  Transcripts are sorted by their bundle_id, which denotes which multi-mapping group the transcript belongs to and can help determine isoforms and gene families.  More details on the output including full descriptions of all columns can be found in the <a href=manual.html#expr>Manual</a>.</p> 
           		<p>&rarr; <a href="#top">Back to top.</a></p>
           </div> 
           
