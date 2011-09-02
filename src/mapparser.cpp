@@ -125,6 +125,7 @@ BAMParser::BAMParser(BamTools::BamReader* reader)
         if (!_reader->GetNextAlignment(a))
         {
             cerr << "ERROR: Input BAM file contains no valid alignments.\n";
+            exit(1);
         }
     } while(!map_end_from_alignment(a));
 }
@@ -200,6 +201,7 @@ SAMParser::SAMParser(istream* in)
         if (!_in->good())
         {
             cerr << "ERROR: Input SAM file contains no valid alignments.\n";
+            exit(1);
         }
         _in->getline(line_buff, BUFF_SIZE-1, '\n');
     }

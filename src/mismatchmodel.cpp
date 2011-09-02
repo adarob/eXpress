@@ -16,10 +16,10 @@
 using namespace std;
 
 MismatchTable::MismatchTable(double alpha)
-{
-    _first_read_mm = vector<FrequencyMatrix>(MAX_READ_LEN, FrequencyMatrix(16, 4, alpha));
-    _second_read_mm = vector<FrequencyMatrix>(MAX_READ_LEN, FrequencyMatrix(16, 4, alpha));
-}
+: _first_read_mm(MAX_READ_LEN, FrequencyMatrix(16, 4, alpha)),
+  _second_read_mm(MAX_READ_LEN, FrequencyMatrix(16, 4, alpha)),
+  _active(false)
+{}
 
 double MismatchTable::log_likelihood(const FragMap& f) const
 {
