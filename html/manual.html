@@ -271,7 +271,7 @@
  	  <tr><th scope="row">2</th><td>target_id</td><td><tt>NM_016467</tt></td><td>The ID given to the target in the input multi-FASTA file.</td></tr> 
    	  <tr><th scope="row">3</th><td>length</td><td><tt>2182</tt></td><td>The number of base pairs in the target sequence given in the input multi-FASTA file.</td></tr> 
 	  <tr><th scope="row">4</th><td>eff_length</td><td><tt>783.136288</tt></td><td>The effective length of the target taking into account the fragment length distribution and fragment biases. This number is what the fragment counts are normalized by to calculate FPKM, not the true length.</td></tr> 
-   	  <tr><th scope="row">5</th><td>bundle_frac</td><td><tt>0.244977</tt></td><td>The fraction of fragment counts probabilistically assigned to this target out of the total number of fragments mapping to targets in the bundle.</td></tr> 
+   	  <tr><th scope="row">5</th><td>est_bundle_frac</td><td><tt>0.244977</tt></td><td>The estimated fraction of fragment counts probabilistically assigned to this target out of the total number of fragments mapping to targets in the bundle.</td></tr> 
    	  <tr><th scope="row">6</th><td>tot_counts</td><td><tt>99</tt></td><td>The number of fragments mapping (uniquely or ambiguously) to this target.</td></tr> 
    	  <tr><th scope="row">7</th><td>uniq_counts</td><td><tt>7</tt></td><td>The number of fragments uniquely mapping to this target.</td></tr> 
 	  <tr><th scope="row">8</th><td>est_counts</td><td><tt>26.702456</tt></td><td>The estimated number of fragments generated from this target in the sequencing experiment.</td></tr> 
@@ -283,13 +283,8 @@
 	  <p>See the <a href="overview.html#methods">Methods</a> for more details on how these values are calculated.</p>
 	  
       <h2 id="covar">Count Variance-Covariance (varcov.xprs)</h2>
-      <p>This file is produced only when the <tt>--calc-covars</tt> option flag is used as described <a href="#running">above</a>.  The file contains the estimated variances and covariances on the counts between pairs of targets that shared multi-mapped reads, primarily to be used in differential expression analysis.  Each target will be listed with its variance on exactly one line (the target_id will be repeated in the first two columns).  Each pair of targets with a nonzero covariance will be listed on exactly one line of the file.  If a pair of targets is not listed in the file, it has a covariance of 0.  The 3 tab-delimited columns of the file are defined as follows:
-      <table CELLSPACING=15> 
-	  <tr><th class="top" scope="col" width=11%>Column Number</th><th class="top" scope="col" width=17%>Column Name</th><th class="top" scope="col" width=17%>Example</th><th class="top" scope="col" width=55%>Description</th></tr> 
-	  <tr><th scope="row">1</th><td>target_1_id</td><td><tt>NM_001211</tt></td><td>The ID of the first target in the covariance pair (ordering is arbitrary).</td></tr> 
- 	  <tr><th scope="row">2</th><td>target_2_id</td><td><tt>NM_001212</tt></td><td>The ID of the second target in the covariance pair (ordering is arbitrary).  This will be the same as target_1_id if the entry is for a variance.</td></tr> 
-   	  <tr><th scope="row">3</th><td>covar</td><td><tt></tt></td><td>The estimated variance for the single target (if target_1_id==target_2_id) or covariance between the two targets due to uncertatinty in the assignment of multi-mapped reads.</td></tr> 
-	  </table>
+      <p>This file is produced only when the <tt>--calc-covars</tt> option flag is used as described <a href="#running">above</a>.  The file contains the estimated variances and covariances on the counts between pairs of targets that shared multi-mapped reads, primarily to be used in differential expression analysis.  Since the covariance between targets in different bundles is always 0, the full sparse matrix is broken up into smaller matrices for each bundle.  An example of this output for the sample dataset used in the <a href=tutorial.html#example>Tutorial</a> is shown below:</p>
+      <p>Each bundle's matrix is headed by an identifier line that begins with a greater than symbol (<tt>></tt>) followed by the bundle id and a comma-separated list of targets in the bundle.  The ordering of this list provides the indices for the matrix that is to follow.  For example, in the output above, the third value in the second row is the covariance between XXX and XXX.  Notice that this identical value is also in the second column in the third row, as the variance-covariance matrix will always be symmetric.</p>
 	  <p>See the <a href="overview.html#methods">Methods</a> for more details on how these values are calculated.</p> 
 	  		<p>&rarr; <a href="#top">Back to top.</a></p>
         </div> 

@@ -245,6 +245,20 @@ void TranscriptTable::update_covar(TransID trans1, TransID trans2, double covar)
     }
 }
 
+double TranscriptTable::get_covar(TransID trans1, TransID trans2)
+{
+    size_t pair_id = hash_trans_pair(trans1, trans2);
+    if (_covar_map.count(pair_id))
+    {
+        return _covar_map[pair_id];
+    }
+    else
+    {
+        return HUGE_VAL;
+    }
+}
+
+
 TransID TranscriptTable::get_trans_rep(TransID trans)
 {
     return _bundles.find_set(trans);
@@ -342,10 +356,14 @@ void TranscriptTable::output_current(ofstream& runexpr_file)
 }
 
 
-void TranscriptTable::output_results(string output_dir, size_t tot_counts)
+void TranscriptTable::output_results(string output_dir, size_t tot_counts, bool output_varcov)
 {
     FILE * expr_file = fopen((output_dir + "/results.xprs").c_str(), "w");
-    fprintf(expr_file, "bundle_id\ttarget_id\tlength\teff_length\tbundle_frac\ttot_counts\tuniq_counts\test_counts\test_counts_var\tfpkm\tfpkm_conf_low\tfpkm_conf_high\n");
+    ofstream varcov_file;
+    if (output_varcov)
+        varcov_file.open((output_dir + "/varcov.xprs").c_str());    
+    
+    fprintf(expr_file, "bundle_id\ttarget_id\tlength\teff_length\test_bundle_frac\ttot_counts\tuniq_counts\test_counts\test_counts_var\tfpkm\tfpkm_conf_low\tfpkm_conf_high\n");
     double l_bil = log(1000000000.);
     double l_tot_counts = log((double)tot_counts);
 
@@ -364,6 +382,9 @@ void TranscriptTable::output_results(string output_dir, size_t tot_counts)
         ++bundle_id;
         vector<Transcript*> bundle_trans = it->second;
         
+        if (output_varcov)
+            varcov_file << ">" << bundle_id << ": ";
+        
         // Calculate total counts for bundle and bundle-level rho
         size_t bundle_counts = 0;
         double l_bundle_mass = HUGE_VAL;
@@ -371,19 +392,27 @@ void TranscriptTable::output_results(string output_dir, size_t tot_counts)
         {
             bundle_counts += bundle_trans[i]->bundle_counts();
             l_bundle_mass = log_sum(l_bundle_mass, bundle_trans[i]->mass()); 
+            if (output_varcov)
+            {
+                if (i)
+                    varcov_file << ", ";
+                varcov_file << bundle_trans[i]->name();
+            }
         }
+        if (output_varcov)
+            varcov_file << endl;
         
         if (bundle_counts)
         {
             double l_bundle_counts = log((double)bundle_counts);
-            
+            double l_var_renorm = 2*(l_bundle_counts - l_bundle_mass);
             // Calculate individual counts and rhos
             for (size_t i = 0; i < bundle_trans.size(); ++i)
             {
                 Transcript& trans = *bundle_trans[i];
                 double l_trans_frac = trans.mass() - l_bundle_mass;
                 double trans_counts = sexp(l_trans_frac + l_bundle_counts);
-                double l_trans_var = trans.var() + 2*(l_bundle_counts - l_bundle_mass);
+                double l_trans_var = trans.var() + l_var_renorm;
                 double std_dev = sexp(0.5*l_trans_var);
                 double eff_len = trans.est_effective_length();
                 double fpkm_constant = sexp(l_bil - log(eff_len) - l_tot_counts);
@@ -391,6 +420,22 @@ void TranscriptTable::output_results(string output_dir, size_t tot_counts)
                 double fpkm_lo = (trans_counts - 2*std_dev) * fpkm_constant;
                 double fpkm_hi = (trans_counts + 2*std_dev) * fpkm_constant;
                 fprintf(expr_file, "%zu\t%s\t%zu\t%f\t%f\t%zu\t%zu\t%f\t%f\t%f\t%f\t%f\n", bundle_id, trans.name().c_str(), trans.length(), eff_len, sexp(l_trans_frac), trans.tot_counts(), trans.uniq_counts(), trans_counts, sexp(l_trans_var), trans_fpkm, fpkm_lo, fpkm_hi);
+            
+                if (output_varcov)
+                {
+                    for (size_t j = 0; j < bundle_trans.size(); ++j)
+                    {
+                        if (j)
+                            varcov_file << " ";
+                        if (i==j)
+                            varcov_file << scientific << sexp(l_trans_var);
+                        else
+                        {
+                            varcov_file << scientific << -sexp(get_covar(trans.id(), bundle_trans[j]->id()) + l_var_renorm);
+                        }   
+                    }
+                    varcov_file << endl;
+                }
             }
         }
         else
@@ -399,6 +444,17 @@ void TranscriptTable::output_results(string output_dir, size_t tot_counts)
             {
                 Transcript& trans = *bundle_trans[i];
                 fprintf(expr_file, "%zu\t%s\t%zu\t%f\t%f\t%d\t%d\t%f\t%f\t%f\t%f\t%f\n", bundle_id, trans.name().c_str(), trans.length(), trans.effective_length(), 0.0, 0, 0, 0.0, 0.0, 0.0, 0.0, 0.0);
+                
+                if (output_varcov)
+                {
+                    for (size_t j = 0; j < bundle_trans.size(); ++j)
+                    {
+                        if (j)
+                            varcov_file << " ";
+                        varcov_file << scientific << 0.0;
+                    }
+                    varcov_file << endl;
+                }
             }   
         }
 

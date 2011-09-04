@@ -428,6 +428,6 @@ int main (int argc, char ** argv)
     //fld_out.close();
 	//trans_table.output_bundles(output_dir);
     
-	trans_table.output_results(output_dir, tot_counts);
+	trans_table.output_results(output_dir, tot_counts, calc_covar);
     return 0;
 }

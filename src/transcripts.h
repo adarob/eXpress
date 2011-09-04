@@ -353,6 +353,15 @@ public:
     void update_covar(TransID trans1, TransID trans2, double covar);
     
     /**
+     * a member function that returns the covariance between two transcripts
+     * these returned value will be the log of the negative of the true value
+     * @param trans1 one of the transcripts in the pair
+     * @param trans2 the other transcript in the pair
+     * @return the log of the negative of the pair's covariance
+     */
+    double get_covar(TransID trans1, TransID trans2);
+    
+    /**
      * a member function that returns the number of pairs of transcripts with non-zero covariance
      * @return the number of transcript pairs with non-zero covariance
      */
@@ -394,11 +403,12 @@ public:
     
     /**
      * a member function that outputs the final expression data in a file called 'results.xprs'
-     * in the given output directory
+     * and (optionally) the variance-covariance matrix in 'varcov.xprs' in the given output directory
      * @param output_dir the directory to output the expression file to
      * @param tot_counts the total number of observed mapped fragments
+     * @param output_varcov boolean specifying whether to also output the variance-covariance matrix
      */
-    void output_results(std::string output_dir, size_t tot_counts);
+    void output_results(std::string output_dir, size_t tot_counts, bool output_varcov);
     
     // These functions are used to output intermediate values for comparisons and will be deactivated in release
     void output_header(std::ofstream& runexpr_file);
