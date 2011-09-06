@@ -31,9 +31,13 @@
   <meta name="publisher" content="Your publisher infos here" />
   <meta name="copyright" content="Copyright (c) 2011 Adam Roberts" />
   <meta name="author" content="Designed by www.1234.info / Modified: Adam Roberts" />
-  <meta name="distribution" content="global" />
-  <meta name="image" content="http://bio.math.berkeley.edu/eXpress/img/logo.png" />
-  <meta name="description" content="eXpress is a general quantification tool for target DNA/RNA sequences. While its primary use currently is RNA-Seq it has the potential for applications in many other areas including as allele-specific expression and metgenomics. What makes eXpress different is that it is an online (or streaming) algorithm, meaning it only makes one pass through the data. This allows it to be very light-weight and efficient using a constant amount of memory and time linear in the number of sequenced fragments being processed. Furthermore, it accepts piped SAM/BAM input, allowing users to avoid storing extremely large alignment files. eXpress models fragment biases (sequence-specific and positional), fragment lengths, and errors, allowing it to also be one of the most accurate quantification methods available." />
+  <meta property="og:site_name" content="eXpress" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="eXpress &bull; Home" />
+  <meta property="og:url" content="http://bio.math.berkeley.edu/eXpress" />
+  <meta property="og:image" content="http://bio.math.berkeley.edu/eXpress/img/logo.png" />
+  <meta property="og:description" content="eXpress is a general quantification tool for target DNA/RNA sequences. While its primary use currently is RNA-Seq it has the potential for applications in many other areas including as allele-specific expression and metgenomics. What makes eXpress different is that it is an online (or streaming) algorithm, meaning it only makes one pass through the data. This allows it to be very light-weight and efficient using a constant amount of memory and time linear in the number of sequenced fragments being processed. Furthermore, it accepts piped SAM/BAM input, allowing users to avoid storing extremely large alignment files. eXpress models fragment biases (sequence-specific and positional), fragment lengths, and errors, allowing it to also be one of the most accurate quantification methods available." />
+  <meta property="fb:admins" content="adarob" />
   <meta name="keywords" content="RNA-Seq, Genomics, transcript,quantification" />
   <link rel="stylesheet" type="text/css" media="screen,projection,print" href="./css/mf54_reset.css" />
   <link rel="stylesheet" type="text/css" media="screen,projection,print" href="./css/mf54_grid.css" />
@@ -125,9 +129,9 @@
         <li><a href="#">Download<!--[if IE 7]><!--></a><!--<![endif]-->
           <!--[if lte IE 6]><table><tr><td><![endif]-->
             <ul>
-              <li><a href=downloads/express-0.9.0/express-0.9.0-src.tgz onClick="_gaq.push(['_trackEvent', 'Downloads', 'Source', 'home-menu']);">Source</a></li>
-              <li><a href=downloads/express-0.9.0/express-0.9.0-macosx_x86_64.tgz onClick="_gaq.push(['_trackEvent', 'Downloads', 'Mac', 'home-menu']);">Mac OS X (64-bit)</a></li>
-              <li><a href=downloads/express-0.9.0/express-0.9.0-linux_x86_64.tgz onClick="_gaq.push(['_trackEvent', 'Downloads', 'Linux', 'home-menu']);">Linux (64-bit)</a></li>
+              <li><a href=downloads/express-0.9.1/express-0.9.1-src.tgz onClick="_gaq.push(['_trackEvent', 'Downloads', 'Source', 'home-menu']);">Source</a></li>
+              <li><a href=downloads/express-0.9.1/express-0.9.1-macosx_x86_64.tgz onClick="_gaq.push(['_trackEvent', 'Downloads', 'Mac', 'home-menu']);">Mac OS X (64-bit)</a></li>
+              <li><a href=downloads/express-0.9.1/express-0.9.1-linux_x86_64.tgz onClick="_gaq.push(['_trackEvent', 'Downloads', 'Linux', 'home-menu']);">Linux (64-bit)</a></li>
             </ul>
           <!--[if lte IE 6]></td></tr></table></a><![endif]-->
         </li>
@@ -155,11 +159,12 @@
         <div class="corner-content-1col-top"></div>                        
         <div class="content-1col-nobox">
           <h1>News</h1>
-		  <h2>09.01.2011 &bull; eXpress 0.9.0 BETA release</h2>
+           <h2>09.XX.2011 &bull; eXpress 0.9.1 BETA released</h2>
+          <p>Minor updates to output, including output for the variance-covariance matrix.</p>
+		  <h2>09.01.2011 &bull; eXpress 0.9.0 BETA released</h2>
           <p>We are pleased to announce the release of the first public beta of
       eXpress! The software is freely available under the <a href=http://www.opensource.org>OSI</a>-approved <a href=http://www.opensource.org/licenses/artistic-license-2.0.php>Artistic License 2.0</a>.  
-      <br /><br />Please send us any comments, suggestions, and bug fixes to <a href=mailto:ask.xprs@gmail.com>ask.xprs@gmail.com</a>.
- </p>
+      <br /><br />Please send us any comments, suggestions, and bug fixes to <a href=mailto:ask.xprs@gmail.com>ask.xprs@gmail.com</a>.</p>
           </div> 
         <div class="corner-content-1col-bottom"></div>                               
       </div>
@@ -170,27 +175,18 @@
          <!-- SUBCONTENT CELL -->
         <div class="corner-subcontent-top"></div>                        
         <div class="subcontent-box">
-          <h1>Current Release</h1>                    
-          <h5>eXpress 0.9.0 BETA</h5>
-          <p>First public beta release.
-          <br />&rarr; <a href="downloads/express-0.9.0/express-0.9.0-src.tgz" onClick="_gaq.push(['_trackEvent', 'Downloads', 'Source', 'home-side']);">Source</a>
-          <br />&rarr; <a href="downloads/express-0.9.0/express-0.9.0-macosx_x86_64.tgz" onClick="_gaq.push(['_trackEvent', 'Downloads', 'Mac', 'home-side']);">Mac OS X (64-bit) Binary</a>
-          <br />&rarr; <a href="downloads/express-0.9.0/express-0.9.0-linux_x86_64.tgz" onClick="_gaq.push(['_trackEvent', 'Downloads', 'Linux', 'home-side']);">Linux (64-bit) Binary</a>
+          <h1>Download</h1>                    
+          <h5>Current Release</h5>
+          <p>eXpress 0.9.1 BETA
+          <br />&rarr; <a href="downloads/express-0.9.1/express-0.9.1-src.tgz" onClick="_gaq.push(['_trackEvent', 'Downloads', 'Source', 'home-side']);">Source</a>
+          <br />&rarr; <a href="downloads/express-0.9.1/express-0.9.1-macosx_x86_64.tgz" onClick="_gaq.push(['_trackEvent', 'Downloads', 'Mac', 'home-side']);">Mac OS X (64-bit) Binary</a>
+          <br />&rarr; <a href="downloads/express-0.9.1/express-0.9.1-linux_x86_64.tgz" onClick="_gaq.push(['_trackEvent', 'Downloads', 'Linux', 'home-side']);">Linux (64-bit) Binary</a>
+          <h5>Previous Versions</h5>
+          <p>&rarr; <a href="downloads" onClick="_gaq.push(['_trackEvent', 'Downloads', 'Previous']);">View All</a>
+
+          
         </div>  
         <div class="corner-subcontent-bottom"></div>
-      
-        <!-- SUBCONTENT CELL 
-        <div class="corner-subcontent-top"></div>                        
-        <div class="subcontent-box">
-          <h1>Previous Versions</h1>                    
-          <h5>eXpress 0.8.0</h5>
-          <p>Released: 15.05.2006<br />OK for operational use.<br />&rarr; <a href="http://www.1234.info/webtemplates/multiflex1/">Download Source</a></p>
-          <h5>eXpress 0.5.0</h5>
-          <p>Released: 08.06.2006<br />OK for operational use.<br />&rarr; <a href="http://www.1234.info/webtemplates/multiflex2/">Download Source</a></p>
-        </div> 
-        <div class="corner-subcontent-bottom"></div>
-        
-        -->
 
 	<!-- SUBCONTENT CELL -->
         <div class="corner-subcontent-top"></div>                        

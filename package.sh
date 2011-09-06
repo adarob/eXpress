@@ -48,6 +48,8 @@ cp LICENSE html/downloads/express-$VERSION/$SRC/LICENSE
 cp -r sample_data html/downloads/express-$VERSION/$SRC/sample_data
 cp html/doc/express-doc.pdf html/downloads/express-$VERSION/$SRC
 
+find . -name '*.DS_Store' -type f -delete
+
 #Tar download directories
 cd html/downloads/express-$VERSION
 tar -czf $MAC.tgz $MAC 

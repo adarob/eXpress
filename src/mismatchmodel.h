@@ -34,6 +34,11 @@ class MismatchTable
     std::vector<FrequencyMatrix> _second_read_mm;
     
     /**
+     * a size_t storing the maximum observed read length
+     */
+    size_t _max_len;
+    
+    /**
      * a boolean specifying whether or not the table values should be used return a log-likelihood 
      */
     bool _active;
@@ -77,9 +82,9 @@ public:
      * a member function that outputs the final model parameters in a tab-separated file
      * the file has 1 row for each read position and the parameters are in columns indexed 
      * as (ref, prev, obs) in base 4 with A,C,G,T encoded as 0,1,2,3.
-     * @param filename to write the file to
+     * @param file stream to append to
      */
-    void output(std::string filename);
+    void append_output(std::ofstream& outfile) const;
 };
 
 #endif

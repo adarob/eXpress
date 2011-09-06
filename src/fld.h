@@ -88,6 +88,11 @@ public:
      */ 
     std::string to_string() const;
 
+    /**
+     * a member function that appends the FLD parameters to the end of the given file
+     * @param outfile the file to append to
+     */ 
+    void append_output(std::ofstream& outfile) const;
 };
 
 #endif

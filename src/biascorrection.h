@@ -80,6 +80,14 @@ public:
      * @return the string representation of the positional nucleotide probabilities
      */
     std::string to_string() const;
+    
+    /**
+     * a member function that outputs the positional nucleotide probabilities in matrix format with nucleotides (A,C,G,T) as
+     * rows and window position as columns
+     * @param outfile the file to append to
+     */
+    void append_output(std::ofstream& outfile) const;
+
 };
 
 /**
@@ -178,6 +186,14 @@ public:
      */
     double get_weight(size_t l, size_t p) const;
 
+    
+    /**
+     * a member function that outputs the fractional position probabilities in matrix format with length bins
+     * as rows and fractional position bins as columns
+     * @param outfile the file to append to
+     */
+    void append_output(std::ofstream& outfile) const;
+    
 };
 
 /**
@@ -249,6 +265,12 @@ public:
      * @return the string representation of the observed probabilities
      */
     std::string to_string() const;
+    
+    /**
+     * a member function that outputs the positional and sequence-specific bias parameter matrices
+     * @param outfile the file to append to
+     */
+    void append_output(std::ofstream& outfile) const;
 };
 
 

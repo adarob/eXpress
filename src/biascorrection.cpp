@@ -82,6 +82,26 @@ string SeqWeightTable::to_string() const
     return s;
 }
 
+void SeqWeightTable::append_output(ofstream& outfile) const
+{
+    for(int i = 0; i < WINDOW; i++)
+    {
+        outfile << "\t" << setw(12) << i-CENTER;
+    }
+    outfile << endl;
+    
+    boost::mutex::scoped_lock lock(_lock);
+    for(size_t j = 0; j < NUM_NUCS; j++)
+    {
+        outfile << NUCS[j] << ":\t";
+        for(size_t i = 0; i < WINDOW; i++)
+        {
+            outfile << scientific << sexp(_observed(i,j)) << "\t";
+        }
+        outfile<<endl;
+    }
+}
+
 PosWeightTable::PosWeightTable(const vector<size_t>& len_bins, const vector<double>& pos_bins, double alpha)
 :_observed(FrequencyMatrix(len_bins.size(), pos_bins.size(),alpha)),
  _expected(FrequencyMatrix(len_bins.size(), pos_bins.size(),0)),
@@ -127,6 +147,34 @@ double PosWeightTable::get_weight(size_t l, size_t p) const
 {
     boost::mutex::scoped_lock lock(_lock);
     return _observed(l,p)-_expected(l,p);
+}
+
+void PosWeightTable::append_output(ofstream& outfile) const
+{
+    char buff[200];
+    
+    sprintf(buff, "\t%0.2f-%0.2f", 0.0, pos_bins()[0]);
+    outfile << buff;
+    for(size_t p = 1; p < pos_bins().size(); p++)
+    {
+        sprintf(buff, "\t%0.2f-%0.2f", pos_bins()[p-1], pos_bins()[p]);
+        outfile << buff;
+    }
+    outfile << endl;
+
+    boost::mutex::scoped_lock lock(_lock);
+    sprintf(buff, "%zu-%zu:\t", 0, len_bins()[0]);
+    for(size_t l = 0; l < len_bins().size(); l++)
+    {
+        if(l)
+            sprintf(buff, "%zu-%zu:\t", len_bins()[l-1]+1, len_bins()[l]);
+        outfile << buff;
+        for(size_t p = 0; p < pos_bins().size(); p++)
+        {
+            outfile << scientific << sexp(_observed(l,p)) << "\t";
+        }
+        outfile<<endl;
+    }
 }
 
 BiasBoss::BiasBoss(double alpha)
@@ -231,4 +279,15 @@ string BiasBoss::to_string() const
     return _5_seq_bias.to_string();
 }
 
+void BiasBoss::append_output(ofstream& outfile) const
+{
+    outfile<<">5' Sequence-Specific Bias\n";
+    _5_seq_bias.append_output(outfile);
+    outfile<<">3' Sequence-Specific Bias\n";
+    _3_seq_bias.append_output(outfile);
+    outfile<<">5' Fractional Position Bias\n";
+    _5_pos_bias.append_output(outfile);
+    outfile<<">3' Fractional Position Bias\n";
+    _3_pos_bias.append_output(outfile);
+}
 

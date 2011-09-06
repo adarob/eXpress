@@ -88,3 +88,9 @@ string FLD::to_string() const
     s.erase(s.length()-1,1);
     return s;
 }
+
+void FLD::append_output(ofstream& outfile) const
+{
+    outfile << ">Fragment Length Distribution (0-" << max_val() << ")\n";
+    outfile << to_string() << endl;
+}

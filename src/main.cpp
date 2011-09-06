@@ -422,6 +422,7 @@ int main (int argc, char ** argv)
 
 	cout << "Writing results to file...\n";
     
+    
     //mismatch_table->output(output_dir);
     //ofstream fld_out((output_dir + "/fld.out").c_str());
     //fld_out << fld.to_string() << '\n';
@@ -429,5 +430,13 @@ int main (int argc, char ** argv)
 	//trans_table.output_bundles(output_dir);
     
 	trans_table.output_results(output_dir, tot_counts, calc_covar);
+    ofstream paramfile((output_dir + "/params.xprs").c_str());
+    fld.append_output(paramfile);
+    if (mismatch_table)
+        mismatch_table->append_output(paramfile);
+    if (bias_table)
+        bias_table->append_output(paramfile);
+    paramfile.close();
+        
     return 0;
 }

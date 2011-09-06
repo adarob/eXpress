@@ -221,7 +221,7 @@
 		  <tr><td VALIGN=top nowrap> 
 		  <tt>--calc-covar</tt> 
 		  </td><td VALIGN=top> 
-		  With this option, eXpress calculates the covariance between targets and outputs them for use in differential expreession analysis. This calculates requires slightly more time and memory.
+		  With this option, eXpress calculates the covariance between targets and outputs them for use in differential expreession analysis. This calculation requires slightly more time and memory.
 		  </td></tr>
 		  
   		  </table></p>
@@ -271,14 +271,13 @@
  	  <tr><th scope="row">2</th><td>target_id</td><td><tt>NM_016467</tt></td><td>The ID given to the target in the input multi-FASTA file.</td></tr> 
    	  <tr><th scope="row">3</th><td>length</td><td><tt>2182</tt></td><td>The number of base pairs in the target sequence given in the input multi-FASTA file.</td></tr> 
 	  <tr><th scope="row">4</th><td>eff_length</td><td><tt>783.136288</tt></td><td>The effective length of the target taking into account the fragment length distribution and fragment biases. This number is what the fragment counts are normalized by to calculate FPKM, not the true length.</td></tr> 
-   	  <tr><th scope="row">5</th><td>est_bundle_frac</td><td><tt>0.244977</tt></td><td>The estimated fraction of fragment counts probabilistically assigned to this target out of the total number of fragments mapping to targets in the bundle.</td></tr> 
-   	  <tr><th scope="row">6</th><td>tot_counts</td><td><tt>99</tt></td><td>The number of fragments mapping (uniquely or ambiguously) to this target.</td></tr> 
-   	  <tr><th scope="row">7</th><td>uniq_counts</td><td><tt>7</tt></td><td>The number of fragments uniquely mapping to this target.</td></tr> 
-	  <tr><th scope="row">8</th><td>est_counts</td><td><tt>26.702456</tt></td><td>The estimated number of fragments generated from this target in the sequencing experiment.</td></tr> 
-  	  <tr><th scope="row">9</th><td>est_counts_var</td><td><tt>28.09047</tt></td><td>The estimated variance on the number of fragments generated from this target in the sequencing experiment due to uncertainty in assignment of multi-mapped reads.</td></tr> 
-   	  <tr><th scope="row">10</th><td>fpkm</td><td><tt>3.514176</tt></td><td>The estimated relative abundance of this target in the sample in units of <b>f</b>ragments <b>p</b>er <b>k</b>ilobase per <b>m</b>illion sequenced. This value is proportional to est_counts divided by eff_length.</td></tr> 
-   	  <tr><th scope="row">11</th><td>fpkm_conf_low</td><td><tt>2.119151</tt></td><td>The lower bound of the 95% confidence interval for the FPKM.</td></tr> 
-   	  <tr><th scope="row">12</th><td>fpkm_conf_high</td><td><tt>4.909200</tt></td><td>The upper bound of the 95% confidence interval for the FPKM.</td></tr> 
+   	  <tr><th scope="row">5</th><td>tot_counts</td><td><tt>99</tt></td><td>The number of fragments mapping (uniquely or ambiguously) to this target.</td></tr> 
+   	  <tr><th scope="row">6</th><td>uniq_counts</td><td><tt>7</tt></td><td>The number of fragments uniquely mapping to this target.</td></tr> 
+	  <tr><th scope="row">7</th><td>est_counts</td><td><tt>26.702456</tt></td><td>The estimated number of fragments generated from this target in the sequencing experiment.</td></tr> 
+  	  <tr><th scope="row">8</th><td>est_counts_var</td><td><tt>28.09047</tt></td><td>The estimated variance on the number of fragments generated from this target in the sequencing experiment due to uncertainty in assignment of multi-mapped reads.</td></tr> 
+   	  <tr><th scope="row">9</th><td>fpkm</td><td><tt>3.514176</tt></td><td>The estimated relative abundance of this target in the sample in units of <b>f</b>ragments <b>p</b>er <b>k</b>ilobase per <b>m</b>illion sequenced. This value is proportional to est_counts divided by eff_length.</td></tr> 
+   	  <tr><th scope="row">10</th><td>fpkm_conf_low</td><td><tt>2.119151</tt></td><td>The lower bound of the 95% confidence interval for the FPKM.</td></tr> 
+   	  <tr><th scope="row">11</th><td>fpkm_conf_high</td><td><tt>4.909200</tt></td><td>The upper bound of the 95% confidence interval for the FPKM.</td></tr> 
 	  </table></p>
 	  <p>See the <a href="overview.html#methods">Methods</a> for more details on how these values are calculated.</p>
 	  

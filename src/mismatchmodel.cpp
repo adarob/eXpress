@@ -18,7 +18,8 @@ using namespace std;
 MismatchTable::MismatchTable(double alpha)
 : _first_read_mm(MAX_READ_LEN, FrequencyMatrix(16, 4, alpha)),
   _second_read_mm(MAX_READ_LEN, FrequencyMatrix(16, 4, alpha)),
-  _active(false)
+  _active(false),
+  _max_len(0)
 {}
 
 double MismatchTable::log_likelihood(const FragMap& f) const
@@ -105,6 +106,8 @@ void MismatchTable::update(const FragMap& f, double mass)
         }
         prev = ref;
     }
+    
+    _max_len = max(_max_len, max(f.seq_l.length(), f.seq_r.length())); 
 }
 
 string MismatchTable::to_string() const
@@ -141,14 +144,23 @@ string MismatchTable::to_string() const
     return s;
 }
 
-void MismatchTable::output(string path)
+void MismatchTable::append_output(ofstream& outfile) const
 {
-    string filename = path + "/mismatch_probs.tab";
-    ofstream outfile(filename.c_str());
-    
-    outfile<<"First Read\n";
-    for(size_t k = 0; k < MAX_READ_LEN; k++)
+    string col_header =  "\t";
+    for(size_t i = 0; i < 64; i++)
     {
+        col_header += NUCS[i>>4];
+        col_header += NUCS[i>>2 & 0b11]; 
+        col_header += "->*";
+        col_header += NUCS[i & 0b11];
+        col_header += '\t';
+    }
+    col_header[col_header.length()-1] = '\n';
+    
+    outfile<<">First Read Mismatch\n" << col_header;
+    for(size_t k = 0; k < _max_len; k++)
+    {
+        outfile << k << ":\t";
         for(size_t i = 0; i < 16; i++)
         {
             for (size_t j = 0; j < 4; j++)
@@ -156,13 +168,14 @@ void MismatchTable::output(string path)
                 outfile << scientific << sexp(_first_read_mm[k](i,j))<<"\t";
             }
         }
-        outfile<<"\n";
+        outfile<<endl;
     }
 
     
-    outfile<<"Second Read\n";
-    for(size_t k = 0; k < MAX_READ_LEN; k++)
+    outfile<<">Second Read Mismatch\n" << col_header;
+    for(size_t k = 0; k < _max_len; k++)
     {
+        outfile << k << ":\t";
         for(size_t i = 0; i < 16; i++)
         {
             for (size_t j = 0; j < 4; j++)
@@ -170,6 +183,6 @@ void MismatchTable::output(string path)
                 outfile << scientific << sexp(_second_read_mm[k](i,j))<<"\t";
             }
         }
-        outfile<<"\n";
+        outfile<<endl;
     }
 }

@@ -29,6 +29,11 @@ const size_t MAX_READ_LEN = 200;
 const int NUM_NUCS = 4;
 
 /**
+ * a global specifying the nucleotide ordering
+ */
+const char NUCS[] = {'A','C','G','T'};
+
+/**
  * global function to calculate the log of the sum of 2 logged values efficiently
  * log(0) == HUGE_VAL
  * @param x a double for the first logged value in the sum
