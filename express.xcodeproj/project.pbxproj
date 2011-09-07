@@ -19,6 +19,7 @@
 		0A60597513A170AD00B5C9BA /* libboost_filesystem.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A60597413A170AD00B5C9BA /* libboost_filesystem.a */; };
 		0A60597713A1753B00B5C9BA /* libboost_system.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A60597613A1753B00B5C9BA /* libboost_system.a */; };
 		0A995CE01416C7A30078C37A /* bundles.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0A995CDF1416C7A30078C37A /* bundles.cpp */; };
+		0A995CE7141814A30078C37A /* fragmasstable.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0A995CE6141814A30078C37A /* fragmasstable.cpp */; };
 		0AD5968913FF20C700EEBDD7 /* mapparser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0AD5968813FF20C700EEBDD7 /* mapparser.cpp */; };
 		0ADF037D140C66D500D16BBE /* libbamtools.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0ADF037C140C66D500D16BBE /* libbamtools.a */; };
 /* End PBXBuildFile section */
@@ -59,6 +60,8 @@
 		0A60597613A1753B00B5C9BA /* libboost_system.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libboost_system.a; path = ../../../../../../opt/local/lib/libboost_system.a; sourceTree = "<group>"; };
 		0A995CDF1416C7A30078C37A /* bundles.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = bundles.cpp; sourceTree = "<group>"; };
 		0A995CE11416C7B50078C37A /* bundles.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = bundles.h; sourceTree = "<group>"; };
+		0A995CE51418148C0078C37A /* fragmasstable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = fragmasstable.h; sourceTree = "<group>"; };
+		0A995CE6141814A30078C37A /* fragmasstable.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = fragmasstable.cpp; sourceTree = "<group>"; };
 		0AD5968713FF20B900EEBDD7 /* mapparser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mapparser.h; sourceTree = "<group>"; };
 		0AD5968813FF20C700EEBDD7 /* mapparser.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = mapparser.cpp; sourceTree = "<group>"; };
 		0ADF037C140C66D500D16BBE /* libbamtools.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libbamtools.a; path = ../../../../../../usr/local/lib/bamtools/libbamtools.a; sourceTree = "<group>"; };
@@ -116,6 +119,8 @@
 				0A5C7631136F2EF10095365C /* frequencymatrix.h */,
 				0A5C7632136F2EF10095365C /* main.cpp */,
 				0A5C7633136F2EF10095365C /* main.h */,
+				0A995CE51418148C0078C37A /* fragmasstable.h */,
+				0A995CE6141814A30078C37A /* fragmasstable.cpp */,
 				0A5C7634136F2EF10095365C /* mismatchmodel.cpp */,
 				0A5C7635136F2EF10095365C /* mismatchmodel.h */,
 				0A5C7636136F2EF10095365C /* transcripts.cpp */,
@@ -187,6 +192,7 @@
 				0A5C763E136F2EF10095365C /* transcripts.cpp in Sources */,
 				0AD5968913FF20C700EEBDD7 /* mapparser.cpp in Sources */,
 				0A995CE01416C7A30078C37A /* bundles.cpp in Sources */,
+				0A995CE7141814A30078C37A /* fragmasstable.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -36,8 +36,10 @@ _avg_bias(0),
 _fld(fld),
 _bias_table(bias_table),
 _mismatch_table(mismatch_table)
-{   _ub_eff_len = est_effective_length();
-    _mass = log(_ub_eff_len*alpha); }
+{   
+    _ub_eff_len = est_effective_length();
+    _mass = log(_ub_eff_len*alpha); 
+}
 
 void Transcript::add_mass(double p, double mass) 
 { 
@@ -140,8 +142,9 @@ void Transcript::update_transcript_bias()
     _avg_bias = _bias_table->get_transcript_bias(_start_bias, _end_bias, *this);
 }
 
-TranscriptTable::TranscriptTable(const string& trans_fasta_file, double alpha, const FLD* fld, BiasBoss* bias_table, const MismatchTable* mismatch_table)
-: _alpha(alpha)
+TranscriptTable::TranscriptTable(const string& trans_fasta_file, double alpha, const FLD* fld, FragMassTable* fmt, BiasBoss* bias_table, const MismatchTable* mismatch_table)
+: _alpha(alpha),
+  _bundle_table(fmt)
 {
     cout << "Loading target sequences from " << trans_fasta_file << "...\n\n";
     ifstream infile (trans_fasta_file.c_str());

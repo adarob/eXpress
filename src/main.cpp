@@ -6,9 +6,10 @@
 //  Copyright 2011 Adam Roberts. All rights reserved.
 //
 
+//TODO: Covariance bundle renorm
+//TODO: Directional
 //TODO: Speed up mismatch model?
 //TODO: Speed up bias initialization (using non-logged values)
-//TODO: Ouptut covariances
 
 //#include <boost/math/distributions/geometric.hpp>
 #include <boost/filesystem.hpp>
@@ -17,6 +18,7 @@
 #include <iostream>
 #include <fstream>
 #include "main.h"
+#include "fragmasstable.h"
 #include "transcripts.h"
 #include "bundles.h"
 #include "fld.h"
@@ -62,8 +64,6 @@ bool vis = false;
 bool output_running = false;
 Direction direction = BOTH;
 
-//bool in_between = false;
-
 bool running = true;
 vector<double> mass_table;
 vector<double> cum_mass_table;
@@ -86,7 +86,6 @@ bool parse_options(int ac, char ** av)
     hidden.add_options()
     ("no-bias-correct","")
     ("no-error-model","")
-      //    ("in-between","")
     ("visualizer-output,v","")
     ("output-running","")
     ("forget-param,f", po::value<double>(&ff_param)->default_value(0.7),"")
@@ -152,7 +151,6 @@ bool parse_options(int ac, char ** av)
     calc_covar = vm.count("calc-covar");
     bias_correct = !(vm.count("no-bias-correct"));
     error_model = !(vm.count("no-error-model"));
-    //  in_between = vm.count("in-between");
     vis = vm.count("visualizer-output");
     output_running = vm.count("output-running");
     
@@ -187,7 +185,7 @@ void process_fragment(Fragment* frag_p, FLD* fld, BiasBoss* bias_table, Mismatch
     // maps to a single location
     {
         
-        double mass_n = mass_table[bundle->counts()];
+        double mass_n = bundle->next_frag_mass();
         
         const FragMap& m = *frag.maps()[0];
         Transcript* t  = m.mapped_trans;
@@ -222,7 +220,7 @@ void process_fragment(Fragment* frag_p, FLD* fld, BiasBoss* bias_table, Mismatch
         bundle = trans_table->merge_bundles(bundle, frag.maps()[i]->mapped_trans->bundle());
     }
     
-    double mass_n = mass_table[bundle->counts()];
+    double mass_n = bundle->next_frag_mass();
     
     // calculate marginal likelihoods
     vector<double> likelihoods(frag.num_maps());
@@ -292,7 +290,7 @@ void process_fragment(Fragment* frag_p, FLD* fld, BiasBoss* bias_table, Mismatch
  * @param mismatch_table pointer to the erorr model table
  * @return the total number of fragments processed
  */
-size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TranscriptTable* trans_table, FLD* fld, BiasBoss* bias_table, MismatchTable* mismatch_table)
+size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TranscriptTable* trans_table, FLD* fld, FragMassTable* fmt, BiasBoss* bias_table, MismatchTable* mismatch_table)
 {
     cout << "Processing input fragment alignments...\n";
     
@@ -302,8 +300,6 @@ size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TranscriptTable* 
     boost::thread parse(&ThreadedMapParser::threaded_parse, &map_parser, &ts, trans_table);
     
     size_t n = 0;
-    size_t fake_n = 0;
-    double mass_n = 0;
     
     // For outputting rhos on log scale
     int m = 0;
@@ -315,14 +311,7 @@ size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TranscriptTable* 
         trans_table->output_header(running_expr_file);    
     }
     
-    // Geometric distribution used for 'in-between' tests
-    //srand ( time(NULL) );
-    //boost::math::geometric geom(.00002);
     cout << setiosflags(ios::left);
-    
-    mass_table.push_back(0);
-    cum_mass_table.push_back(HUGE_VAL);
-    cum_mass_table.push_back(0);
     
     while(true)
     {
@@ -374,16 +363,7 @@ size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TranscriptTable* 
         
         
         // Update mass_n based on forgetting factor
-        //int k = (in_between) ? quantile(geom, rand()/double(RAND_MAX)) : 1;
-        //for (int j = 0; j < k; ++j)
-        //{
-            if (++fake_n > 1)
-            {
-                mass_n += ff_param*log((double)fake_n-1) - log(pow(fake_n,ff_param) - 1);
-                mass_table.push_back(mass_n);
-                cum_mass_table.push_back(log_sum(cum_mass_table.back(), mass_n));
-            }
-        //}
+        fmt->next_frag_mass();
         process_fragment(frag, fld, bias_table, mismatch_table, trans_table);
     }
     
@@ -426,12 +406,13 @@ int main (int argc, char ** argv)
     }
             
     FLD fld(fld_alpha, def_fl_max, def_fl_mean, def_fl_stddev);
+    FragMassTable fmt(ff_param); 
     BiasBoss* bias_table = (bias_correct) ? new BiasBoss(bias_alpha):NULL;
     MismatchTable* mismatch_table = (error_model) ? new MismatchTable(mm_alpha):NULL;
     ThreadedMapParser map_parser(sam_file_name);
-    TranscriptTable trans_table(fasta_file_name, expr_alpha, &fld, bias_table, mismatch_table);
+    TranscriptTable trans_table(fasta_file_name, expr_alpha, &fld, &fmt, bias_table, mismatch_table);
 
-    size_t tot_counts = threaded_calc_abundances(map_parser, &trans_table, &fld, bias_table, mismatch_table);
+    size_t tot_counts = threaded_calc_abundances(map_parser, &trans_table, &fld, &fmt, bias_table, mismatch_table);
 
 	cout << "Writing results to file...\n";
     

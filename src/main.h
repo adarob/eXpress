@@ -1,4 +1,4 @@
-#ifndef MAIN_H
+    #ifndef MAIN_H
 #define MAIN_H
 //
 //  main.h
@@ -20,9 +20,6 @@ enum Direction{ BOTH, FR, RF };
 
 extern Direction direction;
 
-extern std::vector<double> mass_table;
-extern std::vector<double> cum_mass_table;
-
 /**
  * a global bool that is true when processing is still occuring
  * this is primarily used to notify the bias update thread to stop
@@ -43,7 +40,6 @@ const size_t NUM_NUCS = 4;
  * a global specifying the nucleotide ordering
  */
 const char NUCS[] = {'A','C','G','T'};
-
 
 /**
  * global function to calculate the log of the sum of 2 logged values efficiently

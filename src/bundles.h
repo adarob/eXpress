@@ -14,19 +14,28 @@
 
 
 class Transcript;
+class FragMassTable;
 
 class Bundle
 {
     std::vector<Transcript*> _transcripts;     
     double _mass;
     size_t _counts;
-
+    size_t _n;
+    size_t _next_frag_mass;
+    FragMassTable* _fmt;
+    
 public:
-    Bundle(Transcript* trans);
-    void renormalize_transcripts(double new_bundle_mass);
+    Bundle(Transcript* trans, FragMassTable* fmt);
+    
+    double next_frag_mass();
+    void next_frag_mass(double m) { _next_frag_mass = m; }
+    void n(size_t n) { _n = n; }
+    
+    void renormalize_transcripts(double norm_const);
     void add_mass(double mass);
     void incr_counts(size_t incr_amt=1);
-
+    
     size_t size() const { return _transcripts.size(); }
     std::vector<Transcript*>& transcripts() { return _transcripts; }
     double mass() const { return _mass; }
@@ -39,8 +48,10 @@ typedef boost::unordered_set<Bundle*> BundleSet;
 class BundleTable
 {
     BundleSet _bundles;
+    FragMassTable* _fmt;
 
 public:
+    BundleTable(FragMassTable* fmt);
     ~BundleTable();
     const BundleSet bundles() const { return _bundles; }
     size_t size() const { return _bundles.size(); }

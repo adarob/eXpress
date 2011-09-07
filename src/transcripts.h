@@ -22,6 +22,7 @@
 #include "main.h"
 
 class FLD;
+class FragMassTable;
 class FragMap;
 class BiasBoss;
 class MismatchTable;
@@ -319,7 +320,7 @@ public:
      * @param bias_table a pointer to the global BiasBoss object
      * @param mismatch_table a pointer to the global MismatchTable object
      */
-    TranscriptTable(const std::string& trans_fasta_file, double alpha, const FLD* fld, BiasBoss* bias_table, const MismatchTable* mismatch_table);
+    TranscriptTable(const std::string& trans_fasta_file, double alpha, const FLD* fld, FragMassTable* fmt, BiasBoss* bias_table, const MismatchTable* mismatch_table);
     
     /**
      * TranscriptTable Destructor

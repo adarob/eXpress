@@ -6,27 +6,39 @@
 //  Copyright 2011 Adam Roberts. All rights reserved.
 //
 
+#include "fragmasstable.h"
 #include "transcripts.h"
 #include "bundles.h"
 #include "main.h"
 
 using namespace std;
 
-Bundle::Bundle(Transcript* trans)
+Bundle::Bundle(Transcript* trans, FragMassTable* fmt)
 : _mass(trans->mass()),
-  _counts(trans->tot_counts())
+  _counts(trans->tot_counts()),
+  _n(0),
+  _next_frag_mass(0.0),
+  _fmt(fmt)    
 { _transcripts.push_back(trans); }
 
-void Bundle::renormalize_transcripts(double new_bundle_mass)
+double Bundle::next_frag_mass()
 {
-    double l_mass_renorm = new_bundle_mass - mass();
-    double l_var_renorm = 2*(new_bundle_mass - mass());
+    double frag_mass = _next_frag_mass;
+    _next_frag_mass = _fmt->next_frag_mass(++_n, frag_mass);
+    return frag_mass;
+}
+
+void Bundle::renormalize_transcripts(double mass_norm_const)
+{
+    double var_norm_const = 2*(mass_norm_const);
     
     foreach(Transcript* trans, transcripts())
     {
-        trans->mass(trans->mass() + l_mass_renorm);
-        trans->var(trans->var() + l_var_renorm);
+        trans->mass(trans->mass() + mass_norm_const);
+        trans->var(trans->var() + var_norm_const);
     }
+    
+    //Still need to do covars!
 }
 
 void Bundle::add_mass(double mass)
@@ -39,6 +51,9 @@ void Bundle::incr_counts(size_t incr_amt)
     _counts += incr_amt;
 }
 
+BundleTable::BundleTable(FragMassTable* fmt)
+: _fmt(fmt) {}
+
 BundleTable::~BundleTable()
 {
     foreach(Bundle* b, _bundles)
@@ -49,7 +64,7 @@ BundleTable::~BundleTable()
 
 Bundle* BundleTable::create_bundle(Transcript* trans)
 {
-    Bundle* b = new Bundle(trans);
+    Bundle* b = new Bundle(trans, _fmt);
     _bundles.insert(b);
     return b;
 }
@@ -65,11 +80,16 @@ Bundle* BundleTable::merge(Bundle* b1, Bundle* b2)
     double new_bundle_counts = b1->counts() + b2->counts();
     if (new_bundle_counts)
     {
-        double new_bundle_mass = cum_mass_table[new_bundle_counts];
-        b1->renormalize_transcripts(new_bundle_mass);
-        b2->renormalize_transcripts(new_bundle_mass);
+        double new_bundle_mass;
+        double new_frag_mass;
+        size_t new_n = _fmt->nearest_stored_mass(new_bundle_counts, new_frag_mass, new_bundle_mass);
+        double norm_const = new_bundle_mass - log_sum(b1->mass(), b2->mass());
+        b1->renormalize_transcripts(norm_const);
+        b2->renormalize_transcripts(norm_const);
         b1->incr_counts(b2->counts());
         b1->mass(new_bundle_mass);
+        b1->n(new_n);
+        b1->next_frag_mass(new_frag_mass);
     }
     else
     {
