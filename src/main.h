@@ -11,6 +11,7 @@
 #include <cmath>
 #include <cassert>
 #include <algorithm>
+#include <vector>
 #include "boost/foreach.hpp"
 
 #define foreach BOOST_FOREACH
@@ -18,6 +19,9 @@
 enum Direction{ BOTH, FR, RF };
 
 extern Direction direction;
+
+extern std::vector<double> mass_table;
+extern std::vector<double> cum_mass_table;
 
 /**
  * a global bool that is true when processing is still occuring

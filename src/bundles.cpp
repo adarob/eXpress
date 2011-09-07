@@ -61,18 +61,26 @@ Bundle* BundleTable::merge(Bundle* b1, Bundle* b2)
     
     if (b1->size() < b2->size())
         swap(b1, b2);
-    
-    b1->renormalize_transcripts(b1->mass()+b2->mass());
-    b2->renormalize_transcripts(b1->mass()+b2->mass());
+
+    double new_bundle_counts = b1->counts() + b2->counts();
+    if (new_bundle_counts)
+    {
+        double new_bundle_mass = cum_mass_table[new_bundle_counts];
+        b1->renormalize_transcripts(new_bundle_mass);
+        b2->renormalize_transcripts(new_bundle_mass);
+        b1->incr_counts(b2->counts());
+        b1->mass(new_bundle_mass);
+    }
+    else
+    {
+        b1->add_mass(b2->mass());
+    }
     
     foreach(Transcript* trans, b2->transcripts())
     {
         trans->bundle(b1);
         b1->transcripts().push_back(trans);
     }
-    
-    b1->incr_counts(b2->counts());
-    b1->add_mass(b2->mass());
     
     _bundles.erase(b2);
     delete b2;  

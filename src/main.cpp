@@ -66,6 +66,7 @@ Direction direction = BOTH;
 
 bool running = true;
 vector<double> mass_table;
+vector<double> cum_mass_table;
 
 bool parse_options(int ac, char ** av)
 {
@@ -319,6 +320,10 @@ size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TranscriptTable* 
     //boost::math::geometric geom(.00002);
     cout << setiosflags(ios::left);
     
+    mass_table.push_back(0);
+    cum_mass_table.push_back(HUGE_VAL);
+    cum_mass_table.push_back(0);
+    
     while(true)
     {
         ts.proc_lk.lock();
@@ -375,10 +380,10 @@ size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TranscriptTable* 
             if (++fake_n > 1)
             {
                 mass_n += ff_param*log((double)fake_n-1) - log(pow(fake_n,ff_param) - 1);
+                mass_table.push_back(mass_n);
+                cum_mass_table.push_back(log_sum(cum_mass_table.back(), mass_n));
             }
         //}
-        mass_table.push_back(mass_n);
-        
         process_fragment(frag, fld, bias_table, mismatch_table, trans_table);
     }
     

@@ -30,6 +30,7 @@ public:
     size_t size() const { return _transcripts.size(); }
     std::vector<Transcript*>& transcripts() { return _transcripts; }
     double mass() const { return _mass; }
+    void mass(double m) { _mass = m; }
     size_t counts() const { return _counts; }
 };
 
