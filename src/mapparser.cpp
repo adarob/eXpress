@@ -67,12 +67,12 @@ ThreadedMapParser::ThreadedMapParser(string file_name)
             delete reader;
             cout << "Input is not in BAM format. Trying SAM...\n\n";
             ifstream* ifs = new ifstream(file_name.c_str());
-            _parser = new SAMParser(ifs);
             if(!ifs->is_open())
             {
-                cerr << "Unable to open SAM file '" << file_name << "'.\n" ; 
+                cerr << "Unable to open alignment file '" << file_name << "'.\n" ; 
                 exit(1);
             } 
+            _parser = new SAMParser(ifs);
         }
     }
 }
