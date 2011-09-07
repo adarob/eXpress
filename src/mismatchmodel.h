@@ -34,14 +34,14 @@ class MismatchTable
     std::vector<FrequencyMatrix> _second_read_mm;
     
     /**
-     * a size_t storing the maximum observed read length
-     */
-    size_t _max_len;
-    
-    /**
      * a boolean specifying whether or not the table values should be used return a log-likelihood 
      */
     bool _active;
+    
+    /**
+     * a size_t storing the maximum observed read length
+     */
+    size_t _max_len;
 
 public:
    

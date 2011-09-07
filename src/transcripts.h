@@ -18,8 +18,8 @@
 #include <boost/thread.hpp>
 #include <iostream>
 #include <fstream>
+#include "bundles.h"
 #include "main.h"
-
 
 class FLD;
 class FragMap;
@@ -92,6 +92,8 @@ class Transcript
      * the total bundle counts is the sum of this value for all transcripts in the bundle
      */
     size_t _tot_counts;
+    
+    Bundle* _bundle;
     
     /**
      * a private size_t that stores a portion of the fragment counts (non-logged) for the bundle
@@ -188,11 +190,15 @@ public:
      */
     double mass() const { return _mass; }
     
+    void mass(double mass) { _mass = mass; }
+
     /**
      * a member function that returns the current (logged) variance
      * @return logged mass variance
      */
     double var() const { return _var; }
+    
+    void var(double var) { _var = var; }
     
     /**
      * a member function that returns the current count of fragments mapped to this transcript (uniquely or ambiguously)
@@ -222,6 +228,9 @@ public:
     {
         _bundle_counts += incr_amt;
     }
+    
+    Bundle* bundle() { return _bundle; }
+    void bundle(Bundle* bundle) { _bundle = bundle; }
     
     /**
      * a member function that returns the counts mapping to the bundle this transcript is in
@@ -267,13 +276,6 @@ public:
 typedef boost::unordered_map<TransID, Transcript*> TransMap;
 typedef boost::unordered_map<size_t, double> TransPairMap;
 
-// Typedefs to simplify the bundle partitioning
-typedef boost::unordered_map<TransID, size_t> RankMap;
-typedef boost::unordered_map<TransID, TransID> ParentMap;
-typedef boost::associative_property_map<RankMap> Rank;
-typedef boost::associative_property_map<ParentMap> Parent;
-typedef boost::disjoint_sets<Rank, Parent> TransPartition;
-
 /**
  * The TranscriptTable class is used to keep track of the Transcript objects for a run.
  * The constructor parses a fasta file to generate the Transcript objects and store them in a map
@@ -295,12 +297,7 @@ class TranscriptTable
      */
     TransPairMap _covar_map;
     
-    // objects used to partition the transcripts into bundles
-    RankMap _rank_map;
-    ParentMap _parent_map;
-    Rank _rank;
-    Parent _parent;
-    TransPartition _bundles;
+    BundleTable _bundle_table;
     
     /**
      * a private double specifying the initial Transcript mass pseudo-counts for each bp (non-logged)
@@ -368,33 +365,15 @@ public:
     size_t covar_size() const { return _covar_map.size(); }
     
     /**
-     * a member function that returns the bundle representative of the given transcript in the partitioning
-     * @param trans the TransID of the transcript whose representative is requested
-     * @return the TransID of the representative for the bundle the given transcript is in
-     */
-    TransID get_trans_rep(TransID trans);
-    
-    /**
      * a member function that merges the bundles represented by the two given transcripts
-     * @param rep1 the TransID of the first bundle representative
-     * @param rep2 the TransID of the second bundle representative
-     * @return the TransID of the representative for the new merged bundle
      */
-    TransID merge_bundles(TransID rep1, TransID rep2);
+    Bundle* merge_bundles(Bundle* b1, Bundle* b2);
     
     /**
      * a member function that returns the number of bundles in the partition
      * @return the number of bundles in the partition
      */
     size_t num_bundles();
-    
-    /**
-     * a member function that outputs the bundles of the partition in a tab-delimited file called 'bundles.tab'
-     * in the given output directory
-     * each line contains a space-separated list of transcripts in a single bundle
-     * @param output_dir the directory to output the bundle file to
-     */
-    void output_bundles(std::string output_dir);
     
     /**
      * a member function for driving a thread that continuously updates the transcript bias values

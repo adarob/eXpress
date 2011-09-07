@@ -11,6 +11,13 @@
 #include <cmath>
 #include <cassert>
 #include <algorithm>
+#include "boost/foreach.hpp"
+
+#define foreach BOOST_FOREACH
+
+enum Direction{ BOTH, FR, RF };
+
+extern Direction direction;
 
 /**
  * a global bool that is true when processing is still occuring
@@ -26,12 +33,13 @@ const size_t MAX_READ_LEN = 200;
 /**
  * a global size_t specifying the number of possible nucleotides
  */
-const int NUM_NUCS = 4;
+const size_t NUM_NUCS = 4;
 
 /**
  * a global specifying the nucleotide ordering
  */
 const char NUCS[] = {'A','C','G','T'};
+
 
 /**
  * global function to calculate the log of the sum of 2 logged values efficiently

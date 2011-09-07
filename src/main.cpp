@@ -18,6 +18,7 @@
 #include <fstream>
 #include "main.h"
 #include "transcripts.h"
+#include "bundles.h"
 #include "fld.h"
 #include "fragments.h"
 #include "biascorrection.h"
@@ -31,7 +32,7 @@ namespace po = boost::program_options;
 namespace fs = boost::filesystem;
 
 // the forgetting factor parameter controls the growth of the fragment mass
-double ff_param = 0.9;
+double ff_param = 0.7;
 
 // the burn-in parameter determines how many reads are required before the 
 // error and bias models are applied to probabilistic assignment 
@@ -59,13 +60,12 @@ bool bias_correct = true;
 bool calc_covar = false;
 bool vis = false;
 bool output_running = false;
+Direction direction = BOTH;
 
 //bool in_between = false;
 
-enum Direction{ BOTH, FR, RF };
-Direction direction = BOTH;
-
 bool running = true;
+vector<double> mass_table;
 
 bool parse_options(int ac, char ** av)
 {
@@ -88,7 +88,7 @@ bool parse_options(int ac, char ** av)
       //    ("in-between","")
     ("visualizer-output,v","")
     ("output-running","")
-    ("forget-param,f", po::value<double>(&ff_param)->default_value(0.9),"")
+    ("forget-param,f", po::value<double>(&ff_param)->default_value(0.7),"")
     ("sam-file", po::value<string>(&sam_file_name)->default_value(""),"")
     ("fasta-file", po::value<string>(&fasta_file_name)->default_value(""),"")
     ;
@@ -174,17 +174,20 @@ bool parse_options(int ac, char ** av)
  * @param mismatch_table pointer to the erorr model table
  * @param trans_table pointer to the transcript table
  */
-void process_fragment(double mass_n, Fragment* frag_p, FLD* fld, BiasBoss* bias_table, MismatchTable* mismatch_table, TranscriptTable* trans_table)
+void process_fragment(Fragment* frag_p, FLD* fld, BiasBoss* bias_table, MismatchTable* mismatch_table, TranscriptTable* trans_table)
 {
     Fragment& frag = *frag_p;
     
     assert(frag.num_maps());
     
-    frag.maps()[0]->mapped_trans->incr_bundle_counts();
+    Bundle* bundle = frag.maps()[0]->mapped_trans->bundle();
     
     if (frag.num_maps()==1)
     // maps to a single location
     {
+        
+        double mass_n = mass_table[bundle->counts()];
+        
         const FragMap& m = *frag.maps()[0];
         Transcript* t  = m.mapped_trans;
         if (!t)
@@ -203,11 +206,22 @@ void process_fragment(double mass_n, Fragment* frag_p, FLD* fld, BiasBoss* bias_
         if (mismatch_table)
             mismatch_table->update(m, mass_n);
        
+        bundle->add_mass(mass_n);
+        bundle->incr_counts();
+        
         delete frag_p;
         return;
     }
     
     // maps to multiple locations
+    
+    // merge bundles
+    for(size_t i = 1; i < frag.num_maps(); ++i)
+    {
+        bundle = trans_table->merge_bundles(bundle, frag.maps()[i]->mapped_trans->bundle());
+    }
+    
+    double mass_n = mass_table[bundle->counts()];
     
     // calculate marginal likelihoods
     vector<double> likelihoods(frag.num_maps());
@@ -226,20 +240,12 @@ void process_fragment(double mass_n, Fragment* frag_p, FLD* fld, BiasBoss* bias_
     }
 
     // normalize marginal likelihoods
-    TransID bundle_rep = trans_table->get_trans_rep(frag.maps()[0]->trans_id);
     for(size_t i = 0; i < frag.num_maps(); ++i)
     {
         const FragMap& m = *frag.maps()[i];
         Transcript* t  = m.mapped_trans;
         double p = likelihoods[i]-total_likelihood;
         double mass_t = mass_n + p;
-        
-        if (i > 0)
-        {
-            TransID m_rep = trans_table->get_trans_rep(m.trans_id);
-            if (m_rep != bundle_rep)
-                bundle_rep = trans_table->merge_bundles(bundle_rep, m_rep);
-        }
         
         if (sexp(p) == 0)
             continue;
@@ -269,7 +275,9 @@ void process_fragment(double mass_n, Fragment* frag_p, FLD* fld, BiasBoss* bias_
             }
         }
     }
-        
+
+    bundle->add_mass(mass_n);
+    bundle->incr_counts();
     delete frag_p;
 }
 
@@ -369,9 +377,9 @@ size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TranscriptTable* 
                 mass_n += ff_param*log((double)fake_n-1) - log(pow(fake_n,ff_param) - 1);
             }
         //}
-        assert(!isnan(mass_n));
+        mass_table.push_back(mass_n);
         
-        process_fragment(mass_n, frag, fld, bias_table, mismatch_table, trans_table);
+        process_fragment(frag, fld, bias_table, mismatch_table, trans_table);
     }
     
 	running = false;

@@ -8,6 +8,7 @@
 
 #include "main.h"
 #include "transcripts.h"
+#include "bundles.h"
 #include "fld.h"
 #include "fragments.h"
 #include "biascorrection.h"
@@ -140,10 +141,7 @@ void Transcript::update_transcript_bias()
 }
 
 TranscriptTable::TranscriptTable(const string& trans_fasta_file, double alpha, const FLD* fld, BiasBoss* bias_table, const MismatchTable* mismatch_table)
-: _rank(Rank(_rank_map)),
-  _parent(Parent(_parent_map)),
-  _bundles(_rank, _parent),
-  _alpha(alpha)
+: _alpha(alpha)
 {
     cout << "Loading target sequences from " << trans_fasta_file << "...\n\n";
     ifstream infile (trans_fasta_file.c_str());
@@ -221,7 +219,7 @@ void TranscriptTable::add_trans(Transcript* trans)
     }
     
     _trans_map.insert(make_pair(trans->id(), trans));
-    _bundles.make_set(trans->id());
+    trans->bundle(_bundle_table.create_bundle(trans));
 }
 
 Transcript* TranscriptTable::get_trans(TransID id)
@@ -259,50 +257,18 @@ double TranscriptTable::get_covar(TransID trans1, TransID trans2)
 }
 
 
-TransID TranscriptTable::get_trans_rep(TransID trans)
+Bundle* TranscriptTable::merge_bundles(Bundle* b1, Bundle* b2)
 {
-    return _bundles.find_set(trans);
-}
-
-
-TransID TranscriptTable::merge_bundles(TransID rep1, TransID rep2)
-{
-    assert(rep1 != rep2);
-    _bundles.link(rep1, rep2);
-    
-    TransID new_rep = _bundles.find_set(rep1);
-    return new_rep;
+    if (b1 != b2)
+    {
+        return _bundle_table.merge(b1, b2);
+    }
+    return b1;
 }
 
 size_t TranscriptTable::num_bundles()
 {
-    size_t count = 0;
-    for(TransMap::const_iterator it = _trans_map.begin(); it != _trans_map.end(); ++it)
-    {
-        if (_bundles.find_set(it->first) == it->first)
-            count ++;
-    }
-    return count;
-}
-
-void TranscriptTable::output_bundles(string output_dir)
-{
-    ofstream bundle_file((output_dir + "/bundles.tab").c_str());
-    
-    typedef boost::unordered_map<TransID, string> BundleMap;
-    BundleMap b_map;
-    for( TransMap::iterator it = _trans_map.begin(); it != _trans_map.end(); ++it)
-    {
-        TransID rep = _bundles.find_set(it->first);
-        b_map[rep] += '\t' + (it->second)->name();
-    }
-    
-    for (BundleMap::iterator it = b_map.begin(); it != b_map.end(); ++it)
-    {
-        bundle_file << it->second << '\n';
-    }
-    
-    bundle_file.close();
+    return _bundle_table.size();
 }
 
 void TranscriptTable::threaded_bias_update()
@@ -366,45 +332,30 @@ void TranscriptTable::output_results(string output_dir, size_t tot_counts, bool 
     fprintf(expr_file, "bundle_id\ttarget_id\tlength\teff_length\ttot_counts\tuniq_counts\test_counts\test_counts_var\tfpkm\tfpkm_conf_low\tfpkm_conf_high\n");
     double l_bil = log(1000000000.);
     double l_tot_counts = log((double)tot_counts);
-
-    // Bundle transcripts based on partition
-    typedef boost::unordered_map<TransID, vector<Transcript*> > BundleMap;
-    BundleMap b_map;
-    for( TransMap::iterator it = _trans_map.begin(); it != _trans_map.end(); ++it)
-    {
-        TransID rep = _bundles.find_set(it->first);
-        b_map[rep].push_back(it->second);
-    }
     
     size_t bundle_id = 0;
-    for (BundleMap::iterator it = b_map.begin(); it != b_map.end(); ++it)
+    foreach (Bundle* bundle, _bundle_table.bundles())
     {
         ++bundle_id;
-        vector<Transcript*> bundle_trans = it->second;
+        
+        vector<Transcript*>& bundle_trans = bundle->transcripts();
         
         if (output_varcov)
-            varcov_file << ">" << bundle_id << ": ";
-        
-        // Calculate total counts for bundle and bundle-level rho
-        size_t bundle_counts = 0;
-        double l_bundle_mass = HUGE_VAL;
-        for (size_t i = 0; i < bundle_trans.size(); ++i)
         {
-            bundle_counts += bundle_trans[i]->bundle_counts();
-            l_bundle_mass = log_sum(l_bundle_mass, bundle_trans[i]->mass()); 
-            if (output_varcov)
+            varcov_file << ">" << bundle_id << ": ";
+            for (size_t i = 0; i < bundle_trans.size(); ++i)
             {
                 if (i)
                     varcov_file << ", ";
                 varcov_file << bundle_trans[i]->name();
             }
-        }
-        if (output_varcov)
             varcov_file << endl;
+        }
         
-        if (bundle_counts)
+        if (bundle->counts())
         {
-            double l_bundle_counts = log((double)bundle_counts);
+            double l_bundle_mass = bundle->mass();
+            double l_bundle_counts = log((double)bundle->counts());
             double l_var_renorm = 2*(l_bundle_counts - l_bundle_mass);
             // Calculate individual counts and rhos
             for (size_t i = 0; i < bundle_trans.size(); ++i)
