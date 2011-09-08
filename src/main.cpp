@@ -7,11 +7,9 @@
 //
 
 //TODO: Covariance bundle renorm
-//TODO: Directional
 //TODO: Speed up mismatch model?
 //TODO: Speed up bias initialization (using non-logged values)
 
-//#include <boost/math/distributions/geometric.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/program_options.hpp>
 #include <boost/thread.hpp>
