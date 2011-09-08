@@ -94,13 +94,10 @@ class Transcript
      */
     size_t _tot_counts;
     
-    Bundle* _bundle;
-    
     /**
-     * a private size_t that stores a portion of the fragment counts (non-logged) for the bundle
-     * the total bundle counts is the sum of this value for all transcripts in the bundle
+     * a private pointer to the Bundle object the Transcript is a member of
      */
-    size_t _bundle_counts;
+    Bundle* _bundle;
     
     /**
      * a private mutex to provide thread-safety for bias variables with threaded update
@@ -191,6 +188,10 @@ public:
      */
     double mass() const { return _mass; }
     
+    /**
+     * a member function that sets the current (logged) fragment mass
+     * @param logged mass
+     */
     void mass(double mass) { _mass = mass; }
 
     /**
@@ -199,6 +200,10 @@ public:
      */
     double var() const { return _var; }
     
+    /**
+     * a member function that sets the current (logged) variance
+     * @param logged mass variance
+     */
     void var(double var) { _var = var; }
     
     /**
@@ -221,24 +226,16 @@ public:
     void add_mass(double p, double mass);
     
     /**
-     * a member function that increases the counts mapping to the bundle this transcript is in
-     * the total bundle counts is the sum of this value for all transcripts in the bundle
-     * @param incr_amt a size_t to increase the counts by
+     * a member function that returns a pointer to the Bundle object that the Transcript is a member of
+     * @return pointer to the Bundle object that the Transcript is a member of
      */
-    void incr_bundle_counts(size_t incr_amt = 1)
-    {
-        _bundle_counts += incr_amt;
-    }
-    
-    Bundle* bundle() { return _bundle; }
-    void bundle(Bundle* bundle) { _bundle = bundle; }
+    Bundle* bundle() const { return _bundle; }
     
     /**
-     * a member function that returns the counts mapping to the bundle this transcript is in
-     * the total bundle counts is the sum of this value for all transcripts in the bundle
-     * @return a portion of the counts mapping to the bundle this transcript is in 
+     * a member function that sets the pointer to the Bundle object that the Transcript is a member of
+     * @param bundle a pointer to the Bundle object that the Transcript is a member of
      */
-    size_t bundle_counts() { return _bundle_counts; }
+    void bundle(Bundle* bundle) { _bundle = bundle; }
     
     /**
      * a member function that returns (a value proportional to) the log likelihood the given fragment
@@ -298,6 +295,9 @@ class TranscriptTable
      */
     TransPairMap _covar_map;
     
+    /**
+     * a private BundleTable to organize the Transcript objects into equivalance classes based on shared ambiguous (multi-mapped) reads
+     */
     BundleTable _bundle_table;
     
     /**
