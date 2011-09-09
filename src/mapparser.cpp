@@ -166,7 +166,7 @@ bool BAMParser::map_end_from_alignment(BamTools::BamAlignment& a)
         return false;
     
     f.left_first = (a.IsFirstMate() && !a.IsReverseStrand()) || (a.IsSecondMate() && a.IsReverseStrand());
-    if (f.left_first && direction == RF || !f.left_first && direction == FR)
+    if ((f.left_first && direction == RF) || (!f.left_first && direction == FR))
         return false;
     
     f.name = a.Name;
@@ -254,7 +254,7 @@ bool SAMParser::map_end_from_line(char* line)
                 if (paired && (sam_flag & 0x8))
                     goto stop;
                 f.left_first = ((sam_flag & 0x40) && !(sam_flag & 0x10)) || (!(sam_flag & 0x40) && (sam_flag & 0x10));
-                if (f.left_first && direction == RF || !f.left_first && direction == FR)
+                if ((f.left_first && direction == RF) || (!f.left_first && direction == FR))
                     goto stop;
                 break;
             case 2:

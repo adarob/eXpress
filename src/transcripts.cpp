@@ -340,7 +340,7 @@ void TranscriptTable::output_results(string output_dir, size_t tot_counts, bool 
     {
         ++bundle_id;
         
-        vector<Transcript*>& bundle_trans = bundle->transcripts();
+        const vector<Transcript*>& bundle_trans = bundle->transcripts();
         
         if (output_varcov)
         {

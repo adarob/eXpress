@@ -171,7 +171,7 @@ bool parse_options(int ac, char ** av)
  * @param mismatch_table pointer to the erorr model table
  * @param trans_table pointer to the transcript table
  */
-void process_fragment(Fragment* frag_p, FLD* fld, BiasBoss* bias_table, MismatchTable* mismatch_table, TranscriptTable* trans_table)
+void process_fragment(double glob_mass_n, Fragment* frag_p, FLD* fld, BiasBoss* bias_table, MismatchTable* mismatch_table, TranscriptTable* trans_table)
 {
     Fragment& frag = *frag_p;
     
@@ -184,6 +184,8 @@ void process_fragment(Fragment* frag_p, FLD* fld, BiasBoss* bias_table, Mismatch
     {
         
         double mass_n = bundle->next_frag_mass();
+        bundle->add_mass(mass_n);
+        bundle->incr_counts();
         
         const FragMap& m = *frag.maps()[0];
         Transcript* t  = m.mapped_trans;
@@ -196,15 +198,15 @@ void process_fragment(Fragment* frag_p, FLD* fld, BiasBoss* bias_table, Mismatch
         //update parameters
         t->add_mass(0, mass_n);
         if (m.pair_status() == PAIRED)
-                fld->add_val(m.length(), mass_n);
+                fld->add_val(m.length(), glob_mass_n);
         
         if (bias_table)
-            bias_table->update_observed(m, mass_n - t->mass() + log((double)t->unbiased_effective_length()));
+        {
+            double norm_mass = glob_mass_n - (log((double)bundle->counts()) + t->mass() - bundle->mass()) + log((double)t->unbiased_effective_length());
+            bias_table->update_observed(m, norm_mass);
+        }
         if (mismatch_table)
-            mismatch_table->update(m, mass_n);
-       
-        bundle->add_mass(mass_n);
-        bundle->incr_counts();
+            mismatch_table->update(m, glob_mass_n);
         
         delete frag_p;
         return;
@@ -217,8 +219,11 @@ void process_fragment(Fragment* frag_p, FLD* fld, BiasBoss* bias_table, Mismatch
     {
         bundle = trans_table->merge_bundles(bundle, frag.maps()[i]->mapped_trans->bundle());
     }
-    
+
     double mass_n = bundle->next_frag_mass();
+    bundle->add_mass(mass_n);
+    bundle->incr_counts();
+    double l_bundle_counts = log((double)bundle->counts());
     
     // calculate marginal likelihoods
     vector<double> likelihoods(frag.num_maps());
@@ -242,8 +247,7 @@ void process_fragment(Fragment* frag_p, FLD* fld, BiasBoss* bias_table, Mismatch
         const FragMap& m = *frag.maps()[i];
         Transcript* t  = m.mapped_trans;
         double p = likelihoods[i]-total_likelihood;
-        double mass_t = mass_n + p;
-        
+        double glob_mass_t = glob_mass_n + p;
         if (sexp(p) == 0)
             continue;
         
@@ -251,12 +255,15 @@ void process_fragment(Fragment* frag_p, FLD* fld, BiasBoss* bias_table, Mismatch
         t->add_mass(p, mass_n);
         
         if (m.pair_status() == PAIRED)
-            fld->add_val(m.length(), mass_t);
+            fld->add_val(m.length(), glob_mass_t);
  
         if (bias_table)
-            bias_table->update_observed(m, mass_t - t->mass() + log((double)t->unbiased_effective_length()));
+        {
+            double norm_mass = glob_mass_t - (l_bundle_counts + t->mass() - bundle->mass())  + log((double)t->unbiased_effective_length());
+            bias_table->update_observed(m, norm_mass);        
+        }
         if (mismatch_table)
-            mismatch_table->update(m, mass_t);
+            mismatch_table->update(m, glob_mass_t);
         
         if (calc_covar)
         {
@@ -273,8 +280,6 @@ void process_fragment(Fragment* frag_p, FLD* fld, BiasBoss* bias_table, Mismatch
         }
     }
 
-    bundle->add_mass(mass_n);
-    bundle->incr_counts();
     delete frag_p;
 }
 
@@ -359,10 +364,7 @@ size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TranscriptTable* 
             }
         }
         
-        
-        // Update mass_n based on forgetting factor
-        fmt->next_frag_mass();
-        process_fragment(frag, fld, bias_table, mismatch_table, trans_table);
+        process_fragment(fmt->next_frag_mass(), frag, fld, bias_table, mismatch_table, trans_table);
     }
     
 	running = false;

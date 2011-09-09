@@ -42,6 +42,11 @@ class Bundle
     size_t _counts;
     
     /**
+     * a private double that stores the total number of pseudo counts for transcripts in the bundle (logged)
+     */
+    double _pseudo_mass;
+    
+    /**
      * a private size_t that acts as proxy for observed counts, allowing stored mass and cumulative mass values to be used in the FragmentMassTable
      */
     size_t _n;
@@ -89,6 +94,7 @@ public:
      */
     void mass(double m) { _mass = m; }
     
+    
     /**
      * a member function that renormalizes the mass of all transcripts in the bundle by multiplying (adding in log space) the normalizing constant
      * @param norm_const the constant to multiply (add in log space) the transcript masses by (logged)
@@ -100,6 +106,12 @@ public:
      * @param mass the amount to increase the bundle mass by (logged)
      */
     void add_mass(double mass);
+    
+    /**
+     * a member function that increases the total psuedo mass by a given amount
+     * @param mass the amount to increase the bundle pseudo mass by (logged)
+     */
+    void add_pseudo_mass(double mass);
     
     /**
      * a member function that increases the total bundle observed fragment counts by a given amount
@@ -126,10 +138,23 @@ public:
     double mass() const { return _mass; }
     
     /**
+     * a member function that returns the total pseudo-mass for transcripts in the bundle (logged)
+     * @return the total pseudo-mass of the bundle (logged)
+     */
+    double pseudo_mass() const { return _mass; }
+    
+    /**
      * a member function that returns the total number of observed fragments mapped to transcripts in the bundle
      * @return the total number of fragments mapped to transcripts in the bundle
      */
     size_t counts() const { return _counts; }
+    
+    /**
+     * a member function that returns the total number of observed fragments mapped to transcripts in the bundle
+     * plus the psuedo-counts weighted by their proportion of the current mass
+     * @return the total number of fragments mapped to bundle plus weighted psuedo-counts
+     */
+    double counts_plus_pseudo() const;
 };
 
 
