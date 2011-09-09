@@ -355,6 +355,45 @@ void TranscriptTable::output_current(ofstream& runexpr_file)
     runexpr_file << '\n';
 }
 
+void project_to_polytope(vector<Transcript*>& bundle_trans, vector<double>& trans_counts, vector<bool>& polytope_bound, double unbound_counts, double req_unbound_counts)
+{
+    double new_bound_counts = 0;
+    double new_unbound_counts = 0;
+    bool new_fixed = false;
+    for (size_t i = 0; i < bundle_trans.size(); ++i)
+    {
+        if (polytope_bound[i])
+            continue;
+        
+        Transcript& trans = *bundle_trans[i];
+        trans_counts[i] *= req_unbound_counts/unbound_counts;
+        
+        if (trans_counts[i] > trans.tot_counts())
+        {
+            trans_counts[i] = trans.tot_counts();
+            new_bound_counts += trans_counts[i];
+            polytope_bound[i] = true;
+            new_fixed = true;
+        }
+        else if (trans_counts[i] < trans.uniq_counts())
+        {
+            trans_counts[i] = trans.uniq_counts();
+            new_bound_counts += trans_counts[i];
+            polytope_bound[i] = true;
+            new_fixed = true;
+        }
+        else
+        {
+            new_unbound_counts += trans_counts[i];
+        }
+    }
+    
+    if (new_fixed)
+    {
+        project_to_polytope(bundle_trans, trans_counts, polytope_bound, new_unbound_counts, req_unbound_counts - new_bound_counts);
+    }
+    return;
+}
 
 void TranscriptTable::output_results(string output_dir, size_t tot_counts, bool output_varcov)
 {
@@ -406,6 +445,27 @@ void TranscriptTable::output_results(string output_dir, size_t tot_counts, bool 
         {
             double l_bundle_counts = log((double)bundle_counts);
             double l_var_renorm = 2*(l_bundle_counts - l_bundle_mass);
+            
+            vector<double> trans_counts(bundle_trans.size(),0);
+            bool requires_projection = false;
+
+            for (size_t i = 0; i < bundle_trans.size(); ++i)
+            {
+                Transcript& trans = *bundle_trans[i];
+                double l_trans_frac = trans.mass() - l_bundle_mass;
+                trans_counts[i] = sexp(l_trans_frac + l_bundle_counts);
+            
+                if (trans_counts[i] > trans.tot_counts() || trans_counts[i] < trans.uniq_counts())
+                    requires_projection = true;
+            }
+            
+            if (requires_projection)
+            {
+                vector<bool> polytope_bound(bundle_trans.size(),false);
+                project_to_polytope(bundle_trans, trans_counts, polytope_bound, 0.0, bundle_counts);
+            }
+            
+            
             // Calculate individual counts and rhos
             for (size_t i = 0; i < bundle_trans.size(); ++i)
             {
