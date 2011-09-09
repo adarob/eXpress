@@ -150,9 +150,9 @@ void MismatchTable::append_output(ofstream& outfile) const
     for(size_t i = 0; i < 64; i++)
     {
         col_header += NUCS[i>>4];
-        col_header += NUCS[i>>2 & 0b11]; 
+        col_header += NUCS[i>>2 & 3]; 
         col_header += "->*";
-        col_header += NUCS[i & 0b11];
+        col_header += NUCS[i & 3];
         col_header += '\t';
     }
     col_header[col_header.length()-1] = '\n';

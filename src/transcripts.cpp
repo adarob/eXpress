@@ -384,6 +384,7 @@ void project_to_polytope(vector<Transcript*>& bundle_trans, vector<double>& tran
         }
         else
         {
+            trans_counts[i] *= req_unbound_counts/unbound_counts;
             new_unbound_counts += trans_counts[i];
         }
     }
@@ -462,7 +463,7 @@ void TranscriptTable::output_results(string output_dir, size_t tot_counts, bool 
             if (requires_projection)
             {
                 vector<bool> polytope_bound(bundle_trans.size(),false);
-                project_to_polytope(bundle_trans, trans_counts, polytope_bound, 0.0, bundle_counts);
+                project_to_polytope(bundle_trans, trans_counts, polytope_bound, bundle_counts, bundle_counts);
             }
             
             
