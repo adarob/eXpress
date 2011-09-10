@@ -26,7 +26,7 @@ const size_t MAX_READ_LEN = 200;
 /**
  * a global size_t specifying the number of possible nucleotides
  */
-const int NUM_NUCS = 4;
+const size_t NUM_NUCS = 4;
 
 /**
  * a global specifying the nucleotide ordering

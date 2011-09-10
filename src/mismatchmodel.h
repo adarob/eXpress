@@ -39,7 +39,7 @@ class MismatchTable
     size_t _max_len;
     
     /**
-     * a boolean specifying whether or not the table values should be used return a log-likelihood 
+     * a boolean specifying whether or not the table values should be used to return a log-likelihood 
      */
     bool _active;
 

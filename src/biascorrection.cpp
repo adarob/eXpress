@@ -70,7 +70,7 @@ string SeqWeightTable::to_string() const
     boost::mutex::scoped_lock lock(_lock);
     char buffer[50];
     string s = "";
-    for(size_t i = 0; i < WINDOW; ++i)
+    for(int i = 0; i < WINDOW; ++i)
     {
         for (size_t j = 0; j < NUM_NUCS; ++j)
         {
@@ -94,7 +94,7 @@ void SeqWeightTable::append_output(ofstream& outfile) const
     for(size_t j = 0; j < NUM_NUCS; j++)
     {
         outfile << NUCS[j] << ":\t";
-        for(size_t i = 0; i < WINDOW; i++)
+        for(int i = 0; i < WINDOW; i++)
         {
             outfile << scientific << sexp(_observed(i,j)) << "\t";
         }
@@ -163,7 +163,7 @@ void PosWeightTable::append_output(ofstream& outfile) const
     outfile << endl;
 
     boost::mutex::scoped_lock lock(_lock);
-    sprintf(buff, "%zu-%zu:\t", 0, len_bins()[0]);
+    sprintf(buff, "%d-%zu:\t", 0, len_bins()[0]);
     for(size_t l = 0; l < len_bins().size(); l++)
     {
         if(l)
