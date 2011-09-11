@@ -44,7 +44,7 @@ void Transcript::add_mass(double p, double mass)
     _mass = log_sum(_mass, p+mass);
     _tot_counts++;
     if (p == 0.0)
-        // probabilitiy of 1
+        // probability of 1
     {
         _uniq_counts++;
     }
