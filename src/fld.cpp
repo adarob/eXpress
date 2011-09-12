@@ -82,7 +82,7 @@ string FLD::to_string() const
     char buffer[50];
     for(size_t i = 0; i <= max_val(); i++)
     {
-        sprintf(buffer, "%e ",sexp(pdf(i)));
+        sprintf(buffer, "%e\t",sexp(pdf(i)));
         s += buffer; 
     }
     s.erase(s.length()-1,1);

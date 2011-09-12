@@ -90,6 +90,8 @@ void SeqWeightTable::append_output(ofstream& outfile) const
     }
     outfile << endl;
     
+    outfile << "\tObserved Nucleotide Distribution\n";
+    
     boost::mutex::scoped_lock lock(_lock);
     for(size_t j = 0; j < NUM_NUCS; j++)
     {
@@ -100,6 +102,19 @@ void SeqWeightTable::append_output(ofstream& outfile) const
         }
         outfile<<endl;
     }
+    
+    outfile << "\tBias Weights\n";
+    
+    for(size_t j = 0; j < NUM_NUCS; j++)
+    {
+        outfile << NUCS[j] << ":\t";
+        for(int i = 0; i < WINDOW; i++)
+        {
+            outfile << scientific << sexp(_observed(i,j) - _expected(j)) << "\t";
+        }
+        outfile<<endl;
+    }
+
 }
 
 PosWeightTable::PosWeightTable(const vector<size_t>& len_bins, const vector<double>& pos_bins, double alpha)
@@ -162,6 +177,8 @@ void PosWeightTable::append_output(ofstream& outfile) const
     }
     outfile << endl;
 
+    outfile << "\tObserved Position Distribution\n";
+    
     boost::mutex::scoped_lock lock(_lock);
     sprintf(buff, "%d-%zu:\t", 0, len_bins()[0]);
     for(size_t l = 0; l < len_bins().size(); l++)
@@ -175,6 +192,22 @@ void PosWeightTable::append_output(ofstream& outfile) const
         }
         outfile<<endl;
     }
+    
+    outfile << "\tBias Weights\n";
+    
+    sprintf(buff, "%d-%zu:\t", 0, len_bins()[0]);
+    for(size_t l = 0; l < len_bins().size(); l++)
+    {
+        if(l)
+            sprintf(buff, "%zu-%zu:\t", len_bins()[l-1]+1, len_bins()[l]);
+        outfile << buff;
+        for(size_t p = 0; p < pos_bins().size(); p++)
+        {
+            outfile << scientific << sexp(_observed(l,p)-_expected(l,p)) << "\t";
+        }
+        outfile<<endl;
+    }
+
 }
 
 BiasBoss::BiasBoss(double alpha)
@@ -241,8 +274,6 @@ void BiasBoss::update_observed(const FragMap& frag, double normalized_mass)
         _3_seq_bias.increment_observed(seq_3, normalized_mass);
         _3_pos_bias.increment_observed(t_seq.length(), (double)(frag.right-1)/t_seq.length(), normalized_mass);
     }
-       
-
 }
 
 double BiasBoss::get_transcript_bias(std::vector<double>& start_bias, std::vector<double>& end_bias, const Transcript& trans) const
