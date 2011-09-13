@@ -473,8 +473,8 @@ void TranscriptTable::output_results(string output_dir, size_t tot_counts, bool 
                 Transcript& trans = *bundle_trans[i];
                 double count_var = min(sexp(trans.var() + l_var_renorm), 0.25*trans.tot_counts());
                 double count_std_dev = sqrt(count_var);
-                double count_lo = max(trans_counts[i] - 2*count_std_dev, 0.0);
-                double count_hi = trans_counts[i] + 2*count_std_dev;
+                double count_lo = max(trans_counts[i] - 2*count_std_dev, (double)trans.uniq_counts());
+                double count_hi = min(trans_counts[i] + 2*count_std_dev, (double)trans.tot_counts());
                 
                 double fpkm_std_dev = sqrt(trans_counts[i] + count_var);
                 double eff_len = trans.est_effective_length();

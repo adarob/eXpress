@@ -24,7 +24,6 @@ FrequencyMatrix::FrequencyMatrix(size_t m, size_t n, double alpha)
 double FrequencyMatrix::operator()(size_t i, size_t j) const
 {
     assert(i*_N+j < _M*_N);
-    assert(!isnan(_array[i*_N+j]-_rowsums[i]));
     return _array[i*_N+j]-_rowsums[i];
 }
 
