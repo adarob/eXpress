@@ -442,9 +442,6 @@ void TranscriptTable::output_results(string output_dir, size_t tot_counts, bool 
             {
                 Transcript& trans = *bundle_trans[i];
                 double count_var = min(sexp(trans.var() + l_var_renorm), 0.25*trans.tot_counts());
-                double count_std_dev = sqrt(count_var);
-                double count_lo = max(trans_counts[i] - 2*count_std_dev, (double)trans.uniq_counts());
-                double count_hi = min(trans_counts[i] + 2*count_std_dev, (double)trans.tot_counts());
                 
                 double fpkm_std_dev = sqrt(trans_counts[i] + count_var);
                 double eff_len = trans.est_effective_length();
@@ -452,7 +449,7 @@ void TranscriptTable::output_results(string output_dir, size_t tot_counts, bool 
                 double trans_fpkm = trans_counts[i] * fpkm_constant;
                 double fpkm_lo = max(0.0, (trans_counts[i] - 2*fpkm_std_dev) * fpkm_constant);
                 double fpkm_hi = (trans_counts[i] + 2*fpkm_std_dev) * fpkm_constant;
-                fprintf(expr_file, "%zu\t%s\t%zu\t%f\t%zu\t%zu\t%f\t%f\t%f\t%f\t%f\t%f\n", bundle_id, trans.name().c_str(), trans.length(), eff_len, trans.tot_counts(), trans.uniq_counts(), trans_counts[i], count_var, trans_fpkm, fpkm_lo, fpkm_hi);
+                fprintf(expr_file, "%zu\t%s\t%zu\t%f\t%zu\t%zu\t%f\t%f\t%f\t%f\t%f\n", bundle_id, trans.name().c_str(), trans.length(), eff_len, trans.tot_counts(), trans.uniq_counts(), trans_counts[i], count_var, trans_fpkm, fpkm_lo, fpkm_hi);
             
                 if (output_varcov)
                 {
@@ -476,7 +473,7 @@ void TranscriptTable::output_results(string output_dir, size_t tot_counts, bool 
             for (size_t i = 0; i < bundle_trans.size(); ++i)
             {
                 Transcript& trans = *bundle_trans[i];
-                fprintf(expr_file, "%zu\t%s\t%zu\t%f\t%d\t%d\t%f\t%f\t%f\t%f\t%f\t%f\n", bundle_id, trans.name().c_str(), trans.length(), trans.effective_length(), 0, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+                fprintf(expr_file, "%zu\t%s\t%zu\t%f\t%d\t%d\t%f\t%f\t%f\t%f\t%f\n", bundle_id, trans.name().c_str(), trans.length(), trans.effective_length(), 0, 0, 0.0, 0.0, 0.0, 0.0, 0.0);
                 
                 if (output_varcov)
                 {
