@@ -129,9 +129,10 @@
         <li><a href="#">Download<!--[if IE 7]><!--></a><!--<![endif]-->
           <!--[if lte IE 6]><table><tr><td><![endif]-->
             <ul>
-              <li><a href=downloads/express-0.9.1/express-0.9.1-src.tgz onClick="_gaq.push(['_trackEvent', 'Downloads', 'Source', 'home-menu']);">Source</a></li>
-              <li><a href=downloads/express-0.9.1/express-0.9.1-macosx_x86_64.tgz onClick="_gaq.push(['_trackEvent', 'Downloads', 'Mac', 'home-menu']);">Mac OS X (64-bit)</a></li>
-              <li><a href=downloads/express-0.9.1/express-0.9.1-linux_x86_64.tgz onClick="_gaq.push(['_trackEvent', 'Downloads', 'Linux', 'home-menu']);">Linux (64-bit)</a></li>
+              <li><a href=downloads/express-0.9.1/express-0.9.1-src.tgz onClick="_gaq.push(['_trackEvent', 'Downloads', 'Source', 'home-menu']);" target="_blank">Source</a></li>
+              <li><a href=downloads/express-0.9.1/express-0.9.1-macosx_x86_64.tgz onClick="_gaq.push(['_trackEvent', 'Downloads', 'Mac', 'home-menu']);" target="_blank">Mac OS X (64-bit)</a></li>
+              <li><a href=downloads/express-0.9.1/express-0.9.1-linux_x86_64.tgz onClick="_gaq.push(['_trackEvent', 'Downloads', 'Linux', 'home-menu']);" target="_blank">Linux (64-bit)</a></li>
+              <li><a href="downloads" onClick="_gaq.push(['_trackEvent', 'Downloads', 'Previous','home-menu']);">Previous Versions</a></li>
             </ul>
           <!--[if lte IE 6]></td></tr></table></a><![endif]-->
         </li>
@@ -160,7 +161,14 @@
         <div class="content-1col-nobox">
           <h1>News</h1>
            <h2>09.XX.2011 &bull; eXpress 0.9.1 BETA released</h2>
-          <p>Minor updates to output, including output for the variance-covariance matrix.</p>
+          <p><b>Changes:</b>
+   		  <ul>
+          <li>Added variance-covariance file (varcov.xprs)</li>
+          <li>Added parameter (bias, fld, errors, etc.) output file (params.xprs) </li>
+          <li>Added FPKM confidence intervals to results.xprs</li>
+          <li>Column name changes (est_counts->post_counts_mean, est_counts_var->post_counts_var) in results.xprs</li>
+          <li>Estimated (mean posterior) counts are now guaranteed to lay between the total and unique counts</li>
+          </ul></p>
 		  <h2>09.01.2011 &bull; eXpress 0.9.0 BETA released</h2>
           <p>We are pleased to announce the release of the first public beta of
       eXpress! The software is freely available under the <a href=http://www.opensource.org>OSI</a>-approved <a href=http://www.opensource.org/licenses/artistic-license-2.0.php>Artistic License 2.0</a>.  
@@ -178,11 +186,11 @@
           <h1>Download</h1>                    
           <h5>Current Release</h5>
           <p>eXpress 0.9.1 BETA
-          <br />&rarr; <a href="downloads/express-0.9.1/express-0.9.1-src.tgz" onClick="_gaq.push(['_trackEvent', 'Downloads', 'Source', 'home-side']);">Source</a>
-          <br />&rarr; <a href="downloads/express-0.9.1/express-0.9.1-macosx_x86_64.tgz" onClick="_gaq.push(['_trackEvent', 'Downloads', 'Mac', 'home-side']);">Mac OS X (64-bit) Binary</a>
-          <br />&rarr; <a href="downloads/express-0.9.1/express-0.9.1-linux_x86_64.tgz" onClick="_gaq.push(['_trackEvent', 'Downloads', 'Linux', 'home-side']);">Linux (64-bit) Binary</a>
+          <br />&rarr; <a href="downloads/express-0.9.1/express-0.9.1-src.tgz" onClick="_gaq.push(['_trackEvent', 'Downloads', 'Source', 'home-side']); " target="_blank">Source</a>
+          <br />&rarr; <a href="downloads/express-0.9.1/express-0.9.1-macosx_x86_64.tgz" onClick="_gaq.push(['_trackEvent', 'Downloads', 'Mac', 'home-side']);" target="_blank">Mac OS X (64-bit) Binary</a>
+          <br />&rarr; <a href="downloads/express-0.9.1/express-0.9.1-linux_x86_64.tgz" onClick="_gaq.push(['_trackEvent', 'Downloads', 'Linux', 'home-side']);" target="_blank">Linux (64-bit) Binary</a>
           <h5>Previous Versions</h5>
-          <p>&rarr; <a href="downloads" onClick="_gaq.push(['_trackEvent', 'Downloads', 'Previous']);">View All</a>
+          <p>&rarr; <a href="downloads" onClick="_gaq.push(['_trackEvent', 'Downloads', 'Previous','home-side']);">View All</a>
 
           
         </div>  

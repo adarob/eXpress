@@ -84,13 +84,16 @@ string SeqWeightTable::to_string() const
 
 void SeqWeightTable::append_output(ofstream& outfile) const
 {
+    char buff[200];
+    string header = "";
     for(int i = 0; i < WINDOW; i++)
     {
-        outfile << "\t" << setw(12) << i-CENTER;
+        sprintf(buff, "\t%d", i-CENTER);
+        header += buff;
     }
-    outfile << endl;
+    header += '\n';
     
-    outfile << "\tObserved Nucleotide Distribution\n";
+    outfile << "\tObserved Nucleotide Distribution\n" << header;
     
     boost::mutex::scoped_lock lock(_lock);
     for(size_t j = 0; j < NUM_NUCS; j++)
@@ -103,7 +106,7 @@ void SeqWeightTable::append_output(ofstream& outfile) const
         outfile<<endl;
     }
     
-    outfile << "\tBias Weights\n";
+    outfile << "\tBias Weights\n" << header;
     
     for(size_t j = 0; j < NUM_NUCS; j++)
     {
@@ -167,18 +170,20 @@ double PosWeightTable::get_weight(size_t l, size_t p) const
 void PosWeightTable::append_output(ofstream& outfile) const
 {
     char buff[200];
+    string header = "";
+
     
     sprintf(buff, "\t%0.2f-%0.2f", 0.0, pos_bins()[0]);
-    outfile << buff;
+    header += buff;
     for(size_t p = 1; p < pos_bins().size(); p++)
     {
         sprintf(buff, "\t%0.2f-%0.2f", pos_bins()[p-1], pos_bins()[p]);
-        outfile << buff;
+        header += buff;
     }
-    outfile << endl;
+    header += '\n';
+        
+    outfile << "\tObserved Position Distribution\n" << header;
 
-    outfile << "\tObserved Position Distribution\n";
-    
     boost::mutex::scoped_lock lock(_lock);
     sprintf(buff, "%d-%zu:\t", 0, len_bins()[0]);
     for(size_t l = 0; l < len_bins().size(); l++)
@@ -193,7 +198,7 @@ void PosWeightTable::append_output(ofstream& outfile) const
         outfile<<endl;
     }
     
-    outfile << "\tBias Weights\n";
+    outfile << "\tBias Weights\n" << header;
     
     sprintf(buff, "%d-%zu:\t", 0, len_bins()[0]);
     for(size_t l = 0; l < len_bins().size(); l++)

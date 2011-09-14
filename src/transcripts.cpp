@@ -458,7 +458,7 @@ void TranscriptTable::output_results(string output_dir, size_t tot_counts, bool 
                     for (size_t j = 0; j < bundle_trans.size(); ++j)
                     {
                         if (j)
-                            varcov_file << " ";
+                            varcov_file << "\t";
                         if (i==j)
                             varcov_file << scientific << count_var;
                         else
