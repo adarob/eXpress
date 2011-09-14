@@ -215,7 +215,7 @@ void TranscriptTable::add_trans(Transcript* trans)
         }
         else
         {
-            cerr << "ERROR: Hash collision (" << ret->name() << ").\n";
+            cerr << "ERROR: Hash collision (" << ret->name() << " and " << trans->name() <<").\n";
         }
         exit(1);
     }
