@@ -93,7 +93,6 @@ struct FragMap
      */
     int length() const
     {
-        assert(pair_status() == PAIRED);
         return right - left;
     }
     
@@ -108,8 +107,8 @@ struct FragMap
         if (!seq_l.empty() && !seq_r.empty())
             return PAIRED;
         if (seq_l.empty())
-            return LEFT_ONLY;
-        return RIGHT_ONLY;
+            return RIGHT_ONLY;
+        return LEFT_ONLY;
     }
 };
 

@@ -244,7 +244,7 @@ void BiasBoss::update_expectations(const Transcript& trans)
 
 void BiasBoss::update_observed(const FragMap& frag, double normalized_mass)
 {
-    assert (frag.length() > WINDOW);
+    assert (frag.pair_status() != PAIRED || frag.length() > WINDOW);
     
     const string t_seq = frag.mapped_trans->seq();
     

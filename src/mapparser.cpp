@@ -165,7 +165,7 @@ bool BAMParser::map_end_from_alignment(BamTools::BamAlignment& a)
     if (a.IsPaired() && (!a.IsMateMapped() || a.RefID != a.MateRefID))
         return false;
     
-    f.left_first = (a.IsFirstMate() && !a.IsReverseStrand()) || (a.IsSecondMate() && a.IsReverseStrand());
+    f.left_first = (!a.IsPaired() && !a.IsReverseStrand()) || (a.IsFirstMate() && !a.IsReverseStrand()) || (a.IsSecondMate() && a.IsReverseStrand());
     f.name = a.Name;
     f.trans_id = hash_trans_name(_reader->GetReferenceData()[a.RefID].RefName);
     f.left = a.Position;
