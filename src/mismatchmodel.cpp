@@ -165,7 +165,10 @@ void MismatchTable::append_output(ofstream& outfile) const
         {
             for (size_t j = 0; j < 4; j++)
             {
-                outfile << scientific << sexp(_first_read_mm[k](i,j))<<"\t";
+                if (k || i < 4)
+                    outfile << scientific << sexp(_first_read_mm[k](i,j))<<"\t";
+                else
+                    outfile << scientific << 0.0 << "\t";
             }
         }
         outfile<<endl;
@@ -180,7 +183,10 @@ void MismatchTable::append_output(ofstream& outfile) const
         {
             for (size_t j = 0; j < 4; j++)
             {
-                outfile << scientific << sexp(_second_read_mm[k](i,j))<<"\t";
+                if (k || i < 4)
+                    outfile << scientific << sexp(_second_read_mm[k](i,j))<<"\t";
+                else
+                    outfile << scientific << 0.0 << "\t";
             }
         }
         outfile<<endl;

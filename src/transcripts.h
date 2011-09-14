@@ -409,10 +409,6 @@ public:
      * @param output_varcov boolean specifying whether to also output the variance-covariance matrix
      */
     void output_results(std::string output_dir, size_t tot_counts, bool output_varcov);
-    
-    // These functions are used to output intermediate values for comparisons and will be deactivated in release
-    void output_header(std::ofstream& runexpr_file);
-    void output_current(std::ofstream& runexpr_file);
 };
 
 #endif

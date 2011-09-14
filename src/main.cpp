@@ -37,6 +37,8 @@ double ff_param = 0.9;
 // error and bias models are applied to probabilistic assignment 
 size_t burn_in = 100000;
 
+size_t stop_at = 0;
+
 // file location parameters
 string output_dir = ".";
 string fasta_file_name = "";
@@ -58,7 +60,6 @@ bool error_model = true;
 bool bias_correct = true;
 bool calc_covar = false;
 bool vis = false;
-bool output_running = false;
 
 //bool in_between = false;
 
@@ -87,8 +88,8 @@ bool parse_options(int ac, char ** av)
     ("no-error-model","")
       //    ("in-between","")
     ("visualizer-output,v","")
-    ("output-running","")
     ("forget-param,f", po::value<double>(&ff_param)->default_value(0.9),"")
+    ("stop-at", po::value<size_t>(&stop_at)->default_value(0),"")
     ("sam-file", po::value<string>(&sam_file_name)->default_value(""),"")
     ("fasta-file", po::value<string>(&fasta_file_name)->default_value(""),"")
     ;
@@ -153,7 +154,6 @@ bool parse_options(int ac, char ** av)
     error_model = !(vm.count("no-error-model"));
     //  in_between = vm.count("in-between");
     vis = vm.count("visualizer-output");
-    output_running = vm.count("output-running");
     
     if (!vm.count("no-update-check"))
     {
@@ -293,25 +293,11 @@ size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TranscriptTable* 
     boost::thread parse(&ThreadedMapParser::threaded_parse, &map_parser, &ts, trans_table);
     
     size_t n = 0;
-    size_t fake_n = 0;
     double mass_n = 0;
     
-    // For outputting rhos on log scale
-    int m = 0;
-    int i = 1;
-    ofstream running_expr_file;
-    if (output_running)
-    {
-        running_expr_file.open((output_dir + "/running.xprs").c_str());
-        trans_table->output_header(running_expr_file);    
-    }
-    
-    // Geometric distribution used for 'in-between' tests
-    //srand ( time(NULL) );
-    //boost::math::geometric geom(.00002);
     cout << setiosflags(ios::left);
     
-    while(true)
+    while(!stop_at || n < stop_at)
     {
         ts.proc_lk.lock();
         Fragment* frag = ts.next_frag;
@@ -324,23 +310,13 @@ size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TranscriptTable* 
         }
         
         n++;
-
+        
         if (n == burn_in)
         {
             if (bias_table)
                 boost::thread bias_update(&TranscriptTable::threaded_bias_update, trans_table);
             if (mismatch_table)
                 mismatch_table->activate();
-        }
-        
-        //Output current values on log scale
-        if (output_running && n == i * pow(10.,m))
-        {
-            running_expr_file << n << '\t';  
-            trans_table->output_current(running_expr_file);
-            running_expr_file.flush();
-            m += (i==9);
-            i = (i==9) ? 1 : (i+1);
         }
         
         // Output progress
@@ -360,16 +336,10 @@ size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TranscriptTable* 
         }
         
         
-        // Update mass_n based on forgetting factor
-        //int k = (in_between) ? quantile(geom, rand()/double(RAND_MAX)) : 1;
-        //for (int j = 0; j < k; ++j)
-        //{
-            if (++fake_n > 1)
-            {
-                mass_n += ff_param*log((double)fake_n-1) - log(pow(fake_n,ff_param) - 1);
-            }
-        //}
-        assert(!isnan(mass_n));
+        if (n > 1)
+        {
+            mass_n += ff_param*log((double)n-1) - log(pow(n,ff_param) - 1);
+        }
         
         process_fragment(mass_n, frag, fld, bias_table, mismatch_table, trans_table);
     }
@@ -380,13 +350,6 @@ size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TranscriptTable* 
         cout << "99\n";
     else
         cout << "COMPLETED: Processed " << n << " fragments, targets are in " << trans_table->num_bundles() << " bundles\n";
-    
-    if (output_running)
-    {
-        running_expr_file << n << '\t';
-        trans_table->output_current(running_expr_file);
-        running_expr_file.close();
-    }
     
     return n;
 }

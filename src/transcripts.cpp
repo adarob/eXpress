@@ -324,37 +324,6 @@ void TranscriptTable::threaded_bias_update()
     }
 }
 
-void TranscriptTable::output_header(ofstream& runexpr_file)
-{
-  runexpr_file << "Read_Num\t";
-    for( TransMap::iterator it = _trans_map.begin(); it != _trans_map.end(); ++it)
-    {
-        Transcript& trans = *(it->second);
-        runexpr_file << trans.name() << '\t'; 
-    }   
-    runexpr_file << '\n';
-}
-
-void TranscriptTable::output_current(ofstream& runexpr_file)
-{    
-    double sum = HUGE_VAL;
-    for( TransMap::iterator it = _trans_map.begin(); it != _trans_map.end(); ++it)
-    {
-        Transcript& trans = *(it->second);
-        double log_fpkm = trans.mass() - log(trans.est_effective_length());
-        sum = log_sum(sum, log_fpkm);
-    }   
-    
-    for( TransMap::iterator it = _trans_map.begin(); it != _trans_map.end(); ++it)
-    {
-
-        Transcript& trans = *(it->second);
-        double log_fpkm = trans.mass() - log(trans.est_effective_length());
-        runexpr_file << sexp(log_fpkm - sum) << '\t';
-    }   
-    runexpr_file << '\n';
-}
-
 void project_to_polytope(vector<Transcript*>& bundle_trans, vector<double>& trans_counts, vector<bool>& polytope_bound, double unbound_counts, double req_unbound_counts)
 {
     double new_bound_counts = 0;
@@ -513,7 +482,7 @@ void TranscriptTable::output_results(string output_dir, size_t tot_counts, bool 
                     for (size_t j = 0; j < bundle_trans.size(); ++j)
                     {
                         if (j)
-                            varcov_file << " ";
+                            varcov_file << "\t";
                         varcov_file << scientific << 0.0;
                     }
                     varcov_file << endl;
