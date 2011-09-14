@@ -372,7 +372,8 @@ void TranscriptTable::output_results(string output_dir, size_t tot_counts, bool 
     if (output_varcov)
         varcov_file.open((output_dir + "/varcov.xprs").c_str());    
     
-    fprintf(expr_file, "bundle_id\ttarget_id\tlength\teff_length\ttot_counts\tuniq_counts\test_counts\tcounts_conf_low\tcounts_conf_high\tfpkm\tfpkm_conf_low\tfpkm_conf_high\n");
+    fprintf(expr_file, "bundle_id\ttarget_id\tlength\teff_length\ttot_counts\tuniq_counts\tmean_counts\tvar_counts\tfpkm\tfpkm_conf_low\tfpkm_conf_high\n");
+
     double l_bil = log(1000000000.);
     double l_tot_counts = log((double)tot_counts);
 
@@ -451,7 +452,7 @@ void TranscriptTable::output_results(string output_dir, size_t tot_counts, bool 
                 double trans_fpkm = trans_counts[i] * fpkm_constant;
                 double fpkm_lo = max(0.0, (trans_counts[i] - 2*fpkm_std_dev) * fpkm_constant);
                 double fpkm_hi = (trans_counts[i] + 2*fpkm_std_dev) * fpkm_constant;
-                fprintf(expr_file, "%zu\t%s\t%zu\t%f\t%zu\t%zu\t%f\t%f\t%f\t%f\t%f\t%f\n", bundle_id, trans.name().c_str(), trans.length(), eff_len, trans.tot_counts(), trans.uniq_counts(), trans_counts[i], count_lo, count_hi, trans_fpkm, fpkm_lo, fpkm_hi);
+                fprintf(expr_file, "%zu\t%s\t%zu\t%f\t%zu\t%zu\t%f\t%f\t%f\t%f\t%f\t%f\n", bundle_id, trans.name().c_str(), trans.length(), eff_len, trans.tot_counts(), trans.uniq_counts(), trans_counts[i], count_var, trans_fpkm, fpkm_lo, fpkm_hi);
             
                 if (output_varcov)
                 {
