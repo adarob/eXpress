@@ -248,7 +248,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00165"></a>00165     <span class="keywordflow">if</span> (a.IsPaired() &amp;&amp; (!a.IsMateMapped() || a.RefID != a.MateRefID))
 <a name="l00166"></a>00166         <span class="keywordflow">return</span> <span class="keyword">false</span>;
 <a name="l00167"></a>00167     
-<a name="l00168"></a>00168     f.<a class="code" href="struct_frag_map.html#a688e779754f548c87aac1b9f7aa93c79">left_first</a> = (a.IsFirstMate() &amp;&amp; !a.IsReverseStrand()) || (a.IsSecondMate() &amp;&amp; a.IsReverseStrand());
+<a name="l00168"></a>00168     f.<a class="code" href="struct_frag_map.html#a688e779754f548c87aac1b9f7aa93c79">left_first</a> = (!a.IsPaired() &amp;&amp; !a.IsReverseStrand()) || (a.IsFirstMate() &amp;&amp; !a.IsReverseStrand()) || (a.IsSecondMate() &amp;&amp; a.IsReverseStrand());
 <a name="l00169"></a>00169     f.<a class="code" href="struct_frag_map.html#a8514718d4a0ac62765305eddcd4ac276">name</a> = a.Name;
 <a name="l00170"></a>00170     f.<a class="code" href="struct_frag_map.html#a711ad4bc0a21d67a5cd2cc328619400e">trans_id</a> = hash_trans_name(_reader-&gt;GetReferenceData()[a.RefID].RefName);
 <a name="l00171"></a>00171     f.<a class="code" href="struct_frag_map.html#ad8028c435a0ff9aebcc03cb7d05c91c3">left</a> = a.Position;
@@ -376,7 +376,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div id="nav-path" class="navpath">
     <ul>
       <li class="navelem"><b>mapparser.cpp</b>      </li>
-      <li class="footer">Generated on Fri Sep 2 2011 12:36:15 for eXpress by&#160;
+      <li class="footer">Generated on Wed Sep 14 2011 16:04:19 for eXpress by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </li>
     </ul>

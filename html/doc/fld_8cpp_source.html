@@ -165,18 +165,24 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00082"></a>00082     <span class="keywordtype">char</span> buffer[50];
 <a name="l00083"></a>00083     <span class="keywordflow">for</span>(<span class="keywordtype">size_t</span> i = 0; i &lt;= <a class="code" href="class_f_l_d.html#a624f122ba9707476ce3803ad8e611963">max_val</a>(); i++)
 <a name="l00084"></a>00084     {
-<a name="l00085"></a>00085         sprintf(buffer, <span class="stringliteral">&quot;%e &quot;</span>,sexp(<a class="code" href="class_f_l_d.html#a5cebe7ff0e8b8127485374db714287f7">pdf</a>(i)));
+<a name="l00085"></a>00085         sprintf(buffer, <span class="stringliteral">&quot;%e\t&quot;</span>,sexp(<a class="code" href="class_f_l_d.html#a5cebe7ff0e8b8127485374db714287f7">pdf</a>(i)));
 <a name="l00086"></a>00086         s += buffer; 
 <a name="l00087"></a>00087     }
 <a name="l00088"></a>00088     s.erase(s.length()-1,1);
 <a name="l00089"></a>00089     <span class="keywordflow">return</span> s;
 <a name="l00090"></a>00090 }
+<a name="l00091"></a>00091 
+<a name="l00092"></a>00092 <span class="keywordtype">void</span> <a class="code" href="class_f_l_d.html#a0f1b3982b8a86a6bd687c0f41546645b">FLD::append_output</a>(ofstream&amp; outfile)<span class="keyword"> const</span>
+<a name="l00093"></a>00093 <span class="keyword"></span>{
+<a name="l00094"></a>00094     outfile &lt;&lt; <span class="stringliteral">&quot;&gt;Fragment Length Distribution (0-&quot;</span> &lt;&lt; <a class="code" href="class_f_l_d.html#a624f122ba9707476ce3803ad8e611963">max_val</a>() &lt;&lt; <span class="stringliteral">&quot;)\n&quot;</span>;
+<a name="l00095"></a>00095     outfile &lt;&lt; <a class="code" href="class_f_l_d.html#adfa05cc215ef20fac8e265c23986d38c">to_string</a>() &lt;&lt; endl;
+<a name="l00096"></a>00096 }
 </pre></div></div>
 </div>
   <div id="nav-path" class="navpath">
     <ul>
       <li class="navelem"><b>fld.cpp</b>      </li>
-      <li class="footer">Generated on Fri Sep 2 2011 12:36:15 for eXpress by&#160;
+      <li class="footer">Generated on Wed Sep 14 2011 16:04:18 for eXpress by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </li>
     </ul>

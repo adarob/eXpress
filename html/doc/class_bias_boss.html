@@ -98,13 +98,14 @@ Public Member Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_bias_boss.html#ade226a696a85a4c4178dbb2492880e6c">update_observed</a> (const <a class="el" href="struct_frag_map.html">FragMap</a> &amp;frag, double mass)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_bias_boss.html#af215929f1bb48658260104af729c7bfa">get_transcript_bias</a> (std::vector&lt; double &gt; &amp;start_bias, std::vector&lt; double &gt; &amp;end_bias, const <a class="el" href="class_transcript.html">Transcript</a> &amp;trans) const </td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_bias_boss.html#a849af7bee4868e29367aa4a3e47262a0">to_string</a> () const </td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_bias_boss.html#a33a06af813884a0aa4b98b51a72bc1eb">append_output</a> (std::ofstream &amp;outfile) const </td></tr>
 </table>
 <hr/><a name="_details"></a><h2>Detailed Description</h2>
 <div class="textblock"><p>The <a class="el" href="class_bias_boss.html">BiasBoss</a> class keeps track of sequence-specific and positional bias. It allows for the bias associated with a given fragment end to be calculated, and for the bias parameters to be updated based on additional observations. All stored and returned values are in log space. </p>
 <dl class="author"><dt><b>Author:</b></dt><dd>Adam Roberts </dd></dl>
 <dl class="date"><dt><b>Date:</b></dt><dd>2011  Artistic License 2.0 </dd></dl>
 
-<p>Definition at line <a class="el" href="biascorrection_8h_source.html#l00192">192</a> of file <a class="el" href="biascorrection_8h_source.html">biascorrection.h</a>.</p>
+<p>Definition at line <a class="el" href="biascorrection_8h_source.html#l00208">208</a> of file <a class="el" href="biascorrection_8h_source.html">biascorrection.h</a>.</p>
 </div><hr/><h2>Constructor &amp; Destructor Documentation</h2>
 <a class="anchor" id="a052e534308afcc766eb417b6656cdd39"></a><!-- doxytag: member="BiasBoss::BiasBoss" ref="a052e534308afcc766eb417b6656cdd39" args="(double alpha)" -->
 <div class="memitem">
@@ -128,11 +129,35 @@ Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="biascorrection_8cpp_source.html#l00132">132</a> of file <a class="el" href="biascorrection_8cpp_source.html">biascorrection.cpp</a>.</p>
+<p>Definition at line <a class="el" href="biascorrection_8cpp_source.html#l00218">218</a> of file <a class="el" href="biascorrection_8cpp_source.html">biascorrection.cpp</a>.</p>
 
 </div>
 </div>
 <hr/><h2>Member Function Documentation</h2>
+<a class="anchor" id="a33a06af813884a0aa4b98b51a72bc1eb"></a><!-- doxytag: member="BiasBoss::append_output" ref="a33a06af813884a0aa4b98b51a72bc1eb" args="(std::ofstream &amp;outfile) const " -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void BiasBoss::append_output </td>
+          <td>(</td>
+          <td class="paramtype">std::ofstream &amp;&#160;</td>
+          <td class="paramname"><em>outfile</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>a member function that outputs the positional and sequence-specific bias parameter matrices </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramname">outfile</td><td>the file to append to </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <a class="anchor" id="af215929f1bb48658260104af729c7bfa"></a><!-- doxytag: member="BiasBoss::get_transcript_bias" ref="af215929f1bb48658260104af729c7bfa" args="(std::vector&lt; double &gt; &amp;start_bias, std::vector&lt; double &gt; &amp;end_bias, const Transcript &amp;trans) const " -->
 <div class="memitem">
 <div class="memproto">
@@ -174,7 +199,7 @@ Public Member Functions</h2></td></tr>
 </dl>
 <dl class="return"><dt><b>Returns:</b></dt><dd>the product of the average 5' and 3' bias (logged) </dd></dl>
 
-<p>Definition at line <a class="el" href="biascorrection_8cpp_source.html#l00200">200</a> of file <a class="el" href="biascorrection_8cpp_source.html">biascorrection.cpp</a>.</p>
+<p>Definition at line <a class="el" href="biascorrection_8cpp_source.html#l00284">284</a> of file <a class="el" href="biascorrection_8cpp_source.html">biascorrection.cpp</a>.</p>
 
 </div>
 </div>
@@ -194,7 +219,7 @@ Public Member Functions</h2></td></tr>
 <p>a member function that returns a string containing the observed positional nucleotide probabilities (non-logged) in column-major order (A,C,G,T) </p>
 <dl class="return"><dt><b>Returns:</b></dt><dd>the string representation of the observed probabilities </dd></dl>
 
-<p>Definition at line <a class="el" href="biascorrection_8cpp_source.html#l00229">229</a> of file <a class="el" href="biascorrection_8cpp_source.html">biascorrection.cpp</a>.</p>
+<p>Definition at line <a class="el" href="biascorrection_8cpp_source.html#l00313">313</a> of file <a class="el" href="biascorrection_8cpp_source.html">biascorrection.cpp</a>.</p>
 
 </div>
 </div>
@@ -220,7 +245,7 @@ Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="biascorrection_8cpp_source.html#l00139">139</a> of file <a class="el" href="biascorrection_8cpp_source.html">biascorrection.cpp</a>.</p>
+<p>Definition at line <a class="el" href="biascorrection_8cpp_source.html#l00225">225</a> of file <a class="el" href="biascorrection_8cpp_source.html">biascorrection.cpp</a>.</p>
 
 </div>
 </div>
@@ -257,7 +282,7 @@ Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="biascorrection_8cpp_source.html#l00159">159</a> of file <a class="el" href="biascorrection_8cpp_source.html">biascorrection.cpp</a>.</p>
+<p>Definition at line <a class="el" href="biascorrection_8cpp_source.html#l00245">245</a> of file <a class="el" href="biascorrection_8cpp_source.html">biascorrection.cpp</a>.</p>
 
 </div>
 </div>
@@ -270,7 +295,7 @@ Public Member Functions</h2></td></tr>
   <div id="nav-path" class="navpath">
     <ul>
       <li class="navelem"><a class="el" href="class_bias_boss.html">BiasBoss</a>      </li>
-      <li class="footer">Generated on Fri Sep 2 2011 12:36:37 for eXpress by&#160;
+      <li class="footer">Generated on Wed Sep 14 2011 16:04:19 for eXpress by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </li>
     </ul>

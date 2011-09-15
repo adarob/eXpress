@@ -1,12 +1,9 @@
 #!/bin/bash
 
-VERSION=0.9.0
+VERSION=0.9.1
 MAC=express-$VERSION-macosx_x86_64
 LINUX=express-$VERSION-linux_x86_64
 SRC=express-$VERSION-src
-
-#make version header file
-echo "#define PACKAGE_VERSION \"$VERSION\"" > src/version.h
 
 #make version update check file file
 echo \$$VERSION\$ > html/curr_xprs_version
