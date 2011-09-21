@@ -328,6 +328,7 @@ void project_to_polytope(vector<Transcript*>& bundle_trans, vector<double>& tran
 {
     double unbound_counts = 0;
     double bound_counts = 0;
+    bool new_bound = false;
     for (size_t i = 0; i < bundle_trans.size(); ++i)
     {
         Transcript& trans = *bundle_trans[i];
@@ -340,22 +341,24 @@ void project_to_polytope(vector<Transcript*>& bundle_trans, vector<double>& tran
         {
             trans_counts[i] = trans.tot_counts();
             bound_counts += trans_counts[i];
-            polytope_bound[i] = true;
+            new_bound = polytope_bound[i] = true;
         }
         else if (trans_counts[i] < trans.uniq_counts())
         {
             trans_counts[i] = trans.uniq_counts();
             bound_counts += trans_counts[i];
-            polytope_bound[i] = true;
+            new_bound = polytope_bound[i] = true;
         }
         else
         {
             unbound_counts += trans_counts[i];
         }
     }
-    double normalizer = (bundle_counts - bound_counts)/unbound_counts;
-    if (normalizer == 1)
+    
+    if (!new_bound)
         return;
+    
+    double normalizer = (bundle_counts - bound_counts)/unbound_counts;
      
     for (size_t i = 0; i < bundle_trans.size(); ++i)
     {    
