@@ -324,45 +324,48 @@ void TranscriptTable::threaded_bias_update()
     }
 }
 
-void project_to_polytope(vector<Transcript*>& bundle_trans, vector<double>& trans_counts, vector<bool>& polytope_bound, double unbound_counts, double req_unbound_counts)
+void project_to_polytope(vector<Transcript*>& bundle_trans, vector<double>& trans_counts, vector<bool>& polytope_bound, double bundle_counts)
 {
-    double new_bound_counts = 0;
-    double new_unbound_counts = 0;
-    bool new_fixed = false;
+    double unbound_counts = 0;
+    double bound_counts = 0;
     for (size_t i = 0; i < bundle_trans.size(); ++i)
     {
-        if (polytope_bound[i])
-            continue;
-        
         Transcript& trans = *bundle_trans[i];
-        trans_counts[i] *= req_unbound_counts/unbound_counts;
         
-        if (trans_counts[i] > trans.tot_counts())
+        if (polytope_bound[i])
+        {
+            bound_counts += trans_counts[i];
+        }
+        else if (trans_counts[i] > trans.tot_counts())
         {
             trans_counts[i] = trans.tot_counts();
-            new_bound_counts += trans_counts[i];
+            bound_counts += trans_counts[i];
             polytope_bound[i] = true;
-            new_fixed = true;
         }
         else if (trans_counts[i] < trans.uniq_counts())
         {
             trans_counts[i] = trans.uniq_counts();
-            new_bound_counts += trans_counts[i];
+            bound_counts += trans_counts[i];
             polytope_bound[i] = true;
-            new_fixed = true;
         }
         else
         {
-            trans_counts[i] *= req_unbound_counts/unbound_counts;
-            new_unbound_counts += trans_counts[i];
+            unbound_counts += trans_counts[i];
+        }
+    }
+    double normalizer = (bundle_counts - bound_counts)/unbound_counts;
+    if (normalizer == 1)
+        return;
+     
+    for (size_t i = 0; i < bundle_trans.size(); ++i)
+    {    
+        if (!polytope_bound[i])
+        {
+            trans_counts[i] *= normalizer;
         }
     }
     
-    if (new_fixed)
-    {
-        project_to_polytope(bundle_trans, trans_counts, polytope_bound, new_unbound_counts, req_unbound_counts - new_bound_counts);
-    }
-    return;
+    project_to_polytope(bundle_trans, trans_counts, polytope_bound, bundle_counts);
 }
 
 void TranscriptTable::output_results(string output_dir, size_t tot_counts, bool output_varcov)
@@ -372,7 +375,7 @@ void TranscriptTable::output_results(string output_dir, size_t tot_counts, bool 
     if (output_varcov)
         varcov_file.open((output_dir + "/varcov.xprs").c_str());    
     
-    fprintf(expr_file, "bundle_id\ttarget_id\tlength\teff_length\ttot_counts\tuniq_counts\tmean_post_count\tvar__post_count\tfpkm\tfpkm_conf_low\tfpkm_conf_high\n");
+    fprintf(expr_file, "bundle_id\ttarget_id\tlength\teff_length\ttot_counts\tuniq_counts\tpost_count_mean\tpost_count_var\tfpkm\tfpkm_conf_low\tfpkm_conf_high\n");
 
     double l_bil = log(1000000000.);
     double l_tot_counts = log((double)tot_counts);
@@ -433,7 +436,7 @@ void TranscriptTable::output_results(string output_dir, size_t tot_counts, bool 
             if (requires_projection)
             {
                 vector<bool> polytope_bound(bundle_trans.size(),false);
-                project_to_polytope(bundle_trans, trans_counts, polytope_bound, bundle_counts, bundle_counts);
+                project_to_polytope(bundle_trans, trans_counts, polytope_bound, bundle_counts);
             }
             
             
