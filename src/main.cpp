@@ -195,6 +195,7 @@ void process_fragment(double mass_n, Fragment* frag_p, FLD* fld, BiasBoss* bias_
         
         //update parameters
         t->add_mass(0, mass_n);
+        t->incr_uniq_counts();
         if (m.pair_status() == PAIRED)
                 fld->add_val(m.length(), mass_n);
         

@@ -81,10 +81,10 @@ void ThreadedMapParser::threaded_parse(ParseThreadSafety* thread_safety, Transcr
 {
     ParseThreadSafety& ts = *thread_safety;
     bool fragments_remain = true;
-    while (fragments_remain)
+    while (running && fragments_remain)
     {
         Fragment * frag;
-        while (fragments_remain)
+        while (running && fragments_remain)
         {
             frag = new Fragment(); 
             fragments_remain = _parser->next_fragment(*frag);
