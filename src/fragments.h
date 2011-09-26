@@ -28,12 +28,12 @@ class TranscriptTable;
 enum PairStatus { PAIRED, LEFT_ONLY, RIGHT_ONLY };
 
 /**
- *  The FragMap struct stores the information for a single (multi-)mapping of a fragment.
+ *  The FragHit struct stores the information for a single (multi-)mapping of a fragment.
  *  @author    Adam Roberts
  *  @date      2011
  *  @copyright Artistic License 2.0
  **/
-struct FragMap
+struct FragHit
 {
     /**
      * a public string for the SAM "Query Template Name" (fragment name)
@@ -124,15 +124,15 @@ class Fragment
 {
     
     /**
-     * a private vector of FragMap pointers containing all multi-mappings of the fragment
+     * a private vector of FragHit pointers containing all multi-mappings of the fragment
      */
-    std::vector<FragMap*> _frag_maps;
+    std::vector<FragHit*> _frag_hits;
     
     /**
-     * a private vector of FragMap pointers containing single-end mappings whose pairs have not been found
+     * a private vector of FragHit pointers containing single-end mappings whose pairs have not been found
      * this is temporarily used when parsing the file to find mates, but is not important later on
      */
-    std::vector<FragMap*> _open_mates;
+    std::vector<FragHit*> _open_mates;
     
     /**
      * a private string for the SAM "Query Template Name" (fragment name)
@@ -141,26 +141,26 @@ class Fragment
     
     /**
      * a private function that searches for the mate of the given read mapping
-     * if found, the mates are combined into a single fragment and added to _frag_maps
+     * if found, the mates are combined into a single fragment and added to _frag_hits
      * if not found, the read mapping is added to open_mates
      */
-    void add_open_mate(FragMap* om);
+    void add_open_mate(FragHit* om);
 
 public:
     
     /**
-     * Fragment destructor deletes all FragMap objects pointed to by the Fragment
+     * Fragment destructor deletes all FragHit objects pointed to by the Fragment
      */
     ~Fragment();
     
     /**
-     * a member function that adds a new FragMap (single read at this point) to the Fragment
-     * if it is the first FragMap, it sets the Fragment name and is added to _open_mates,
-     * if the fragment is not paired, it is added to _frag_maps,
+     * a member function that adds a new FragHit (single read at this point) to the Fragment
+     * if it is the first FragHit, it sets the Fragment name and is added to _open_mates,
+     * if the fragment is not paired, it is added to _frag_hits,
      * otherwise, add_open_mate is called
-     * @param f the FragMap to be added
+     * @param f the FragHit to be added
      */
-    bool add_map_end(FragMap* f);
+    bool add_map_end(FragHit* f);
     
     /**
      * a member function that returns the SAM "Query Template Name" (fragment name)
@@ -172,13 +172,13 @@ public:
      * a member function that returns the number of multi-mappings for the fragment
      * @return number of multi-mappings for fragment
      */
-    const size_t num_maps() const { return _frag_maps.size(); }
+    const size_t num_hits() const { return _frag_hits.size(); }
     
     /**
-     * a member function that returns FragMap multi-mappings of the fragment
-     * @return a vector containing pointers to the FragMap multi-mappings
+     * a member function that returns FragHit multi-mappings of the fragment
+     * @return a vector containing pointers to the FragHit multi-mappings
      */
-    const std::vector<FragMap*>& maps() const { return _frag_maps; }
+    const std::vector<FragHit*>& hits() const { return _frag_hits; }
 };
 
 

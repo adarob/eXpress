@@ -15,7 +15,7 @@
 #include <api/BamReader.h>
 
 class Fragment;
-class FragMap;
+class FragHit;
 class TranscriptTable;
 
 /**
@@ -50,7 +50,7 @@ class BAMParser : public Parser
     /**
      * a private pointer to the current fragment mapping being parsed
      */
-    FragMap* _frag_buff;
+    FragHit* _frag_buff;
     
     /**
      * a private function to parse a single alignment and store the data in _frag_buff
@@ -92,7 +92,7 @@ class SAMParser : public Parser
     /**
      * a private pointer to the current fragment mapping being parsed
      */
-    FragMap* _frag_buff;
+    FragHit* _frag_buff;
     
     /**
      * a private function to parse a single line and store the data in _frag_buff

@@ -22,7 +22,7 @@
 
 
 class FLD;
-class FragMap;
+class FragHit;
 class BiasBoss;
 class MismatchTable;
 
@@ -242,10 +242,10 @@ public:
     /**
      * a member function that returns (a value proportional to) the log likelihood the given fragment
      * originated from this transcript
-     * @param frag a FragMap to return the likelihood of being originated from this transcript
+     * @param frag a FragHit to return the likelihood of being originated from this transcript
      * @return (a value proportional to) the log likelihood the given fragment originated from this transcript
      */
-    double log_likelihood(const FragMap& frag) const;
+    double log_likelihood(const FragHit& frag) const;
 
     
     /**

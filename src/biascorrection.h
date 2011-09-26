@@ -16,7 +16,7 @@
 #include "frequencymatrix.h"
 
 class Transcript;
-class FragMap;
+class FragHit;
 
 /**
  * The SeqWeightTable class keeps track of sequence-specific bias parameters.
@@ -69,7 +69,7 @@ public:
     
     /**
      * a member function that calculates the bias weight (logged) of a bias window
-     * @param seq the transcript sequence the fragment maps to
+     * @param seq the transcript sequence the fragment hits to
      * @param i the fragment end point (the central point of the bias window)
      * @return the bias weight for the bias window which is the product of the individual nucleotide bias weights
      */
@@ -245,10 +245,10 @@ public:
     /**
      * a member function that updates the observed parameters (sequence-specific and positional) 
      * given a fragment mapping to a transcript and its logged probabilistic assignment
-     * @param frag the fragment mapping
+     * @param hit the fragment hit (alignment)
      * @param mass the logged probabality of the mapping, which is the amount to update the observed counts by
      */
-    void update_observed(const FragMap& frag, double mass);
+    void update_observed(const FragHit& hit, double mass);
     
     /**
      * a member function that returns the 5' and 3' bias values at each position in a given transcript

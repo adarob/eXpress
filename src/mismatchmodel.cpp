@@ -22,7 +22,7 @@ MismatchTable::MismatchTable(double alpha)
   _active(false)
 {}
 
-double MismatchTable::log_likelihood(const FragMap& f) const
+double MismatchTable::log_likelihood(const FragHit& f) const
 {
     if (!_active)
         return 0;
@@ -69,7 +69,7 @@ double MismatchTable::log_likelihood(const FragMap& f) const
 }
 
 
-void MismatchTable::update(const FragMap& f, double mass)
+void MismatchTable::update(const FragHit& f, double mass)
 {
     const string& t_seq = f.mapped_trans->seq();
     

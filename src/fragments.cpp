@@ -13,9 +13,9 @@ using namespace std;
 
 Fragment::~Fragment()
 {
-    for (size_t i = 0; i < num_maps(); i++)
+    for (size_t i = 0; i < num_hits(); i++)
     {
-        delete _frag_maps[i];
+        delete _frag_hits[i];
     }
     
     for (size_t i = 0; i < _open_mates.size(); i++)
@@ -24,38 +24,38 @@ Fragment::~Fragment()
     }
 }
 
-bool Fragment::add_map_end(FragMap* m)
+bool Fragment::add_map_end(FragHit* h)
 {
     if (_name.empty())
     {
-        _name = m->name;
+        _name = h->name;
     }
-    else if (_name != m->name)
+    else if (_name != h->name)
     {
         return false;
     }
     
-    if (m->mate_l >= 0)
+    if (h->mate_l >= 0)
     {
-        add_open_mate(m);
+        add_open_mate(h);
     }
     else
     // single-end fragment
     {
-        _frag_maps.push_back(m);
+        _frag_hits.push_back(h);
     }
     
     return true;
 }
 
-void Fragment::add_open_mate(FragMap* new_p)
+void Fragment::add_open_mate(FragHit* new_p)
 {
     bool found = false;
     
-    FragMap& nm = *new_p;
-    for( vector<FragMap*>::iterator it = _open_mates.begin(); it != _open_mates.end(); ++it)
+    FragHit& nm = *new_p;
+    for( vector<FragHit*>::iterator it = _open_mates.begin(); it != _open_mates.end(); ++it)
     {
-        FragMap& om = **it;
+        FragHit& om = **it;
         if (nm.trans_id == om.trans_id && nm.mate_l == om.left && om.mate_l == nm.left)
         {
             if (nm.left < om.left)
@@ -74,7 +74,7 @@ void Fragment::add_open_mate(FragMap* new_p)
             assert(nm.left_first == om.left_first);
             found = true;
             delete *it;
-            _frag_maps.push_back(&nm);
+            _frag_hits.push_back(&nm);
             _open_mates.erase(it);
             break;
         }

@@ -88,15 +88,15 @@ void ThreadedMapParser::threaded_parse(ParseThreadSafety* thread_safety, Transcr
         {
             frag = new Fragment(); 
             fragments_remain = _parser->next_fragment(*frag);
-            if (frag->num_maps())
+            if (frag->num_hits())
                 break;
             delete frag;
             frag = NULL;
         }
 		
-        for (size_t i = 0; frag && i < frag->maps().size(); ++i)
+        for (size_t i = 0; frag && i < frag->hits().size(); ++i)
         {
-            FragMap& m = *(frag->maps()[i]);
+            FragHit& m = *(frag->hits()[i]);
             Transcript* t = trans_table->get_trans(m.trans_id);
             if (!t)
             {
@@ -119,8 +119,8 @@ BAMParser::BAMParser(BamTools::BamReader* reader)
     _reader = reader;
     BamTools::BamAlignment a;
     
-    // Get first valid FragMap
-    _frag_buff = new FragMap();
+    // Get first valid FragHit
+    _frag_buff = new FragHit();
     do {
         if (!_reader->GetNextAlignment(a))
         {
@@ -135,7 +135,7 @@ bool BAMParser::next_fragment(Fragment& nf)
     nf.add_map_end(_frag_buff);
     
     BamTools::BamAlignment a;
-    _frag_buff = new FragMap();
+    _frag_buff = new FragHit();
 
     while(true)
     {   
@@ -151,13 +151,13 @@ bool BAMParser::next_fragment(Fragment& nf)
         {
             return true;
         }
-        _frag_buff = new FragMap();
+        _frag_buff = new FragHit();
     }
 }
 
 bool BAMParser::map_end_from_alignment(BamTools::BamAlignment& a)
 {
-    FragMap& f = *_frag_buff;
+    FragHit& f = *_frag_buff;
     
     if (!a.IsMapped())
         return false;
@@ -186,7 +186,7 @@ SAMParser::SAMParser(istream* in)
     
     char line_buff[BUFF_SIZE];
     
-    _frag_buff = new FragMap();
+    _frag_buff = new FragHit();
     while(_in->good())
     {
         _in->getline(line_buff, BUFF_SIZE-1, '\n');
@@ -212,7 +212,7 @@ bool SAMParser::next_fragment(Fragment& nf)
 {
     nf.add_map_end(_frag_buff);    
     
-    _frag_buff = new FragMap();
+    _frag_buff = new FragHit();
     char line_buff[BUFF_SIZE];
     
     while(_in->good())
@@ -222,7 +222,7 @@ bool SAMParser::next_fragment(Fragment& nf)
             continue;
         if (!nf.add_map_end(_frag_buff))
             break;
-        _frag_buff = new FragMap();
+        _frag_buff = new FragHit();
     }
     
     return _in->good();
@@ -230,7 +230,7 @@ bool SAMParser::next_fragment(Fragment& nf)
 
 bool SAMParser::map_end_from_line(char* line)
 {
-    FragMap& f = *_frag_buff;
+    FragHit& f = *_frag_buff;
     char *p = strtok(line, "\t");
     int sam_flag=0;    
     bool paired=0;

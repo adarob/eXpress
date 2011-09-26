@@ -242,16 +242,16 @@ void BiasBoss::update_expectations(const Transcript& trans)
     }
 }
 
-void BiasBoss::update_observed(const FragMap& frag, double normalized_mass)
+void BiasBoss::update_observed(const FragHit& hit, double normalized_mass)
 {
-    assert (frag.pair_status() != PAIRED || frag.length() > WINDOW);
+    assert (hit.pair_status() != PAIRED || hit.length() > WINDOW);
     
-    const string t_seq = frag.mapped_trans->seq();
+    const string t_seq = hit.mapped_trans->seq();
     
-    if (frag.pair_status() != RIGHT_ONLY)
+    if (hit.pair_status() != RIGHT_ONLY)
     {
         string seq_5;
-        int left_window = frag.left - (CENTER-1);
+        int left_window = hit.left - (CENTER-1);
         if (left_window < 0)
         {
             seq_5 = PADDING.substr(0, -left_window);
@@ -263,12 +263,12 @@ void BiasBoss::update_observed(const FragMap& frag, double normalized_mass)
         }
         
         _5_seq_bias.increment_observed(seq_5, normalized_mass);
-        _5_pos_bias.increment_observed(t_seq.length(), (double)frag.left/t_seq.length(), normalized_mass);
+        _5_pos_bias.increment_observed(t_seq.length(), (double)hit.left/t_seq.length(), normalized_mass);
     }
     
-    if (frag.pair_status() != LEFT_ONLY)
+    if (hit.pair_status() != LEFT_ONLY)
     {
-        int left_window = frag.right - CENTER;
+        int left_window = hit.right - CENTER;
         string seq_3 = t_seq.substr(left_window, WINDOW);
         int overhang =left_window + WINDOW - (int)t_seq.length();
         if (overhang > 0)
@@ -277,7 +277,7 @@ void BiasBoss::update_observed(const FragMap& frag, double normalized_mass)
         }
         
         _3_seq_bias.increment_observed(seq_3, normalized_mass);
-        _3_pos_bias.increment_observed(t_seq.length(), (double)(frag.right-1)/t_seq.length(), normalized_mass);
+        _3_pos_bias.increment_observed(t_seq.length(), (double)(hit.right-1)/t_seq.length(), normalized_mass);
     }
 }
 

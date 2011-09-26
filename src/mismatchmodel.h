@@ -10,7 +10,7 @@
 
 #include "frequencymatrix.h"
 
-class FragMap;
+class FragHit;
 class Transcript;
 
 /** 
@@ -63,14 +63,14 @@ public:
      * @param f the fragment mapping to calculate the log likelihood for
      * @return the log likelihood of the mapping based on mismatches
      */
-    double log_likelihood(const FragMap& f) const;
+    double log_likelihood(const FragHit& f) const;
     
     /**
      * member function that updates the error model parameters based on a mapping and its (logged) mass
      * @param f the fragment mapping 
      * @param mass the logged mass to increase the parameters by
      */
-    void update(const FragMap&, double mass);
+    void update(const FragHit&, double mass);
     
     /**
      * member function that returns a string containing a collapsed confusion matrix based on the model parameters for the first read

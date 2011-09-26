@@ -44,40 +44,40 @@ public:
     /**
      * FLD Constructor
      * @param alpha double that sets the average pseudo-counts (logged)
-     * @param max_val an integer that sets the maximum allowable FragMap length
+     * @param max_val an integer that sets the maximum allowable FragHit length
      * @param mean a size_t for the mean of the prior gaussian dist
      * @param std_dev a size_t for the std dev of the prior gaussian dist
      */
     FLD(double alpha, size_t max_val, size_t mean, size_t std_dev);
     
     /**
-     * a member function that returns the maximum allowed FragMap length
-     * @return max allowed FragMap length
+     * a member function that returns the maximum allowed FragHit length
+     * @return max allowed FragHit length
      */ 
     size_t max_val() const;
     
     /**
-     * a member function that returns the mean FragMap length
-     * @return mean observed FragMap length
+     * a member function that returns the mean FragHit length
+     * @return mean observed FragHit length
      */ 
     double mean() const;
     
     /**
-     * a member function that updates the distribution based on a new FragMap observation
-     * @param len an integer for the observed FragMap length
-     * @param mass a double for the mass (logged) of the observed FragMap
+     * a member function that updates the distribution based on a new FragHit observation
+     * @param len an integer for the observed FragHit length
+     * @param mass a double for the mass (logged) of the observed FragHit
      */
     void add_val(size_t len, double mass);
     
     /**
-     * a member function that returns the (logged) probability of a given FragMap length
-     * @param len an integer for the FragMap length to return the probability of
-     * @return (logged) probability of observing the given FragMap length
+     * a member function that returns the (logged) probability of a given FragHit length
+     * @param len an integer for the FragHit length to return the probability of
+     * @return (logged) probability of observing the given FragHit length
      */ 
     double pdf(size_t len) const;
     
     /**
-     * a member function that returns the (logged) number of observed fragmaps (including pseudo-counts)
+     * a member function that returns the (logged) number of observed FragHits (including pseudo-counts)
      * @return number of observed fragments
      */ 
     double tot_mass() const;

@@ -8,9 +8,7 @@
 
 //TODO: Speed up mismatch model?
 //TODO: Speed up bias initialization (using non-logged values)
-//TODO: Ouptut covariances
 
-//#include <boost/math/distributions/geometric.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/program_options.hpp>
 #include <boost/thread.hpp>
@@ -178,14 +176,14 @@ void process_fragment(double mass_n, Fragment* frag_p, FLD* fld, BiasBoss* bias_
 {
     Fragment& frag = *frag_p;
     
-    assert(frag.num_maps());
+    assert(frag.num_hits());
     
-    frag.maps()[0]->mapped_trans->incr_bundle_counts();
+    frag.hits()[0]->mapped_trans->incr_bundle_counts();
     
-    if (frag.num_maps()==1)
-    // maps to a single location
+    if (frag.num_hits()==1)
+    // hits to a single location
     {
-        const FragMap& m = *frag.maps()[0];
+        const FragHit& m = *frag.hits()[0];
         Transcript* t  = m.mapped_trans;
         if (!t)
         {
@@ -208,14 +206,14 @@ void process_fragment(double mass_n, Fragment* frag_p, FLD* fld, BiasBoss* bias_
         return;
     }
     
-    // maps to multiple locations
+    // hits to multiple locations
     
     // calculate marginal likelihoods
-    vector<double> likelihoods(frag.num_maps());
+    vector<double> likelihoods(frag.num_hits());
     double total_likelihood = 0.0;
-    for(size_t i = 0; i < frag.num_maps(); ++i)
+    for(size_t i = 0; i < frag.num_hits(); ++i)
     {
-        const FragMap& m = *frag.maps()[i];
+        const FragHit& m = *frag.hits()[i];
         Transcript* t = m.mapped_trans;
         likelihoods[i] = t->log_likelihood(m);
         total_likelihood = (i) ? log_sum(total_likelihood, likelihoods[i]):likelihoods[i];
@@ -227,10 +225,10 @@ void process_fragment(double mass_n, Fragment* frag_p, FLD* fld, BiasBoss* bias_
     }
 
     // normalize marginal likelihoods
-    TransID bundle_rep = trans_table->get_trans_rep(frag.maps()[0]->trans_id);
-    for(size_t i = 0; i < frag.num_maps(); ++i)
+    TransID bundle_rep = trans_table->get_trans_rep(frag.hits()[0]->trans_id);
+    for(size_t i = 0; i < frag.num_hits(); ++i)
     {
-        const FragMap& m = *frag.maps()[i];
+        const FragHit& m = *frag.hits()[i];
         Transcript* t  = m.mapped_trans;
         double p = likelihoods[i]-total_likelihood;
         double mass_t = mass_n + p;
@@ -258,9 +256,9 @@ void process_fragment(double mass_n, Fragment* frag_p, FLD* fld, BiasBoss* bias_
         
         if (calc_covar)
         {
-            for(size_t j = i+1; j < frag.num_maps(); ++j)
+            for(size_t j = i+1; j < frag.num_hits(); ++j)
             {
-                const FragMap& m2 = *frag.maps()[j];
+                const FragHit& m2 = *frag.hits()[j];
                 double p2 = likelihoods[j]-total_likelihood;
                 if (sexp(p2) == 0)
                     continue;
@@ -386,14 +384,7 @@ int main (int argc, char ** argv)
 
 	cout << "Writing results to file...\n";
     
-    
-    //mismatch_table->output(output_dir);
-    //ofstream fld_out((output_dir + "/fld.out").c_str());
-    //fld_out << fld.to_string() << '\n';
-    //fld_out.close();
-	//trans_table.output_bundles(output_dir);
-    
-	trans_table.output_results(output_dir, tot_counts, calc_covar);
+    trans_table.output_results(output_dir, tot_counts, calc_covar);
     ofstream paramfile((output_dir + "/params.xprs").c_str());
     fld.append_output(paramfile);
     if (mismatch_table)
@@ -401,6 +392,8 @@ int main (int argc, char ** argv)
     if (bias_table)
         bias_table->append_output(paramfile);
     paramfile.close();
-        
+    
+    cout << "Done\n";
+    
     return 0;
 }

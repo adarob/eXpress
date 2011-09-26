@@ -1,6 +1,6 @@
 #!/bin/bash
 
-VERSION=0.9.1
+VERSION=0.9.2
 MAC=express-$VERSION-macosx_x86_64
 LINUX=express-$VERSION-linux_x86_64
 SRC=express-$VERSION-src

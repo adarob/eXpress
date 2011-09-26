@@ -160,6 +160,14 @@
         <div class="corner-content-1col-top"></div>                        
         <div class="content-1col-nobox">
           <h1>News</h1>
+          <h2>09.27.2011 &bull; eXpress 0.9.2 BETA released</h2>
+          <p><b>Changes:</b>
+   		  <ul>
+   		  <li>Added eff_count_mean and eff_count_var columns to report bias-corrected counts</li>
+   		  <li>Fixed bug in poltyope projection that led to mean posterior counts outside of the interval between unique and total counts</li>
+          <li>Fixed compatibility issue with Linux binary</li>
+          </ul></p>
+
            <h2>09.14.2011 &bull; eXpress 0.9.1 BETA released</h2>
           <p><b>Changes:</b>
    		  <ul>
@@ -168,7 +176,7 @@
           <li>Added parameter (bias, fld, errors, etc.) output file (params.xprs) </li>
           <li>Added FPKM confidence intervals to results.xprs</li>
           <li>Column name changes (est_counts->post_counts_mean, est_counts_var->post_counts_var) in results.xprs</li>
-          <li>Estimated (mean posterior) counts are now guaranteed to lay between the total and unique counts</li>
+          <li>Estimated (mean posterior) counts are now guaranteed to lay between the total and unique counts using polytope projection</li>
           </ul></p>
 		  <h2>09.01.2011 &bull; eXpress 0.9.0 BETA released</h2>
           <p>We are pleased to announce the release of the first public beta of
@@ -186,7 +194,7 @@
         <div class="subcontent-box">
           <h1>Download</h1>                    
           <h5>Current Release</h5>
-          <p>eXpress 0.9.1 BETA
+          <p>eXpress 0.9.2 BETA
           <br />&rarr; <a href="downloads/express-0.9.1/express-0.9.1-src.tgz" onClick="_gaq.push(['_trackEvent', 'Downloads', 'Source', 'home-side']); " target="_blank">Source</a>
           <br />&rarr; <a href="downloads/express-0.9.1/express-0.9.1-macosx_x86_64.tgz" onClick="_gaq.push(['_trackEvent', 'Downloads', 'Mac', 'home-side']);" target="_blank">Mac OS X (64-bit) Binary</a>
           <br />&rarr; <a href="downloads/express-0.9.1/express-0.9.1-linux_x86_64.tgz" onClick="_gaq.push(['_trackEvent', 'Downloads', 'Linux', 'home-side']);" target="_blank">Linux (64-bit) Binary</a>
