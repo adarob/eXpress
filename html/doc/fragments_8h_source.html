@@ -104,36 +104,36 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00021"></a>00021 
 <a name="l00028"></a>00028 <span class="keyword">enum</span> PairStatus { PAIRED, LEFT_ONLY, RIGHT_ONLY };
 <a name="l00029"></a>00029 
-<a name="l00036"></a><a class="code" href="struct_frag_map.html">00036</a> <span class="keyword">struct </span><a class="code" href="struct_frag_map.html">FragMap</a>
+<a name="l00036"></a><a class="code" href="struct_frag_hit.html">00036</a> <span class="keyword">struct </span><a class="code" href="struct_frag_hit.html">FragHit</a>
 <a name="l00037"></a>00037 {
-<a name="l00041"></a><a class="code" href="struct_frag_map.html#a8514718d4a0ac62765305eddcd4ac276">00041</a>     std::string <a class="code" href="struct_frag_map.html#a8514718d4a0ac62765305eddcd4ac276">name</a>;
+<a name="l00041"></a><a class="code" href="struct_frag_hit.html#a429885700bdb7a6e097ae966e56c56e8">00041</a>     std::string <a class="code" href="struct_frag_hit.html#a429885700bdb7a6e097ae966e56c56e8">name</a>;
 <a name="l00042"></a>00042     
-<a name="l00046"></a><a class="code" href="struct_frag_map.html#a711ad4bc0a21d67a5cd2cc328619400e">00046</a>     TransID <a class="code" href="struct_frag_map.html#a711ad4bc0a21d67a5cd2cc328619400e">trans_id</a>;
+<a name="l00046"></a><a class="code" href="struct_frag_hit.html#a601050f9689b3d843ed9ce55671c7f01">00046</a>     TransID <a class="code" href="struct_frag_hit.html#a601050f9689b3d843ed9ce55671c7f01">trans_id</a>;
 <a name="l00047"></a>00047     
-<a name="l00051"></a><a class="code" href="struct_frag_map.html#a8d3d49a3f6db14ceeefb2434969fc3f4">00051</a>     <a class="code" href="class_transcript.html">Transcript</a>* <a class="code" href="struct_frag_map.html#a8d3d49a3f6db14ceeefb2434969fc3f4">mapped_trans</a>;
+<a name="l00051"></a><a class="code" href="struct_frag_hit.html#a0f4c6af60ebe405711cd03713d9f55ae">00051</a>     <a class="code" href="class_transcript.html">Transcript</a>* <a class="code" href="struct_frag_hit.html#a0f4c6af60ebe405711cd03713d9f55ae">mapped_trans</a>;
 <a name="l00052"></a>00052     
-<a name="l00056"></a><a class="code" href="struct_frag_map.html#af02beb8c3e6883e3954ce07a0b5fddd9">00056</a>     std::string <a class="code" href="struct_frag_map.html#af02beb8c3e6883e3954ce07a0b5fddd9">seq_l</a>;
+<a name="l00056"></a><a class="code" href="struct_frag_hit.html#a7dc9ae8da797e1a0df2b576218c59f48">00056</a>     std::string <a class="code" href="struct_frag_hit.html#a7dc9ae8da797e1a0df2b576218c59f48">seq_l</a>;
 <a name="l00057"></a>00057     
-<a name="l00061"></a><a class="code" href="struct_frag_map.html#a20ee2488ba339b0c93add0bcbb65b979">00061</a>     std::string <a class="code" href="struct_frag_map.html#a20ee2488ba339b0c93add0bcbb65b979">seq_r</a>;
+<a name="l00061"></a><a class="code" href="struct_frag_hit.html#aef2e4300e8ec030142f7af9d0cc37e9c">00061</a>     std::string <a class="code" href="struct_frag_hit.html#aef2e4300e8ec030142f7af9d0cc37e9c">seq_r</a>;
 <a name="l00062"></a>00062     
-<a name="l00067"></a><a class="code" href="struct_frag_map.html#ad8028c435a0ff9aebcc03cb7d05c91c3">00067</a>     <span class="keywordtype">int</span> <a class="code" href="struct_frag_map.html#ad8028c435a0ff9aebcc03cb7d05c91c3">left</a>;
+<a name="l00067"></a><a class="code" href="struct_frag_hit.html#af50781d0435f9ce5cecd0bfc67e35c83">00067</a>     <span class="keywordtype">int</span> <a class="code" href="struct_frag_hit.html#af50781d0435f9ce5cecd0bfc67e35c83">left</a>;
 <a name="l00068"></a>00068     
-<a name="l00073"></a><a class="code" href="struct_frag_map.html#af9b896df4add2a71c6023ec077a4bdd0">00073</a>     <span class="keywordtype">int</span> <a class="code" href="struct_frag_map.html#af9b896df4add2a71c6023ec077a4bdd0">right</a>;
+<a name="l00073"></a><a class="code" href="struct_frag_hit.html#a56b767b37618e037513600954ad8e663">00073</a>     <span class="keywordtype">int</span> <a class="code" href="struct_frag_hit.html#a56b767b37618e037513600954ad8e663">right</a>;
 <a name="l00074"></a>00074     
-<a name="l00080"></a><a class="code" href="struct_frag_map.html#a9e7dfc92eee4d1c1a4e444b14d994a49">00080</a>     <span class="keywordtype">int</span> <a class="code" href="struct_frag_map.html#a9e7dfc92eee4d1c1a4e444b14d994a49">mate_l</a>;
+<a name="l00080"></a><a class="code" href="struct_frag_hit.html#ab2cc7d8b6992532a68bed7c8e0ba28fc">00080</a>     <span class="keywordtype">int</span> <a class="code" href="struct_frag_hit.html#ab2cc7d8b6992532a68bed7c8e0ba28fc">mate_l</a>;
 <a name="l00081"></a>00081     
-<a name="l00087"></a><a class="code" href="struct_frag_map.html#a688e779754f548c87aac1b9f7aa93c79">00087</a>     <span class="keywordtype">bool</span> <a class="code" href="struct_frag_map.html#a688e779754f548c87aac1b9f7aa93c79">left_first</a>;
+<a name="l00087"></a><a class="code" href="struct_frag_hit.html#a671e366df876333590ebc8a94c0deb33">00087</a>     <span class="keywordtype">bool</span> <a class="code" href="struct_frag_hit.html#a671e366df876333590ebc8a94c0deb33">left_first</a>;
 <a name="l00088"></a>00088     
-<a name="l00094"></a><a class="code" href="struct_frag_map.html#ad127d0430b4ab03f35118680a60788f5">00094</a>     <span class="keywordtype">int</span> <a class="code" href="struct_frag_map.html#ad127d0430b4ab03f35118680a60788f5">length</a>()<span class="keyword"> const</span>
+<a name="l00094"></a><a class="code" href="struct_frag_hit.html#ae3cd8216ac8588da5eec0937532ee0bd">00094</a>     <span class="keywordtype">int</span> <a class="code" href="struct_frag_hit.html#ae3cd8216ac8588da5eec0937532ee0bd">length</a>()<span class="keyword"> const</span>
 <a name="l00095"></a>00095 <span class="keyword">    </span>{
-<a name="l00096"></a>00096         <span class="keywordflow">return</span> <a class="code" href="struct_frag_map.html#af9b896df4add2a71c6023ec077a4bdd0">right</a> - <a class="code" href="struct_frag_map.html#ad8028c435a0ff9aebcc03cb7d05c91c3">left</a>;
+<a name="l00096"></a>00096         <span class="keywordflow">return</span> <a class="code" href="struct_frag_hit.html#a56b767b37618e037513600954ad8e663">right</a> - <a class="code" href="struct_frag_hit.html#af50781d0435f9ce5cecd0bfc67e35c83">left</a>;
 <a name="l00097"></a>00097     }
 <a name="l00098"></a>00098     
-<a name="l00105"></a><a class="code" href="struct_frag_map.html#a1113cf78dff88915963e9cf7f5a525c7">00105</a>     PairStatus <a class="code" href="struct_frag_map.html#a1113cf78dff88915963e9cf7f5a525c7">pair_status</a>()<span class="keyword"> const</span>
+<a name="l00105"></a><a class="code" href="struct_frag_hit.html#a2bb956b0fa92820eefc5bf7a13a74d47">00105</a>     PairStatus <a class="code" href="struct_frag_hit.html#a2bb956b0fa92820eefc5bf7a13a74d47">pair_status</a>()<span class="keyword"> const</span>
 <a name="l00106"></a>00106 <span class="keyword">    </span>{ 
-<a name="l00107"></a>00107         <span class="keywordflow">if</span> (!<a class="code" href="struct_frag_map.html#af02beb8c3e6883e3954ce07a0b5fddd9">seq_l</a>.empty() &amp;&amp; !<a class="code" href="struct_frag_map.html#a20ee2488ba339b0c93add0bcbb65b979">seq_r</a>.empty())
+<a name="l00107"></a>00107         <span class="keywordflow">if</span> (!<a class="code" href="struct_frag_hit.html#a7dc9ae8da797e1a0df2b576218c59f48">seq_l</a>.empty() &amp;&amp; !<a class="code" href="struct_frag_hit.html#aef2e4300e8ec030142f7af9d0cc37e9c">seq_r</a>.empty())
 <a name="l00108"></a>00108             <span class="keywordflow">return</span> PAIRED;
-<a name="l00109"></a>00109         <span class="keywordflow">if</span> (<a class="code" href="struct_frag_map.html#af02beb8c3e6883e3954ce07a0b5fddd9">seq_l</a>.empty())
+<a name="l00109"></a>00109         <span class="keywordflow">if</span> (<a class="code" href="struct_frag_hit.html#a7dc9ae8da797e1a0df2b576218c59f48">seq_l</a>.empty())
 <a name="l00110"></a>00110             <span class="keywordflow">return</span> RIGHT_ONLY;
 <a name="l00111"></a>00111         <span class="keywordflow">return</span> LEFT_ONLY;
 <a name="l00112"></a>00112     }
@@ -142,25 +142,25 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00123"></a><a class="code" href="class_fragment.html">00123</a> <span class="keyword">class </span><a class="code" href="class_fragment.html">Fragment</a>
 <a name="l00124"></a>00124 {
 <a name="l00125"></a>00125     
-<a name="l00129"></a>00129     std::vector&lt;FragMap*&gt; _frag_maps;
+<a name="l00129"></a>00129     std::vector&lt;FragHit*&gt; _frag_hits;
 <a name="l00130"></a>00130     
-<a name="l00135"></a>00135     std::vector&lt;FragMap*&gt; _open_mates;
+<a name="l00135"></a>00135     std::vector&lt;FragHit*&gt; _open_mates;
 <a name="l00136"></a>00136     
 <a name="l00140"></a>00140     std::string _name;
 <a name="l00141"></a>00141     
-<a name="l00147"></a>00147     <span class="keywordtype">void</span> add_open_mate(<a class="code" href="struct_frag_map.html">FragMap</a>* om);
+<a name="l00147"></a>00147     <span class="keywordtype">void</span> add_open_mate(<a class="code" href="struct_frag_hit.html">FragHit</a>* om);
 <a name="l00148"></a>00148 
 <a name="l00149"></a>00149 <span class="keyword">public</span>:
 <a name="l00150"></a>00150     
 <a name="l00154"></a>00154     <a class="code" href="class_fragment.html#afafef6f55cd0df3527e50d6ce01a182a">~Fragment</a>();
 <a name="l00155"></a>00155     
-<a name="l00163"></a>00163     <span class="keywordtype">bool</span> <a class="code" href="class_fragment.html#a9bdf6dde9770408cd10247c849c88d1d">add_map_end</a>(<a class="code" href="struct_frag_map.html">FragMap</a>* f);
+<a name="l00163"></a>00163     <span class="keywordtype">bool</span> <a class="code" href="class_fragment.html#a29dc3beb491b6267b1e983d3e5b1a790">add_map_end</a>(<a class="code" href="struct_frag_hit.html">FragHit</a>* f);
 <a name="l00164"></a>00164     
 <a name="l00169"></a><a class="code" href="class_fragment.html#a24cda168c57267384025aff39e96fd39">00169</a>     <span class="keyword">const</span> std::string <a class="code" href="class_fragment.html#a24cda168c57267384025aff39e96fd39">name</a>()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> _name; }
 <a name="l00170"></a>00170     
-<a name="l00175"></a><a class="code" href="class_fragment.html#ad1cd0dd503c97bd6ac1b2b0b0ed05e0d">00175</a>     <span class="keyword">const</span> <span class="keywordtype">size_t</span> <a class="code" href="class_fragment.html#ad1cd0dd503c97bd6ac1b2b0b0ed05e0d">num_maps</a>()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> _frag_maps.size(); }
+<a name="l00175"></a><a class="code" href="class_fragment.html#a32b40ddfd8b60387368fde18ba682755">00175</a>     <span class="keyword">const</span> <span class="keywordtype">size_t</span> <a class="code" href="class_fragment.html#a32b40ddfd8b60387368fde18ba682755">num_hits</a>()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> _frag_hits.size(); }
 <a name="l00176"></a>00176     
-<a name="l00181"></a><a class="code" href="class_fragment.html#a6ef49e039fa9cc6133223c9d08be7e07">00181</a>     <span class="keyword">const</span> std::vector&lt;FragMap*&gt;&amp; <a class="code" href="class_fragment.html#a6ef49e039fa9cc6133223c9d08be7e07">maps</a>()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> _frag_maps; }
+<a name="l00181"></a><a class="code" href="class_fragment.html#a3f5edd9e3af16628065df333d50def86">00181</a>     <span class="keyword">const</span> std::vector&lt;FragHit*&gt;&amp; <a class="code" href="class_fragment.html#a3f5edd9e3af16628065df333d50def86">hits</a>()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> _frag_hits; }
 <a name="l00182"></a>00182 };
 <a name="l00183"></a>00183 
 <a name="l00184"></a>00184 
@@ -170,7 +170,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div id="nav-path" class="navpath">
     <ul>
       <li class="navelem"><b>fragments.h</b>      </li>
-      <li class="footer">Generated on Thu Sep 15 2011 22:50:16 for eXpress by&#160;
+      <li class="footer">Generated on Mon Sep 26 2011 21:24:42 for eXpress by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </li>
     </ul>

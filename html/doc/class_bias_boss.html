@@ -95,7 +95,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 Public Member Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_bias_boss.html#a052e534308afcc766eb417b6656cdd39">BiasBoss</a> (double alpha)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_bias_boss.html#a0be8a21ce7edf3206111bf3e8d04910e">update_expectations</a> (const <a class="el" href="class_transcript.html">Transcript</a> &amp;trans)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_bias_boss.html#ade226a696a85a4c4178dbb2492880e6c">update_observed</a> (const <a class="el" href="struct_frag_map.html">FragMap</a> &amp;frag, double mass)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_bias_boss.html#a4a3d5e083c77d567db176d45339de79c">update_observed</a> (const <a class="el" href="struct_frag_hit.html">FragHit</a> &amp;hit, double mass)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_bias_boss.html#af215929f1bb48658260104af729c7bfa">get_transcript_bias</a> (std::vector&lt; double &gt; &amp;start_bias, std::vector&lt; double &gt; &amp;end_bias, const <a class="el" href="class_transcript.html">Transcript</a> &amp;trans) const </td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_bias_boss.html#a849af7bee4868e29367aa4a3e47262a0">to_string</a> () const </td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_bias_boss.html#a33a06af813884a0aa4b98b51a72bc1eb">append_output</a> (std::ofstream &amp;outfile) const </td></tr>
@@ -249,15 +249,15 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="ade226a696a85a4c4178dbb2492880e6c"></a><!-- doxytag: member="BiasBoss::update_observed" ref="ade226a696a85a4c4178dbb2492880e6c" args="(const FragMap &amp;frag, double mass)" -->
+<a class="anchor" id="a4a3d5e083c77d567db176d45339de79c"></a><!-- doxytag: member="BiasBoss::update_observed" ref="a4a3d5e083c77d567db176d45339de79c" args="(const FragHit &amp;hit, double mass)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">void BiasBoss::update_observed </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="struct_frag_map.html">FragMap</a> &amp;&#160;</td>
-          <td class="paramname"><em>frag</em>, </td>
+          <td class="paramtype">const <a class="el" href="struct_frag_hit.html">FragHit</a> &amp;&#160;</td>
+          <td class="paramname"><em>hit</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -276,7 +276,7 @@ Public Member Functions</h2></td></tr>
 <p>a member function that updates the observed parameters (sequence-specific and positional) given a fragment mapping to a transcript and its logged probabilistic assignment </p>
 <dl><dt><b>Parameters:</b></dt><dd>
   <table class="params">
-    <tr><td class="paramname">frag</td><td>the fragment mapping </td></tr>
+    <tr><td class="paramname">hit</td><td>the fragment hit (alignment) </td></tr>
     <tr><td class="paramname">mass</td><td>the logged probabality of the mapping, which is the amount to update the observed counts by </td></tr>
   </table>
   </dd>
@@ -295,7 +295,7 @@ Public Member Functions</h2></td></tr>
   <div id="nav-path" class="navpath">
     <ul>
       <li class="navelem"><a class="el" href="class_bias_boss.html">BiasBoss</a>      </li>
-      <li class="footer">Generated on Thu Sep 15 2011 22:50:18 for eXpress by&#160;
+      <li class="footer">Generated on Mon Sep 26 2011 21:24:49 for eXpress by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </li>
     </ul>

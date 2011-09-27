@@ -105,26 +105,26 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00022"></a>00022   _active(false)
 <a name="l00023"></a>00023 {}
 <a name="l00024"></a>00024 
-<a name="l00025"></a><a class="code" href="class_mismatch_table.html#a395ed48fbb48467c7ae20558e482b159">00025</a> <span class="keywordtype">double</span> <a class="code" href="class_mismatch_table.html#a395ed48fbb48467c7ae20558e482b159">MismatchTable::log_likelihood</a>(<span class="keyword">const</span> <a class="code" href="struct_frag_map.html">FragMap</a>&amp; f)<span class="keyword"> const</span>
+<a name="l00025"></a><a class="code" href="class_mismatch_table.html#aed4e942c6b9774bf354b862f647e1a6c">00025</a> <span class="keywordtype">double</span> <a class="code" href="class_mismatch_table.html#aed4e942c6b9774bf354b862f647e1a6c">MismatchTable::log_likelihood</a>(<span class="keyword">const</span> <a class="code" href="struct_frag_hit.html">FragHit</a>&amp; f)<span class="keyword"> const</span>
 <a name="l00026"></a>00026 <span class="keyword"></span>{
 <a name="l00027"></a>00027     <span class="keywordflow">if</span> (!_active)
 <a name="l00028"></a>00028         <span class="keywordflow">return</span> 0;
 <a name="l00029"></a>00029     
-<a name="l00030"></a>00030     <span class="keyword">const</span> <span class="keywordtype">string</span>&amp; t_seq = f.<a class="code" href="struct_frag_map.html#a8d3d49a3f6db14ceeefb2434969fc3f4">mapped_trans</a>-&gt;<a class="code" href="class_transcript.html#abdf9e6054e345ed9f1a49f0be3a0ccc7">seq</a>();
+<a name="l00030"></a>00030     <span class="keyword">const</span> <span class="keywordtype">string</span>&amp; t_seq = f.<a class="code" href="struct_frag_hit.html#a0f4c6af60ebe405711cd03713d9f55ae">mapped_trans</a>-&gt;<a class="code" href="class_transcript.html#abdf9e6054e345ed9f1a49f0be3a0ccc7">seq</a>();
 <a name="l00031"></a>00031     <span class="keywordtype">double</span> ll = 0;
 <a name="l00032"></a>00032     
-<a name="l00033"></a>00033     <span class="keyword">const</span> vector&lt;FrequencyMatrix&gt;&amp; left_mm = (f.<a class="code" href="struct_frag_map.html#a688e779754f548c87aac1b9f7aa93c79">left_first</a>) ? _first_read_mm : _second_read_mm;
-<a name="l00034"></a>00034     <span class="keyword">const</span> vector&lt;FrequencyMatrix&gt;&amp; right_mm = (!f.<a class="code" href="struct_frag_map.html#a688e779754f548c87aac1b9f7aa93c79">left_first</a>) ? _first_read_mm : _second_read_mm;
+<a name="l00033"></a>00033     <span class="keyword">const</span> vector&lt;FrequencyMatrix&gt;&amp; left_mm = (f.<a class="code" href="struct_frag_hit.html#a671e366df876333590ebc8a94c0deb33">left_first</a>) ? _first_read_mm : _second_read_mm;
+<a name="l00034"></a>00034     <span class="keyword">const</span> vector&lt;FrequencyMatrix&gt;&amp; right_mm = (!f.<a class="code" href="struct_frag_hit.html#a671e366df876333590ebc8a94c0deb33">left_first</a>) ? _first_read_mm : _second_read_mm;
 <a name="l00035"></a>00035     
 <a name="l00036"></a>00036     <span class="keywordtype">size_t</span> cur;
 <a name="l00037"></a>00037     <span class="keywordtype">size_t</span> ref;
 <a name="l00038"></a>00038     <span class="keywordtype">size_t</span> prev = 0;
 <a name="l00039"></a>00039     <span class="keywordtype">size_t</span> index;
 <a name="l00040"></a>00040     
-<a name="l00041"></a>00041     <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; f.<a class="code" href="struct_frag_map.html#af02beb8c3e6883e3954ce07a0b5fddd9">seq_l</a>.length(); i++)
+<a name="l00041"></a>00041     <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; f.<a class="code" href="struct_frag_hit.html#a7dc9ae8da797e1a0df2b576218c59f48">seq_l</a>.length(); i++)
 <a name="l00042"></a>00042     {
-<a name="l00043"></a>00043         cur = ctoi(f.<a class="code" href="struct_frag_map.html#af02beb8c3e6883e3954ce07a0b5fddd9">seq_l</a>[i]);
-<a name="l00044"></a>00044         ref = ctoi(t_seq[f.<a class="code" href="struct_frag_map.html#ad8028c435a0ff9aebcc03cb7d05c91c3">left</a>+i]);
+<a name="l00043"></a>00043         cur = ctoi(f.<a class="code" href="struct_frag_hit.html#a7dc9ae8da797e1a0df2b576218c59f48">seq_l</a>[i]);
+<a name="l00044"></a>00044         ref = ctoi(t_seq[f.<a class="code" href="struct_frag_hit.html#af50781d0435f9ce5cecd0bfc67e35c83">left</a>+i]);
 <a name="l00045"></a>00045         <span class="keywordflow">if</span> (prev != 4 &amp;&amp; cur != 4 &amp;&amp; ref != 4)
 <a name="l00046"></a>00046         {
 <a name="l00047"></a>00047             index = (prev &lt;&lt; 2) + ref;
@@ -134,12 +134,12 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00051"></a>00051         prev = ref;
 <a name="l00052"></a>00052     }
 <a name="l00053"></a>00053     
-<a name="l00054"></a>00054     <span class="keywordtype">size_t</span> r_len = f.<a class="code" href="struct_frag_map.html#a20ee2488ba339b0c93add0bcbb65b979">seq_r</a>.length();
+<a name="l00054"></a>00054     <span class="keywordtype">size_t</span> r_len = f.<a class="code" href="struct_frag_hit.html#aef2e4300e8ec030142f7af9d0cc37e9c">seq_r</a>.length();
 <a name="l00055"></a>00055     prev = 0;
 <a name="l00056"></a>00056     <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 1; i &lt; r_len; i++)
 <a name="l00057"></a>00057     {
-<a name="l00058"></a>00058         ref = ctoi_r(t_seq[f.<a class="code" href="struct_frag_map.html#af9b896df4add2a71c6023ec077a4bdd0">right</a>-i-1]);
-<a name="l00059"></a>00059         cur = ctoi_r(f.<a class="code" href="struct_frag_map.html#a20ee2488ba339b0c93add0bcbb65b979">seq_r</a>[r_len-i-1]);
+<a name="l00058"></a>00058         ref = ctoi_r(t_seq[f.<a class="code" href="struct_frag_hit.html#a56b767b37618e037513600954ad8e663">right</a>-i-1]);
+<a name="l00059"></a>00059         cur = ctoi_r(f.<a class="code" href="struct_frag_hit.html#aef2e4300e8ec030142f7af9d0cc37e9c">seq_r</a>[r_len-i-1]);
 <a name="l00060"></a>00060         <span class="keywordflow">if</span> (prev != 4 &amp;&amp; cur != 4 &amp;&amp; ref != 4)
 <a name="l00061"></a>00061         {
 <a name="l00062"></a>00062             index = (prev &lt;&lt; 2) + ref;
@@ -152,22 +152,22 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00069"></a>00069 }
 <a name="l00070"></a>00070 
 <a name="l00071"></a>00071 
-<a name="l00072"></a><a class="code" href="class_mismatch_table.html#aeb5b480129df9aee3947fbfb85545ca4">00072</a> <span class="keywordtype">void</span> <a class="code" href="class_mismatch_table.html#aeb5b480129df9aee3947fbfb85545ca4">MismatchTable::update</a>(<span class="keyword">const</span> <a class="code" href="struct_frag_map.html">FragMap</a>&amp; f, <span class="keywordtype">double</span> mass)
+<a name="l00072"></a><a class="code" href="class_mismatch_table.html#a6d4a099f4503e23ace38fb8c344f321e">00072</a> <span class="keywordtype">void</span> <a class="code" href="class_mismatch_table.html#a6d4a099f4503e23ace38fb8c344f321e">MismatchTable::update</a>(<span class="keyword">const</span> <a class="code" href="struct_frag_hit.html">FragHit</a>&amp; f, <span class="keywordtype">double</span> mass)
 <a name="l00073"></a>00073 {
-<a name="l00074"></a>00074     <span class="keyword">const</span> <span class="keywordtype">string</span>&amp; t_seq = f.<a class="code" href="struct_frag_map.html#a8d3d49a3f6db14ceeefb2434969fc3f4">mapped_trans</a>-&gt;<a class="code" href="class_transcript.html#abdf9e6054e345ed9f1a49f0be3a0ccc7">seq</a>();
+<a name="l00074"></a>00074     <span class="keyword">const</span> <span class="keywordtype">string</span>&amp; t_seq = f.<a class="code" href="struct_frag_hit.html#a0f4c6af60ebe405711cd03713d9f55ae">mapped_trans</a>-&gt;<a class="code" href="class_transcript.html#abdf9e6054e345ed9f1a49f0be3a0ccc7">seq</a>();
 <a name="l00075"></a>00075     
-<a name="l00076"></a>00076     vector&lt;FrequencyMatrix&gt;&amp; left_mm = (f.<a class="code" href="struct_frag_map.html#a688e779754f548c87aac1b9f7aa93c79">left_first</a>) ? _first_read_mm : _second_read_mm;
-<a name="l00077"></a>00077     vector&lt;FrequencyMatrix&gt;&amp; right_mm = (!f.<a class="code" href="struct_frag_map.html#a688e779754f548c87aac1b9f7aa93c79">left_first</a>) ? _first_read_mm : _second_read_mm;
+<a name="l00076"></a>00076     vector&lt;FrequencyMatrix&gt;&amp; left_mm = (f.<a class="code" href="struct_frag_hit.html#a671e366df876333590ebc8a94c0deb33">left_first</a>) ? _first_read_mm : _second_read_mm;
+<a name="l00077"></a>00077     vector&lt;FrequencyMatrix&gt;&amp; right_mm = (!f.<a class="code" href="struct_frag_hit.html#a671e366df876333590ebc8a94c0deb33">left_first</a>) ? _first_read_mm : _second_read_mm;
 <a name="l00078"></a>00078     
 <a name="l00079"></a>00079     <span class="keywordtype">size_t</span> cur;
 <a name="l00080"></a>00080     <span class="keywordtype">size_t</span> ref;
 <a name="l00081"></a>00081     <span class="keywordtype">size_t</span> prev = 0;
 <a name="l00082"></a>00082     <span class="keywordtype">size_t</span> index;
 <a name="l00083"></a>00083     
-<a name="l00084"></a>00084     <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; f.<a class="code" href="struct_frag_map.html#af02beb8c3e6883e3954ce07a0b5fddd9">seq_l</a>.length(); i++)
+<a name="l00084"></a>00084     <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; f.<a class="code" href="struct_frag_hit.html#a7dc9ae8da797e1a0df2b576218c59f48">seq_l</a>.length(); i++)
 <a name="l00085"></a>00085     {
-<a name="l00086"></a>00086         cur = ctoi(f.<a class="code" href="struct_frag_map.html#af02beb8c3e6883e3954ce07a0b5fddd9">seq_l</a>[i]);
-<a name="l00087"></a>00087         ref = ctoi(t_seq[f.<a class="code" href="struct_frag_map.html#ad8028c435a0ff9aebcc03cb7d05c91c3">left</a>+i]);
+<a name="l00086"></a>00086         cur = ctoi(f.<a class="code" href="struct_frag_hit.html#a7dc9ae8da797e1a0df2b576218c59f48">seq_l</a>[i]);
+<a name="l00087"></a>00087         ref = ctoi(t_seq[f.<a class="code" href="struct_frag_hit.html#af50781d0435f9ce5cecd0bfc67e35c83">left</a>+i]);
 <a name="l00088"></a>00088         <span class="keywordflow">if</span> (prev != 4 &amp;&amp; cur != 4 &amp;&amp; ref != 4)
 <a name="l00089"></a>00089         {
 <a name="l00090"></a>00090             index = (prev &lt;&lt; 2) + ref;
@@ -176,12 +176,12 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00093"></a>00093         prev = ref;
 <a name="l00094"></a>00094     }
 <a name="l00095"></a>00095     
-<a name="l00096"></a>00096     <span class="keywordtype">size_t</span> r_len = f.<a class="code" href="struct_frag_map.html#a20ee2488ba339b0c93add0bcbb65b979">seq_r</a>.length();
+<a name="l00096"></a>00096     <span class="keywordtype">size_t</span> r_len = f.<a class="code" href="struct_frag_hit.html#aef2e4300e8ec030142f7af9d0cc37e9c">seq_r</a>.length();
 <a name="l00097"></a>00097     prev = 0;
 <a name="l00098"></a>00098     <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; r_len; i++)
 <a name="l00099"></a>00099     {
-<a name="l00100"></a>00100         ref = ctoi_r(t_seq[f.<a class="code" href="struct_frag_map.html#af9b896df4add2a71c6023ec077a4bdd0">right</a>-i-1]);
-<a name="l00101"></a>00101         cur = ctoi_r(f.<a class="code" href="struct_frag_map.html#a20ee2488ba339b0c93add0bcbb65b979">seq_r</a>[r_len-i-1]);
+<a name="l00100"></a>00100         ref = ctoi_r(t_seq[f.<a class="code" href="struct_frag_hit.html#a56b767b37618e037513600954ad8e663">right</a>-i-1]);
+<a name="l00101"></a>00101         cur = ctoi_r(f.<a class="code" href="struct_frag_hit.html#aef2e4300e8ec030142f7af9d0cc37e9c">seq_r</a>[r_len-i-1]);
 <a name="l00102"></a>00102         <span class="keywordflow">if</span> (prev != 4 &amp;&amp; cur != 4 &amp;&amp; ref != 4)
 <a name="l00103"></a>00103         {
 <a name="l00104"></a>00104             index = (prev &lt;&lt; 2) + ref;
@@ -190,7 +190,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00107"></a>00107         prev = ref;
 <a name="l00108"></a>00108     }
 <a name="l00109"></a>00109     
-<a name="l00110"></a>00110     _max_len = max(_max_len, max(f.<a class="code" href="struct_frag_map.html#af02beb8c3e6883e3954ce07a0b5fddd9">seq_l</a>.length(), f.<a class="code" href="struct_frag_map.html#a20ee2488ba339b0c93add0bcbb65b979">seq_r</a>.length())); 
+<a name="l00110"></a>00110     _max_len = max(_max_len, max(f.<a class="code" href="struct_frag_hit.html#a7dc9ae8da797e1a0df2b576218c59f48">seq_l</a>.length(), f.<a class="code" href="struct_frag_hit.html#aef2e4300e8ec030142f7af9d0cc37e9c">seq_r</a>.length())); 
 <a name="l00111"></a>00111 }
 <a name="l00112"></a>00112 
 <a name="l00113"></a><a class="code" href="class_mismatch_table.html#a48aa36b97921c294702bd506eb43f6a7">00113</a> <span class="keywordtype">string</span> <a class="code" href="class_mismatch_table.html#a48aa36b97921c294702bd506eb43f6a7">MismatchTable::to_string</a>()<span class="keyword"> const</span>
@@ -280,7 +280,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div id="nav-path" class="navpath">
     <ul>
       <li class="navelem"><b>mismatchmodel.cpp</b>      </li>
-      <li class="footer">Generated on Thu Sep 15 2011 22:50:16 for eXpress by&#160;
+      <li class="footer">Generated on Mon Sep 26 2011 21:24:43 for eXpress by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </li>
     </ul>

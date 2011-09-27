@@ -147,7 +147,7 @@ Public Member Functions</h2></td></tr>
 <dl><dt><b>Parameters:</b></dt><dd>
   <table class="params">
     <tr><td class="paramname">alpha</td><td>double that sets the average pseudo-counts (logged) </td></tr>
-    <tr><td class="paramname">max_val</td><td>an integer that sets the maximum allowable <a class="el" href="struct_frag_map.html">FragMap</a> length </td></tr>
+    <tr><td class="paramname">max_val</td><td>an integer that sets the maximum allowable <a class="el" href="struct_frag_hit.html">FragHit</a> length </td></tr>
     <tr><td class="paramname">mean</td><td>a size_t for the mean of the prior gaussian dist </td></tr>
     <tr><td class="paramname">std_dev</td><td>a size_t for the std dev of the prior gaussian dist </td></tr>
   </table>
@@ -183,11 +183,11 @@ Public Member Functions</h2></td></tr>
       </table>
 </div>
 <div class="memdoc">
-<p>a member function that updates the distribution based on a new <a class="el" href="struct_frag_map.html">FragMap</a> observation </p>
+<p>a member function that updates the distribution based on a new <a class="el" href="struct_frag_hit.html">FragHit</a> observation </p>
 <dl><dt><b>Parameters:</b></dt><dd>
   <table class="params">
-    <tr><td class="paramname">len</td><td>an integer for the observed <a class="el" href="struct_frag_map.html">FragMap</a> length </td></tr>
-    <tr><td class="paramname">mass</td><td>a double for the mass (logged) of the observed <a class="el" href="struct_frag_map.html">FragMap</a> </td></tr>
+    <tr><td class="paramname">len</td><td>an integer for the observed <a class="el" href="struct_frag_hit.html">FragHit</a> length </td></tr>
+    <tr><td class="paramname">mass</td><td>a double for the mass (logged) of the observed <a class="el" href="struct_frag_hit.html">FragHit</a> </td></tr>
   </table>
   </dd>
 </dl>
@@ -233,8 +233,8 @@ Public Member Functions</h2></td></tr>
       </table>
 </div>
 <div class="memdoc">
-<p>a member function that returns the maximum allowed <a class="el" href="struct_frag_map.html">FragMap</a> length </p>
-<dl class="return"><dt><b>Returns:</b></dt><dd>max allowed <a class="el" href="struct_frag_map.html">FragMap</a> length </dd></dl>
+<p>a member function that returns the maximum allowed <a class="el" href="struct_frag_hit.html">FragHit</a> length </p>
+<dl class="return"><dt><b>Returns:</b></dt><dd>max allowed <a class="el" href="struct_frag_hit.html">FragHit</a> length </dd></dl>
 
 <p>Definition at line <a class="el" href="fld_8cpp_source.html#l00041">41</a> of file <a class="el" href="fld_8cpp_source.html">fld.cpp</a>.</p>
 
@@ -253,8 +253,8 @@ Public Member Functions</h2></td></tr>
       </table>
 </div>
 <div class="memdoc">
-<p>a member function that returns the mean <a class="el" href="struct_frag_map.html">FragMap</a> length </p>
-<dl class="return"><dt><b>Returns:</b></dt><dd>mean observed <a class="el" href="struct_frag_map.html">FragMap</a> length </dd></dl>
+<p>a member function that returns the mean <a class="el" href="struct_frag_hit.html">FragHit</a> length </p>
+<dl class="return"><dt><b>Returns:</b></dt><dd>mean observed <a class="el" href="struct_frag_hit.html">FragHit</a> length </dd></dl>
 
 <p>Definition at line <a class="el" href="fld_8cpp_source.html#l00074">74</a> of file <a class="el" href="fld_8cpp_source.html">fld.cpp</a>.</p>
 
@@ -274,14 +274,14 @@ Public Member Functions</h2></td></tr>
       </table>
 </div>
 <div class="memdoc">
-<p>a member function that returns the (logged) probability of a given <a class="el" href="struct_frag_map.html">FragMap</a> length </p>
+<p>a member function that returns the (logged) probability of a given <a class="el" href="struct_frag_hit.html">FragHit</a> length </p>
 <dl><dt><b>Parameters:</b></dt><dd>
   <table class="params">
-    <tr><td class="paramname">len</td><td>an integer for the <a class="el" href="struct_frag_map.html">FragMap</a> length to return the probability of </td></tr>
+    <tr><td class="paramname">len</td><td>an integer for the <a class="el" href="struct_frag_hit.html">FragHit</a> length to return the probability of </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="return"><dt><b>Returns:</b></dt><dd>(logged) probability of observing the given <a class="el" href="struct_frag_map.html">FragMap</a> length </dd></dl>
+<dl class="return"><dt><b>Returns:</b></dt><dd>(logged) probability of observing the given <a class="el" href="struct_frag_hit.html">FragHit</a> length </dd></dl>
 
 <p>Definition at line <a class="el" href="fld_8cpp_source.html#l00062">62</a> of file <a class="el" href="fld_8cpp_source.html">fld.cpp</a>.</p>
 
@@ -320,7 +320,7 @@ Public Member Functions</h2></td></tr>
       </table>
 </div>
 <div class="memdoc">
-<p>a member function that returns the (logged) number of observed fragmaps (including pseudo-counts) </p>
+<p>a member function that returns the (logged) number of observed FragHits (including pseudo-counts) </p>
 <dl class="return"><dt><b>Returns:</b></dt><dd>number of observed fragments </dd></dl>
 
 <p>Definition at line <a class="el" href="fld_8cpp_source.html#l00069">69</a> of file <a class="el" href="fld_8cpp_source.html">fld.cpp</a>.</p>
@@ -336,7 +336,7 @@ Public Member Functions</h2></td></tr>
   <div id="nav-path" class="navpath">
     <ul>
       <li class="navelem"><a class="el" href="class_f_l_d.html">FLD</a>      </li>
-      <li class="footer">Generated on Thu Sep 15 2011 22:50:18 for eXpress by&#160;
+      <li class="footer">Generated on Mon Sep 26 2011 21:24:49 for eXpress by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </li>
     </ul>

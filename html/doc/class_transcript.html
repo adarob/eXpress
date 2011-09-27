@@ -102,10 +102,11 @@ Public Member Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_transcript.html#ad044ec3263fcdb16a015cb374be9893d">var</a> () const </td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_transcript.html#a00162b4706b0e9b494b1de6033457243">tot_counts</a> () const </td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_transcript.html#a23108362e439753a49f82bc5916bde9a">uniq_counts</a> () const </td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_transcript.html#ac602834b5516cc43cca8152590d54107">add_mass</a> (double p, double mass)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_transcript.html#a705dba56f747ea42a56209e4f01a05ca">incr_bundle_counts</a> (size_t incr_amt=1)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_transcript.html#ae62b3f0c969c2c8116f9ae2525d63ecc">bundle_counts</a> ()</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_transcript.html#ace88d86cfad986bf2d0d8bdd1b23257d">log_likelihood</a> (const <a class="el" href="struct_frag_map.html">FragMap</a> &amp;frag) const </td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_transcript.html#ac602834b5516cc43cca8152590d54107">add_mass</a> (double p, double mass)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_transcript.html#a75fbbc00c2611c0dcd0bf0edc1a29015">incr_uniq_counts</a> (size_t incr_amt=1)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_transcript.html#a705dba56f747ea42a56209e4f01a05ca">incr_bundle_counts</a> (size_t incr_amt=1)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_transcript.html#a2679ec539ea2a6c1331fde8e60b9de6e">log_likelihood</a> (const <a class="el" href="struct_frag_hit.html">FragHit</a> &amp;frag) const </td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_transcript.html#ae5386809de4d16de33edc72c5d647d8f">effective_length</a> () const </td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_transcript.html#a6f62632781837d2e9e854367d5339002">est_effective_length</a> () const </td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_transcript.html#a958b68b6da879b2b1274146106efcd50">unbiased_effective_length</a> () const </td></tr>
@@ -237,7 +238,7 @@ Public Member Functions</h2></td></tr>
 <p>a member function that returns the counts mapping to the bundle this transcript is in the total bundle counts is the sum of this value for all transcripts in the bundle </p>
 <dl class="return"><dt><b>Returns:</b></dt><dd>a portion of the counts mapping to the bundle this transcript is in </dd></dl>
 
-<p>Definition at line <a class="el" href="transcripts_8h_source.html#l00231">231</a> of file <a class="el" href="transcripts_8h_source.html">transcripts.h</a>.</p>
+<p>Definition at line <a class="el" href="transcripts_8h_source.html#l00214">214</a> of file <a class="el" href="transcripts_8h_source.html">transcripts.h</a>.</p>
 
 </div>
 </div>
@@ -257,7 +258,7 @@ Public Member Functions</h2></td></tr>
 <p>a member function that calcualtes and returns the effective length of the transcript (non-logged) </p>
 <dl class="return"><dt><b>Returns:</b></dt><dd>the effective length of the transcript calculated as <img class="formulaInl" alt="$ \tilde{l} = \sum_{l=1}^{L(t)}\sum_{i=1}^{L(t)} D(l)b_5[i]*b_3[i+l] $" src="form_1.png"/> </dd></dl>
 
-<p>Definition at line <a class="el" href="transcripts_8cpp_source.html#l00110">110</a> of file <a class="el" href="transcripts_8cpp_source.html">transcripts.cpp</a>.</p>
+<p>Definition at line <a class="el" href="transcripts_8cpp_source.html#l00105">105</a> of file <a class="el" href="transcripts_8cpp_source.html">transcripts.cpp</a>.</p>
 
 </div>
 </div>
@@ -277,7 +278,7 @@ Public Member Functions</h2></td></tr>
 <p>a member function that calcualtes and returns the estimated effective length of the transcript (non-logged) using the avg bias </p>
 <dl class="return"><dt><b>Returns:</b></dt><dd>the estimated effective length of the transcript calculated as <img class="formulaInl" alt="$ \tilde{l} = \bar{bias}\sum_{l=1}^{L(t)} D(l)(L(t) - l + 1) $" src="form_2.png"/> </dd></dl>
 
-<p>Definition at line <a class="el" href="transcripts_8cpp_source.html#l00091">91</a> of file <a class="el" href="transcripts_8cpp_source.html">transcripts.cpp</a>.</p>
+<p>Definition at line <a class="el" href="transcripts_8cpp_source.html#l00086">86</a> of file <a class="el" href="transcripts_8cpp_source.html">transcripts.cpp</a>.</p>
 
 </div>
 </div>
@@ -323,7 +324,33 @@ Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="transcripts_8h_source.html#l00221">221</a> of file <a class="el" href="transcripts_8h_source.html">transcripts.h</a>.</p>
+<p>Definition at line <a class="el" href="transcripts_8h_source.html#l00237">237</a> of file <a class="el" href="transcripts_8h_source.html">transcripts.h</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a75fbbc00c2611c0dcd0bf0edc1a29015"></a><!-- doxytag: member="Transcript::incr_uniq_counts" ref="a75fbbc00c2611c0dcd0bf0edc1a29015" args="(size_t incr_amt=1)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void Transcript::incr_uniq_counts </td>
+          <td>(</td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>incr_amt</em> = <code>1</code></td><td>)</td>
+          <td><code> [inline]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>a member function that increases the ccount of fragments uniquely mapped to this transcript </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramname">incr_amt</td><td>a size_t to increase the counts by </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Definition at line <a class="el" href="transcripts_8h_source.html#l00227">227</a> of file <a class="el" href="transcripts_8h_source.html">transcripts.h</a>.</p>
 
 </div>
 </div>
@@ -347,14 +374,14 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="ace88d86cfad986bf2d0d8bdd1b23257d"></a><!-- doxytag: member="Transcript::log_likelihood" ref="ace88d86cfad986bf2d0d8bdd1b23257d" args="(const FragMap &amp;frag) const " -->
+<a class="anchor" id="a2679ec539ea2a6c1331fde8e60b9de6e"></a><!-- doxytag: member="Transcript::log_likelihood" ref="a2679ec539ea2a6c1331fde8e60b9de6e" args="(const FragHit &amp;frag) const " -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">double Transcript::log_likelihood </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="struct_frag_map.html">FragMap</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="struct_frag_hit.html">FragHit</a> &amp;&#160;</td>
           <td class="paramname"><em>frag</em></td><td>)</td>
           <td> const</td>
         </tr>
@@ -364,13 +391,13 @@ Public Member Functions</h2></td></tr>
 <p>a member function that returns (a value proportional to) the log likelihood the given fragment originated from this transcript </p>
 <dl><dt><b>Parameters:</b></dt><dd>
   <table class="params">
-    <tr><td class="paramname">frag</td><td>a <a class="el" href="struct_frag_map.html">FragMap</a> to return the likelihood of being originated from this transcript </td></tr>
+    <tr><td class="paramname">frag</td><td>a <a class="el" href="struct_frag_hit.html">FragHit</a> to return the likelihood of being originated from this transcript </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="return"><dt><b>Returns:</b></dt><dd>(a value proportional to) the log likelihood the given fragment originated from this transcript </dd></dl>
 
-<p>Definition at line <a class="el" href="transcripts_8cpp_source.html#l00057">57</a> of file <a class="el" href="transcripts_8cpp_source.html">transcripts.cpp</a>.</p>
+<p>Definition at line <a class="el" href="transcripts_8cpp_source.html#l00052">52</a> of file <a class="el" href="transcripts_8cpp_source.html">transcripts.cpp</a>.</p>
 
 </div>
 </div>
@@ -470,7 +497,7 @@ Public Member Functions</h2></td></tr>
 <p>a member function that calcualtes and returns the effective length of the transcript (non-logged) ignoring bias and using the prior <a class="el" href="class_f_l_d.html">FLD</a> distribution </p>
 <dl class="return"><dt><b>Returns:</b></dt><dd>the effective length of the transcript calculated as <img class="formulaInl" alt="$ \tilde{l} = \sum_{l=1}^{L(t)} D_{prior}(l)(L(t) - l + 1) $" src="form_3.png"/> </dd></dl>
 
-<p>Definition at line <a class="el" href="transcripts_8cpp_source.html#l00105">105</a> of file <a class="el" href="transcripts_8cpp_source.html">transcripts.cpp</a>.</p>
+<p>Definition at line <a class="el" href="transcripts_8cpp_source.html#l00100">100</a> of file <a class="el" href="transcripts_8cpp_source.html">transcripts.cpp</a>.</p>
 
 </div>
 </div>
@@ -509,7 +536,7 @@ Public Member Functions</h2></td></tr>
 <div class="memdoc">
 <p>a member function that causes the transcript bias to be re-calculated by the _bias_table based on curent parameters </p>
 
-<p>Definition at line <a class="el" href="transcripts_8cpp_source.html#l00134">134</a> of file <a class="el" href="transcripts_8cpp_source.html">transcripts.cpp</a>.</p>
+<p>Definition at line <a class="el" href="transcripts_8cpp_source.html#l00129">129</a> of file <a class="el" href="transcripts_8cpp_source.html">transcripts.cpp</a>.</p>
 
 </div>
 </div>
@@ -542,7 +569,7 @@ Public Member Functions</h2></td></tr>
   <div id="nav-path" class="navpath">
     <ul>
       <li class="navelem"><a class="el" href="class_transcript.html">Transcript</a>      </li>
-      <li class="footer">Generated on Thu Sep 15 2011 22:50:18 for eXpress by&#160;
+      <li class="footer">Generated on Mon Sep 26 2011 21:24:50 for eXpress by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </li>
     </ul>

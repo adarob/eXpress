@@ -94,10 +94,10 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <tr><td colspan="2"><h2><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_fragment.html#afafef6f55cd0df3527e50d6ce01a182a">~Fragment</a> ()</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_fragment.html#a9bdf6dde9770408cd10247c849c88d1d">add_map_end</a> (<a class="el" href="struct_frag_map.html">FragMap</a> *f)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_fragment.html#a29dc3beb491b6267b1e983d3e5b1a790">add_map_end</a> (<a class="el" href="struct_frag_hit.html">FragHit</a> *f)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">const std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_fragment.html#a24cda168c57267384025aff39e96fd39">name</a> () const </td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">const size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_fragment.html#ad1cd0dd503c97bd6ac1b2b0b0ed05e0d">num_maps</a> () const </td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">const std::vector&lt; <a class="el" href="struct_frag_map.html">FragMap</a> * &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_fragment.html#a6ef49e039fa9cc6133223c9d08be7e07">maps</a> () const </td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">const size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_fragment.html#a32b40ddfd8b60387368fde18ba682755">num_hits</a> () const </td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">const std::vector&lt; <a class="el" href="struct_frag_hit.html">FragHit</a> * &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_fragment.html#a3f5edd9e3af16628065df333d50def86">hits</a> () const </td></tr>
 </table>
 <hr/><a name="_details"></a><h2>Detailed Description</h2>
 <div class="textblock"><p>The <a class="el" href="class_fragment.html">Fragment</a> class stores information for all multi-mappings of a single fragment. By design, only paired-end mappings of paired-end reads will be accepted. All mappings of single-end reads will be accepted. </p>
@@ -119,31 +119,31 @@ Public Member Functions</h2></td></tr>
       </table>
 </div>
 <div class="memdoc">
-<p><a class="el" href="class_fragment.html">Fragment</a> destructor deletes all <a class="el" href="struct_frag_map.html">FragMap</a> objects pointed to by the <a class="el" href="class_fragment.html">Fragment</a> </p>
+<p><a class="el" href="class_fragment.html">Fragment</a> destructor deletes all <a class="el" href="struct_frag_hit.html">FragHit</a> objects pointed to by the <a class="el" href="class_fragment.html">Fragment</a> </p>
 
 <p>Definition at line <a class="el" href="fragments_8cpp_source.html#l00014">14</a> of file <a class="el" href="fragments_8cpp_source.html">fragments.cpp</a>.</p>
 
 </div>
 </div>
 <hr/><h2>Member Function Documentation</h2>
-<a class="anchor" id="a9bdf6dde9770408cd10247c849c88d1d"></a><!-- doxytag: member="Fragment::add_map_end" ref="a9bdf6dde9770408cd10247c849c88d1d" args="(FragMap *f)" -->
+<a class="anchor" id="a29dc3beb491b6267b1e983d3e5b1a790"></a><!-- doxytag: member="Fragment::add_map_end" ref="a29dc3beb491b6267b1e983d3e5b1a790" args="(FragHit *f)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">bool Fragment::add_map_end </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="struct_frag_map.html">FragMap</a> *&#160;</td>
+          <td class="paramtype"><a class="el" href="struct_frag_hit.html">FragHit</a> *&#160;</td>
           <td class="paramname"><em>f</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
-<p>a member function that adds a new <a class="el" href="struct_frag_map.html">FragMap</a> (single read at this point) to the <a class="el" href="class_fragment.html">Fragment</a> if it is the first <a class="el" href="struct_frag_map.html">FragMap</a>, it sets the <a class="el" href="class_fragment.html">Fragment</a> name and is added to _open_mates, if the fragment is not paired, it is added to _frag_maps, otherwise, add_open_mate is called </p>
+<p>a member function that adds a new <a class="el" href="struct_frag_hit.html">FragHit</a> (single read at this point) to the <a class="el" href="class_fragment.html">Fragment</a> if it is the first <a class="el" href="struct_frag_hit.html">FragHit</a>, it sets the <a class="el" href="class_fragment.html">Fragment</a> name and is added to _open_mates, if the fragment is not paired, it is added to _frag_hits, otherwise, add_open_mate is called </p>
 <dl><dt><b>Parameters:</b></dt><dd>
   <table class="params">
-    <tr><td class="paramname">f</td><td>the <a class="el" href="struct_frag_map.html">FragMap</a> to be added </td></tr>
+    <tr><td class="paramname">f</td><td>the <a class="el" href="struct_frag_hit.html">FragHit</a> to be added </td></tr>
   </table>
   </dd>
 </dl>
@@ -152,12 +152,12 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="a6ef49e039fa9cc6133223c9d08be7e07"></a><!-- doxytag: member="Fragment::maps" ref="a6ef49e039fa9cc6133223c9d08be7e07" args="() const " -->
+<a class="anchor" id="a3f5edd9e3af16628065df333d50def86"></a><!-- doxytag: member="Fragment::hits" ref="a3f5edd9e3af16628065df333d50def86" args="() const " -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">const std::vector&lt;<a class="el" href="struct_frag_map.html">FragMap</a>*&gt;&amp; Fragment::maps </td>
+          <td class="memname">const std::vector&lt;<a class="el" href="struct_frag_hit.html">FragHit</a>*&gt;&amp; Fragment::hits </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const<code> [inline]</code></td>
@@ -165,8 +165,8 @@ Public Member Functions</h2></td></tr>
       </table>
 </div>
 <div class="memdoc">
-<p>a member function that returns <a class="el" href="struct_frag_map.html">FragMap</a> multi-mappings of the fragment </p>
-<dl class="return"><dt><b>Returns:</b></dt><dd>a vector containing pointers to the <a class="el" href="struct_frag_map.html">FragMap</a> multi-mappings </dd></dl>
+<p>a member function that returns <a class="el" href="struct_frag_hit.html">FragHit</a> multi-mappings of the fragment </p>
+<dl class="return"><dt><b>Returns:</b></dt><dd>a vector containing pointers to the <a class="el" href="struct_frag_hit.html">FragHit</a> multi-mappings </dd></dl>
 
 <p>Definition at line <a class="el" href="fragments_8h_source.html#l00181">181</a> of file <a class="el" href="fragments_8h_source.html">fragments.h</a>.</p>
 
@@ -192,12 +192,12 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="ad1cd0dd503c97bd6ac1b2b0b0ed05e0d"></a><!-- doxytag: member="Fragment::num_maps" ref="ad1cd0dd503c97bd6ac1b2b0b0ed05e0d" args="() const " -->
+<a class="anchor" id="a32b40ddfd8b60387368fde18ba682755"></a><!-- doxytag: member="Fragment::num_hits" ref="a32b40ddfd8b60387368fde18ba682755" args="() const " -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">const size_t Fragment::num_maps </td>
+          <td class="memname">const size_t Fragment::num_hits </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const<code> [inline]</code></td>
@@ -221,7 +221,7 @@ Public Member Functions</h2></td></tr>
   <div id="nav-path" class="navpath">
     <ul>
       <li class="navelem"><a class="el" href="class_fragment.html">Fragment</a>      </li>
-      <li class="footer">Generated on Thu Sep 15 2011 22:50:18 for eXpress by&#160;
+      <li class="footer">Generated on Mon Sep 26 2011 21:24:49 for eXpress by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </li>
     </ul>

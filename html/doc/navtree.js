@@ -5,7 +5,7 @@ var NAVTREE =
       [ "BAMParser", "class_b_a_m_parser.html", null ],
       [ "BiasBoss", "class_bias_boss.html", null ],
       [ "FLD", "class_f_l_d.html", null ],
-      [ "FragMap", "struct_frag_map.html", null ],
+      [ "FragHit", "struct_frag_hit.html", null ],
       [ "Fragment", "class_fragment.html", null ],
       [ "FrequencyMatrix", "class_frequency_matrix.html", null ],
       [ "MismatchTable", "class_mismatch_table.html", null ],
@@ -22,7 +22,7 @@ var NAVTREE =
     [ "Class Hierarchy", "hierarchy.html", [
       [ "BiasBoss", "class_bias_boss.html", null ],
       [ "FLD", "class_f_l_d.html", null ],
-      [ "FragMap", "struct_frag_map.html", null ],
+      [ "FragHit", "struct_frag_hit.html", null ],
       [ "Fragment", "class_fragment.html", null ],
       [ "FrequencyMatrix", "class_frequency_matrix.html", null ],
       [ "MismatchTable", "class_mismatch_table.html", null ],
