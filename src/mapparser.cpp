@@ -48,42 +48,80 @@ int cigar_length(vector<BamTools::CigarOp> cigar_vec)
     return tot_len;
 }
 
-ThreadedMapParser::ThreadedMapParser(string file_name)
+ThreadedMapParser::ThreadedMapParser(string in_file, string out_file) 
 {
-    if (file_name.size() == 0)
+    bool is_sam = false;
+    _writer = NULL;
+    if (in_file.size() == 0)
     {
         cout << "No alignment file specified. Expecting streaming input on stdin...\n\n";
         _parser = new SAMParser(&cin);
+        is_sam = true;
     }
     else
     {
         BamTools::BamReader* reader = new BamTools::BamReader();
-        if (reader->Open(file_name))
+        if (reader->Open(in_file))
         {
             _parser = new BAMParser(reader);
+            if (out_file.size())
+            {
+                BamTools::BamWriter* writer = new BamTools::BamWriter();
+                if (writer->Open(out_file, reader->GetHeader(), reader->GetReferenceData()))
+                {
+                    _writer = new BAMWriter(writer);
+                }
+                else
+                {
+                    cerr << "Unable to open output BAM file '" << out_file << "'.\n" ; 
+                    exit(1);  
+                }
+            }
         }
         else
         {
             delete reader;
             cout << "Input is not in BAM format. Trying SAM...\n\n";
-            ifstream* ifs = new ifstream(file_name.c_str());
-            _parser = new SAMParser(ifs);
+            ifstream* ifs = new ifstream(in_file.c_str());
             if(!ifs->is_open())
             {
-                cerr << "Unable to open SAM file '" << file_name << "'.\n" ; 
+                cerr << "Unable to open input SAM file '" << in_file << "'.\n" ; 
                 exit(1);
-            } 
+            }
+            _parser = new SAMParser(ifs);
+            is_sam = true;
         }
     }
+    
+    if (is_sam && out_file.size())
+    {
+        ofstream* ofs = new ofstream(out_file.c_str());
+        if(!ofs->is_open())
+        {
+            cerr << "Unable to open output SAM file '" << out_file << "'.\n" ; 
+            exit(1);
+        }
+        *ofs << _parser->header();
+        _writer = new SAMWriter(ofs);
+    }
+}
+
+ThreadedMapParser::~ThreadedMapParser()
+{
+    delete _parser;
+    if (_writer)
+        delete _writer;
 }
 
 void ThreadedMapParser::threaded_parse(ParseThreadSafety* thread_safety, TranscriptTable* trans_table)
 {
     ParseThreadSafety& ts = *thread_safety;
     bool fragments_remain = true;
-    while (running && fragments_remain)
+    Fragment * last_frag;
+    ts.next_frag = NULL;
+    while (true)
     {
-        Fragment * frag;
+        Fragment* frag = NULL;
         while (running && fragments_remain)
         {
             frag = new Fragment(); 
@@ -93,7 +131,6 @@ void ThreadedMapParser::threaded_parse(ParseThreadSafety* thread_safety, Transcr
             delete frag;
             frag = NULL;
         }
-		
         for (size_t i = 0; frag && i < frag->hits().size(); ++i)
         {
             FragHit& m = *(frag->hits()[i]);
@@ -106,12 +143,19 @@ void ThreadedMapParser::threaded_parse(ParseThreadSafety* thread_safety, Transcr
             m.mapped_trans = t;
             assert(t->id() == m.trans_id);
         }
+
+        last_frag = ts.next_frag;
         ts.next_frag = frag;
         ts.proc_lk.unlock();
         ts.parse_lk.lock();
+        if (last_frag && _writer)
+            _writer->write_fragment(*last_frag);
+        if (last_frag)
+            delete last_frag;
+        
+        if (!frag)
+            break;
     }
-    ts.next_frag = NULL;
-    ts.proc_lk.unlock();
 }
 
 BAMParser::BAMParser(BamTools::BamReader* reader)
@@ -173,11 +217,35 @@ bool BAMParser::map_end_from_alignment(BamTools::BamAlignment& a)
     f.mate_l = a.MatePosition;
     
     if (a.IsReverseStrand())
+    {
         f.seq_r = a.QueryBases;
+        f.bam_r = a;
+    }
     else
+    {
         f.seq_l = a.QueryBases;
+        f.bam_l = a;
+    }
     
     return true;
+}
+
+BAMWriter::BAMWriter(BamTools::BamWriter* writer) : _writer(writer) {}
+BAMWriter::~BAMWriter() 
+{ 
+    _writer->Close(); 
+    delete _writer;
+}
+
+void BAMWriter::write_fragment(Fragment& f)
+{
+    foreach(FragHit* hit, f.hits())
+    {
+        hit->bam_l.AddTag("PH","f",(float)hit->probability);
+        hit->bam_r.AddTag("PH","f",(float)hit->probability);
+        _writer->SaveAlignment(hit->bam_l);
+        _writer->SaveAlignment(hit->bam_r);
+    }
 }
 
 SAMParser::SAMParser(istream* in)
@@ -185,11 +253,14 @@ SAMParser::SAMParser(istream* in)
     _in = in;
     
     char line_buff[BUFF_SIZE];
-    
     _frag_buff = new FragHit();
+    _header = "";
+
     while(_in->good())
     {
         _in->getline(line_buff, BUFF_SIZE-1, '\n');
+        _header += line_buff;
+        _header += "\n";
         if (line_buff[0] != '@')
         {
             break;
@@ -231,6 +302,7 @@ bool SAMParser::next_fragment(Fragment& nf)
 bool SAMParser::map_end_from_line(char* line)
 {
     FragHit& f = *_frag_buff;
+    string sam_line(line);
     char *p = strtok(line, "\t");
     int sam_flag=0;    
     bool paired=0;
@@ -277,9 +349,15 @@ bool SAMParser::map_end_from_line(char* line)
                 break;
             case 9:
                 if (sam_flag & 0x10)
+                {
                     f.seq_r = p;
+                    f.sam_r = sam_line;
+                }
                 else
+                {
                     f.seq_l = p;
+                    f.sam_l = sam_line;
+                }
                 goto stop;
         }
         
@@ -287,4 +365,20 @@ bool SAMParser::map_end_from_line(char* line)
     }
 stop:
     return i == 10;
+}
+
+SAMWriter::SAMWriter(ostream* out) : _out(out) {}
+SAMWriter::~SAMWriter() 
+{ 
+    _out->flush(); 
+    delete _out;
+}
+
+void SAMWriter::write_fragment(Fragment& f)
+{
+    foreach(FragHit* hit, f.hits())
+    {
+        *_out << hit->sam_l << " PH:f:" << (float)hit->probability << endl;
+        *_out << hit->sam_r << " PH:f:" << (float)hit->probability << endl;
+    }
 }

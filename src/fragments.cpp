@@ -63,12 +63,16 @@ void Fragment::add_open_mate(FragHit* new_p)
                 assert(nm.seq_r.empty());
                 nm.right = om.right;
                 nm.seq_r = om.seq_r;
+                nm.sam_r = om.sam_r;
+                nm.bam_r = om.bam_r;
             }
             else
             {
                 assert(nm.seq_l.empty());
                 nm.left = om.left;
                 nm.seq_l = om.seq_l;
+                nm.sam_l = om.sam_l;
+                nm.bam_l = om.bam_l;
             }
             
             assert(nm.left_first == om.left_first);

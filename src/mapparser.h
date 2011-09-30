@@ -13,6 +13,8 @@
 #include <string>
 #include <boost/thread.hpp>
 #include <api/BamReader.h>
+#include <api/BamWriter.h>
+
 
 class Fragment;
 class FragHit;
@@ -20,6 +22,7 @@ class TranscriptTable;
 
 /**
  * The Parser class is an abstract class that can be a SAMParser or BAMParser.
+ * It fills Fragment objects by parsing an input file in SAM/BAM format.
  *  @author    Adam Roberts
  *  @date      2011
  *  @copyright Artistic License 2.0
@@ -27,6 +30,13 @@ class TranscriptTable;
 class Parser
 {
 public:
+    virtual ~Parser(){};
+
+    /**
+     * a member function that returns a string version of the header
+     * @return string version of the header
+     */
+    virtual const std::string& header() const=0;
     
     /**
      * a member function that loads all mappings of the next fragment
@@ -34,6 +44,26 @@ public:
      * @return true if more reads remain in the SAM/BAM file/stream, false otherwise
      */
     virtual bool next_fragment(Fragment& f)=0;
+};
+
+/**
+ * The Writer class is an abstract class than can be a SAMWriter or BAMWriter.
+ * It writes Fragment objects back to file (in SAM/BAM format) with per-mapping probabilistic assignments.
+ *  @author    Adam Roberts
+ *  @date      2011
+ *  @copyright Artistic License 2.0
+ **/
+class Writer
+{
+public:
+    virtual ~Writer(){};
+    
+    /**
+     * a member function that writes all mappings of the fragment to the ouptut
+     * file along with their probabilities in the "PH" field
+     * @param f the processed Fragment to output
+     */
+    virtual void write_fragment(Fragment& f)=0;
 };
 
 
@@ -45,6 +75,9 @@ public:
  **/
 class BAMParser : public Parser
 {
+    /**
+     * a private pointer to the BamReader object which direclty parses the BAM file
+     */
     BamTools::BamReader* _reader;
     
     /**
@@ -61,11 +94,20 @@ class BAMParser : public Parser
 public:
     
     /**
-     * BAMParser constructor opens the file
+     * BAMParser constructor sets the reader
      */
     BAMParser(BamTools::BamReader* reader);
     
+    /**
+     * BAMParser destructor deletes the reader
+     */
     ~BAMParser() { delete _reader; }
+    
+    /**
+     * a member function that returns a string version of the header
+     * @return string version of the header
+     */
+    const std::string& header() const { return _reader->GetHeaderText(); }
     
     /**
      * a member function that loads all mappings of the next fragment
@@ -74,6 +116,40 @@ public:
      */
     bool next_fragment(Fragment& f);
 };
+
+/**
+ * The BAMWriter class writes Fragment objects back to file (in BAM format) with per-mapping probabilistic assignments.
+ *  @author    Adam Roberts
+ *  @date      2011
+ *  @copyright Artistic License 2.0
+ **/
+class BAMWriter : public Writer
+{
+    /**
+     * a private pointer to the BamWriter object which direclty writes to the BAM file
+     */
+    BamTools::BamWriter* _writer;
+    
+public:
+    
+    /**
+     * BAMWriter constructor stores a pointer to the BAM file
+     */
+    BAMWriter(BamTools::BamWriter* writer);
+    
+    /**
+     * BAMWriter destructor flushes and deletes the Bamtools::BamWriter
+     */
+    ~BAMWriter();
+    
+    /**
+     * a member function that writes all mappings of the fragment to the ouptut
+     * file in BAM format along with their probabilities in the "PH" field
+     * @param f the processed Fragment to output
+     */
+    void write_fragment(Fragment& f);
+};
+
 
 /**
  * The SAMParser class fills Fragment objects by parsing an input in SAM format.
@@ -95,6 +171,11 @@ class SAMParser : public Parser
     FragHit* _frag_buff;
     
     /**
+     * a private string storing the SAM header
+     */
+    std::string _header;
+    
+    /**
      * a private function to parse a single line and store the data in _frag_buff
      * @return true if the mapping is valid and false otherwise
      */
@@ -107,6 +188,12 @@ public:
     SAMParser(std::istream* in);
     
     /**
+     * a member function that returns a string version of the header
+     * @return string version of the header
+     */
+    const std::string& header() const { return _header; }
+    
+    /**
      * a member function that loads all mappings of the next fragment
      * when the next fragment is reached, the current alignment is left in the
      * _frag_buff for the next call
@@ -114,6 +201,39 @@ public:
      * @return true if more reads remain in the SAM file, false otherwise
      */
     bool next_fragment(Fragment& f);
+};
+
+/**
+ * The SAMWriter class writes Fragment objects back to file (in SAM format) with per-mapping probabilistic assignments.
+ *  @author    Adam Roberts
+ *  @date      2011
+ *  @copyright Artistic License 2.0
+ **/
+class SAMWriter : public Writer
+{
+    /**
+     * a private pointer to the output stream to which the alignments are written in SAM format
+     */
+    std::ostream* _out;
+    
+public:
+    
+    /**
+     * SAMWriter constructor stores a pointer to the output stream
+     */
+    SAMWriter(std::ostream* out);
+
+    /**
+     * SAMWriter destructor flushes and deletes output stream
+     */
+    ~SAMWriter();
+    
+    /**
+     * a member function that writes all mappings of the fragment to the ouptut
+     * file in SAM format along with their probabilities in the "PH" field
+     * @param f the processed Fragment to output
+     */
+    void write_fragment(Fragment& f);
 };
 
 /**
@@ -153,15 +273,27 @@ struct ParseThreadSafety
  **/
 class ThreadedMapParser
 {
+    /**
+     * a private pointer to the Parser object that will read the input in SAM/BAM format
+     */
     Parser* _parser;
+    
+    /**
+     * a private pointer to the Writer object that will write the output in SAM/BAM format
+     */
+    Writer* _writer;
     
 public:
     /**
      * ThreadedMapParser constructor determines what format the input is in and initializes the correct parser.
      */
-    ThreadedMapParser(std::string input_file);
+    ThreadedMapParser(std::string input_file, std::string output_file);
     
-    ~ThreadedMapParser() { delete _parser; }
+    /**
+     * ThreadedMapParser destructor deletes the parser and writer (if it exists).
+     */
+    ~ThreadedMapParser();
+    
     /**
      * a member function that drives the parse thread
      * when all valid mappings of a fragment have been parsed, its mapped transcripts are found and the information

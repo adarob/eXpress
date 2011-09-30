@@ -14,6 +14,7 @@
 #include <iostream>
 #include <fstream>
 #include <cassert>
+#include <api/BamAlignment.h>
 
 typedef size_t TransID;
 class Transcript;
@@ -110,6 +111,13 @@ struct FragHit
             return RIGHT_ONLY;
         return LEFT_ONLY;
     }
+    
+    double probability;
+    
+    BamTools::BamAlignment bam_l;
+    BamTools::BamAlignment bam_r;
+    std::string sam_l;
+    std::string sam_r;
 };
 
 /**

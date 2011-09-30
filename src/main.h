@@ -11,6 +11,9 @@
 #include <cmath>
 #include <cassert>
 #include <algorithm>
+#include <boost/foreach.hpp>
+
+#define foreach BOOST_FOREACH
 
 /**
  * a global bool that is true when processing is still occuring

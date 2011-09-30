@@ -6,7 +6,7 @@
 //  Copyright 2011 Adam Roberts. All rights reserved.
 //
 
-//TODO: Speed up mismatch model?
+//TODO: Handle hash collisions
 //TODO: Speed up bias initialization (using non-logged values)
 
 #include <boost/filesystem.hpp>
@@ -14,6 +14,7 @@
 #include <boost/thread.hpp>
 #include <iostream>
 #include <fstream>
+#include <stdio.h>
 #include "main.h"
 #include "transcripts.h"
 #include "fld.h"
@@ -40,7 +41,8 @@ size_t stop_at = 0;
 // file location parameters
 string output_dir = ".";
 string fasta_file_name = "";
-string sam_file_name = "";
+string in_map_file_name = "";
+string out_map_file_name = "";
 
 // intial pseudo-count parameters (non-logged)
 double expr_alpha = .001;
@@ -58,6 +60,8 @@ bool error_model = true;
 bool bias_correct = true;
 bool calc_covar = false;
 bool vis = false;
+bool output_alignments = false;
+bool output_running = false;
 
 //bool in_between = false;
 
@@ -74,6 +78,7 @@ bool parse_options(int ac, char ** av)
     ("output-dir,o", po::value<string>(&output_dir)->default_value("."), "write all output files to this directory")
     ("frag-len-mean,m", po::value<int>(&def_fl_mean)->default_value(200), "prior estimate for average fragment length")
     ("frag-len-stddev,s", po::value<int>(&def_fl_stddev)->default_value(60), "prior estimate for fragment length std deviation")
+    ("output-alignments", po::value<string>(&out_map_file_name), "optional file to output alignments (sam/bam) with probabilistic assignments")
     ("fr-stranded", "accept only forward->reverse alignments (second-stranded protocols)")
     ("rf-stranded", "accept only reverse->forward alignments (first-stranded protocols)")
     ("calc-covar", "calculate and output covariance matrix")
@@ -84,11 +89,11 @@ bool parse_options(int ac, char ** av)
     hidden.add_options()
     ("no-bias-correct","")
     ("no-error-model","")
-      //    ("in-between","")
     ("visualizer-output,v","")
+    ("output-running", "")
     ("forget-param,f", po::value<double>(&ff_param)->default_value(0.9),"")
     ("stop-at", po::value<size_t>(&stop_at)->default_value(0),"")
-    ("sam-file", po::value<string>(&sam_file_name)->default_value(""),"")
+    ("sam-file", po::value<string>(&in_map_file_name)->default_value(""),"")
     ("fasta-file", po::value<string>(&fasta_file_name)->default_value(""),"")
     ;
     
@@ -150,8 +155,8 @@ bool parse_options(int ac, char ** av)
     calc_covar = vm.count("calc-covar");
     bias_correct = !(vm.count("no-bias-correct"));
     error_model = !(vm.count("no-error-model"));
-    //  in_between = vm.count("in-between");
     vis = vm.count("visualizer-output");
+    output_running = vm.count("output-running");
     
     if (!vm.count("no-update-check"))
     {
@@ -183,13 +188,10 @@ void process_fragment(double mass_n, Fragment* frag_p, FLD* fld, BiasBoss* bias_
     if (frag.num_hits()==1)
     // hits to a single location
     {
-        const FragHit& m = *frag.hits()[0];
+        FragHit& m = *frag.hits()[0];
         Transcript* t  = m.mapped_trans;
-        if (!t)
-        {
-            cerr << "ERROR: Transcript " << m.name << " not found in reference fasta.";
-            exit(1);
-        }
+        
+        m.probability = 1.0;
         
         //update parameters
         t->add_mass(0, mass_n);
@@ -202,7 +204,6 @@ void process_fragment(double mass_n, Fragment* frag_p, FLD* fld, BiasBoss* bias_
         if (mismatch_table)
             mismatch_table->update(m, mass_n);
        
-        delete frag_p;
         return;
     }
     
@@ -228,7 +229,7 @@ void process_fragment(double mass_n, Fragment* frag_p, FLD* fld, BiasBoss* bias_
     TransID bundle_rep = trans_table->get_trans_rep(frag.hits()[0]->trans_id);
     for(size_t i = 0; i < frag.num_hits(); ++i)
     {
-        const FragHit& m = *frag.hits()[i];
+        FragHit& m = *frag.hits()[i];
         Transcript* t  = m.mapped_trans;
         double p = likelihoods[i]-total_likelihood;
         double mass_t = mass_n + p;
@@ -240,7 +241,8 @@ void process_fragment(double mass_n, Fragment* frag_p, FLD* fld, BiasBoss* bias_
                 bundle_rep = trans_table->merge_bundles(bundle_rep, m_rep);
         }
         
-        if (sexp(p) == 0)
+        m.probability = sexp(p);
+        if (m.probability == 0)
             continue;
         
         // update parameters
@@ -268,8 +270,6 @@ void process_fragment(double mass_n, Fragment* frag_p, FLD* fld, BiasBoss* bias_
             }
         }
     }
-        
-    delete frag_p;
 }
 
 /**
@@ -304,7 +304,6 @@ size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TranscriptTable* 
         ts.parse_lk.unlock();
         if (!frag)
         {
-            ts.proc_lk.unlock();
             break;
         }
         
@@ -321,6 +320,26 @@ size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TranscriptTable* 
         // Output progress
         if (n == 1 || n % 100000 == 0)
         {
+            if (output_running)
+            {
+                char buff[500];
+                sprintf(buff, "%s/x_%zu", output_dir.c_str(), n);
+                string dir(buff);
+                try { fs::create_directories(dir); }
+                catch (fs::filesystem_error& e)
+                {
+                    cerr << e.what() << endl;
+                    exit(1);
+                }
+                trans_table->output_results(dir, n, false);
+                ofstream paramfile((dir + "/params.xprs").c_str());
+                fld->append_output(paramfile);
+                if (mismatch_table)
+                    mismatch_table->append_output(paramfile);
+                if (bias_table)
+                    bias_table->append_output(paramfile);
+                paramfile.close();
+            }
             if (vis)
             {
                 cout << "0 " << fld->to_string() << '\n';
@@ -350,6 +369,9 @@ size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TranscriptTable* 
     else
         cout << "COMPLETED: Processed " << n << " fragments, targets are in " << trans_table->num_bundles() << " bundles\n";
     
+    parse.join();
+    ts.proc_lk.unlock();
+    ts.parse_lk.unlock();
     return n;
 }
 
@@ -377,7 +399,7 @@ int main (int argc, char ** argv)
     FLD fld(fld_alpha, def_fl_max, def_fl_mean, def_fl_stddev);
     BiasBoss* bias_table = (bias_correct) ? new BiasBoss(bias_alpha):NULL;
     MismatchTable* mismatch_table = (error_model) ? new MismatchTable(mm_alpha):NULL;
-    ThreadedMapParser map_parser(sam_file_name);
+    ThreadedMapParser map_parser(in_map_file_name, out_map_file_name);
     TranscriptTable trans_table(fasta_file_name, expr_alpha, &fld, bias_table, mismatch_table);
 
     size_t tot_counts = threaded_calc_abundances(map_parser, &trans_table, &fld, bias_table, mismatch_table);
