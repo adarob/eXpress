@@ -221,7 +221,6 @@ void process_fragment(double mass_n, Fragment* frag_p, FLD* fld, BiasBoss* bias_
     }
     if (sexp(total_likelihood) == 0)
     {
-        delete frag_p;
         return;
     }
 

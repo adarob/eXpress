@@ -499,4 +499,7 @@ void TranscriptTable::output_results(string output_dir, size_t tot_counts, bool 
         }
 
     }
+    fclose(expr_file);
+    if (output_varcov)
+        varcov_file.close();
 }
