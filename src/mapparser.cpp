@@ -118,7 +118,6 @@ void ThreadedMapParser::threaded_parse(ParseThreadSafety* thread_safety, Transcr
     ParseThreadSafety& ts = *thread_safety;
     bool fragments_remain = true;
     Fragment * last_frag;
-    ts.next_frag = NULL;
     while (true)
     {
         Fragment* frag = NULL;

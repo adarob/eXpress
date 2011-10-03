@@ -105,6 +105,7 @@ double Transcript::unbiased_effective_length() const
 double Transcript::effective_length() const
 {
     double eff_len = 0.0;
+    boost::mutex::scoped_lock lock(_bias_lock);
     
     for(size_t l = 1; l <= min(length(), _fld->max_val()); l++)
     {
@@ -116,7 +117,6 @@ double Transcript::effective_length() const
         eff_len += sexp(_fld->pdf(l))*len_bias;
     }
     
-    boost::mutex::scoped_lock lock(_bias_lock);
     return eff_len;
 }
 
@@ -327,30 +327,24 @@ void project_to_polytope(vector<Transcript*> bundle_trans, vector<double>& trans
     {
         double unbound_counts = 0;
         double bound_counts = 0;
-        bool new_bound = false;
         for (size_t i = 0; i < bundle_trans.size(); ++i)
         {
             Transcript& trans = *bundle_trans[i];
             
-            if (polytope_bound[i])
-            {
-                bound_counts += trans_counts[i];
-            }
-            else if (new_bound)
-            {
-                unbound_counts += trans_counts[i];
-            }
-            else if (trans_counts[i] > trans.tot_counts())
+            if (trans_counts[i] > trans.tot_counts())
             {
                 trans_counts[i] = trans.tot_counts();
-                bound_counts += trans_counts[i];
-                new_bound = polytope_bound[i] = true;
+                polytope_bound[i] = true;
             }
             else if (trans_counts[i] < trans.uniq_counts())
             {
                 trans_counts[i] = trans.uniq_counts();
+                polytope_bound[i] = true;
+            }
+            
+            if (polytope_bound[i])
+            {
                 bound_counts += trans_counts[i];
-                new_bound = polytope_bound[i] = true;
             }
             else
             {
@@ -358,18 +352,27 @@ void project_to_polytope(vector<Transcript*> bundle_trans, vector<double>& trans
             }
         }
         
-        if (!new_bound)
+        if (unbound_counts + bound_counts == bundle_counts)
             return;
         
         double normalizer = (bundle_counts - bound_counts)/unbound_counts;
-         
+        bool unbound_exist = false;
+        unbound_counts = 0;
         for (size_t i = 0; i < bundle_trans.size(); ++i)
         {    
             if (!polytope_bound[i])
             {
                 trans_counts[i] *= normalizer;
+                unbound_counts += trans_counts[i];
+                unbound_exist = true;
             }
         }
+        
+        if (unbound_counts + bound_counts == bundle_counts)
+            return;
+        
+        if (!unbound_exist)
+            polytope_bound = vector<bool>(bundle_trans.size(), false);
     }
 }
 
