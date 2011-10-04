@@ -368,7 +368,7 @@ void project_to_polytope(vector<Transcript*> bundle_trans, vector<double>& trans
             }
         }
         
-        if (unbound_counts + bound_counts == bundle_counts)
+        if (unbound_counts + bound_counts - bundle_counts < 0.00001)
             return;
         
         if (!unbound_exist)
