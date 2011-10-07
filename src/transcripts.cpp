@@ -21,22 +21,22 @@
 using namespace std;
 
 
-Transcript::Transcript(const std::string& name, const std::string& seq, double alpha, const FLD* fld, const BiasBoss* bias_table, const MismatchTable* mismatch_table)
-:_name(name),
-_id(hash_trans_name(name)),
-_seq(seq),
-_var(HUGE_VAL),
-_uniq_counts(0),
-_tot_counts(0),
-_bundle_counts(0),
-_start_bias(std::vector<double>(seq.length(),0)),
-_end_bias(std::vector<double>(seq.length(),0)),
-_avg_bias(0),
-_fld(fld),
-_bias_table(bias_table),
-_mismatch_table(mismatch_table)
-{   _ub_eff_len = est_effective_length();
-    _mass = log(_ub_eff_len*alpha); }
+Transcript::Transcript(const TransID id, const std::string& name, const std::string& seq, double alpha, const Globals* globs)
+:   _globs(globs),
+    _id(id),
+    _name(name),
+    _seq(seq),
+    _var(HUGE_VAL),
+    _uniq_counts(0),
+    _tot_counts(0),
+    _bundle_counts(0),
+    _start_bias(std::vector<double>(seq.length(),0)),
+    _end_bias(std::vector<double>(seq.length(),0)),
+    _avg_bias(0)
+{   
+    _ub_eff_len = est_effective_length();
+    _mass = log(_ub_eff_len*alpha); 
+}
 
 void Transcript::add_mass(double p, double mass) 
 { 
@@ -54,28 +54,28 @@ double Transcript::log_likelihood(const FragHit& frag) const
     boost::mutex::scoped_lock lock(_bias_lock);
 
     double ll = mass();
-    if (_mismatch_table)
-        ll += _mismatch_table->log_likelihood(frag);
+    if (_globs->mismatch_table)
+        ll += (_globs->mismatch_table)->log_likelihood(frag);
     
     switch(frag.pair_status())
     {
         case PAIRED:
         {
             ll += _start_bias[frag.left] + _end_bias[frag.right-1];
-            ll += _fld->pdf(frag.length());
+            ll += (_globs->fld)->pdf(frag.length());
             ll -= total_bias_for_length(frag.length());
             break;
         }
         case LEFT_ONLY:
         {
             ll += _start_bias[frag.left];
-            ll -= total_bias_for_length(min((int)length()-frag.left, (int)sexp(_fld->mean())));
+            ll -= total_bias_for_length(min((int)length()-frag.left, (int)sexp((_globs->fld)->mean())));
             break;
         }
         case RIGHT_ONLY:
         {
             ll += _end_bias[frag.right-1];
-            ll -= total_bias_for_length(min(frag.right, (int)sexp(_fld->mean())));
+            ll -= total_bias_for_length(min(frag.right, (int)sexp((_globs->fld)->mean())));
             break;
         }
     }
@@ -87,9 +87,9 @@ double Transcript::est_effective_length() const
 {
     double eff_len = 0.0;
     
-    for(size_t l = 1; l <= min(length(), _fld->max_val()); l++)
+    for(size_t l = 1; l <= min(length(), (_globs->fld)->max_val()); l++)
     {
-        eff_len += sexp(_fld->pdf(l))*(length()-l+1);
+        eff_len += sexp((_globs->fld)->pdf(l))*(length()-l+1);
     }
     
     boost::mutex::scoped_lock lock(_bias_lock);
@@ -107,14 +107,14 @@ double Transcript::effective_length() const
     double eff_len = 0.0;
     boost::mutex::scoped_lock lock(_bias_lock);
     
-    for(size_t l = 1; l <= min(length(), _fld->max_val()); l++)
+    for(size_t l = 1; l <= min(length(), (_globs->fld)->max_val()); l++)
     {
         double len_bias = 0;
         for (size_t i = 0; i < length()-l+1; i++)
         {
             len_bias += sexp(_start_bias[i] + _end_bias[i+l]);
         }
-        eff_len += sexp(_fld->pdf(l))*len_bias;
+        eff_len += sexp((_globs->fld)->pdf(l))*len_bias;
     }
     
     return eff_len;
@@ -122,20 +122,22 @@ double Transcript::effective_length() const
 
 double Transcript::total_bias_for_length(size_t l) const
 {
-    assert(l <= _fld->max_val());
+    assert(l <= (_globs->fld)->max_val());
     return _avg_bias + log((double)(length() - l + 1));
 }
 
 void Transcript::update_transcript_bias()
 {
-    if (!_bias_table)
+    if (!_globs->bias_table)
         return;
     boost::mutex::scoped_lock lock(_bias_lock);
-    _avg_bias = _bias_table->get_transcript_bias(_start_bias, _end_bias, *this);
+    _avg_bias = (_globs->bias_table)->get_transcript_bias(_start_bias, _end_bias, *this);
 }
 
-TranscriptTable::TranscriptTable(const string& trans_fasta_file, double alpha, const FLD* fld, BiasBoss* bias_table, const MismatchTable* mismatch_table)
-: _rank(Rank(_rank_map)),
+TranscriptTable::TranscriptTable(const string& trans_fasta_file, const TransIndex& trans_index, double alpha, const Globals* globs)
+: _globs(globs),
+  _trans_map(trans_index.size(), NULL),
+  _rank(Rank(_rank_map)),
   _parent(Parent(_parent_map)),
   _bundles(_rank, _parent),
   _alpha(alpha)
@@ -154,10 +156,7 @@ TranscriptTable::TranscriptTable(const string& trans_fasta_file, double alpha, c
             {
                 if (!name.empty())
                 {
-                    Transcript* trans = new Transcript(name, seq, alpha, fld, bias_table, mismatch_table);
-                    add_trans(trans);
-                    if (bias_table)
-                        bias_table->update_expectations(*trans);
+                    add_trans(name, seq, trans_index);
                 }
                 name = line.substr(1,line.find(' ')-1);
                 seq = "";
@@ -170,61 +169,58 @@ TranscriptTable::TranscriptTable(const string& trans_fasta_file, double alpha, c
         }
         if (!name.empty())
         {
-            Transcript* trans = new Transcript(name, seq, alpha, fld, bias_table, mismatch_table);
-            add_trans(trans);
-            if (bias_table)
-                bias_table->update_expectations(*trans);
+            add_trans(name, seq, trans_index);
         }
         infile.close();
     }
     else 
     {
-        cerr << "Unable to open MultiFASTA file '" << trans_fasta_file << "'.\n" ; 
+        cerr << "ERROR: Unable to open MultiFASTA file '" << trans_fasta_file << "'.\n" ; 
         exit(1);
     }
     
     if (size() == 0)
     {
-        cerr << "No targets found in MultiFASTA file '" << trans_fasta_file << "'.\n" ; 
+        cerr << "ERROR: No targets found in MultiFASTA file '" << trans_fasta_file << "'.\n" ; 
         exit(1);        
     }
     
+    for(TransIndex::const_iterator it = trans_index.begin(); it != trans_index.end(); ++it)
+    {
+        if (!_trans_map[it->second])
+        {
+            cerr << "ERROR: Sequence for target '" << it->first << "' not found in MultiFasta file '" << trans_fasta_file << "'.\n";
+            exit(1);
+        }
+    }
 }
 
 TranscriptTable::~TranscriptTable()
 {
-    for( TransMap::iterator it = _trans_map.begin(); it != _trans_map.end(); ++it)
+    foreach( Transcript* trans, _trans_map)
     {
-        delete it->second;
+        delete trans;
     }
 }
 
-void TranscriptTable::add_trans(Transcript* trans)
+void TranscriptTable::add_trans(const string& name, const string& seq, const TransIndex& trans_index)
 {
-    Transcript* ret = get_trans(trans->id());
-    if (ret)
+    TransIndex::const_iterator it = trans_index.find(name);
+    if(it == trans_index.end())
     {
-        if (trans->name() == ret->name())
-        {
-            cerr << "ERROR: Repeated target ID in multi-fasta input (" << ret->name() << ").\n";
-        }
-        else
-        {
-            cerr << "ERROR: Hash collision (" << ret->name() << " and " << trans->name() <<").\n";
-        }
-        exit(1);
+        cerr << "Warning: Target '" << name << "' exists in MultiFASTA but not alignment (SAM/BAM) file.\n";
+        return;
     }
-    
-    _trans_map.insert(make_pair(trans->id(), trans));
+    Transcript* trans = new Transcript(it->second, name, seq, _alpha, _globs);
+    if (_globs->bias_table)
+        (_globs->bias_table)->update_expectations(*trans);
+    _trans_map[trans->id()] = trans;
     _bundles.make_set(trans->id());
 }
 
 Transcript* TranscriptTable::get_trans(TransID id)
 {
-    TransMap::iterator it = _trans_map.find(id);
-    if(it != _trans_map.end())
-        return it->second;
-    return NULL;
+    return _trans_map[id];
 }
 
 void TranscriptTable::update_covar(TransID trans1, TransID trans2, double covar)
@@ -272,9 +268,9 @@ TransID TranscriptTable::merge_bundles(TransID rep1, TransID rep2)
 size_t TranscriptTable::num_bundles()
 {
     size_t count = 0;
-    for(TransMap::const_iterator it = _trans_map.begin(); it != _trans_map.end(); ++it)
+    foreach(Transcript* trans, _trans_map)
     {
-        if (_bundles.find_set(it->first) == it->first)
+        if (_bundles.find_set(trans->id()) == trans->id())
             count ++;
     }
     return count;
@@ -286,10 +282,10 @@ void TranscriptTable::output_bundles(string output_dir)
     
     typedef boost::unordered_map<TransID, string> BundleMap;
     BundleMap b_map;
-    for( TransMap::iterator it = _trans_map.begin(); it != _trans_map.end(); ++it)
+    foreach(Transcript* trans, _trans_map)
     {
-        TransID rep = _bundles.find_set(it->first);
-        b_map[rep] += '\t' + (it->second)->name();
+        TransID rep = _bundles.find_set(trans->id());
+        b_map[rep] += '\t' + trans->name();
     }
     
     for (BundleMap::iterator it = b_map.begin(); it != b_map.end(); ++it)
@@ -305,10 +301,9 @@ void TranscriptTable::threaded_bias_update()
     while(running)
     {
         //size_t count = 0;
-        for( TransMap::iterator it = _trans_map.begin(); it != _trans_map.end(); ++it)
+        foreach(Transcript* trans, _trans_map)
         {  
-            Transcript& trans = *(it->second);
-            trans.update_transcript_bias();
+            trans->update_transcript_bias();
             //if (++count%10000 == 0)
             //    cout << "*"<<count<<"\n";
             if (!running)
@@ -391,10 +386,10 @@ void TranscriptTable::output_results(string output_dir, size_t tot_counts, bool 
     // Bundle transcripts based on partition
     typedef boost::unordered_map<TransID, vector<Transcript*> > BundleMap;
     BundleMap b_map;
-    for( TransMap::iterator it = _trans_map.begin(); it != _trans_map.end(); ++it)
+    foreach( Transcript* trans, _trans_map)
     {
-        TransID rep = _bundles.find_set(it->first);
-        b_map[rep].push_back(it->second);
+        TransID rep = _bundles.find_set(trans->id());
+        b_map[rep].push_back(trans);
     }
     
     size_t bundle_id = 0;

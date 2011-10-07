@@ -6,7 +6,10 @@
 //  Copyright 2011 Adam Roberts. All rights reserved.
 //
 
-//TODO: Handle hash collisions
+//TODO: Use Bundle objects
+//TODO: Use SAM/BAM indices
+//TODO: Switch to compressed_matrix for covars
+//TODO: Add additional EM step
 //TODO: Speed up bias initialization (using non-logged values)
 
 #include <boost/filesystem.hpp>
@@ -177,7 +180,7 @@ bool parse_options(int ac, char ** av)
  * @param mismatch_table pointer to the erorr model table
  * @param trans_table pointer to the transcript table
  */
-void process_fragment(double mass_n, Fragment* frag_p, FLD* fld, BiasBoss* bias_table, MismatchTable* mismatch_table, TranscriptTable* trans_table)
+void process_fragment(double mass_n, Fragment* frag_p, TranscriptTable* trans_table, const Globals& globs)
 {
     Fragment& frag = *frag_p;
     
@@ -197,12 +200,12 @@ void process_fragment(double mass_n, Fragment* frag_p, FLD* fld, BiasBoss* bias_
         t->add_mass(0, mass_n);
         t->incr_uniq_counts();
         if (m.pair_status() == PAIRED)
-                fld->add_val(m.length(), mass_n);
+                (globs.fld)->add_val(m.length(), mass_n);
         
-        if (bias_table)
-            bias_table->update_observed(m, mass_n - t->mass() + log((double)t->unbiased_effective_length()));
-        if (mismatch_table)
-            mismatch_table->update(m, mass_n);
+        if (globs.bias_table)
+            (glos.bias_table)->update_observed(m, mass_n - t->mass() + log((double)t->unbiased_effective_length()));
+        if (globs.mismatch_table)
+            (globs.mismatch_table)->update(m, mass_n);
        
         return;
     }
@@ -248,12 +251,12 @@ void process_fragment(double mass_n, Fragment* frag_p, FLD* fld, BiasBoss* bias_
         t->add_mass(p, mass_n);
         
         if (m.pair_status() == PAIRED)
-            fld->add_val(m.length(), mass_t);
+            (globs.fld)->add_val(m.length(), mass_t);
  
-        if (bias_table)
-            bias_table->update_observed(m, mass_t - t->mass() + log((double)t->unbiased_effective_length()));
-        if (mismatch_table)
-            mismatch_table->update(m, mass_t);
+        if (globs.bias_table)
+            (globs.bias_table)->update_observed(m, mass_t - t->mass() + log((double)t->unbiased_effective_length()));
+        if (globs.mismatch_table)
+            (globs.mismatch_table)->update(m, mass_t);
         
         if (calc_covar)
         {
@@ -280,8 +283,9 @@ void process_fragment(double mass_n, Fragment* frag_p, FLD* fld, BiasBoss* bias_
  * @param bias_table pointer to the bias parameter table
  * @param mismatch_table pointer to the erorr model table
  * @return the total number of fragments processed
+ FIX
  */
-size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TranscriptTable* trans_table, FLD* fld, BiasBoss* bias_table, MismatchTable* mismatch_table)
+size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TranscriptTable* trans_table, Globals& globs)
 {
     cout << "Processing input fragment alignments...\n";
     
@@ -310,10 +314,10 @@ size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TranscriptTable* 
         
         if (n == burn_in)
         {
-            if (bias_table)
+            if (globs.bias_table)
                 boost::thread bias_update(&TranscriptTable::threaded_bias_update, trans_table);
-            if (mismatch_table)
-                mismatch_table->activate();
+            if (globs.mismatch_table)
+                (globs.mismatch_table)->activate();
         }
         
         // Output progress
@@ -332,18 +336,18 @@ size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TranscriptTable* 
                 }
                 trans_table->output_results(dir, n, false);
                 ofstream paramfile((dir + "/params.xprs").c_str());
-                fld->append_output(paramfile);
-                if (mismatch_table)
-                    mismatch_table->append_output(paramfile);
-                if (bias_table)
-                    bias_table->append_output(paramfile);
+                (globs.fld)->append_output(paramfile);
+                if (globs.mismatch_table)
+                    (globs.mismatch_table)->append_output(paramfile);
+                if (globs.bias_table)
+                    (globs.bias_table)->append_output(paramfile);
                 paramfile.close();
             }
             if (vis)
             {
-                cout << "0 " << fld->to_string() << '\n';
-                cout << "1 " << mismatch_table->to_string() << '\n';
-                cout << "2 " << bias_table->to_string() << '\n';
+                cout << "0 " << (globs.fld)->to_string() << '\n';
+                cout << "1 " << (globs.mismatch_table)->to_string() << '\n';
+                cout << "2 " << (globs.bias_table)->to_string() << '\n';
                 cout << "3 " << n << '\n';
             }
             else
@@ -358,7 +362,7 @@ size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TranscriptTable* 
             mass_n += ff_param*log((double)n-1) - log(pow(n,ff_param) - 1);
         }
         
-        process_fragment(mass_n, frag, fld, bias_table, mismatch_table, trans_table);
+        process_fragment(mass_n, frag, trans_table, globs);
     }
     
 	running = false;
@@ -394,24 +398,25 @@ int main (int argc, char ** argv)
         cerr << "ERROR: cannot create directory " << output_dir << ".\n";
         exit(1);
     }
-            
+    
+    Globals globs;
     FLD fld(fld_alpha, def_fl_max, def_fl_mean, def_fl_stddev);
-    BiasBoss* bias_table = (bias_correct) ? new BiasBoss(bias_alpha):NULL;
-    MismatchTable* mismatch_table = (error_model) ? new MismatchTable(mm_alpha):NULL;
+    globs.bias_table = (bias_correct) ? new BiasBoss(bias_alpha):NULL;
+    globs.mismatch_table = (error_model) ? new MismatchTable(mm_alpha):NULL;
     ThreadedMapParser map_parser(in_map_file_name, out_map_file_name);
-    TranscriptTable trans_table(fasta_file_name, expr_alpha, &fld, bias_table, mismatch_table);
+    TranscriptTable trans_table(fasta_file_name, map_parser.index_table, expr_alpha, globs);
 
-    size_t tot_counts = threaded_calc_abundances(map_parser, &trans_table, &fld, bias_table, mismatch_table);
+    size_t tot_counts = threaded_calc_abundances(map_parser, &trans_table, globs);
 
 	cout << "Writing results to file...\n";
     
     trans_table.output_results(output_dir, tot_counts, calc_covar);
     ofstream paramfile((output_dir + "/params.xprs").c_str());
     fld.append_output(paramfile);
-    if (mismatch_table)
-        mismatch_table->append_output(paramfile);
-    if (bias_table)
-        bias_table->append_output(paramfile);
+    if (globs.mismatch_table)
+        (globs.mismatch_table)->append_output(paramfile);
+    if (globs.bias_table)
+        (globs.bias_table)->append_output(paramfile);
     paramfile.close();
     
     cout << "Done\n";

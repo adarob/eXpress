@@ -210,7 +210,7 @@ bool BAMParser::map_end_from_alignment(BamTools::BamAlignment& a)
     
     f.left_first = (!a.IsPaired() && !a.IsReverseStrand()) || (a.IsFirstMate() && !a.IsReverseStrand()) || (a.IsSecondMate() && a.IsReverseStrand());
     f.name = a.Name;
-    f.trans_id = hash_trans_name(_reader->GetReferenceData()[a.RefID].RefName);
+    f.trans_id = a.RefID;
     f.left = a.Position;
     f.right = f.left + cigar_length(a.CigarData);
     f.mate_l = a.MatePosition;

@@ -15,6 +15,17 @@
 
 #define foreach BOOST_FOREACH
 
+class BiasBoss;
+class MismatchTable;
+class FLD;
+
+struct Globals
+{
+    FLD* fld;
+    MismatchTable* mismatch_table;
+    BiasBoss* bias_table;
+};
+
 /**
  * a global bool that is true when processing is still occuring
  * this is primarily used to notify the bias update thread to stop

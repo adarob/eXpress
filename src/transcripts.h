@@ -56,6 +56,8 @@ static size_t hash_trans_pair(TransID trans1, TransID trans2)
  **/
 class Transcript
 {
+    const Globals* _globs;
+    
     /**
      * a private string that stores the transcript name
      */
@@ -125,21 +127,6 @@ class Transcript
     double _ub_eff_len;
     
     /**
-     * a private pointer to the "global" Fragment Length Distribution (FLD) object
-     */
-    const FLD* _fld;
-    
-    /**
-     * a private pointer to the "global" bias table object
-     */
-    const BiasBoss* _bias_table;
-    
-    /**
-     * a private pointer to the "global" mismatch (error) table object
-     */
-    const MismatchTable* _mismatch_table;
-    
-    /**
      * a private member function that returns the (logged) total bias for a given fragment length
      * @param l a size_t that specifies the fragment length
      * @return the total bias for length (\f$ B = \bar{bias}(L(t) - l + 1) \f$)
@@ -153,11 +140,9 @@ public:
      * @param name a string that stores the transcript name
      * @param seq a string that stores the transcript sequence
      * @param alpha a double that specifies the intial pseudo-counts (non-logged)
-     * @param fld a pointer to the global Fragment Length Distribution (FLD) object
-     * @param bias_table a pointer to the global BiasBoss object
-     * @param mismatch_table a pointer to the global MismatchTable object
+     FIX
      */
-    Transcript(const std::string& name, const std::string& seq, double alpha, const FLD* fld, const BiasBoss* bias_table, const MismatchTable* mismatch_table);
+    Transcript(const size_t id, const std::string& name, const std::string& seq, double alpha, const Globals* globs);
     
     /**
      * a member function that returns the transcript name
@@ -273,7 +258,8 @@ public:
     
 };
 
-typedef boost::unordered_map<TransID, Transcript*> TransMap;
+typedef std::vector<Transcript*> TransMap;
+typedef boost::unordered_map<std::string, size_t> TransIndex;
 typedef boost::unordered_map<size_t, double> TransPairMap;
 
 // Typedefs to simplify the bundle partitioning
@@ -293,8 +279,11 @@ typedef boost::disjoint_sets<Rank, Parent> TransPartition;
  **/
 class TranscriptTable
 {
+    
+    const Globals* _globs;
+        
     /**
-     * a private map to look up pointers to Transcript objects by their hashed TransID id
+     * a private map to look up pointers to Transcript objects by their TransID id
      */
     TransMap _trans_map;
     
@@ -318,20 +307,20 @@ class TranscriptTable
     
     /**
      * a private function that adds a transcript pointer to the table
-     * @param trans a pointer to the transcript to be added
+     * FIX: @param trans a pointer to the transcript to be added
      */
-    void add_trans(Transcript* trans);  
+    void add_trans(const std::string&, const std::string& seq, const TransIndex& trans_index);  
     
 public:
     /**
      * TranscriptTable Constructor
      * @param trans_fasta_file a string storing the path to the fasta file from which to load transcripts
      * @param alpha a double that specifies the intial pseudo-counts for each bp of the transcripts (non-logged)
-     * @param fld a pointer to the global Fragment Length Distribution (FLD) object
+     * FIX: @param fld a pointer to the global Fragment Length Distribution (FLD) object
      * @param bias_table a pointer to the global BiasBoss object
      * @param mismatch_table a pointer to the global MismatchTable object
      */
-    TranscriptTable(const std::string& trans_fasta_file, double alpha, const FLD* fld, BiasBoss* bias_table, const MismatchTable* mismatch_table);
+    TranscriptTable(const std::string& trans_fasta_file, const TransIndex& trans_index, double alpha, const Globals* globs);
     
     /**
      * TranscriptTable Destructor
