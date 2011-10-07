@@ -221,23 +221,25 @@ Transcript* TranscriptTable::get_trans(TransID id)
 
 void TranscriptTable::update_covar(TransID trans1, TransID trans2, double covar)
 {
-    size_t pair_id = size()*min(trans1, trans2)+max(trans1, trans2);
-    if (_covar_map.count(pair_id))
+    TransPair p(min(trans1,trans2), max(trans1,trans2));
+    CovarMap::iterator it = _covar_map.find(p);
+    if (it != _covar_map.end())
     {
-        _covar_map[pair_id] = log_sum(covar, _covar_map[pair_id]);
+        it->second = log_sum(covar, it->second);
     }
     else
     {
-        _covar_map[pair_id] = covar;
+        _covar_map[p] = covar;
     }
 }
 
 double TranscriptTable::get_covar(TransID trans1, TransID trans2)
 {
-    size_t pair_id = size()*min(trans1, trans2)+max(trans1, trans2);
-    if (_covar_map.count(pair_id))
+    TransPair p(min(trans1,trans2), max(trans1,trans2));
+    
+    if (_covar_map.count(p))
     {
-        return _covar_map[pair_id];
+        return _covar_map[p];
     }
     else
     {
@@ -377,9 +379,6 @@ void TranscriptTable::output_results(string output_dir, size_t tot_counts, bool 
         {
             l_bundle_mass = log_sum(l_bundle_mass, bundle_trans[i]->mass()); 
         }
-
-        if (output_varcov)
-            varcov_file << endl;
         
         if (bundle->counts())
         {

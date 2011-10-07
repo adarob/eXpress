@@ -380,7 +380,7 @@ size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TranscriptTable* 
 
 
 int main (int argc, char ** argv)
-{   
+{      
     int parse_ret = parse_options(argc,argv);
     if (parse_ret)
         return parse_ret;
