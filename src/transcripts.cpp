@@ -222,16 +222,14 @@ Transcript* TranscriptTable::get_trans(TransID id)
 void TranscriptTable::update_covar(TransID trans1, TransID trans2, double covar)
 {
     size_t pair_id = size()*min(trans1, trans2)+max(trans1, trans2);
-    CovarMap::iterator it = _covar_map.find(pair_id);
-    if (it != _covar_map.end())
+    if (_covar_map.count(pair_id))
     {
-        it->second = log_sum(covar, it->second);
+        _covar_map[pair_id] = log_sum(covar, _covar_map[pair_id]);
     }
     else
     {
         _covar_map[pair_id] = covar;
     }
-    
 }
 
 double TranscriptTable::get_covar(TransID trans1, TransID trans2)
