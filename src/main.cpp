@@ -268,7 +268,7 @@ void process_fragment(double mass_n, Fragment* frag_p, TranscriptTable* trans_ta
                     continue;
                 
                 double covar = 2*mass_n + p + p2;
-                trans_table -> update_covar(m.trans_id, m2.trans_id, covar); 
+                trans_table->update_covar(m.trans_id, m2.trans_id, covar); 
             }
         }
     }

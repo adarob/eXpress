@@ -59,14 +59,14 @@ class Transcript
     const Globals* _globs;
     
     /**
-     * a private string that stores the transcript name
-     */
-    std::string _name;
-    
-    /**
      * a private TransID that stores the hashed transcript name
      */
     TransID _id;
+    
+    /**
+     * a private string that stores the transcript name
+     */
+    std::string _name;
     
     /**
      * a private string that stores the transcript sequence
