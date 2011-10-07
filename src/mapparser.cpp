@@ -117,7 +117,8 @@ void ThreadedMapParser::threaded_parse(ParseThreadSafety* thread_safety, Transcr
 {
     ParseThreadSafety& ts = *thread_safety;
     bool fragments_remain = true;
-    Fragment * last_frag;
+    Fragment * last_frag = NULL;
+    ts.next_frag = NULL;
     while (true)
     {
         Fragment* frag = NULL;
@@ -156,11 +157,11 @@ void ThreadedMapParser::threaded_parse(ParseThreadSafety* thread_safety, Transcr
             break;
         if (!running)
         {
-            ts.parse_lk.unlock();
             delete frag;
             break;
         }
     }
+    ts.parse_lk.unlock();
 }
 
 BAMParser::BAMParser(BamTools::BamReader* reader)

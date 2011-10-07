@@ -406,6 +406,12 @@ int main (int argc, char ** argv)
     ThreadedMapParser map_parser(in_map_file_name, out_map_file_name);
     TranscriptTable trans_table(fasta_file_name, map_parser.trans_index(), expr_alpha, &globs);
 
+    if (calc_covar && (double)SIZE_T_MAX < pow((double)map_parser.trans_index().size(), 2.0))
+    {
+        cerr << "Warning: Your system is unable to represent large enough values for efficiently hashing transcript pairs.  Covariance calculation will be disabled.\n";
+        calc_covar = false;
+    }
+    
     size_t tot_counts = threaded_calc_abundances(map_parser, &trans_table, globs);
 
 	cout << "Writing results to file...\n";
