@@ -232,9 +232,7 @@ public:
 
 typedef std::vector<Transcript*> TransMap;
 typedef boost::unordered_map<std::string, size_t> TransIndex;
-
-typedef std::pair<TransID, TransID> TransPair;
-typedef boost::unordered_map<TransPair, double> CovarMap;
+typedef boost::unordered_map<size_t, double> CovarMap;
 
 /**
  * The TranscriptTable class is used to keep track of the Transcript objects for a run.
