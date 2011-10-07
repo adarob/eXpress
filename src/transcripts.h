@@ -342,25 +342,17 @@ public:
        
     /**
      * a member function that merges the bundles represented by the two given transcripts
-     * @param rep1 the TransID of the first bundle representative
+     * FIX @param rep1 the TransID of the first bundle representative
      * @param rep2 the TransID of the second bundle representative
      * @return the TransID of the representative for the new merged bundle
      */
-    TransID merge_bundles(TransID rep1, TransID rep2);
+    Bundle* merge_bundles(Bundle* b1, Bundle* b2);
     
     /**
      * a member function that returns the number of bundles in the partition
      * @return the number of bundles in the partition
      */
     size_t num_bundles();
-    
-    /**
-     * a member function that outputs the bundles of the partition in a tab-delimited file called 'bundles.tab'
-     * in the given output directory
-     * each line contains a space-separated list of transcripts in a single bundle
-     * @param output_dir the directory to output the bundle file to
-     */
-    void output_bundles(std::string output_dir);
     
     /**
      * a member function for driving a thread that continuously updates the transcript bias values

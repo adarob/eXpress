@@ -29,7 +29,6 @@ Transcript::Transcript(const TransID id, const std::string& name, const std::str
     _var(HUGE_VAL),
     _uniq_counts(0),
     _tot_counts(0),
-    _bundle_counts(0),
     _start_bias(std::vector<double>(seq.length(),0)),
     _end_bias(std::vector<double>(seq.length(),0)),
     _avg_bias(0)
@@ -137,9 +136,6 @@ void Transcript::update_transcript_bias()
 TranscriptTable::TranscriptTable(const string& trans_fasta_file, const TransIndex& trans_index, double alpha, const Globals* globs)
 : _globs(globs),
   _trans_map(trans_index.size(), NULL),
-  _rank(Rank(_rank_map)),
-  _parent(Parent(_parent_map)),
-  _bundles(_rank, _parent),
   _alpha(alpha)
 {
     cout << "Loading target sequences from " << trans_fasta_file << "...\n\n";
@@ -215,7 +211,7 @@ void TranscriptTable::add_trans(const string& name, const string& seq, const Tra
     if (_globs->bias_table)
         (_globs->bias_table)->update_expectations(*trans);
     _trans_map[trans->id()] = trans;
-    _bundles.make_set(trans->id());
+    trans->bundle(_bundle_table.create_bundle(trans));
 }
 
 Transcript* TranscriptTable::get_trans(TransID id)
@@ -250,51 +246,20 @@ double TranscriptTable::get_covar(TransID trans1, TransID trans2)
 }
 
 
-TransID TranscriptTable::get_trans_rep(TransID trans)
+Bundle* TranscriptTable::merge_bundles(Bundle* b1, Bundle* b2)
 {
-    return _bundles.find_set(trans);
-}
-
-
-TransID TranscriptTable::merge_bundles(TransID rep1, TransID rep2)
-{
-    assert(rep1 != rep2);
-    _bundles.link(rep1, rep2);
-    
-    TransID new_rep = _bundles.find_set(rep1);
-    return new_rep;
+    if (b1 != b2)
+    {
+        return _bundle_table.merge(b1, b2);
+    }
+    return b1;
 }
 
 size_t TranscriptTable::num_bundles()
 {
-    size_t count = 0;
-    foreach(Transcript* trans, _trans_map)
-    {
-        if (_bundles.find_set(trans->id()) == trans->id())
-            count ++;
-    }
-    return count;
+    return _bundle_table.size();
 }
 
-void TranscriptTable::output_bundles(string output_dir)
-{
-    ofstream bundle_file((output_dir + "/bundles.tab").c_str());
-    
-    typedef boost::unordered_map<TransID, string> BundleMap;
-    BundleMap b_map;
-    foreach(Transcript* trans, _trans_map)
-    {
-        TransID rep = _bundles.find_set(trans->id());
-        b_map[rep] += '\t' + trans->name();
-    }
-    
-    for (BundleMap::iterator it = b_map.begin(); it != b_map.end(); ++it)
-    {
-        bundle_file << it->second << '\n';
-    }
-    
-    bundle_file.close();
-}
 
 void TranscriptTable::threaded_bias_update()
 {
@@ -386,41 +351,39 @@ void TranscriptTable::output_results(string output_dir, size_t tot_counts, bool 
     // Bundle transcripts based on partition
     typedef boost::unordered_map<TransID, vector<Transcript*> > BundleMap;
     BundleMap b_map;
-    foreach( Transcript* trans, _trans_map)
-    {
-        TransID rep = _bundles.find_set(trans->id());
-        b_map[rep].push_back(trans);
-    }
     
     size_t bundle_id = 0;
-    for (BundleMap::iterator it = b_map.begin(); it != b_map.end(); ++it)
+    foreach (Bundle* bundle, _bundle_table.bundles())
     {
         ++bundle_id;
-        vector<Transcript*> bundle_trans = it->second;
+        
+        const vector<Transcript*>& bundle_trans = bundle->transcripts();
         
         if (output_varcov)
-            varcov_file << ">" << bundle_id << ": ";
-        
-        // Calculate total counts for bundle and bundle-level rho
-        size_t bundle_counts = 0;
-        double l_bundle_mass = HUGE_VAL;
-        for (size_t i = 0; i < bundle_trans.size(); ++i)
         {
-            bundle_counts += bundle_trans[i]->bundle_counts();
-            l_bundle_mass = log_sum(l_bundle_mass, bundle_trans[i]->mass()); 
-            if (output_varcov)
+            varcov_file << ">" << bundle_id << ": ";
+            for (size_t i = 0; i < bundle_trans.size(); ++i)
             {
                 if (i)
                     varcov_file << ", ";
                 varcov_file << bundle_trans[i]->name();
             }
+            varcov_file << endl;
+        }        
+        
+        // Calculate total counts for bundle and bundle-level rho
+        double l_bundle_mass = HUGE_VAL;
+        for (size_t i = 0; i < bundle_trans.size(); ++i)
+        {
+            l_bundle_mass = log_sum(l_bundle_mass, bundle_trans[i]->mass()); 
         }
+
         if (output_varcov)
             varcov_file << endl;
         
-        if (bundle_counts)
+        if (bundle->counts())
         {
-            double l_bundle_counts = log((double)bundle_counts);
+            double l_bundle_counts = log((double)bundle->counts());
             double l_var_renorm = 2*(l_bundle_counts - l_bundle_mass);
             
             vector<double> trans_counts(bundle_trans.size(),0);
@@ -438,7 +401,7 @@ void TranscriptTable::output_results(string output_dir, size_t tot_counts, bool 
             
             if (bundle_trans.size() > 1 && requires_projection)
             {
-                project_to_polytope(bundle_trans, trans_counts, bundle_counts);
+                project_to_polytope(bundle_trans, trans_counts, bundle->counts());
             }
             
             
