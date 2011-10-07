@@ -19,7 +19,7 @@
 #include <iostream>
 #include <fstream>
 #include "main.h"
-
+#include "bundles.h"
 
 class FLD;
 class FragHit;
@@ -28,10 +28,6 @@ class MismatchTable;
 
 typedef size_t TransID;
 
-/**
- * a global function to hash transcript names to TransIDs
- */
-static boost::hash<std::string> hash_trans_name;
 
 /**
  * a global function to combine TransIDs into paired hashes
@@ -96,10 +92,9 @@ class Transcript
     size_t _tot_counts;
     
     /**
-     * a private size_t that stores a portion of the fragment counts (non-logged) for the bundle
-     * the total bundle counts is the sum of this value for all transcripts in the bundle
+     FIX
      */
-    size_t _bundle_counts;
+    Bundle* _bundle;
     
     /**
      * a private mutex to provide thread-safety for bias variables with threaded update
@@ -192,11 +187,10 @@ public:
     size_t uniq_counts() const { return _uniq_counts; }
     
     /**
-     * a member function that returns the counts mapping to the bundle this transcript is in
-     * the total bundle counts is the sum of this value for all transcripts in the bundle
-     * @return a portion of the counts mapping to the bundle this transcript is in 
+     FIX
      */
-    size_t bundle_counts() { return _bundle_counts; }
+    Bundle* bundle() { return _bundle; }
+    void bundle(Bundle* b) { _bundle = b; }
     
     /**
      * a member function that increases the expected fragment counts and variance by a given (logged) fragment mass
@@ -212,16 +206,6 @@ public:
     void incr_uniq_counts(size_t incr_amt = 1)
     {
         _uniq_counts += incr_amt;
-    }
-    
-    /**
-     * a member function that increases the counts mapping to the bundle this transcript is in
-     * the total bundle counts is the sum of this value for all transcripts in the bundle
-     * @param incr_amt a size_t to increase the counts by
-     */
-    void incr_bundle_counts(size_t incr_amt = 1)
-    {
-        _bundle_counts += incr_amt;
     }
     
     /**
@@ -262,13 +246,6 @@ typedef std::vector<Transcript*> TransMap;
 typedef boost::unordered_map<std::string, size_t> TransIndex;
 typedef boost::unordered_map<size_t, double> TransPairMap;
 
-// Typedefs to simplify the bundle partitioning
-typedef boost::unordered_map<TransID, size_t> RankMap;
-typedef boost::unordered_map<TransID, TransID> ParentMap;
-typedef boost::associative_property_map<RankMap> Rank;
-typedef boost::associative_property_map<ParentMap> Parent;
-typedef boost::disjoint_sets<Rank, Parent> TransPartition;
-
 /**
  * The TranscriptTable class is used to keep track of the Transcript objects for a run.
  * The constructor parses a fasta file to generate the Transcript objects and store them in a map
@@ -288,17 +265,15 @@ class TranscriptTable
     TransMap _trans_map;
     
     /**
+     *FIX
+     */
+    BundleTable _bundle_table;
+    
+    /**
      * a private map to look up the covariance for pairs of Transcripts by their combined hashed TransIDs
      * these values are stored positive, even though they are negative
      */
     TransPairMap _covar_map;
-    
-    // objects used to partition the transcripts into bundles
-    RankMap _rank_map;
-    ParentMap _parent_map;
-    Rank _rank;
-    Parent _parent;
-    TransPartition _bundles;
     
     /**
      * a private double specifying the initial Transcript mass pseudo-counts for each bp (non-logged)
@@ -364,14 +339,7 @@ public:
      * @return the number of transcript pairs with non-zero covariance
      */
     size_t covar_size() const { return _covar_map.size(); }
-    
-    /**
-     * a member function that returns the bundle representative of the given transcript in the partitioning
-     * @param trans the TransID of the transcript whose representative is requested
-     * @return the TransID of the representative for the bundle the given transcript is in
-     */
-    TransID get_trans_rep(TransID trans);
-    
+       
     /**
      * a member function that merges the bundles represented by the two given transcripts
      * @param rep1 the TransID of the first bundle representative
