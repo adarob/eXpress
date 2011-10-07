@@ -14,7 +14,6 @@
 
 
 class Transcript;
-class FragMassTable;
 
 /** 
  * The Bundle class keeps track of a group of transcripts that have shared ambiguous (multi-mapped)

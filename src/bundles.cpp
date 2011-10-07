@@ -13,7 +13,7 @@
 using namespace std;
 
 Bundle::Bundle(Transcript* trans)
-: _counts(trans->tot_counts()),
+: _counts(trans->tot_counts())
 { _transcripts.push_back(trans); }
 
 
@@ -24,7 +24,7 @@ void Bundle::incr_counts(size_t incr_amt)
 
 Bundle* BundleTable::create_bundle(Transcript* trans)
 {
-    Bundle* b = new Bundle(trans, _fmt);
+    Bundle* b = new Bundle(trans);
     _bundles.insert(b);
     return b;
 }
