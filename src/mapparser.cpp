@@ -154,6 +154,12 @@ void ThreadedMapParser::threaded_parse(ParseThreadSafety* thread_safety, Transcr
         
         if (!frag)
             break;
+        if (!running)
+        {
+            ts.parse_lk.unlock();
+            delete frag;
+            break;
+        }
     }
 }
 

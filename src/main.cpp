@@ -372,9 +372,9 @@ size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TranscriptTable* 
     else
         cout << "COMPLETED: Processed " << n << " fragments, targets are in " << trans_table->num_bundles() << " bundles\n";
     
-    parse.join();
-    ts.proc_lk.unlock();
     ts.parse_lk.unlock();
+    ts.proc_lk.unlock();
+    parse.join();
     return n;
 }
 
