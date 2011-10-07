@@ -176,10 +176,8 @@ bool parse_options(int ac, char ** av)
  * and the mass of the fragment is divided based on the normalized marginals to update the model parameters.
  * @param mass_n double specifying the logged fragment mass
  * @param frag_p pointer to the fragment to probabilistically assign
- * @param fld pointer to the fragment length distribution
- * @param bias_table pointer to the bias parameter table
- * @param mismatch_table pointer to the erorr model table
  * @param trans_table pointer to the transcript table
+ * @param globs a pointer to the struct containing pointers to the global parameter tables (bias_table, mismatch_table, fld)
  */
 void process_fragment(double mass_n, Fragment* frag_p, TranscriptTable* trans_table, const Globals& globs)
 {
@@ -279,11 +277,8 @@ void process_fragment(double mass_n, Fragment* frag_p, TranscriptTable* trans_ta
  * processed once they are passed by the parsing thread.
  * @param map_parser the parsing object
  * @param trans_table pointer to the transcript table
- * @param fld pointer to the fragment length distribution
- * @param bias_table pointer to the bias parameter table
- * @param mismatch_table pointer to the erorr model table
+ * @param globs a struct containing pointers to the global parameter tables (bias_table, mismatch_table, fld)
  * @return the total number of fragments processed
- FIX
  */
 size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TranscriptTable* trans_table, Globals& globs)
 {
@@ -406,7 +401,8 @@ int main (int argc, char ** argv)
     ThreadedMapParser map_parser(in_map_file_name, out_map_file_name);
     TranscriptTable trans_table(fasta_file_name, map_parser.trans_index(), expr_alpha, &globs);
 
-    if (calc_covar && (double)SIZE_T_MAX < pow((double)map_parser.trans_index().size(), 2.0))
+    double num_trans = (double)map_parser.trans_index().size();
+    if (calc_covar && (double)SIZE_T_MAX < num_trans*(num_trans+1))
     {
         cerr << "Warning: Your system is unable to represent large enough values for efficiently hashing transcript pairs.  Covariance calculation will be disabled.\n";
         calc_covar = false;

@@ -40,6 +40,9 @@ typedef size_t TransID;
  **/
 class Transcript
 {
+    /**
+     * a private pointer to the struct containing pointers to the global parameter tables (bias_table, mismatch_table, fld)
+     */
     const Globals* _globs;
     
     /**
@@ -80,7 +83,7 @@ class Transcript
     size_t _tot_counts;
     
     /**
-     FIX
+     * a private pointer to the Bundle this Transcript is a member of
      */
     Bundle* _bundle;
     
@@ -123,7 +126,7 @@ public:
      * @param name a string that stores the transcript name
      * @param seq a string that stores the transcript sequence
      * @param alpha a double that specifies the intial pseudo-counts (non-logged)
-     FIX
+     * @param globs a pointer to the struct containing pointers to the global parameter tables (bias_table, mismatch_table, fld)
      */
     Transcript(const size_t id, const std::string& name, const std::string& seq, double alpha, const Globals* globs);
     
@@ -175,9 +178,15 @@ public:
     size_t uniq_counts() const { return _uniq_counts; }
     
     /**
-     FIX
+     * a member function that returns the Bundle this Transcript is a member of
+     * @return a pointer to the Bundle this transcript is a member of
      */
     Bundle* bundle() { return _bundle; }
+
+    /**
+     * a member function that set the Bundle this Transcript is a member of
+     * @param b a pointer to the Bundle to set this Transcript as a member of
+     */
     void bundle(Bundle* b) { _bundle = b; }
     
     /**
@@ -244,7 +253,9 @@ typedef boost::unordered_map<size_t, double> CovarMap;
  **/
 class TranscriptTable
 {
-    
+    /**
+     * a private pointer to the struct containing pointers to the global parameter tables (bias_table, mismatch_table, fld)
+     */
     const Globals* _globs;
         
     /**
@@ -253,7 +264,7 @@ class TranscriptTable
     TransMap _trans_map;
     
     /**
-     *FIX
+     * the private table to keep track of Bundles
      */
     BundleTable _bundle_table;
     
@@ -270,18 +281,19 @@ class TranscriptTable
     
     /**
      * a private function that adds a transcript pointer to the table
-     * FIX: @param trans a pointer to the transcript to be added
+     * @param name the name of the trancript
+     * @param seq the sequence of the transcript
+     * @param trans_idex the transcript-to-index map
      */
-    void add_trans(const std::string&, const std::string& seq, const TransIndex& trans_index);  
+    void add_trans(const std::string& name, const std::string& seq, const TransIndex& trans_index);  
     
 public:
     /**
      * TranscriptTable Constructor
      * @param trans_fasta_file a string storing the path to the fasta file from which to load transcripts
+     * @param trans_index the transcript-to-index map
      * @param alpha a double that specifies the intial pseudo-counts for each bp of the transcripts (non-logged)
-     * FIX: @param fld a pointer to the global Fragment Length Distribution (FLD) object
-     * @param bias_table a pointer to the global BiasBoss object
-     * @param mismatch_table a pointer to the global MismatchTable object
+     * @param globs a pointer to the struct containing pointers to the global parameter tables (bias_table, mismatch_table, fld)
      */
     TranscriptTable(const std::string& trans_fasta_file, const TransIndex& trans_index, double alpha, const Globals* globs);
     
@@ -329,10 +341,10 @@ public:
     size_t covar_size() const { return _covar_map.size(); }
        
     /**
-     * a member function that merges the bundles represented by the two given transcripts
-     * FIX @param rep1 the TransID of the first bundle representative
-     * @param rep2 the TransID of the second bundle representative
-     * @return the TransID of the representative for the new merged bundle
+     * a member function that merges the given Bundles
+     * @param b1 a pointer to the first Bundle to merge
+     * @param b2 a pointer to the second Bundle to merge
+     * @return a pointer to the merged Bundle
      */
     Bundle* merge_bundles(Bundle* b1, Bundle* b2);
     

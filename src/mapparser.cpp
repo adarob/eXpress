@@ -169,10 +169,9 @@ BAMParser::BAMParser(BamTools::BamReader* reader)
     _reader = reader;
     BamTools::BamAlignment a;
     
-    size_t index = 0;
     foreach(const BamTools::RefData& ref, _reader->GetReferenceData())
     {
-        _trans_index[ref.RefName] = index++;
+        _trans_index[ref.RefName] = _trans_index.size();
     }
     
     // Get first valid FragHit
@@ -267,8 +266,6 @@ SAMParser::SAMParser(istream* in)
     char line_buff[BUFF_SIZE];
     _frag_buff = new FragHit();
     _header = "";
-
-    size_t index = 0;
     
     while(_in->good())
     {
@@ -288,7 +285,7 @@ SAMParser::SAMParser(istream* in)
             str = str.substr(0,str.find_first_of("\n\t "));
             if (_trans_index.find(str) == _trans_index.end())
             {
-                _trans_index[str] = index++;
+                _trans_index[str] = _trans_index.size();
             }
             else
             {

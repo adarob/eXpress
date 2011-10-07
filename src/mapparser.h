@@ -42,7 +42,8 @@ public:
     virtual const std::string header() const=0;
     
     /**
-     * FIX
+     * a member function that returns the transcript-to-index map
+     * @return the transcript-to-index map
      */
     virtual const TransIndex& trans_index() const=0;
     
@@ -88,7 +89,9 @@ class BAMParser : public Parser
      */
     BamTools::BamReader* _reader;
     
-    //FIX
+    /**
+     * the private returns transcript-to-index map
+     */
     TransIndex _trans_index; 
     
     /**
@@ -120,7 +123,10 @@ public:
      */
     const std::string header() const { return _reader->GetHeaderText(); }
     
-    //FIX
+    /**
+     * a member function that returns the transcript-to-index map
+     * @return the transcript-to-index map
+     */
     const TransIndex& trans_index() const { return _trans_index; }
     
     /**
@@ -179,7 +185,9 @@ class SAMParser : public Parser
      */
     std::istream* _in;
     
-    // FIX
+    /**
+     * the private transcript-to-index map
+     */
     TransIndex _trans_index; 
     
     /**
@@ -210,7 +218,10 @@ public:
      */
     const std::string header() const { return _header; }
     
-    //FIX
+    /**
+     * a member function that returns the transcript-to-index map
+     * @return the transcript-to-index map
+     */
     const TransIndex& trans_index() const { return _trans_index; }
     
     /**
@@ -323,7 +334,9 @@ public:
      */
     void threaded_parse(ParseThreadSafety* thread_safety, TranscriptTable* trans_table);
     
-    /**FIX
+    /**
+     * a member function that returns the transcript-to-index map
+     * @return the transcript-to-index map
      */
     const TransIndex& trans_index() { return _parser->trans_index(); }
 };

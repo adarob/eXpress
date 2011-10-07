@@ -19,6 +19,9 @@ class BiasBoss;
 class MismatchTable;
 class FLD;
 
+/**
+ * a struct containing pointers to the global parameter tables (bias_table, mismatch_table, fld)
+ */
 struct Globals
 {
     FLD* fld;
