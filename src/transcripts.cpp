@@ -221,7 +221,7 @@ Transcript* TranscriptTable::get_trans(TransID id)
 
 void TranscriptTable::update_covar(TransID trans1, TransID trans2, double covar)
 {
-    size_t pair_id = hash_trans_pair(trans1, trans2);
+    size_t pair_id = size()*min(trans1, trans2)+max(trans1, trans2);
     if (_covar_map.count(pair_id))
     {
         _covar_map[pair_id] = log_sum(covar, _covar_map[pair_id]);
@@ -234,7 +234,7 @@ void TranscriptTable::update_covar(TransID trans1, TransID trans2, double covar)
 
 double TranscriptTable::get_covar(TransID trans1, TransID trans2)
 {
-    size_t pair_id = hash_trans_pair(trans1, trans2);
+    size_t pair_id = size()*min(trans1, trans2)+max(trans1, trans2);
     if (_covar_map.count(pair_id))
     {
         return _covar_map[pair_id];

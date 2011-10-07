@@ -12,6 +12,7 @@
 #include <vector>
 #include <string>
 #include <boost/thread.hpp>
+#include <boost/unordered_map.hpp>
 #include <api/BamReader.h>
 #include <api/BamWriter.h>
 
@@ -19,6 +20,8 @@
 class Fragment;
 class FragHit;
 class TranscriptTable;
+
+typedef boost::unordered_map<std::string, size_t> TransIndex;
 
 /**
  * The Parser class is an abstract class that can be a SAMParser or BAMParser.
@@ -37,6 +40,11 @@ public:
      * @return string version of the header
      */
     virtual const std::string header() const=0;
+    
+    /**
+     * FIX
+     */
+    virtual const TransIndex& trans_index() const=0;
     
     /**
      * a member function that loads all mappings of the next fragment
@@ -80,6 +88,9 @@ class BAMParser : public Parser
      */
     BamTools::BamReader* _reader;
     
+    //FIX
+    TransIndex _trans_index; 
+    
     /**
      * a private pointer to the current fragment mapping being parsed
      */
@@ -108,6 +119,9 @@ public:
      * @return string version of the header
      */
     const std::string header() const { return _reader->GetHeaderText(); }
+    
+    //FIX
+    const TransIndex& trans_index() const { return _trans_index; }
     
     /**
      * a member function that loads all mappings of the next fragment
@@ -165,6 +179,9 @@ class SAMParser : public Parser
      */
     std::istream* _in;
     
+    // FIX
+    TransIndex _trans_index; 
+    
     /**
      * a private pointer to the current fragment mapping being parsed
      */
@@ -192,6 +209,9 @@ public:
      * @return string version of the header
      */
     const std::string header() const { return _header; }
+    
+    //FIX
+    const TransIndex& trans_index() const { return _trans_index; }
     
     /**
      * a member function that loads all mappings of the next fragment
@@ -303,6 +323,9 @@ public:
      */
     void threaded_parse(ParseThreadSafety* thread_safety, TranscriptTable* trans_table);
     
+    /**FIX
+     */
+    const TransIndex& trans_index() { return _parser->trans_index(); }
 };
 
 

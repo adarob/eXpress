@@ -162,6 +162,12 @@ BAMParser::BAMParser(BamTools::BamReader* reader)
     _reader = reader;
     BamTools::BamAlignment a;
     
+    size_t index = 0;
+    foreach(const BamTools::RefData& ref, _reader->GetReferenceData())
+    {
+        _trans_index[ref.RefName] = index++;
+    }
+    
     // Get first valid FragHit
     _frag_buff = new FragHit();
     do {
@@ -255,14 +261,32 @@ SAMParser::SAMParser(istream* in)
     _frag_buff = new FragHit();
     _header = "";
 
+    size_t index = 0;
+    
     while(_in->good())
     {
         _in->getline(line_buff, BUFF_SIZE-1, '\n');
-        _header += line_buff;
-        _header += "\n";
         if (line_buff[0] != '@')
         {
             break;
+        }
+        _header += line_buff;
+        _header += "\n";
+        
+        string str(line_buff);
+        size_t idx = str.find("SN:");
+        if (idx!=string::npos)
+        {
+            str = str.substr(str.find("SN:")+3);
+            str = str.substr(0,str.find_first_of("\n\t "));
+            if (_trans_index.find(str) == _trans_index.end())
+            {
+                _trans_index[str] = index++;
+            }
+            else
+            {
+                cerr << "Warning: Target '" << str << "' appears twice in the SAM index.\n";
+            }
         }
     }
 
@@ -326,7 +350,7 @@ bool SAMParser::map_end_from_line(char* line)
             case 2:
                 if(p[0] == '*')
                     goto stop;
-                f.trans_id = hash_trans_name(p);
+                f.trans_id = _trans_index[p];
                 break;
             case 3:
                 f.left = atoi(p)-1;

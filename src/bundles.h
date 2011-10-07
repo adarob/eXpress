@@ -11,7 +11,7 @@
 
 #include <vector>
 #include <boost/unordered_set.hpp>
-
+#include <boost/unordered_map.hpp>
 
 class Transcript;
 
@@ -87,14 +87,13 @@ class BundleTable
      * a private unordered_set to store all of the bundles
      */
     BundleSet _bundles;
-
+    
 public:
     
     /**
      * BundleTable constructor.
-     * @param fmt a pointer to the (global) FragMassTable
      */
-    BundleTable();
+    BundleTable() {};
     
     /**
      * BundleTable deconstructor.  Deletes all Bundle objects.
@@ -130,6 +129,5 @@ public:
      */ 
     Bundle* merge(Bundle* b1, Bundle* b2);
 };
-
 
 #endif

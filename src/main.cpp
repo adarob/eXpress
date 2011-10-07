@@ -19,6 +19,7 @@
 #include <fstream>
 #include <stdio.h>
 #include "main.h"
+#include "bundles.h"
 #include "transcripts.h"
 #include "fld.h"
 #include "fragments.h"
@@ -186,7 +187,8 @@ void process_fragment(double mass_n, Fragment* frag_p, TranscriptTable* trans_ta
     
     assert(frag.num_hits());
     
-    frag.hits()[0]->mapped_trans->incr_bundle_counts();
+    Bundle* bundle = frag.hits()[0]->mapped_trans->bundle();
+    bundle->incr_counts();
     
     if (frag.num_hits()==1)
     // hits to a single location
@@ -203,7 +205,7 @@ void process_fragment(double mass_n, Fragment* frag_p, TranscriptTable* trans_ta
                 (globs.fld)->add_val(m.length(), mass_n);
         
         if (globs.bias_table)
-            (glos.bias_table)->update_observed(m, mass_n - t->mass() + log((double)t->unbiased_effective_length()));
+            (globs.bias_table)->update_observed(m, mass_n - t->mass() + log((double)t->unbiased_effective_length()));
         if (globs.mismatch_table)
             (globs.mismatch_table)->update(m, mass_n);
        
@@ -226,23 +228,21 @@ void process_fragment(double mass_n, Fragment* frag_p, TranscriptTable* trans_ta
     {
         return;
     }
+    
+    // merge bundles
+    for(size_t i = 1; i < frag.num_hits(); ++i)
+    {
+        bundle = trans_table->merge_bundles(bundle, frag.hits()[i]->mapped_trans->bundle());
+    }
 
     // normalize marginal likelihoods
-    TransID bundle_rep = trans_table->get_trans_rep(frag.hits()[0]->trans_id);
     for(size_t i = 0; i < frag.num_hits(); ++i)
     {
         FragHit& m = *frag.hits()[i];
         Transcript* t  = m.mapped_trans;
         double p = likelihoods[i]-total_likelihood;
         double mass_t = mass_n + p;
-        
-        if (i > 0)
-        {
-            TransID m_rep = trans_table->get_trans_rep(m.trans_id);
-            if (m_rep != bundle_rep)
-                bundle_rep = trans_table->merge_bundles(bundle_rep, m_rep);
-        }
-        
+               
         m.probability = sexp(p);
         if (m.probability == 0)
             continue;
@@ -400,11 +400,11 @@ int main (int argc, char ** argv)
     }
     
     Globals globs;
-    FLD fld(fld_alpha, def_fl_max, def_fl_mean, def_fl_stddev);
+    globs.fld = new FLD(fld_alpha, def_fl_max, def_fl_mean, def_fl_stddev);
     globs.bias_table = (bias_correct) ? new BiasBoss(bias_alpha):NULL;
     globs.mismatch_table = (error_model) ? new MismatchTable(mm_alpha):NULL;
     ThreadedMapParser map_parser(in_map_file_name, out_map_file_name);
-    TranscriptTable trans_table(fasta_file_name, map_parser.index_table, expr_alpha, globs);
+    TranscriptTable trans_table(fasta_file_name, map_parser.trans_index(), expr_alpha, &globs);
 
     size_t tot_counts = threaded_calc_abundances(map_parser, &trans_table, globs);
 
@@ -412,7 +412,7 @@ int main (int argc, char ** argv)
     
     trans_table.output_results(output_dir, tot_counts, calc_covar);
     ofstream paramfile((output_dir + "/params.xprs").c_str());
-    fld.append_output(paramfile);
+    (globs.fld)->append_output(paramfile);
     if (globs.mismatch_table)
         (globs.mismatch_table)->append_output(paramfile);
     if (globs.bias_table)

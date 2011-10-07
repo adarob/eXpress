@@ -12,8 +12,6 @@
 #include <string>
 #include <map>
 #include <boost/unordered_map.hpp>
-#include <boost/functional/hash.hpp>
-#include <boost/pending/disjoint_sets.hpp>
 #include <vector>
 #include <boost/thread.hpp>
 #include <iostream>
@@ -28,16 +26,6 @@ class MismatchTable;
 
 typedef size_t TransID;
 
-
-/**
- * a global function to combine TransIDs into paired hashes
- */
-static size_t hash_trans_pair(TransID trans1, TransID trans2)
-{
-    size_t seed = std::min(trans1, trans2);
-    boost::hash_combine(seed, std::max(trans1, trans2));
-    return seed;
-}
 
 /**
  * The Transcript class is used to store objects for the transcripts
@@ -244,7 +232,7 @@ public:
 
 typedef std::vector<Transcript*> TransMap;
 typedef boost::unordered_map<std::string, size_t> TransIndex;
-typedef boost::unordered_map<size_t, double> TransPairMap;
+typedef boost::unordered_map<size_t, double> CovarMap;
 
 /**
  * The TranscriptTable class is used to keep track of the Transcript objects for a run.
@@ -273,7 +261,7 @@ class TranscriptTable
      * a private map to look up the covariance for pairs of Transcripts by their combined hashed TransIDs
      * these values are stored positive, even though they are negative
      */
-    TransPairMap _covar_map;
+    CovarMap _covar_map;
     
     /**
      * a private double specifying the initial Transcript mass pseudo-counts for each bp (non-logged)

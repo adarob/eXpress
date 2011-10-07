@@ -16,10 +16,17 @@ Bundle::Bundle(Transcript* trans)
 : _counts(trans->tot_counts())
 { _transcripts.push_back(trans); }
 
-
 void Bundle::incr_counts(size_t incr_amt)
 {
     _counts += incr_amt;
+}
+
+BundleTable::~BundleTable()
+{
+    foreach(Bundle* bundle, _bundles)
+    {
+        delete bundle;
+    }
 }
 
 Bundle* BundleTable::create_bundle(Transcript* trans)
