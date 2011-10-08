@@ -26,7 +26,9 @@ Transcript::Transcript(const TransID id, const std::string& name, const std::str
     _id(id),
     _name(name),
     _seq(seq),
-    _var(HUGE_VAL),
+    _mass_var(HUGE_VAL),
+    _est_counts(0),
+    _est_counts_var(0),
     _uniq_counts(0),
     _tot_counts(0),
     _start_bias(std::vector<double>(seq.length(),0)),
@@ -44,9 +46,15 @@ void Transcript::add_mass(double p, double mass)
     _tot_counts++;
     if (p != 0.0)
     {
-        _var = log_sum(_var, 2*mass + p + log(1-sexp(p)));
+        _mass_var = log_sum(_mass_var, 2*mass + p + log(1-sexp(p)));
     }
 }  
+
+void Transcript::add_prob_count(double p)
+{
+    _est_counts += p;
+    _est_counts_var += p*(1-p);
+}
 
 double Transcript::log_likelihood(const FragHit& frag) const
 {
@@ -336,7 +344,7 @@ void project_to_polytope(vector<Transcript*> bundle_trans, vector<double>& trans
     }
 }
 
-void TranscriptTable::output_results(string output_dir, size_t tot_counts, bool output_varcov)
+void TranscriptTable::output_results(string output_dir, size_t tot_counts, bool output_varcov, bool multi_iteration)
 {
     FILE * expr_file = fopen((output_dir + "/results.xprs").c_str(), "w");
     ofstream varcov_file;
@@ -390,7 +398,7 @@ void TranscriptTable::output_results(string output_dir, size_t tot_counts, bool 
             {
                 Transcript& trans = *bundle_trans[i];
                 double l_trans_frac = trans.mass() - l_bundle_mass;
-                trans_counts[i] = sexp(l_trans_frac + l_bundle_counts);
+                trans_counts[i] = (multi_iteration) ? trans.est_counts():sexp(l_trans_frac + l_bundle_counts);
             
                 if (trans_counts[i] > (double)trans.tot_counts() || trans_counts[i] < (double)trans.uniq_counts())
                     requires_projection = true;
@@ -408,7 +416,7 @@ void TranscriptTable::output_results(string output_dir, size_t tot_counts, bool 
                 Transcript& trans = *bundle_trans[i];
                 double eff_len = trans.est_effective_length();
 
-                double count_var = min(sexp(trans.var() + l_var_renorm), 0.25*trans.tot_counts());
+                double count_var = (multi_iteration) ? trans.est_counts_var():min(sexp(trans.mass_var() + l_var_renorm), 0.25*trans.tot_counts());
                 double eff_count_norm = (double)trans.length()/eff_len;
                 
                 double fpkm_std_dev = sqrt(trans_counts[i] + count_var);
@@ -425,12 +433,14 @@ void TranscriptTable::output_results(string output_dir, size_t tot_counts, bool 
                     {
                         if (j)
                             varcov_file << "\t";
+                        
                         if (i==j)
                             varcov_file << scientific << count_var;
+                        else if (multi_iteration)
+                            varcov_file << scientific << -get_covar(trans.id(), bundle_trans[j]->id());
                         else
-                        {
                             varcov_file << scientific << -sexp(get_covar(trans.id(), bundle_trans[j]->id()) + l_var_renorm);
-                        }   
+                           
                     }
                     varcov_file << endl;
                 }

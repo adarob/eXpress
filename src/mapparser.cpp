@@ -81,7 +81,7 @@ ThreadedMapParser::ThreadedMapParser(string in_file, string out_file)
         else
         {
             delete reader;
-            cout << "Input is not in BAM format. Trying SAM...\n\n";
+            cout << "Input is not in BAM format. Trying SAM...\n";
             ifstream* ifs = new ifstream(in_file.c_str());
             if(!ifs->is_open())
             {
@@ -118,7 +118,6 @@ void ThreadedMapParser::threaded_parse(ParseThreadSafety* thread_safety, Transcr
     ParseThreadSafety& ts = *thread_safety;
     bool fragments_remain = true;
     Fragment * last_frag = NULL;
-    ts.next_frag = NULL;
     while (true)
     {
         Fragment* frag = NULL;
@@ -145,14 +144,27 @@ void ThreadedMapParser::threaded_parse(ParseThreadSafety* thread_safety, Transcr
         }
 
         last_frag = ts.next_frag;
-        ts.next_frag = frag;
-        ts.proc_lk.unlock();
-        ts.parse_lk.lock();
+        
+        {
+            boost::unique_lock<boost::mutex> lock(ts.mut);
+            if (running)
+            {
+                ts.next_frag = frag;
+                ts.frag_clean = true;
+                
+                ts.cond.notify_one();
+
+                while(ts.frag_clean)
+                {
+                    ts.cond.wait(lock);
+                }
+            }
+        }
+
         if (last_frag && _writer)
             _writer->write_fragment(*last_frag);
         if (last_frag)
             delete last_frag;
-        
         if (!frag)
             break;
         if (!running)
@@ -161,7 +173,6 @@ void ThreadedMapParser::threaded_parse(ParseThreadSafety* thread_safety, Transcr
             break;
         }
     }
-    ts.parse_lk.unlock();
 }
 
 BAMParser::BAMParser(BamTools::BamReader* reader)

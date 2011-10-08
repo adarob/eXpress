@@ -68,7 +68,17 @@ class Transcript
     /**
      * a private double that stores the (logged) variance of the mass
      */
-    double _var;
+    double _mass_var;
+    
+    /**
+     * a private double that stores the estimated counts of observed fragment mappings
+     */
+    double _est_counts;
+    
+    /**
+     * a private double that stores the variance of the estimated counts
+     */
+    double _est_counts_var;
     
     /**
      * a private size_t that stores the number of fragments (non-logged) uniquely mapping
@@ -163,7 +173,12 @@ public:
      * a member function that returns the current (logged) variance
      * @return logged mass variance
      */
-    double var() const { return _var; }
+    double mass_var() const { return _mass_var; }
+    
+    //DOC
+    double est_counts() const { return _est_counts; }
+        
+    double est_counts_var() const { return _est_counts_var; }
     
     /**
      * a member function that returns the current count of fragments mapped to this transcript (uniquely or ambiguously)
@@ -196,6 +211,9 @@ public:
      */
     void add_mass(double p, double mass);
     
+    // DOC
+    void add_prob_count(double p);
+
     /**
      * a member function that increases the ccount of fragments uniquely mapped to this transcript
      * @param incr_amt a size_t to increase the counts by
@@ -365,8 +383,9 @@ public:
      * @param output_dir the directory to output the expression file to
      * @param tot_counts the total number of observed mapped fragments
      * @param output_varcov boolean specifying whether to also output the variance-covariance matrix
+     * @param multi_iteration boolean specifying whether multiple rounds were run, which affects count normalization
      */
-    void output_results(std::string output_dir, size_t tot_counts, bool output_varcov);
+    void output_results(std::string output_dir, size_t tot_counts, bool output_varcov, bool multi_iteration);
 };
 
 #endif

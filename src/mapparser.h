@@ -282,14 +282,15 @@ struct ParseThreadSafety
     Fragment* next_frag;
     
     /**
-     * a mutex to lock the main (processing) thread when next_frag has not yet been updated
+     * FIX
      */
-    boost::mutex proc_lk;
+    boost::mutex mut;
     
-    /**
-     * a mutex to lock the parsing thread when the next_frag pointer should be not modified
-     */
-    boost::mutex parse_lk;
+    boost::condition_variable cond;
+    
+    bool frag_clean;
+    
+    ParseThreadSafety() : next_frag(NULL), frag_clean(false) {}
 };
 
 /**

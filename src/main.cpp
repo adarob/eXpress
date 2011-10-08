@@ -67,12 +67,15 @@ bool vis = false;
 bool output_alignments = false;
 bool output_running = false;
 
-//bool in_between = false;
-
+// directional parameters
 enum Direction{ BOTH, FR, RF };
 Direction direction = BOTH;
 
 bool running = true;
+
+// used for multiple rounds of EM
+enum Iteration{ FIRST, LAST, ONLY };
+Iteration iteration = ONLY;
 
 bool parse_options(int ac, char ** av)
 {
@@ -162,10 +165,11 @@ bool parse_options(int ac, char ** av)
     vis = vm.count("visualizer-output");
     output_running = vm.count("output-running");
     
+    if (in_map_file_name != "")
+        iteration = FIRST;
+    
     if (!vm.count("no-update-check"))
-    {
         check_version(PACKAGE_VERSION);
-    }
     
     return 0;
 }
@@ -186,7 +190,8 @@ void process_fragment(double mass_n, Fragment* frag_p, TranscriptTable* trans_ta
     assert(frag.num_hits());
     
     Bundle* bundle = frag.hits()[0]->mapped_trans->bundle();
-    bundle->incr_counts();
+    if (iteration != FIRST)
+        bundle->incr_counts();
     
     if (frag.num_hits()==1)
     // hits to a single location
@@ -197,16 +202,22 @@ void process_fragment(double mass_n, Fragment* frag_p, TranscriptTable* trans_ta
         m.probability = 1.0;
         
         //update parameters
-        t->add_mass(0, mass_n);
-        t->incr_uniq_counts();
-        if (m.pair_status() == PAIRED)
-                (globs.fld)->add_val(m.length(), mass_n);
-        
-        if (globs.bias_table)
-            (globs.bias_table)->update_observed(m, mass_n - t->mass() + log((double)t->unbiased_effective_length()));
-        if (globs.mismatch_table)
-            (globs.mismatch_table)->update(m, mass_n);
-       
+        if (iteration == FIRST || iteration == ONLY)
+        {
+            t->add_mass(0, mass_n);
+            t->incr_uniq_counts();
+            if (m.pair_status() == PAIRED)
+                    (globs.fld)->add_val(m.length(), mass_n);
+            
+            if (globs.bias_table)
+                (globs.bias_table)->update_observed(m, mass_n - t->mass() + log((double)t->unbiased_effective_length()));
+            if (globs.mismatch_table)
+                (globs.mismatch_table)->update(m, mass_n);
+        }
+        else
+        {
+            t->add_prob_count(1.0);
+        }
         return;
     }
     
@@ -244,19 +255,28 @@ void process_fragment(double mass_n, Fragment* frag_p, TranscriptTable* trans_ta
         m.probability = sexp(p);
         if (m.probability == 0)
             continue;
+        assert(!isinf(m.probability));
         
         // update parameters
-        t->add_mass(p, mass_n);
+        if (iteration == FIRST || iteration == ONLY)
+        {
+
+            t->add_mass(p, mass_n);
+            
+            if (m.pair_status() == PAIRED)
+                (globs.fld)->add_val(m.length(), mass_t);
+     
+            if (globs.bias_table)
+                (globs.bias_table)->update_observed(m, mass_t - t->mass() + log((double)t->unbiased_effective_length()));
+            if (globs.mismatch_table)
+                (globs.mismatch_table)->update(m, mass_t);
+        }
+        else
+        {
+            t->add_prob_count(m.probability);
+        }
         
-        if (m.pair_status() == PAIRED)
-            (globs.fld)->add_val(m.length(), mass_t);
- 
-        if (globs.bias_table)
-            (globs.bias_table)->update_observed(m, mass_t - t->mass() + log((double)t->unbiased_effective_length()));
-        if (globs.mismatch_table)
-            (globs.mismatch_table)->update(m, mass_t);
-        
-        if (calc_covar)
+        if (calc_covar && (iteration == ONLY || iteration == LAST))
         {
             for(size_t j = i+1; j < frag.num_hits(); ++j)
             {
@@ -265,7 +285,10 @@ void process_fragment(double mass_n, Fragment* frag_p, TranscriptTable* trans_ta
                 if (sexp(p2) == 0)
                     continue;
                 
-                double covar = 2*mass_n + p + p2;
+                double covar = p + p2;
+                if (iteration == ONLY)
+                    covar += 2*mass_n;
+                
                 trans_table->update_covar(m.trans_id, m2.trans_id, covar); 
             }
         }
@@ -283,23 +306,31 @@ void process_fragment(double mass_n, Fragment* frag_p, TranscriptTable* trans_ta
 size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TranscriptTable* trans_table, Globals& globs)
 {
     cout << "Processing input fragment alignments...\n";
+    running = true;
     
     ParseThreadSafety ts;
-    ts.proc_lk.lock();
-    ts.parse_lk.lock();
     boost::thread parse(&ThreadedMapParser::threaded_parse, &map_parser, &ts, trans_table);
     
     size_t n = 0;
     double mass_n = 0;
-    
+    Fragment* frag;
     cout << setiosflags(ios::left);
     
     while(!stop_at || n < stop_at)
     {
-        ts.proc_lk.lock();
-        Fragment* frag = ts.next_frag;
+        {
+            boost::unique_lock<boost::mutex> lock(ts.mut);
+            while(!ts.frag_clean)
+            {
+                ts.cond.wait(lock);
+            }
+            
+            frag = ts.next_frag;
+            
+            ts.frag_clean = false;
+            ts.cond.notify_one();
+        }
         
-        ts.parse_lk.unlock();
         if (!frag)
         {
             break;
@@ -318,7 +349,7 @@ size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TranscriptTable* 
         // Output progress
         if (n == 1 || n % 100000 == 0)
         {
-            if (output_running)
+            if (output_running && (iteration == ONLY || iteration == LAST))
             {
                 char buff[500];
                 sprintf(buff, "%s/x_%zu", output_dir.c_str(), n);
@@ -329,7 +360,7 @@ size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TranscriptTable* 
                     cerr << e.what() << endl;
                     exit(1);
                 }
-                trans_table->output_results(dir, n, false);
+                trans_table->output_results(dir, n, false, iteration==LAST);
                 ofstream paramfile((dir + "/params.xprs").c_str());
                 (globs.fld)->append_output(paramfile);
                 if (globs.mismatch_table)
@@ -358,17 +389,21 @@ size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TranscriptTable* 
         }
         
         process_fragment(mass_n, frag, trans_table, globs);
+        frag->not_in_use();
     }
     
-	running = false;
-
+    {
+        boost::unique_lock<boost::mutex> lock(ts.mut);
+        running = false;
+        ts.frag_clean = false;
+        ts.cond.notify_one();
+    }
+    
     if (vis)
         cout << "99\n";
     else
         cout << "COMPLETED: Processed " << n << " fragments, targets are in " << trans_table->num_bundles() << " bundles\n";
     
-    ts.parse_lk.unlock();
-    ts.proc_lk.unlock();
     parse.join();
     return n;
 }
@@ -398,21 +433,30 @@ int main (int argc, char ** argv)
     globs.fld = new FLD(fld_alpha, def_fl_max, def_fl_mean, def_fl_stddev);
     globs.bias_table = (bias_correct) ? new BiasBoss(bias_alpha):NULL;
     globs.mismatch_table = (error_model) ? new MismatchTable(mm_alpha):NULL;
-    ThreadedMapParser map_parser(in_map_file_name, out_map_file_name);
-    TranscriptTable trans_table(fasta_file_name, map_parser.trans_index(), expr_alpha, &globs);
+    ThreadedMapParser* map_parser = new ThreadedMapParser(in_map_file_name, (iteration==ONLY) ? out_map_file_name:"");
+    TranscriptTable trans_table(fasta_file_name, map_parser->trans_index(), expr_alpha, &globs);
 
-    double num_trans = (double)map_parser.trans_index().size();
+    double num_trans = (double)map_parser->trans_index().size();
     if (calc_covar && (double)SIZE_T_MAX < num_trans*(num_trans+1))
     {
         cerr << "Warning: Your system is unable to represent large enough values for efficiently hashing transcript pairs.  Covariance calculation will be disabled.\n";
         calc_covar = false;
     }
     
-    size_t tot_counts = threaded_calc_abundances(map_parser, &trans_table, globs);
-
+    size_t tot_counts = threaded_calc_abundances(*map_parser, &trans_table, globs);
+    delete map_parser;
+    
+    if (iteration == FIRST)
+    {
+        cout << "\nRe-estimating counts with second-round of EM...\n";
+        iteration = LAST;
+        map_parser = new ThreadedMapParser(in_map_file_name, out_map_file_name);
+        tot_counts = threaded_calc_abundances(*map_parser, &trans_table, globs);
+    }
+    
 	cout << "Writing results to file...\n";
     
-    trans_table.output_results(output_dir, tot_counts, calc_covar);
+    trans_table.output_results(output_dir, tot_counts, calc_covar, iteration!=ONLY);
     ofstream paramfile((output_dir + "/params.xprs").c_str());
     (globs.fld)->append_output(paramfile);
     if (globs.mismatch_table)
