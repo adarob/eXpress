@@ -130,9 +130,6 @@ struct FragHit
  **/
 class Fragment
 {
-    
-    bool _in_use;
-    
     /**
      * a private vector of FragHit pointers containing all multi-mappings of the fragment
      */
@@ -157,11 +154,6 @@ class Fragment
     void add_open_mate(FragHit* om);
 
 public:
-    
-    Fragment() { _in_use = true; }
-    void not_in_use() { _in_use = false; }
-    bool in_use() { return _in_use; }
-    
     
     /**
      * Fragment destructor deletes all FragHit objects pointed to by the Fragment
