@@ -215,6 +215,7 @@ void TranscriptTable::add_trans(const string& name, const string& seq, const Tra
         cerr << "Warning: Target '" << name << "' exists in MultiFASTA but not alignment (SAM/BAM) file.\n";
         return;
     }
+
     Transcript* trans = new Transcript(it->second, name, seq, _alpha, _globs);
     if (_globs->bias_table)
         (_globs->bias_table)->update_expectations(*trans);
@@ -273,17 +274,12 @@ void TranscriptTable::threaded_bias_update()
 {
     while(running)
     {
-        //size_t count = 0;
         foreach(Transcript* trans, _trans_map)
         {  
             trans->update_transcript_bias();
-            //if (++count%10000 == 0)
-            //    cout << "*"<<count<<"\n";
             if (!running)
                 break;
         }
-        //if (size() > 1000)
-        //    cout << "* Completed bias update of all " << size() << " targets.\n";
     }
 }
 

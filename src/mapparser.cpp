@@ -136,7 +136,7 @@ void ThreadedMapParser::threaded_parse(ParseThreadSafety* thread_safety, Transcr
             Transcript* t = trans_table->get_trans(m.trans_id);
             if (!t)
             {
-                cerr << "ERROR: Target sequence not found. Input same FASTA file used in alignment.\n";
+                cerr << "ERROR: Target sequence at index '" << m.trans_id << "' not found. Input same FASTA file used in alignment.\n";
                 exit(1);
             }
             m.mapped_trans = t;
@@ -180,9 +180,10 @@ BAMParser::BAMParser(BamTools::BamReader* reader)
     _reader = reader;
     BamTools::BamAlignment a;
     
+    size_t index = 0;
     foreach(const BamTools::RefData& ref, _reader->GetReferenceData())
     {
-        _trans_index[ref.RefName] = _trans_index.size();
+        _trans_index[ref.RefName] = index++;
     }
     
     // Get first valid FragHit
@@ -278,6 +279,7 @@ SAMParser::SAMParser(istream* in)
     _frag_buff = new FragHit();
     _header = "";
     
+    size_t index = 0;
     while(_in->good())
     {
         _in->getline(line_buff, BUFF_SIZE-1, '\n');
@@ -296,7 +298,7 @@ SAMParser::SAMParser(istream* in)
             str = str.substr(0,str.find_first_of("\n\t "));
             if (_trans_index.find(str) == _trans_index.end())
             {
-                _trans_index[str] = _trans_index.size();
+                _trans_index[str] = index++;
             }
             else
             {
