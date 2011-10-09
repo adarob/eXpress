@@ -1,0 +1,7 @@
+#define PACKAGE_VERSION "@express_VERSION_MAJOR@.@express_VERSION_MINOR@.@express_VERSION_PATCH@"
+#if @WIN32_INT@
+	#define WIN32
+	#define SIZE_T_FMT "%Iu"
+#else
+	#define SIZE_T_FMT "%zu"
+#endif

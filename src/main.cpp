@@ -26,8 +26,10 @@
 #include "biascorrection.h"
 #include "mismatchmodel.h"
 #include "mapparser.h"
-#include "version.h"
-#include "update_check.h"
+
+#ifndef WIN32
+    #include "update_check.h"
+#endif
 
 using namespace std;
 namespace po = boost::program_options;
@@ -167,9 +169,11 @@ bool parse_options(int ac, char ** av)
     
     if (in_map_file_name != "")
         iteration = FIRST;
-    
+
+#ifndef WIN32
     if (!vm.count("no-update-check"))
         check_version(PACKAGE_VERSION);
+#endif
     
     return 0;
 }
@@ -353,7 +357,7 @@ size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TranscriptTable* 
             if (output_running && (iteration == ONLY || iteration == LAST))
             {
                 char buff[500];
-                sprintf(buff, "%s/x_%zu", output_dir.c_str(), n);
+                sprintf(buff, "%s/x_" SIZE_T_FMT "", output_dir.c_str(), n);
                 string dir(buff);
                 try { fs::create_directories(dir); }
                 catch (fs::filesystem_error& e)
@@ -442,7 +446,7 @@ int main (int argc, char ** argv)
     TranscriptTable trans_table(fasta_file_name, map_parser->trans_index(), expr_alpha, &globs);
 
     double num_trans = (double)map_parser->trans_index().size();
-    if (calc_covar && (double)SIZE_T_MAX < num_trans*(num_trans+1))
+    if (calc_covar && (double)SIZE_MAX < num_trans*(num_trans+1))
     {
         cerr << "Warning: Your system is unable to represent large enough values for efficiently hashing transcript pairs.  Covariance calculation will be disabled.\n";
         calc_covar = false;

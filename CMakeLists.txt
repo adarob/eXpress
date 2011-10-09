@@ -4,11 +4,10 @@ project(express)
 
 set(${PROJECT_NAME}_VERSION_MAJOR 0)
 set(${PROJECT_NAME}_VERSION_MINOR 9)
-set(${PROJECT_NAME}_VERSION_PATCH 2)
+set(${PROJECT_NAME}_VERSION_PATCH 3)
 
 set(CMAKE_CXX_FLAGS "-Wall")
 
-#set(CMAKE_CXX_FLAGS "/EHsc")
 set(CMAKE_CXX_FLAGS_DEBUG "-g ${CMAKE_CXX_FLAGS}")
 set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O3 -g ${CMAKE_CXX_FLAGS}")
 set(CMAKE_CXX_FLAGS_MINSIZEREL "-Os ${CMAKE_CXX_FLAGS}")
@@ -22,8 +21,20 @@ find_package(Boost 1.41
 	filesystem
     program_options
     REQUIRED)
+    
+if(WIN32)
+	set(CMAKE_CXX_FLAGS "/EHsc")
+	set(WIN32_INT 1)
+else(WIN32)
+	find_package(ZLIB REQUIRED)
+	set(WIN32_INT 0)
+endif(WIN32)
 
-find_package(ZLIB REQUIRED)
+configure_file (
+  "${PROJECT_SOURCE_DIR}/src/config.h.in"
+  "${PROJECT_SOURCE_DIR}/src/config.h"
+  )
+
 
 include_directories(${Boost_INCLUDE_DIRS} "${CMAKE_CURRENT_SOURCE_DIR}/bamtools/include") 
 

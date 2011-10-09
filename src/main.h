@@ -8,6 +8,7 @@
 //  Copyright 2011 Adam Roberts. All rights reserved.
 //
 
+#include "config.h"
 #include <cmath>
 #include <cassert>
 #include <algorithm>

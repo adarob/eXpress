@@ -351,10 +351,6 @@ void TranscriptTable::output_results(string output_dir, size_t tot_counts, bool 
 
     double l_bil = log(1000000000.);
     double l_tot_counts = log((double)tot_counts);
-
-    // Bundle transcripts based on partition
-    typedef boost::unordered_map<TransID, vector<Transcript*> > BundleMap;
-    BundleMap b_map;
     
     size_t bundle_id = 0;
     foreach (Bundle* bundle, _bundle_table.bundles())
@@ -421,7 +417,7 @@ void TranscriptTable::output_results(string output_dir, size_t tot_counts, bool 
                 double fpkm_lo = max(0.0, (trans_counts[i] - 2*fpkm_std_dev) * fpkm_constant);
                 double fpkm_hi = (trans_counts[i] + 2*fpkm_std_dev) * fpkm_constant;
                 
-                fprintf(expr_file, "%zu\t%s\t%zu\t%f\t%zu\t%zu\t%f\t%f\t%f\t%f\t%f\t%f\t%f\n", bundle_id, trans.name().c_str(), trans.length(), eff_len, trans.tot_counts(), trans.uniq_counts(), trans_counts[i], count_var, trans_counts[i]*eff_count_norm, count_var*pow(eff_count_norm,2.0),trans_fpkm, fpkm_lo, fpkm_hi);
+                fprintf(expr_file, "" SIZE_T_FMT "\t%s\t" SIZE_T_FMT "\t%f\t" SIZE_T_FMT "\t" SIZE_T_FMT "\t%f\t%f\t%f\t%f\t%f\t%f\t%f\n", bundle_id, trans.name().c_str(), trans.length(), eff_len, trans.tot_counts(), trans.uniq_counts(), trans_counts[i], count_var, trans_counts[i]*eff_count_norm, count_var*pow(eff_count_norm,2.0),trans_fpkm, fpkm_lo, fpkm_hi);
             
                 if (output_varcov)
                 {
@@ -447,7 +443,7 @@ void TranscriptTable::output_results(string output_dir, size_t tot_counts, bool 
             for (size_t i = 0; i < bundle_trans.size(); ++i)
             {
                 Transcript& trans = *bundle_trans[i];
-                fprintf(expr_file, "%zu\t%s\t%zu\t%f\t%d\t%d\t%f\t%f\t%f\t%f\t%f\t%f\t%f\n", bundle_id, trans.name().c_str(), trans.length(), trans.est_effective_length(), 0, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+                fprintf(expr_file, "" SIZE_T_FMT "\t%s\t" SIZE_T_FMT "\t%f\t%d\t%d\t%f\t%f\t%f\t%f\t%f\t%f\t%f\n", bundle_id, trans.name().c_str(), trans.length(), trans.est_effective_length(), 0, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
                 
                 if (output_varcov)
                 {

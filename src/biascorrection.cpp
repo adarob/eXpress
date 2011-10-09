@@ -185,11 +185,11 @@ void PosWeightTable::append_output(ofstream& outfile) const
     outfile << "\tObserved Position Distribution\n" << header;
 
     boost::mutex::scoped_lock lock(_lock);
-    sprintf(buff, "%d-%zu:\t", 0, len_bins()[0]);
+    sprintf(buff, "%d-" SIZE_T_FMT ":\t", 0, len_bins()[0]);
     for(size_t l = 0; l < len_bins().size(); l++)
     {
         if(l)
-            sprintf(buff, "%zu-%zu:\t", len_bins()[l-1]+1, len_bins()[l]);
+            sprintf(buff, "" SIZE_T_FMT "-" SIZE_T_FMT ":\t", len_bins()[l-1]+1, len_bins()[l]);
         outfile << buff;
         for(size_t p = 0; p < pos_bins().size(); p++)
         {
@@ -200,11 +200,11 @@ void PosWeightTable::append_output(ofstream& outfile) const
     
     outfile << "\tBias Weights\n" << header;
     
-    sprintf(buff, "%d-%zu:\t", 0, len_bins()[0]);
+    sprintf(buff, "%d-" SIZE_T_FMT ":\t", 0, len_bins()[0]);
     for(size_t l = 0; l < len_bins().size(); l++)
     {
         if(l)
-            sprintf(buff, "%zu-%zu:\t", len_bins()[l-1]+1, len_bins()[l]);
+            sprintf(buff, "" SIZE_T_FMT "-" SIZE_T_FMT ":\t", len_bins()[l-1]+1, len_bins()[l]);
         outfile << buff;
         for(size_t p = 0; p < pos_bins().size(); p++)
         {
