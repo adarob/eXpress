@@ -87,7 +87,7 @@ bool parse_options(int ac, char ** av)
     ("output-dir,o", po::value<string>(&output_dir)->default_value("."), "write all output files to this directory")
     ("frag-len-mean,m", po::value<int>(&def_fl_mean)->default_value(200), "prior estimate for average fragment length")
     ("frag-len-stddev,s", po::value<int>(&def_fl_stddev)->default_value(60), "prior estimate for fragment length std deviation")
-    ("output-alignments", po::value<string>(&out_map_file_name), "optional file to output alignments (sam/bam) with probabilistic assignments")
+    ("output-alignments", "output alignments (sam/bam) with probabilistic assignments")
     ("fr-stranded", "accept only forward->reverse alignments (second-stranded protocols)")
     ("rf-stranded", "accept only reverse->forward alignments (first-stranded protocols)")
     ("calc-covar", "calculate and output covariance matrix")
@@ -98,6 +98,7 @@ bool parse_options(int ac, char ** av)
     hidden.add_options()
     ("no-bias-correct","")
     ("no-error-model","")
+    ("single-round", "")
     ("visualizer-output,v","")
     ("output-running", "")
     ("forget-param,f", po::value<double>(&ff_param)->default_value(0.9),"")
@@ -167,9 +168,14 @@ bool parse_options(int ac, char ** av)
     vis = vm.count("visualizer-output");
     output_running = vm.count("output-running");
     
-    if (in_map_file_name != "")
+    if (!vm.count("single-round") && in_map_file_name != "")
         iteration = FIRST;
 
+    if (vm.count("output-alignments"))
+    {
+        out_map_file_name = output_dir + "hits.prob";
+    }
+    
 #ifndef WIN32
     if (!vm.count("no-update-check"))
         check_version(PACKAGE_VERSION);

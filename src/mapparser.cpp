@@ -66,6 +66,7 @@ ThreadedMapParser::ThreadedMapParser(string in_file, string out_file)
             _parser = new BAMParser(reader);
             if (out_file.size())
             {
+                out_file += ".bam";
                 BamTools::BamWriter* writer = new BamTools::BamWriter();
                 if (writer->Open(out_file, reader->GetHeader(), reader->GetReferenceData()))
                 {
@@ -95,6 +96,7 @@ ThreadedMapParser::ThreadedMapParser(string in_file, string out_file)
     
     if (is_sam && out_file.size())
     {
+        out_file += ".sam";
         ofstream* ofs = new ofstream(out_file.c_str());
         if(!ofs->is_open())
         {
@@ -264,8 +266,8 @@ void BAMWriter::write_fragment(Fragment& f)
 {
     foreach(FragHit* hit, f.hits())
     {
-        hit->bam_l.AddTag("PH","f",(float)hit->probability);
-        hit->bam_r.AddTag("PH","f",(float)hit->probability);
+        hit->bam_l.AddTag("XP","f",(float)hit->probability);
+        hit->bam_r.AddTag("XP","f",(float)hit->probability);
         _writer->SaveAlignment(hit->bam_l);
         _writer->SaveAlignment(hit->bam_r);
     }
@@ -418,7 +420,7 @@ void SAMWriter::write_fragment(Fragment& f)
 {
     foreach(FragHit* hit, f.hits())
     {
-        *_out << hit->sam_l << " PH:f:" << (float)hit->probability << endl;
-        *_out << hit->sam_r << " PH:f:" << (float)hit->probability << endl;
+        *_out << hit->sam_l << " XP:f:" << (float)hit->probability << endl;
+        *_out << hit->sam_r << " XP:f:" << (float)hit->probability << endl;
     }
 }

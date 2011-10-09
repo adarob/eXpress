@@ -69,7 +69,7 @@ public:
     
     /**
      * a member function that writes all mappings of the fragment to the ouptut
-     * file along with their probabilities in the "PH" field
+     * file along with their probabilities in the "XP" field
      * @param f the processed Fragment to output
      */
     virtual void write_fragment(Fragment& f)=0;
@@ -164,7 +164,7 @@ public:
     
     /**
      * a member function that writes all mappings of the fragment to the ouptut
-     * file in BAM format along with their probabilities in the "PH" field
+     * file in BAM format along with their probabilities in the "XP" field
      * @param f the processed Fragment to output
      */
     void write_fragment(Fragment& f);
@@ -261,7 +261,7 @@ public:
     
     /**
      * a member function that writes all mappings of the fragment to the ouptut
-     * file in SAM format along with their probabilities in the "PH" field
+     * file in SAM format along with their probabilities in the "XP" field
      * @param f the processed Fragment to output
      */
     void write_fragment(Fragment& f);
@@ -318,6 +318,8 @@ class ThreadedMapParser
 public:
     /**
      * ThreadedMapParser constructor determines what format the input is in and initializes the correct parser.
+     * @param input_file string containing the path to the input SAM/BAM file
+     * @param output_file string containing the path the output file less its extension (empty if writing is to be disabled)
      */
     ThreadedMapParser(std::string input_file, std::string output_file);
     

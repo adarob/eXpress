@@ -1,8 +1,9 @@
 #!/bin/bash
 
-VERSION=0.9.2
+VERSION=0.9.3
 MAC=express-$VERSION-macosx_x86_64
 LINUX=express-$VERSION-linux_x86_64
+WIN=express-$VERSION-win32_x86_64
 SRC=express-$VERSION-src
 
 #make version update check file file
@@ -25,6 +26,7 @@ rm -r html/doc/latex
 mkdir html/downloads/express-$VERSION
 mkdir html/downloads/express-$VERSION/$MAC
 mkdir html/downloads/express-$VERSION/$LINUX
+mkdir html/downloads/express-$VERSION/$WIN
 mkdir html/downloads/express-$VERSION/$SRC
 
 #Populate download directories
@@ -38,6 +40,12 @@ cp linux_build/src/express html/downloads/express-$VERSION/$LINUX
 cp README html/downloads/express-$VERSION/$LINUX/README
 cp LICENSE html/downloads/express-$VERSION/$LINUX/LICENSE
 cp -r sample_data html/downloads/express-$VERSION/$LINUX/sample_data
+#windows
+cp win_build/src/express.exe html/downloads/express-$VERSION/$WIN
+cp win_build/src/zlibd1.dll html/downloads/express-$VERSION/$WIN
+cp README html/downloads/express-$VERSION/$WIN/README
+cp LICENSE html/downloads/express-$VERSION/$WIN/LICENSE
+cp -r sample_data html/downloads/express-$VERSION/$WIN/sample_data
 #src
 cp -r src html/downloads/express-$VERSION/$SRC/src
 cp README html/downloads/express-$VERSION/$SRC/README
@@ -52,6 +60,7 @@ cd html/downloads/express-$VERSION
 tar -czf $MAC.tgz $MAC 
 tar -czf $LINUX.tgz $LINUX
 tar -czf $SRC.tgz $SRC
+zip -mr $WIN.zip $WIN
 rm -r $MAC
 rm -r $LINUX
 rm -r $SRC

@@ -3,28 +3,37 @@ var NAVTREE =
   [ "eXpress", "index.html", [
     [ "Class List", "annotated.html", [
       [ "BAMParser", "class_b_a_m_parser.html", null ],
+      [ "BAMWriter", "class_b_a_m_writer.html", null ],
       [ "BiasBoss", "class_bias_boss.html", null ],
+      [ "Bundle", "class_bundle.html", null ],
+      [ "BundleTable", "class_bundle_table.html", null ],
       [ "FLD", "class_f_l_d.html", null ],
       [ "FragHit", "struct_frag_hit.html", null ],
       [ "Fragment", "class_fragment.html", null ],
       [ "FrequencyMatrix", "class_frequency_matrix.html", null ],
+      [ "Globals", "struct_globals.html", null ],
       [ "MismatchTable", "class_mismatch_table.html", null ],
       [ "Parser", "class_parser.html", null ],
       [ "ParseThreadSafety", "struct_parse_thread_safety.html", null ],
       [ "PosWeightTable", "class_pos_weight_table.html", null ],
       [ "SAMParser", "class_s_a_m_parser.html", null ],
+      [ "SAMWriter", "class_s_a_m_writer.html", null ],
       [ "SeqWeightTable", "class_seq_weight_table.html", null ],
       [ "ThreadedMapParser", "class_threaded_map_parser.html", null ],
       [ "Transcript", "class_transcript.html", null ],
-      [ "TranscriptTable", "class_transcript_table.html", null ]
+      [ "TranscriptTable", "class_transcript_table.html", null ],
+      [ "Writer", "class_writer.html", null ]
     ] ],
     [ "Class Index", "classes.html", null ],
     [ "Class Hierarchy", "hierarchy.html", [
       [ "BiasBoss", "class_bias_boss.html", null ],
+      [ "Bundle", "class_bundle.html", null ],
+      [ "BundleTable", "class_bundle_table.html", null ],
       [ "FLD", "class_f_l_d.html", null ],
       [ "FragHit", "struct_frag_hit.html", null ],
       [ "Fragment", "class_fragment.html", null ],
       [ "FrequencyMatrix", "class_frequency_matrix.html", null ],
+      [ "Globals", "struct_globals.html", null ],
       [ "MismatchTable", "class_mismatch_table.html", null ],
       [ "Parser", "class_parser.html", [
         [ "BAMParser", "class_b_a_m_parser.html", null ],
@@ -35,12 +44,19 @@ var NAVTREE =
       [ "SeqWeightTable", "class_seq_weight_table.html", null ],
       [ "ThreadedMapParser", "class_threaded_map_parser.html", null ],
       [ "Transcript", "class_transcript.html", null ],
-      [ "TranscriptTable", "class_transcript_table.html", null ]
+      [ "TranscriptTable", "class_transcript_table.html", null ],
+      [ "Writer", "class_writer.html", [
+        [ "BAMWriter", "class_b_a_m_writer.html", null ],
+        [ "SAMWriter", "class_s_a_m_writer.html", null ]
+      ] ]
     ] ],
     [ "Class Members", "functions.html", null ],
     [ "File List", "files.html", [
       [ "src/biascorrection.cpp", null, null ],
       [ "src/biascorrection.h", null, null ],
+      [ "src/bundles.cpp", null, null ],
+      [ "src/bundles.h", null, null ],
+      [ "src/config.h", null, null ],
       [ "src/fld.cpp", null, null ],
       [ "src/fld.h", null, null ],
       [ "src/fragments.cpp", null, null ],
@@ -55,8 +71,7 @@ var NAVTREE =
       [ "src/mismatchmodel.h", null, null ],
       [ "src/transcripts.cpp", null, null ],
       [ "src/transcripts.h", null, null ],
-      [ "src/update_check.h", null, null ],
-      [ "src/version.h", null, null ]
+      [ "src/update_check.h", null, null ]
     ] ]
   ] ]
 ];

@@ -22,10 +22,14 @@ II.  Requirements:
 --------------------------------------------------------------------------------
 
 eXpress is a standalone tool that requires gcc 4.0 or greater, and runs on Linux 
-and OS X.  
+Macintosh OS X, and Windows.  
 
-It depends on Boost (http://www.boost.org) and 
-BamTools (https://github.com/pezmaster31/bamtools).
+It depends on Boost (http://www.boost.org), 
+BamTools (https://github.com/pezmaster31/bamtools),
+ZLIB (http://zlib.net/),
+and the Microsoft Visual C++ Runtime Library (Windows only) 
+(http://www.microsoft.com/download/en/details.aspx?id=5555).
+
 
 --------------------------------------------------------------------------------
 III. Learn More (Installation, Manual, etc.):
@@ -51,7 +55,7 @@ See included file LICENSE for details.
 V.   Acknowledgements:
 --------------------------------------------------------------------------------
 
-* Cole Trapnell, developer of Cufflinks
+* Cole Trapnell, primary developer of Cufflinks
 * Derek Barnett, author of the BamTools API
 
 --------------------------------------------------------------------------------

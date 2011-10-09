@@ -94,16 +94,35 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <tr><td colspan="2"><h2><a name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_fragment.html">Fragment</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_parse_thread_safety.html#a462012f8256c208cf8dde4d61546711c">next_frag</a></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">boost::mutex&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_parse_thread_safety.html#a4bbb16492525b428f3369e6e1e125b4f">proc_lk</a></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">boost::mutex&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_parse_thread_safety.html#a0c0a244e36bdcb58a13c0ec699c3346b">parse_lk</a></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">boost::mutex&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_parse_thread_safety.html#a3eec0e7ef6466840df131350e4534271">mut</a></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0c6cf6905d16c3dd3c70010c97ed26b1"></a><!-- doxytag: member="ParseThreadSafety::cond" ref="a0c6cf6905d16c3dd3c70010c97ed26b1" args="" -->
+boost::condition_variable&#160;</td><td class="memItemRight" valign="bottom"><b>cond</b></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae280cd98bd694c7f0f6bcb53b8d1471d"></a><!-- doxytag: member="ParseThreadSafety::frag_clean" ref="ae280cd98bd694c7f0f6bcb53b8d1471d" args="" -->
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>frag_clean</b></td></tr>
 </table>
 <hr/><a name="_details"></a><h2>Detailed Description</h2>
 <div class="textblock"><p>The <a class="el" href="struct_parse_thread_safety.html">ParseThreadSafety</a> struct stores objects to allow for parsing to safely occur on a separate thread from processing. </p>
 <dl class="author"><dt><b>Author:</b></dt><dd>Adam Roberts </dd></dl>
 <dl class="date"><dt><b>Date:</b></dt><dd>2011  Artistic License 2.0 </dd></dl>
 
-<p>Definition at line <a class="el" href="mapparser_8h_source.html#l00126">126</a> of file <a class="el" href="mapparser_8h_source.html">mapparser.h</a>.</p>
+<p>Definition at line <a class="el" href="mapparser_8h_source.html#l00277">277</a> of file <a class="el" href="mapparser_8h_source.html">mapparser.h</a>.</p>
 </div><hr/><h2>Member Data Documentation</h2>
+<a class="anchor" id="a3eec0e7ef6466840df131350e4534271"></a><!-- doxytag: member="ParseThreadSafety::mut" ref="a3eec0e7ef6466840df131350e4534271" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">boost::mutex <a class="el" href="struct_parse_thread_safety.html#a3eec0e7ef6466840df131350e4534271">ParseThreadSafety::mut</a></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>FIX </p>
+
+<p>Definition at line <a class="el" href="mapparser_8h_source.html#l00287">287</a> of file <a class="el" href="mapparser_8h_source.html">mapparser.h</a>.</p>
+
+</div>
+</div>
 <a class="anchor" id="a462012f8256c208cf8dde4d61546711c"></a><!-- doxytag: member="ParseThreadSafety::next_frag" ref="a462012f8256c208cf8dde4d61546711c" args="" -->
 <div class="memitem">
 <div class="memproto">
@@ -116,39 +135,7 @@ Public Attributes</h2></td></tr>
 <div class="memdoc">
 <p>a pointer to the next <a class="el" href="class_fragment.html">Fragment</a> to be processed by the main thread </p>
 
-<p>Definition at line <a class="el" href="mapparser_8h_source.html#l00131">131</a> of file <a class="el" href="mapparser_8h_source.html">mapparser.h</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="a0c0a244e36bdcb58a13c0ec699c3346b"></a><!-- doxytag: member="ParseThreadSafety::parse_lk" ref="a0c0a244e36bdcb58a13c0ec699c3346b" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">boost::mutex <a class="el" href="struct_parse_thread_safety.html#a0c0a244e36bdcb58a13c0ec699c3346b">ParseThreadSafety::parse_lk</a></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-<p>a mutex to lock the parsing thread when the next_frag pointer should be not modified </p>
-
-<p>Definition at line <a class="el" href="mapparser_8h_source.html#l00141">141</a> of file <a class="el" href="mapparser_8h_source.html">mapparser.h</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="a4bbb16492525b428f3369e6e1e125b4f"></a><!-- doxytag: member="ParseThreadSafety::proc_lk" ref="a4bbb16492525b428f3369e6e1e125b4f" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">boost::mutex <a class="el" href="struct_parse_thread_safety.html#a4bbb16492525b428f3369e6e1e125b4f">ParseThreadSafety::proc_lk</a></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-<p>a mutex to lock the main (processing) thread when next_frag has not yet been updated </p>
-
-<p>Definition at line <a class="el" href="mapparser_8h_source.html#l00136">136</a> of file <a class="el" href="mapparser_8h_source.html">mapparser.h</a>.</p>
+<p>Definition at line <a class="el" href="mapparser_8h_source.html#l00282">282</a> of file <a class="el" href="mapparser_8h_source.html">mapparser.h</a>.</p>
 
 </div>
 </div>
@@ -160,7 +147,7 @@ Public Attributes</h2></td></tr>
   <div id="nav-path" class="navpath">
     <ul>
       <li class="navelem"><a class="el" href="struct_parse_thread_safety.html">ParseThreadSafety</a>      </li>
-      <li class="footer">Generated on Mon Sep 26 2011 21:24:49 for eXpress by&#160;
+      <li class="footer">Generated on Sat Oct 8 2011 22:41:38 for eXpress by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </li>
     </ul>

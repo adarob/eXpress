@@ -103,6 +103,8 @@ Inheritance diagram for SAMParser:</div>
 <tr><td colspan="2"><h2><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_a_m_parser.html#ad9cbcbbcf1c313ffc6ae4564551f7842">SAMParser</a> (std::istream *in)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">const std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_a_m_parser.html#aa66126ef3e05798e6e512dd50e7dc88f">header</a> () const </td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">const TransIndex &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_a_m_parser.html#a464359e7343167740629ab7b50cc0015">trans_index</a> () const </td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_a_m_parser.html#adcf1547d49af17ff0ec8f9ef357ee494">next_fragment</a> (<a class="el" href="class_fragment.html">Fragment</a> &amp;f)</td></tr>
 </table>
 <hr/><a name="_details"></a><h2>Detailed Description</h2>
@@ -110,7 +112,7 @@ Public Member Functions</h2></td></tr>
 <dl class="author"><dt><b>Author:</b></dt><dd>Adam Roberts </dd></dl>
 <dl class="date"><dt><b>Date:</b></dt><dd>2011  Artistic License 2.0 </dd></dl>
 
-<p>Definition at line <a class="el" href="mapparser_8h_source.html#l00085">85</a> of file <a class="el" href="mapparser_8h_source.html">mapparser.h</a>.</p>
+<p>Definition at line <a class="el" href="mapparser_8h_source.html#l00181">181</a> of file <a class="el" href="mapparser_8h_source.html">mapparser.h</a>.</p>
 </div><hr/><h2>Constructor &amp; Destructor Documentation</h2>
 <a class="anchor" id="ad9cbcbbcf1c313ffc6ae4564551f7842"></a><!-- doxytag: member="SAMParser::SAMParser" ref="ad9cbcbbcf1c313ffc6ae4564551f7842" args="(std::istream *in)" -->
 <div class="memitem">
@@ -128,11 +130,33 @@ Public Member Functions</h2></td></tr>
 <div class="memdoc">
 <p><a class="el" href="class_s_a_m_parser.html">SAMParser</a> constructor removes the header, and parses the first line </p>
 
-<p>Definition at line <a class="el" href="mapparser_8cpp_source.html#l00183">183</a> of file <a class="el" href="mapparser_8cpp_source.html">mapparser.cpp</a>.</p>
+<p>Definition at line <a class="el" href="mapparser_8cpp_source.html#l00274">274</a> of file <a class="el" href="mapparser_8cpp_source.html">mapparser.cpp</a>.</p>
 
 </div>
 </div>
 <hr/><h2>Member Function Documentation</h2>
+<a class="anchor" id="aa66126ef3e05798e6e512dd50e7dc88f"></a><!-- doxytag: member="SAMParser::header" ref="aa66126ef3e05798e6e512dd50e7dc88f" args="() const " -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const std::string SAMParser::header </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const<code> [inline, virtual]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>a member function that returns a string version of the header </p>
+<dl class="return"><dt><b>Returns:</b></dt><dd>string version of the header </dd></dl>
+
+<p>Implements <a class="el" href="class_parser.html#ac888c1af9db0b404cf0c494d28b76969">Parser</a>.</p>
+
+<p>Definition at line <a class="el" href="mapparser_8h_source.html#l00219">219</a> of file <a class="el" href="mapparser_8h_source.html">mapparser.h</a>.</p>
+
+</div>
+</div>
 <a class="anchor" id="adcf1547d49af17ff0ec8f9ef357ee494"></a><!-- doxytag: member="SAMParser::next_fragment" ref="adcf1547d49af17ff0ec8f9ef357ee494" args="(Fragment &amp;f)" -->
 <div class="memitem">
 <div class="memproto">
@@ -158,7 +182,29 @@ Public Member Functions</h2></td></tr>
 
 <p>Implements <a class="el" href="class_parser.html#a581d038676fe4882e73f29d5bf3cd834">Parser</a>.</p>
 
-<p>Definition at line <a class="el" href="mapparser_8cpp_source.html#l00211">211</a> of file <a class="el" href="mapparser_8cpp_source.html">mapparser.cpp</a>.</p>
+<p>Definition at line <a class="el" href="mapparser_8cpp_source.html#l00322">322</a> of file <a class="el" href="mapparser_8cpp_source.html">mapparser.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a464359e7343167740629ab7b50cc0015"></a><!-- doxytag: member="SAMParser::trans_index" ref="a464359e7343167740629ab7b50cc0015" args="() const " -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const TransIndex&amp; SAMParser::trans_index </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const<code> [inline, virtual]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>a member function that returns the transcript-to-index map </p>
+<dl class="return"><dt><b>Returns:</b></dt><dd>the transcript-to-index map </dd></dl>
+
+<p>Implements <a class="el" href="class_parser.html#a53031c7eea91937e9f26b6853d186ded">Parser</a>.</p>
+
+<p>Definition at line <a class="el" href="mapparser_8h_source.html#l00225">225</a> of file <a class="el" href="mapparser_8h_source.html">mapparser.h</a>.</p>
 
 </div>
 </div>
@@ -171,7 +217,7 @@ Public Member Functions</h2></td></tr>
   <div id="nav-path" class="navpath">
     <ul>
       <li class="navelem"><a class="el" href="class_s_a_m_parser.html">SAMParser</a>      </li>
-      <li class="footer">Generated on Mon Sep 26 2011 21:24:50 for eXpress by&#160;
+      <li class="footer">Generated on Sat Oct 8 2011 22:41:38 for eXpress by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </li>
     </ul>

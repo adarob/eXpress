@@ -123,9 +123,10 @@
         <li><a href="#">Download<!--[if IE 7]><!--></a><!--<![endif]-->
           <!--[if lte IE 6]><table><tr><td><![endif]-->
             <ul>
-              <li><a href=downloads/express-0.9.2/express-0.9.2-src.tgz onClick="_gaq.push(['_trackEvent', 'Downloads', 'Source', 'Manual']);" target="_blank">Source</a></li>
-              <li><a href=downloads/express-0.9.2/express-0.9.2-macosx_x86_64.tgz onClick="_gaq.push(['_trackEvent', 'Downloads', 'Mac', 'Manual']);" target="_blank">Mac OS X (64-bit)</a></li>
-              <li><a href=downloads/express-0.9.2/express-0.9.2-linux_x86_64.tgz onClick="_gaq.push(['_trackEvent', 'Downloads', 'Linux', 'Manual']);" target="_blank">Linux (64-bit)</a></li>
+              <li><a href=downloads/express-0.9.3/express-0.9.3-macosx_x86_64.tgz onClick="_gaq.push(['_trackEvent', 'Downloads', 'Mac', 'Manual']);" target="_blank">Mac OS X (64-bit)</a></li>
+              <li><a href=downloads/express-0.9.3/express-0.9.3-linux_x86_64.tgz onClick="_gaq.push(['_trackEvent', 'Downloads', 'Linux', 'Manual']);" target="_blank">Linux (64-bit)</a></li>
+              <li><a href=downloads/express-0.9.3/express-0.9.3-win32_x86_64.zip onClick="_gaq.push(['_trackEvent', 'Downloads', 'Windows', 'Manual']);" target="_blank">Windows (64-bit)</a></li>
+              <li><a href=downloads/express-0.9.3/express-0.9.3-src.tgz onClick="_gaq.push(['_trackEvent', 'Downloads', 'Source', 'Manual']);" target="_blank">Source Code</a></li>
               <li><a href="downloads" onClick="_gaq.push(['_trackEvent', 'Downloads', 'Previous','Manual']);">Previous Versions</a></li>
             </ul>
           <!--[if lte IE 6]></td></tr></table></a><![endif]-->
@@ -167,7 +168,7 @@
      	  
      	  <h1 id="usage">Usage</h1>
 		  <h2 id="prereq">Prerequisites</h2>
-		  <p>eXpress runs on intel-based computers running Linux, Mac OS X, or Windows.  You can install pre-compiled binaries or build eXpress from the source code. If you wish to build eXpress yourself, you must have a C++ compiler installed (for example, <a href=http://developer.apple.com/tools/xcode>XCode</a> for Mac OS X, <a href=http://www.microsoft.com/visualstudio/en-us/products/2010-editions/visual-cpp-express>Visual C++ Express</a> for Windows 7) as well as <a href=http://www.cmake.org>CMake</a>, <a href=https://github.com/pezmaster31/bamtools>BamTools</a>, and the <a href="http://www.boost.org">Boost C++ libraries</a>.  See the <a href="tutorial.html#install">Installation</a> section on the Getting Started page for detailed instruction.</p> 
+		  <p>eXpress runs on intel-based computers running Linux, Mac OS X, or Windows.  You can install pre-compiled binaries or build eXpress from the source code. If you wish to build eXpress yourself, you must have a C++ compiler installed (for example, <a href=http://developer.apple.com/tools/xcode>XCode</a> for Mac OS X, <a href=http://www.microsoft.com/visualstudio/en-us/products/2010-editions/visual-cpp-express>Visual C++ Express</a> for Windows 7) as well as <a href=http://www.cmake.org>CMake</a>, <a href=https://github.com/pezmaster31/bamtools>BamTools</a>, and the <a href="http://www.boost.org">Boost C++ libraries</a>.  See the <a href="tutorial.html#install">Installation</a> section on the Getting Started page for detailed instructions.</p> 
 		  <h2 id="running">Running eXpress</h2>
        	  <p>Run <tt>eXpress</tt> from the command line as follows:
 	      <ul><pre class="sc"><code>$ express [options]* &lt;target_seqs.fasta&gt; &lt;aligned_reads.(sam/bam)&gt;</code></pre></ul></p> 
@@ -205,6 +206,12 @@
 		  <tt>-s/--frag-len-stddev &lt;int&gt;</tt> 
 		  </td><td VALIGN=top> 
 		  Specifies the fragment length standard deviation.  While the empirical distribution is estimated from paired-end reads on-the-fly, this value paramaterizes the prior distribution.  If only single-end reads are available, this prior distribution is also used to determine the effective length.  Default is 60.
+		  </td></tr> 
+		  
+		  <tr><td VALIGN=top nowrap> 
+		  <tt>--output-alignments</tt> 
+		  </td><td VALIGN=top> 
+		  With this option, eXpress outputs an additional file called <tt>hits.prob.(sam/bam)</tt> containing identical copies of all input alignments with an additional <tt>XP</tt> tag that contains the estimated probability that each alignment of the read (pair) is the "correct" one.  The <tt>XP</tt> values for all alignments of of the same read (pair) will sum to 1. 
 		  </td></tr> 
 		  
 		  <tr><td VALIGN=top nowrap> 
