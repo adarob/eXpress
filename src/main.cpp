@@ -220,7 +220,7 @@ void process_fragment(double mass_n, Fragment* frag_p, TranscriptTable* trans_ta
                     (globs.fld)->add_val(m.length(), mass_n);
             
             if (globs.bias_table)
-                (globs.bias_table)->update_observed(m, mass_n - t->mass() + log((double)t->unbiased_effective_length()));
+                (globs.bias_table)->update_observed(m, mass_n - t->mass() + t->cached_effective_length());
             if (globs.mismatch_table)
                 (globs.mismatch_table)->update(m, mass_n);
         }
@@ -277,7 +277,7 @@ void process_fragment(double mass_n, Fragment* frag_p, TranscriptTable* trans_ta
                 (globs.fld)->add_val(m.length(), mass_t);
      
             if (globs.bias_table)
-                (globs.bias_table)->update_observed(m, mass_t - t->mass() + log((double)t->unbiased_effective_length()));
+                (globs.bias_table)->update_observed(m, mass_t - t->mass() + t->cached_effective_length());
             if (globs.mismatch_table)
                 (globs.mismatch_table)->update(m, mass_t);
         }
@@ -358,7 +358,7 @@ size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TranscriptTable* 
         }
         
         // Output progress
-        if (n == 1 || n % 100000 == 0)
+        if (n == 1 || n % 1000000 == 0)
         {
             if (output_running && (iteration == ONLY || iteration == LAST))
             {
@@ -452,7 +452,12 @@ int main (int argc, char ** argv)
     TranscriptTable trans_table(fasta_file_name, map_parser->trans_index(), expr_alpha, &globs);
 
     double num_trans = (double)map_parser->trans_index().size();
-    if (calc_covar && (double)SIZE_MAX < num_trans*(num_trans+1))
+#ifdef WIN32
+    double max_hash = (double)SIZE_MAX;
+#else
+    double max_hash = (double)SSIZE_MAX;
+#endif
+    if (calc_covar && max_hash < num_trans*(num_trans+1))
     {
         cerr << "Warning: Your system is unable to represent large enough values for efficiently hashing transcript pairs.  Covariance calculation will be disabled.\n";
         calc_covar = false;
@@ -463,7 +468,7 @@ int main (int argc, char ** argv)
     
     if (iteration == FIRST)
     {
-        cout << "\nRe-estimating counts with second-round of EM...\n";
+        cout << "\nRe-estimating counts with second round of EM...\n";
         iteration = LAST;
         map_parser = new ThreadedMapParser(in_map_file_name, out_map_file_name);
         tot_counts = threaded_calc_abundances(*map_parser, &trans_table, globs);

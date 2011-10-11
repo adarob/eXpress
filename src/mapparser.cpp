@@ -50,6 +50,7 @@ int cigar_length(vector<BamTools::CigarOp> cigar_vec)
 
 ThreadedMapParser::ThreadedMapParser(string in_file, string out_file) 
 {
+    
     bool is_sam = false;
     _writer = NULL;
     if (in_file.size() == 0)
@@ -63,6 +64,7 @@ ThreadedMapParser::ThreadedMapParser(string in_file, string out_file)
         BamTools::BamReader* reader = new BamTools::BamReader();
         if (reader->Open(in_file))
         {
+            cout << "Parsing BAM header...\n";
             _parser = new BAMParser(reader);
             if (out_file.size())
             {
@@ -74,7 +76,7 @@ ThreadedMapParser::ThreadedMapParser(string in_file, string out_file)
                 }
                 else
                 {
-                    cerr << "Unable to open output BAM file '" << out_file << "'.\n" ; 
+                    cerr << "ERROR: Unable to open output BAM file '" << out_file << "'.\n" ; 
                     exit(1);  
                 }
             }
@@ -86,7 +88,7 @@ ThreadedMapParser::ThreadedMapParser(string in_file, string out_file)
             ifstream* ifs = new ifstream(in_file.c_str());
             if(!ifs->is_open())
             {
-                cerr << "Unable to open input SAM file '" << in_file << "'.\n" ; 
+                cerr << "ERROR: Unable to open input SAM file '" << in_file << "'.\n" ; 
                 exit(1);
             }
             _parser = new SAMParser(ifs);
@@ -100,7 +102,7 @@ ThreadedMapParser::ThreadedMapParser(string in_file, string out_file)
         ofstream* ofs = new ofstream(out_file.c_str());
         if(!ofs->is_open())
         {
-            cerr << "Unable to open output SAM file '" << out_file << "'.\n" ; 
+            cerr << "ERROR: Unable to open output SAM file '" << out_file << "'.\n" ; 
             exit(1);
         }
         *ofs << _parser->header();

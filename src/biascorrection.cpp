@@ -33,7 +33,7 @@ SeqWeightTable::SeqWeightTable(size_t window_size, double alpha)
 
 void SeqWeightTable::increment_expected(char c)
 {
-    boost::mutex::scoped_lock lock(_lock);
+    WriteLock lock(_lock);
     size_t index = ctoi(c);
     if (index != 4)
     {
@@ -43,7 +43,7 @@ void SeqWeightTable::increment_expected(char c)
 
 void SeqWeightTable::increment_observed(string& seq, double normalized_mass)
 {
-    boost::mutex::scoped_lock lock(_lock);
+    WriteLock lock(_lock);
     for (size_t i = 0; i < seq.length(); ++i)
     {
         size_t index = ctoi(seq[i]);
@@ -54,7 +54,7 @@ void SeqWeightTable::increment_observed(string& seq, double normalized_mass)
 
 double SeqWeightTable::get_weight(const string& seq, int i) const
 {
-    boost::mutex::scoped_lock lock(_lock);
+    ReadLock lock(_lock);
     double weight = 0;
     for (int j = max(0, CENTER-1-i); j < min(WINDOW, CENTER-1+(int)seq.length()-i); ++j)
     {
@@ -67,7 +67,7 @@ double SeqWeightTable::get_weight(const string& seq, int i) const
 
 string SeqWeightTable::to_string() const
 {
-    boost::mutex::scoped_lock lock(_lock);
+    ReadLock lock(_lock);
     char buffer[50];
     string s = "";
     for(int i = 0; i < WINDOW; ++i)
@@ -95,7 +95,7 @@ void SeqWeightTable::append_output(ofstream& outfile) const
     
     outfile << "\tObserved Nucleotide Distribution\n" << header;
     
-    boost::mutex::scoped_lock lock(_lock);
+    ReadLock lock(_lock);
     for(size_t j = 0; j < NUM_NUCS; j++)
     {
         outfile << NUCS[j] << ":\t";
@@ -136,7 +136,7 @@ void PosWeightTable::increment_expected(size_t len, double pos)
 
 void PosWeightTable::increment_expected(size_t l, size_t p)
 {
-    boost::mutex::scoped_lock lock(_lock);
+    WriteLock lock(_lock);
     _expected.increment(l, p, 0);
 }
 
@@ -149,7 +149,7 @@ void PosWeightTable::increment_observed(size_t len, double pos, double normalize
 
 void PosWeightTable::increment_observed(size_t l, size_t p, double normalized_mass)
 {
-    boost::mutex::scoped_lock lock(_lock);
+    WriteLock lock(_lock);
     _observed.increment(l,p, normalized_mass);
 } 
 
@@ -157,13 +157,13 @@ double PosWeightTable::get_weight(size_t len, double pos) const
 {
     size_t l = upper_bound(len_bins().begin(),len_bins().end(), len) - len_bins().begin();
     size_t p = upper_bound(pos_bins().begin(),pos_bins().end(), pos) - pos_bins().begin();
-    boost::mutex::scoped_lock lock(_lock);
+    ReadLock lock(_lock);
     return _observed(l,p)-_expected(l,p);
 }
 
 double PosWeightTable::get_weight(size_t l, size_t p) const
 {
-    boost::mutex::scoped_lock lock(_lock);
+    ReadLock lock(_lock);
     return _observed(l,p)-_expected(l,p);
 }
 
@@ -184,7 +184,7 @@ void PosWeightTable::append_output(ofstream& outfile) const
         
     outfile << "\tObserved Position Distribution\n" << header;
 
-    boost::mutex::scoped_lock lock(_lock);
+    ReadLock lock(_lock);
     sprintf(buff, "%d-" SIZE_T_FMT ":\t", 0, len_bins()[0]);
     for(size_t l = 0; l < len_bins().size(); l++)
     {

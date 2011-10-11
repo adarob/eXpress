@@ -45,6 +45,8 @@ size_t FLD::max_val() const
 
 void FLD::add_val(size_t len, double mass)
 {
+    WriteLock lock(_lock);
+    
     if (len > max_val()) return;
     if (len < _min) _min = len;
     
@@ -61,6 +63,8 @@ void FLD::add_val(size_t len, double mass)
 
 double FLD::pdf(size_t len) const
 {
+    ReadLock lock(_lock);
+    
     if (len < 1 || len > max_val())
         return HUGE_VAL;
     return _hist[len]-_tot_mass;
@@ -68,16 +72,22 @@ double FLD::pdf(size_t len) const
 
 double FLD::tot_mass() const
 {
+    ReadLock lock(_lock);
+
     return _tot_mass;
 }
 
 double FLD::mean() const
 {
+    ReadLock lock(_lock);
+
     return _sum - tot_mass();
 }
 
 string FLD::to_string() const
 {
+    ReadLock lock(_lock);
+
     string s = "";
     char buffer[50];
     for(size_t i = 0; i <= max_val(); i++)
@@ -91,6 +101,8 @@ string FLD::to_string() const
 
 void FLD::append_output(ofstream& outfile) const
 {
+    ReadLock lock(_lock);
+
     outfile << ">Fragment Length Distribution (0-" << max_val() << ")\n";
     outfile << to_string() << endl;
 }

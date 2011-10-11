@@ -123,11 +123,9 @@ class Transcript
     double _ub_eff_len;
     
     /**
-     * a private member function that returns the (logged) total bias for a given fragment length
-     * @param l a size_t that specifies the fragment length
-     * @return the total bias for length (\f$ B = \bar{bias}(L(t) - l + 1) \f$)
+     * a private double storing the most recently updated (logged) effective length as calculated by the bias updater thread
      */
-    double total_bias_for_length(size_t l) const;
+    double _cached_eff_len;
     
 public:
     
@@ -245,10 +243,10 @@ public:
     double est_effective_length() const;
     
     /**
-     * a member function that calcualtes and returns the effective length of the transcript (non-logged) ignoring bias and using the prior FLD distribution
-     * @return the effective length of the transcript calculated as \f$ \tilde{l} = \sum_{l=1}^{L(t)} D_{prior}(l)(L(t) - l + 1) \f$
+     * a member function that returns the most recently estimated effective length as calculated by the bias updater thread 
+     * @return the cached effective length of the transcript calculated
      */
-    double unbiased_effective_length() const;
+    double cached_effective_length() const;
 
     /**
      * a member function that causes the transcript bias to be re-calculated by the _bias_table based on curent parameters

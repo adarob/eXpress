@@ -18,6 +18,9 @@
 class Transcript;
 class FragHit;
 
+typedef boost::shared_lock<boost::shared_mutex> ReadLock;
+typedef boost::unique_lock<boost::shared_mutex> WriteLock;
+
 /**
  * The SeqWeightTable class keeps track of sequence-specific bias parameters.
  * It allows for the bias associated with a given sequence to be calculated, and for the bias
@@ -43,7 +46,7 @@ class SeqWeightTable
     /**
      * a private mutex block access for multi-threaded bias updating
      */
-    mutable boost::mutex _lock;
+    mutable boost::shared_mutex _lock;
     
 public:
     
@@ -124,7 +127,7 @@ class PosWeightTable
     /**
      * a private mutex block access for multi-threaded bias updating
      */
-    mutable boost::mutex _lock;
+    mutable boost::shared_mutex _lock;
     
 public:
     

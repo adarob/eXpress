@@ -36,6 +36,7 @@ Transcript::Transcript(const TransID id, const std::string& name, const std::str
     _avg_bias(0)
 {   
     _ub_eff_len = est_effective_length();
+    _cached_eff_len = log(est_effective_length());
     _mass = log(_ub_eff_len*alpha); 
 }
 
@@ -63,6 +64,7 @@ double Transcript::log_likelihood(const FragHit& frag) const
     double ll = mass();
     if (_globs->mismatch_table)
         ll += (_globs->mismatch_table)->log_likelihood(frag);
+    ll -= _cached_eff_len;
     
     switch(frag.pair_status())
     {
@@ -70,19 +72,16 @@ double Transcript::log_likelihood(const FragHit& frag) const
         {
             ll += _start_bias[frag.left] + _end_bias[frag.right-1];
             ll += (_globs->fld)->pdf(frag.length());
-            ll -= total_bias_for_length(frag.length());
             break;
         }
         case LEFT_ONLY:
         {
             ll += _start_bias[frag.left];
-            ll -= total_bias_for_length(min((int)length()-frag.left, (int)sexp((_globs->fld)->mean())));
             break;
         }
         case RIGHT_ONLY:
         {
             ll += _end_bias[frag.right-1];
-            ll -= total_bias_for_length(min(frag.right, (int)sexp((_globs->fld)->mean())));
             break;
         }
     }
@@ -104,9 +103,9 @@ double Transcript::est_effective_length() const
     return eff_len;
 }
 
-double Transcript::unbiased_effective_length() const
+double Transcript::cached_effective_length() const
 {
-    return _ub_eff_len;
+    return _cached_eff_len;
 }
 
 double Transcript::effective_length() const
@@ -127,18 +126,16 @@ double Transcript::effective_length() const
     return eff_len;
 }
 
-double Transcript::total_bias_for_length(size_t l) const
-{
-    assert(l <= (_globs->fld)->max_val());
-    return _avg_bias + log((double)(length() - l + 1));
-}
 
 void Transcript::update_transcript_bias()
 {
     if (!_globs->bias_table)
         return;
-    boost::mutex::scoped_lock lock(_bias_lock);
-    _avg_bias = (_globs->bias_table)->get_transcript_bias(_start_bias, _end_bias, *this);
+    {
+        boost::mutex::scoped_lock lock(_bias_lock);
+        _avg_bias = (_globs->bias_table)->get_transcript_bias(_start_bias, _end_bias, *this);
+    }
+    _cached_eff_len = est_effective_length();
 }
 
 TranscriptTable::TranscriptTable(const string& trans_fasta_file, const TransIndex& trans_index, double alpha, const Globals* globs)
