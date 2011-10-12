@@ -54,9 +54,13 @@ void FLD::add_val(size_t len, double mass)
     
     for (size_t i = 0; i < KERNEL.size(); i++)
     {
-        double k_mass = mass + KERNEL[i];
-        _hist[offset] = log_sum(_hist[offset], k_mass);
-        _sum = log_sum(_sum, log((double)offset++)+k_mass);
+        if (offset > 0 && offset <= max_val())
+        {
+            double k_mass = mass + KERNEL[i];
+            _hist[offset] = log_sum(_hist[offset], k_mass);
+            _sum = log_sum(_sum, log((double)offset)+k_mass);
+        }
+        offset++;
     }
     _tot_mass = log_sum(_tot_mass, mass);
 }
