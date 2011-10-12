@@ -351,8 +351,7 @@ size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TranscriptTable* 
         
         if (n == burn_in)
         {
-            if (globs.bias_table)
-                bias_update = new boost::thread(&TranscriptTable::threaded_bias_update, trans_table);
+            bias_update = new boost::thread(&TranscriptTable::threaded_bias_update, trans_table);
             if (globs.mismatch_table)
                 (globs.mismatch_table)->activate();
         }
@@ -452,12 +451,8 @@ int main (int argc, char ** argv)
     TranscriptTable trans_table(fasta_file_name, map_parser->trans_index(), expr_alpha, &globs);
 
     double num_trans = (double)map_parser->trans_index().size();
-#ifdef WIN32
-    double max_hash = (double)SIZE_MAX;
-#else
-    double max_hash = (double)SSIZE_MAX;
-#endif
-    if (calc_covar && max_hash < num_trans*(num_trans+1))
+    
+    if (calc_covar && (double)SSIZE_MAX < num_trans*(num_trans+1))
     {
         cerr << "Warning: Your system is unable to represent large enough values for efficiently hashing transcript pairs.  Covariance calculation will be disabled.\n";
         calc_covar = false;

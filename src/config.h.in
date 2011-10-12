@@ -2,6 +2,7 @@
 #if @WIN32_INT@
 	#define WIN32
 	#define SIZE_T_FMT "%Iu"
+	#define SSIZE_MAX SIZE_MAX
 #else
 	#define SIZE_T_FMT "%zu"
 #endif
