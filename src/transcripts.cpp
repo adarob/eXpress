@@ -59,32 +59,24 @@ void Transcript::add_prob_count(double p)
 
 double Transcript::log_likelihood(const FragHit& frag) const
 {
-    boost::mutex::scoped_lock lock(_bias_lock);
 
     double ll = mass();
     if (_globs->mismatch_table)
         ll += (_globs->mismatch_table)->log_likelihood(frag);
-    ll -= _cached_eff_len;
-    
-    switch(frag.pair_status())
+
+    const PairStatus ps = frag.pair_status();
     {
-        case PAIRED:
-        {
-            ll += _start_bias[frag.left] + _end_bias[frag.right-1];
-            ll += (_globs->fld)->pdf(frag.length());
-            break;
-        }
-        case LEFT_ONLY:
-        {
+        boost::mutex::scoped_lock lock(_bias_lock);
+
+        if (ps != RIGHT_ONLY)
             ll += _start_bias[frag.left];
-            break;
-        }
-        case RIGHT_ONLY:
-        {
-            ll += _end_bias[frag.right-1];
-            break;
-        }
+        if (ps != LEFT_ONLY)
+            ll += _end_bias[frag.right-1];            
+        ll -= _cached_eff_len;
     }
+    
+    if (ps == PAIRED)
+        ll += (_globs->fld)->pdf(frag.length());
     
     return ll;
 }
