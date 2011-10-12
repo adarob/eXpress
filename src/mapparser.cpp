@@ -61,6 +61,7 @@ ThreadedMapParser::ThreadedMapParser(string in_file, string out_file)
     }
     else
     {
+        cout << "Attempting to read input in BAM format...\n";
         BamTools::BamReader* reader = new BamTools::BamReader();
         if (reader->Open(in_file))
         {
