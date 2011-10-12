@@ -48,7 +48,8 @@ int cigar_length(vector<BamTools::CigarOp> cigar_vec)
     return tot_len;
 }
 
-ThreadedMapParser::ThreadedMapParser(string in_file, string out_file) 
+ThreadedMapParser::ThreadedMapParser(string in_file, string out_file, bool write_active) 
+: _write_active(write_active)
 {
     
     bool is_sam = false;
@@ -166,7 +167,7 @@ void ThreadedMapParser::threaded_parse(ParseThreadSafety* thread_safety, Transcr
             }
         }
 
-        if (last_frag && _writer)
+        if (last_frag && _writer && _write_active)
             _writer->write_fragment(*last_frag);
         if (last_frag)
             delete last_frag;
@@ -256,6 +257,16 @@ bool BAMParser::map_end_from_alignment(BamTools::BamAlignment& a)
     }
     
     return true;
+}
+
+void BAMParser::reset()
+{
+    _reader->Rewind();
+    
+    // Get first valid FragHit
+    BamTools::BamAlignment a;
+    _frag_buff = new FragHit();
+    do {_reader->GetNextAlignment(a);} while(!map_end_from_alignment(a));
 }
 
 BAMWriter::BAMWriter(BamTools::BamWriter* writer) : _writer(writer) {}
@@ -410,6 +421,31 @@ bool SAMParser::map_end_from_line(char* line)
     }
 stop:
     return i == 10;
+}
+
+void SAMParser::reset()
+{
+    // Rewind input file
+    _in->seekg(0, ios::beg); 
+    _in->clear();
+    
+    // Load first alignment
+    char line_buff[BUFF_SIZE];
+    _frag_buff = new FragHit();
+    
+    while(_in->good())
+    {
+        _in->getline(line_buff, BUFF_SIZE-1, '\n');
+        if (line_buff[0] != '@')
+        {
+            break;
+        }
+    }
+    
+    while(!map_end_from_line(line_buff))
+    { 
+        _in->getline(line_buff, BUFF_SIZE-1, '\n');
+    }
 }
 
 SAMWriter::SAMWriter(ostream* out) : _out(out) {}

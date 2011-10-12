@@ -53,6 +53,8 @@ public:
      * @return true if more reads remain in the SAM/BAM file/stream, false otherwise
      */
     virtual bool next_fragment(Fragment& f)=0;
+
+    virtual void reset() = 0;
 };
 
 /**
@@ -135,6 +137,8 @@ public:
      * @return true if more reads remain in the BAM file, false otherwise
      */
     bool next_fragment(Fragment& f);
+    
+    void reset();
 };
 
 /**
@@ -205,6 +209,8 @@ class SAMParser : public Parser
      * @return true if the mapping is valid and false otherwise
      */
     bool map_end_from_line(char* line);
+    
+    void reset();
     
 public:
     /**
@@ -315,13 +321,15 @@ class ThreadedMapParser
      */
     Writer* _writer;
     
+    bool _write_active;
+    
 public:
     /**
      * ThreadedMapParser constructor determines what format the input is in and initializes the correct parser.
      * @param input_file string containing the path to the input SAM/BAM file
      * @param output_file string containing the path the output file less its extension (empty if writing is to be disabled)
      */
-    ThreadedMapParser(std::string input_file, std::string output_file);
+    ThreadedMapParser(std::string input_file, std::string output_file, bool write_active);
     
     /**
      * ThreadedMapParser destructor deletes the parser and writer (if it exists).
@@ -342,6 +350,11 @@ public:
      * @return the transcript-to-index map
      */
     const TransIndex& trans_index() { return _parser->trans_index(); }
+    
+    void write_active(bool b) { _write_active = b; }
+    
+    void reset_reader() { _parser->reset(); }
+    
 };
 
 

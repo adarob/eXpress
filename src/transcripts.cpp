@@ -121,8 +121,7 @@ double Transcript::effective_length() const
 
 void Transcript::update_transcript_bias()
 {
-    if (!_globs->bias_table)
-        return;
+    if (_globs->bias_table)
     {
         boost::mutex::scoped_lock lock(_bias_lock);
         _avg_bias = (_globs->bias_table)->get_transcript_bias(_start_bias, _end_bias, *this);

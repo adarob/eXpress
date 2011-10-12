@@ -447,10 +447,10 @@ int main (int argc, char ** argv)
     globs.fld = new FLD(fld_alpha, def_fl_max, def_fl_mean, def_fl_stddev);
     globs.bias_table = (bias_correct) ? new BiasBoss(bias_alpha):NULL;
     globs.mismatch_table = (error_model) ? new MismatchTable(mm_alpha):NULL;
-    ThreadedMapParser* map_parser = new ThreadedMapParser(in_map_file_name, (iteration==ONLY) ? out_map_file_name:"");
-    TranscriptTable trans_table(fasta_file_name, map_parser->trans_index(), expr_alpha, &globs);
+    ThreadedMapParser map_parser(in_map_file_name, out_map_file_name, iteration==ONLY);
+    TranscriptTable trans_table(fasta_file_name, map_parser.trans_index(), expr_alpha, &globs);
 
-    double num_trans = (double)map_parser->trans_index().size();
+    double num_trans = (double)map_parser.trans_index().size();
     
     if (calc_covar && (double)SSIZE_MAX < num_trans*(num_trans+1))
     {
@@ -458,15 +458,15 @@ int main (int argc, char ** argv)
         calc_covar = false;
     }
     
-    size_t tot_counts = threaded_calc_abundances(*map_parser, &trans_table, globs);
-    delete map_parser;
+    size_t tot_counts = threaded_calc_abundances(map_parser, &trans_table, globs);
     
     if (iteration == FIRST)
     {
         cout << "\nRe-estimating counts with second round of EM...\n";
         iteration = LAST;
-        map_parser = new ThreadedMapParser(in_map_file_name, out_map_file_name);
-        tot_counts = threaded_calc_abundances(*map_parser, &trans_table, globs);
+        map_parser.reset_reader();
+        map_parser.write_active(true);
+        tot_counts = threaded_calc_abundances(map_parser, &trans_table, globs);
     }
     
 	cout << "Writing results to file...\n";
