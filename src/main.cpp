@@ -200,7 +200,7 @@ void process_fragment(double mass_n, Fragment* frag_p, TranscriptTable* trans_ta
     assert(frag.num_hits());
     
     Bundle* bundle = frag.hits()[0]->mapped_trans->bundle();
-    if (iteration != FIRST)
+    if (iteration != LAST)
         bundle->incr_counts();
     
     if (frag.num_hits()==1)
@@ -212,7 +212,7 @@ void process_fragment(double mass_n, Fragment* frag_p, TranscriptTable* trans_ta
         m.probability = 1.0;
         
         //update parameters
-        if (iteration == FIRST || iteration == ONLY)
+        if (iteration != LAST)
         {
             t->add_mass(0, mass_n);
             t->incr_uniq_counts();
@@ -268,7 +268,7 @@ void process_fragment(double mass_n, Fragment* frag_p, TranscriptTable* trans_ta
         assert(!isinf(m.probability));
         
         // update parameters
-        if (iteration == FIRST || iteration == ONLY)
+        if (iteration != LAST)
         {
 
             t->add_mass(p, mass_n);
@@ -286,7 +286,7 @@ void process_fragment(double mass_n, Fragment* frag_p, TranscriptTable* trans_ta
             t->add_prob_count(m.probability);
         }
         
-        if (calc_covar && (iteration == ONLY || iteration == LAST))
+        if (calc_covar && (iteration != FIRST))
         {
             for(size_t j = i+1; j < frag.num_hits(); ++j)
             {
