@@ -59,7 +59,7 @@ double mm_alpha = 1;
 // fragment length parameters
 int def_fl_max = 800;
 int def_fl_mean = 200;
-int def_fl_stddev = 100;
+int def_fl_stddev = 80;
 
 // option parameters
 bool error_model = true;
@@ -86,7 +86,7 @@ bool parse_options(int ac, char ** av)
     ("help,h", "produce help message")
     ("output-dir,o", po::value<string>(&output_dir)->default_value("."), "write all output files to this directory")
     ("frag-len-mean,m", po::value<int>(&def_fl_mean)->default_value(200), "prior estimate for average fragment length")
-    ("frag-len-stddev,s", po::value<int>(&def_fl_stddev)->default_value(100), "prior estimate for fragment length std deviation")
+    ("frag-len-stddev,s", po::value<int>(&def_fl_stddev)->default_value(80), "prior estimate for fragment length std deviation")
     ("output-alignments", "output alignments (sam/bam) with probabilistic assignments")
     ("fr-stranded", "accept only forward->reverse alignments (second-stranded protocols)")
     ("rf-stranded", "accept only reverse->forward alignments (first-stranded protocols)")
@@ -193,43 +193,39 @@ bool parse_options(int ac, char ** av)
  * @param trans_table pointer to the transcript table
  * @param globs a pointer to the struct containing pointers to the global parameter tables (bias_table, mismatch_table, fld)
  */
-void process_fragment(double mass_n, Fragment* frag_p, TranscriptTable* trans_table, const Globals& globs)
+bool process_fragment(double mass_n, Fragment* frag_p, TranscriptTable* trans_table, const Globals& globs)
 {
     Fragment& frag = *frag_p;
     
     assert(frag.num_hits());
     
-    Bundle* bundle = frag.hits()[0]->mapped_trans->bundle();
-    if (iteration != LAST)
-        bundle->incr_counts();
-    
-    if (frag.num_hits()==1)
-    // hits to a single location
-    {
-        FragHit& m = *frag.hits()[0];
-        Transcript* t  = m.mapped_trans;
-        
-        m.probability = 1.0;
-        
-        //update parameters
-        if (iteration != LAST)
-        {
-            t->add_mass(0, mass_n);
-            t->incr_uniq_counts();
-            if (m.pair_status() == PAIRED)
-                    (globs.fld)->add_val(m.length(), mass_n);
-            
-            if (globs.bias_table)
-                (globs.bias_table)->update_observed(m, mass_n - t->mass() + t->cached_effective_length());
-            if (globs.mismatch_table)
-                (globs.mismatch_table)->update(m, mass_n);
-        }
-        else
-        {
-            t->add_prob_count(1.0);
-        }
-        return;
-    }
+//    if (frag.num_hits()==1)
+//    // hits to a single location
+//    {
+//        FragHit& m = *frag.hits()[0];
+//        Transcript* t  = m.mapped_trans;
+//        
+//        m.probability = 1.0;
+//        
+//        //update parameters
+//        if (iteration != LAST)
+//        {
+//            t->add_mass(0, mass_n);
+//            t->incr_uniq_counts();
+//            if (m.pair_status() == PAIRED)
+//                    (globs.fld)->add_val(m.length(), mass_n);
+//            
+//            if (globs.bias_table)
+//                (globs.bias_table)->update_observed(m, mass_n - t->mass() + t->cached_effective_length());
+//            if (globs.mismatch_table)
+//                (globs.mismatch_table)->update(m, mass_n);
+//        }
+//        else
+//        {
+//            t->add_prob_count(1.0);
+//        }
+//        return;
+//    }
     
     // hits to multiple locations
     
@@ -243,8 +239,19 @@ void process_fragment(double mass_n, Fragment* frag_p, TranscriptTable* trans_ta
         likelihoods[i] = t->log_likelihood(m);
         total_likelihood = (i) ? log_sum(total_likelihood, likelihoods[i]):likelihoods[i];
     }
+
+    if (sexp(total_likelihood)==0.0)
+    {
+        return false;
+    }
     
     // merge bundles
+    Bundle* bundle = frag.hits()[0]->mapped_trans->bundle();
+    if (iteration != LAST)
+    {
+        bundle->incr_counts();
+    }
+    
     for(size_t i = 1; i < frag.num_hits(); ++i)
     {
         bundle = trans_table->merge_bundles(bundle, frag.hits()[i]->mapped_trans->bundle());
@@ -269,12 +276,13 @@ void process_fragment(double mass_n, Fragment* frag_p, TranscriptTable* trans_ta
         // update parameters
         if (iteration != LAST)
         {
+            if (i==0 && frag.num_hits()==1)
+                t->incr_uniq_counts();
 
             t->add_mass(p, mass_n);
             
             if (m.pair_status() == PAIRED)
                 (globs.fld)->add_val(m.length(), mass_t);
-     
             if (globs.bias_table)
                 (globs.bias_table)->update_observed(m, mass_t - t->mass() + t->cached_effective_length());
             if (globs.mismatch_table)
@@ -302,6 +310,7 @@ void process_fragment(double mass_n, Fragment* frag_p, TranscriptTable* trans_ta
             }
         }
     }
+    return true;
 }
 
 /**
@@ -321,18 +330,17 @@ size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TranscriptTable* 
     boost::thread parse(&ThreadedMapParser::threaded_parse, &map_parser, &ts, trans_table);
     boost::thread* bias_update = NULL;
     
-    size_t n = 0;
+    size_t n = 1;
     double mass_n = 0;
     Fragment* frag;
     cout << setiosflags(ios::left);
     
-    while(!stop_at || n < stop_at)
+    while(!stop_at || n <= stop_at)
     {
         {
             boost::unique_lock<boost::mutex> lock(ts.mut);
             while(!ts.frag_clean)
             {
-                cout << "Proc wait\n";
                 ts.cond.wait(lock);
             }
             
@@ -346,9 +354,7 @@ size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TranscriptTable* 
         {
             break;
         }
-        
-        n++;
-        
+                
         if (n == burn_in)
         {
             bias_update = new boost::thread(&TranscriptTable::threaded_bias_update, trans_table);
@@ -357,12 +363,12 @@ size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TranscriptTable* 
         }
         
         // Output progress
-        if (n == 1 || n % 1000000 == 0)
+        if (n % 1000000 == 1)
         {
             if (output_running && (iteration == ONLY || iteration == LAST))
             {
                 char buff[500];
-                sprintf(buff, "%s/x_" SIZE_T_FMT "", output_dir.c_str(), n);
+                sprintf(buff, "%s/x_" SIZE_T_FMT "", output_dir.c_str(), n-1);
                 string dir(buff);
                 try { fs::create_directories(dir); }
                 catch (fs::filesystem_error& e)
@@ -370,7 +376,7 @@ size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TranscriptTable* 
                     cerr << e.what() << endl;
                     exit(1);
                 }
-                trans_table->output_results(dir, n, false, iteration==LAST);
+                trans_table->output_results(dir, n-1, false, iteration==LAST);
                 ofstream paramfile((dir + "/params.xprs").c_str());
                 (globs.fld)->append_output(paramfile);
                 if (globs.mismatch_table)
@@ -392,13 +398,11 @@ size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TranscriptTable* 
             }
         }
         
-        
-        if (n > 1)
+        if (process_fragment(mass_n, frag, trans_table, globs))
         {
+            n += 1;
             mass_n += ff_param*log((double)n-1) - log(pow(n,ff_param) - 1);
         }
-        
-        process_fragment(mass_n, frag, trans_table, globs);
     }
     
     {
@@ -407,6 +411,8 @@ size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TranscriptTable* 
         ts.frag_clean = false;
         ts.cond.notify_one();
     }
+    
+    n -= 1;
     
     if (vis)
         cout << "99\n";

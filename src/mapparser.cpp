@@ -162,7 +162,6 @@ void ThreadedMapParser::threaded_parse(ParseThreadSafety* thread_safety, Transcr
 
                 while(ts.frag_clean)
                 {
-                    cout << "Parser wait\n";
                     ts.cond.wait(lock);
                 }
             }

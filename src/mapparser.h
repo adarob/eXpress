@@ -39,7 +39,7 @@ public:
      * a member function that returns a string version of the header
      * @return string version of the header
      */
-    virtual const std::string& header() const=0;
+    virtual const std::string header() const=0;
     
     /**
      * a member function that returns the transcript-to-index map
@@ -123,7 +123,7 @@ public:
      * a member function that returns a string version of the header
      * @return string version of the header
      */
-    const std::string& header() const { return _reader->GetHeaderText(); }
+    const std::string header() const { return _reader->GetHeaderText(); }
     
     /**
      * a member function that returns the transcript-to-index map
@@ -222,7 +222,7 @@ public:
      * a member function that returns a string version of the header
      * @return string version of the header
      */
-    const std::string& header() const { return _header; }
+    const std::string header() const { return _header; }
     
     /**
      * a member function that returns the transcript-to-index map
