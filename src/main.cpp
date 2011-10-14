@@ -59,7 +59,7 @@ double mm_alpha = 1;
 // fragment length parameters
 int def_fl_max = 800;
 int def_fl_mean = 200;
-int def_fl_stddev = 60;
+int def_fl_stddev = 100;
 
 // option parameters
 bool error_model = true;
@@ -86,7 +86,7 @@ bool parse_options(int ac, char ** av)
     ("help,h", "produce help message")
     ("output-dir,o", po::value<string>(&output_dir)->default_value("."), "write all output files to this directory")
     ("frag-len-mean,m", po::value<int>(&def_fl_mean)->default_value(200), "prior estimate for average fragment length")
-    ("frag-len-stddev,s", po::value<int>(&def_fl_stddev)->default_value(60), "prior estimate for fragment length std deviation")
+    ("frag-len-stddev,s", po::value<int>(&def_fl_stddev)->default_value(100), "prior estimate for fragment length std deviation")
     ("output-alignments", "output alignments (sam/bam) with probabilistic assignments")
     ("fr-stranded", "accept only forward->reverse alignments (second-stranded protocols)")
     ("rf-stranded", "accept only reverse->forward alignments (first-stranded protocols)")
@@ -243,10 +243,6 @@ void process_fragment(double mass_n, Fragment* frag_p, TranscriptTable* trans_ta
         likelihoods[i] = t->log_likelihood(m);
         total_likelihood = (i) ? log_sum(total_likelihood, likelihoods[i]):likelihoods[i];
     }
-    if (sexp(total_likelihood) == 0)
-    {
-        return;
-    }
     
     // merge bundles
     for(size_t i = 1; i < frag.num_hits(); ++i)
@@ -261,8 +257,11 @@ void process_fragment(double mass_n, Fragment* frag_p, TranscriptTable* trans_ta
         Transcript* t  = m.mapped_trans;
         double p = likelihoods[i]-total_likelihood;
         double mass_t = mass_n + p;
-               
+        
+        assert(!(isnan(mass_t)||isinf(mass_t)));
+        
         m.probability = sexp(p);
+        
         if (m.probability == 0)
             continue;
         assert(!isinf(m.probability));
@@ -333,6 +332,7 @@ size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TranscriptTable* 
             boost::unique_lock<boost::mutex> lock(ts.mut);
             while(!ts.frag_clean)
             {
+                cout << "Proc wait\n";
                 ts.cond.wait(lock);
             }
             

@@ -78,6 +78,7 @@ double Transcript::log_likelihood(const FragHit& frag) const
     if (ps == PAIRED)
         ll += (_globs->fld)->pdf(frag.length());
     
+    assert(!(isnan(ll)||isinf(ll)));
     return ll;
 }
 
@@ -374,19 +375,15 @@ void TranscriptTable::output_results(string output_dir, size_t tot_counts, bool 
             vector<double> trans_counts(bundle_trans.size(),0);
             bool requires_projection = false;
 
-            double bundle_tot = 0;
             for (size_t i = 0; i < bundle_trans.size(); ++i)
             {
                 Transcript& trans = *bundle_trans[i];
                 double l_trans_frac = trans.mass() - l_bundle_mass;
                 trans_counts[i] = (multi_iteration) ? trans.est_counts():sexp(l_trans_frac + l_bundle_counts);
-                bundle_tot += trans_counts[i];
                 if (trans_counts[i] - (double)trans.tot_counts() > EPSILON ||  (double)trans.uniq_counts() - trans_counts[i] > EPSILON)
                     requires_projection = true;
             }
             
-            if (abs(bundle_tot - (double)bundle->counts()) > EPSILON)
-                cerr << "SHIT";
             
             if (bundle_trans.size() > 1 && requires_projection)
             {

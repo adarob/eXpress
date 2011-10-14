@@ -46,7 +46,6 @@ double MismatchTable::log_likelihood(const FragHit& f) const
         {
             index = (prev << 2) + ref;
             ll += left_mm[i](index, cur);
-            assert(!isnan(ll));
         }
         prev = ref;
     }
@@ -61,10 +60,11 @@ double MismatchTable::log_likelihood(const FragHit& f) const
         {
             index = (prev << 2) + ref;
             ll += right_mm[i](index, cur);
-            assert(!isnan(ll));
         }
         prev = ref;
     }
+    
+    assert(!(isnan(ll)||isinf(ll)));
     return ll;
 }
 

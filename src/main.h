@@ -51,7 +51,7 @@ const size_t NUM_NUCS = 4;
  */
 const char NUCS[] = {'A','C','G','T'};
 
-const double EPSILON = 0.0001
+const double EPSILON = 0.0001;
 
 /**
  * global function to calculate the log of the sum of 2 logged values efficiently

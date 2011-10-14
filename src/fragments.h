@@ -173,7 +173,7 @@ public:
      * a member function that returns the SAM "Query Template Name" (fragment name)
      * @return the string SAM "Query Template Name" (fragment name)
      */
-    const std::string name() const { return _name; }
+    const std::string& name() const { return _name; }
     
     /**
      * a member function that returns the number of multi-mappings for the fragment
