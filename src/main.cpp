@@ -193,39 +193,11 @@ bool parse_options(int ac, char ** av)
  * @param trans_table pointer to the transcript table
  * @param globs a pointer to the struct containing pointers to the global parameter tables (bias_table, mismatch_table, fld)
  */
-bool process_fragment(double mass_n, Fragment* frag_p, TranscriptTable* trans_table, const Globals& globs)
+void process_fragment(double mass_n, Fragment* frag_p, TranscriptTable* trans_table, const Globals& globs)
 {
     Fragment& frag = *frag_p;
     
     assert(frag.num_hits());
-    
-//    if (frag.num_hits()==1)
-//    // hits to a single location
-//    {
-//        FragHit& m = *frag.hits()[0];
-//        Transcript* t  = m.mapped_trans;
-//        
-//        m.probability = 1.0;
-//        
-//        //update parameters
-//        if (iteration != LAST)
-//        {
-//            t->add_mass(0, mass_n);
-//            t->incr_uniq_counts();
-//            if (m.pair_status() == PAIRED)
-//                    (globs.fld)->add_val(m.length(), mass_n);
-//            
-//            if (globs.bias_table)
-//                (globs.bias_table)->update_observed(m, mass_n - t->mass() + t->cached_effective_length());
-//            if (globs.mismatch_table)
-//                (globs.mismatch_table)->update(m, mass_n);
-//        }
-//        else
-//        {
-//            t->add_prob_count(1.0);
-//        }
-//        return;
-//    }
     
     // hits to multiple locations
     
@@ -240,10 +212,7 @@ bool process_fragment(double mass_n, Fragment* frag_p, TranscriptTable* trans_ta
         total_likelihood = (i) ? log_sum(total_likelihood, likelihoods[i]):likelihoods[i];
     }
 
-    if (islzero(total_likelihood))
-    {
-        return false;
-    }
+    assert(!islzero(total_likelihood));
     
     // merge bundles
     Bundle* bundle = frag.hits()[0]->mapped_trans->bundle();
@@ -310,7 +279,6 @@ bool process_fragment(double mass_n, Fragment* frag_p, TranscriptTable* trans_ta
             }
         }
     }
-    return true;
 }
 
 /**
@@ -331,7 +299,6 @@ size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TranscriptTable* 
     boost::thread* bias_update = NULL;
     
     size_t n = 1;
-    size_t all_n = 1;
     double mass_n = 0;
     Fragment* frag;
     cout << setiosflags(ios::left);
@@ -364,7 +331,7 @@ size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TranscriptTable* 
         }
         
         // Output progress
-        if (all_n % 1000000 == 1)
+        if (n % 1000001 == 1)
         {
             if (output_running && (iteration == ONLY || iteration == LAST))
             {
@@ -395,16 +362,13 @@ size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TranscriptTable* 
             }
             else
             {
-                cout << "Fragments Processed: " << setw(9) << n << "\t Number of Bundles: "<< trans_table->num_bundles() << endl;
+                cout << "Fragments Processed: " << setw(9) << n-1 << "\t Number of Bundles: "<< trans_table->num_bundles() << endl;
             }
         }
         
-        all_n += 1;
-        if (process_fragment(mass_n, frag, trans_table, globs))
-        {
-            n += 1;
-            mass_n += ff_param*log((double)n-1) - log(pow(n,ff_param) - 1);
-        }
+        process_fragment(mass_n, frag, trans_table, globs);
+        n += 1;
+        mass_n += ff_param*log((double)n-1) - log(pow(n,ff_param) - 1);
     }
     
     {
@@ -419,7 +383,7 @@ size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TranscriptTable* 
     if (vis)
         cout << "99\n";
     else
-        cout << "COMPLETED: Processed " << all_n-1 << " mapped fragments, targets are in " << trans_table->num_bundles() << " bundles\n";
+        cout << "COMPLETED: Processed " << n << " mapped fragments, targets are in " << trans_table->num_bundles() << " bundles\n";
     
     parse.join();
     if (bias_update)

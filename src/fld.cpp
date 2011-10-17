@@ -29,7 +29,7 @@ FLD::FLD(double alpha, size_t max_val, size_t mean, size_t std_dev) :
     
     double tot = log(alpha*max_val);
     
-    for (size_t i = 1; i <= max_val; ++i)
+    for (size_t i = 0; i <= max_val; ++i)
     {  
         double mass = tot + log(boost::math::cdf(norm,i+0.5) - boost::math::cdf(norm,i-0.5));
         _hist[i] = mass;
@@ -47,7 +47,7 @@ void FLD::add_val(size_t len, double mass)
 {
     WriteLock lock(_lock);
     
-    if (len > max_val()) return;
+    if (len > max_val()) len = max_val();
     if (len < _min) _min = len;
     
     size_t offset = len - KERNEL.size()/2; 
@@ -59,18 +59,17 @@ void FLD::add_val(size_t len, double mass)
             double k_mass = mass + KERNEL[i];
             _hist[offset] = log_sum(_hist[offset], k_mass);
             _sum = log_sum(_sum, log((double)offset)+k_mass);
+            _tot_mass = log_sum(_tot_mass, k_mass);
         }
         offset++;
     }
-    _tot_mass = log_sum(_tot_mass, mass);
 }
 
 double FLD::pdf(size_t len) const
 {
     ReadLock lock(_lock);
     
-    if (len < 1 || len > max_val())
-        return HUGE_VAL;
+    if (len > max_val()) len = max_val();
     return _hist[len]-_tot_mass;
 }
 
