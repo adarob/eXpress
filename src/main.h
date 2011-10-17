@@ -80,13 +80,23 @@ inline double log_sum(double x, double y)
 }
 
 /**
+ * global function to determine if a logged value is 0 in non-log space
+ * @param x a double for the logged value to be tested
+ * @return True if exp(x)==0 (without rounding)
+ */
+inline double islzero(double x)
+{
+    return (fabs(x) == HUGE_VAL);
+}
+
+/**
  * global function to exponentiate a logged value
  * @param x a double for the logged value to be exponentiated
  * @return exp(x) or 0 if x = log(0)
  */
 inline double sexp(double x)
 {
-    if (fabs(x) == HUGE_VAL)
+    if (islzero(x))
         return 0.0;
     return exp(x);
 }

@@ -240,7 +240,7 @@ bool process_fragment(double mass_n, Fragment* frag_p, TranscriptTable* trans_ta
         total_likelihood = (i) ? log_sum(total_likelihood, likelihoods[i]):likelihoods[i];
     }
 
-    if (sexp(total_likelihood)==0.0)
+    if (islzero(total_likelihood))
     {
         return false;
     }
