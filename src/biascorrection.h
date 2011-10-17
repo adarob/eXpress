@@ -63,6 +63,9 @@ public:
      */
     void increment_expected(char c); 
     
+    //FIX
+    void normalize_expected();
+    
     /**
      * a member function that increments the observed counts for the given fragment sequence by some mass (logged)
      * @param seq a string of nucleotides in the bias window for the sequenced fragment end
@@ -156,6 +159,8 @@ public:
      */
     void increment_expected(size_t l, size_t p); 
 
+    //FIX
+    void normalize_expected();
     
     /**
      * a member function that increments the observed counts for the given fragment position by some mass (logged)
@@ -244,6 +249,9 @@ public:
      * @param trans the transcript to measure expected counts from
      */
     void update_expectations(const Transcript& trans);
+    
+    //FIX
+    void normalize_expectations();
     
     /**
      * a member function that updates the observed parameters (sequence-specific and positional) 

@@ -331,7 +331,7 @@ size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TranscriptTable* 
         }
         
         // Output progress
-        if (n % 1000001 == 1)
+        if (n % 1000000 == 1)
         {
             if (output_running && (iteration == ONLY || iteration == LAST))
             {

@@ -165,6 +165,10 @@ TranscriptTable::TranscriptTable(const string& trans_fasta_file, const TransInde
             add_trans(name, seq, trans_index);
         }
         infile.close();
+        if (globs->bias_table)
+        {
+            globs->bias_table->normalize_expectations();
+        }
     }
     else 
     {

@@ -43,6 +43,9 @@ class FrequencyMatrix
      */
     size_t _N;
     
+    //FIX
+    bool _logged;
+    
 public:
     
     /**
@@ -55,8 +58,9 @@ public:
      * @param m a size_t specifying the number of distributions (rows)
      * @param n a size_t specifying the number of values in each distribution (columns)
      * @param alpha a double specifying the intial psuedo-counts (un-logged)
+     * FIX
      */   
-    FrequencyMatrix(size_t m, size_t n, double alpha);
+    FrequencyMatrix(size_t m, size_t n, double alpha, bool logged = true);
    
     /**
      * a member function to extract the logged probability of a given position in the matrix
@@ -101,6 +105,9 @@ public:
      * @return a double specifying the raw row sum for the given distribution
      */ 
     double row(size_t i) const { return _rowsums[i]; } 
+    
+    //FIX
+    void set_logged(bool logged);
 };
 
 #endif

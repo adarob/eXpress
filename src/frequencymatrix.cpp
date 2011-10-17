@@ -13,19 +13,22 @@
 
 using namespace std;
 
-FrequencyMatrix::FrequencyMatrix(size_t m, size_t n, double alpha)
-: _array(m*n, log(alpha)),
-  _rowsums(m,log(n*alpha)),
+FrequencyMatrix::FrequencyMatrix(size_t m, size_t n, double alpha, bool logged)
+: _array(m*n, logged ? log(alpha):alpha),
+   _rowsums(m, logged ? log(n*alpha):n*alpha),
   _M(m),
-  _N(n)
+  _N(n),
+  _logged(logged)
 {}
 
 
 double FrequencyMatrix::operator()(size_t i, size_t j) const
 {
     assert(i*_N+j < _M*_N);
-    //assert(!isnan(_array[i*_N+j]-_rowsums[i]));
-    return _array[i*_N+j]-_rowsums[i];
+    if (_logged)
+        return _array[i*_N+j]-_rowsums[i];
+    else
+        return _array[i*_N+j]/_rowsums[i];
 }
 
 double FrequencyMatrix::operator()(size_t k) const
@@ -37,12 +40,52 @@ double FrequencyMatrix::operator()(size_t k) const
 void FrequencyMatrix::increment(size_t i, size_t j, double incr_amt)
 {
     assert(i*_N+j < _M*_N);
-    _array[i*_N+j] = log_sum(_array[i*_N+j], incr_amt);
-    _rowsums[i] = log_sum(_rowsums[i], incr_amt);
+    if (_logged)
+    {
+        _array[i*_N+j] = log_sum(_array[i*_N+j], incr_amt);
+        _rowsums[i] = log_sum(_rowsums[i], incr_amt);
+    }
+    else
+    {
+        _array[i*_N+j] += incr_amt;
+        _rowsums[i] += incr_amt;
+    }
     assert(!isnan(_rowsums[i]) && !isinf(_rowsums[i]));
 }
 
 void FrequencyMatrix::increment(size_t k, double incr_amt)
 {
     increment(0, k, incr_amt);
+}
+
+void FrequencyMatrix::set_logged(bool logged)
+{
+    if (logged == _logged)
+        return;
+    
+    if (logged)
+    {
+        for(size_t i = 0; i < _M*_N; ++i)
+        {
+            _array[i] = log(_array[i]);
+        }
+        for(size_t i = 0; i < _M; ++i)
+        {
+            _rowsums[i] = log(_rowsums[i]);
+        }
+    }
+    else
+    {
+        for(size_t i = 0; i < _M*_N; ++i)
+        {
+            _array[i] = sexp(_array[i]);
+        }
+        for(size_t i = 0; i < _M; ++i)
+        {
+            _rowsums[i] = sexp(_rowsums[i]);
+        }
+    }
+    
+    _logged = logged;
+    
 }

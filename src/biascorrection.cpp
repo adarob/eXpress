@@ -28,7 +28,7 @@ const string PADDING = "NNNNNNNNNN";
 
 SeqWeightTable::SeqWeightTable(size_t window_size, double alpha)
 :_observed(window_size, NUM_NUCS, alpha),
- _expected(1, NUM_NUCS, 0) 
+ _expected(1, NUM_NUCS, 0, false) 
 {}
 
 void SeqWeightTable::increment_expected(char c)
@@ -37,8 +37,13 @@ void SeqWeightTable::increment_expected(char c)
     size_t index = ctoi(c);
     if (index != 4)
     {
-        _expected.increment(index, 0);
+        _expected.increment(index, 1);
     }
+}
+
+void SeqWeightTable::normalize_expected()
+{
+    _expected.set_logged(true);
 }
 
 void SeqWeightTable::increment_observed(string& seq, double normalized_mass)
@@ -122,7 +127,7 @@ void SeqWeightTable::append_output(ofstream& outfile) const
 
 PosWeightTable::PosWeightTable(const vector<size_t>& len_bins, const vector<double>& pos_bins, double alpha)
 :_observed(FrequencyMatrix(len_bins.size(), pos_bins.size(),alpha)),
- _expected(FrequencyMatrix(len_bins.size(), pos_bins.size(),0)),
+ _expected(FrequencyMatrix(len_bins.size(), pos_bins.size(),0,false)),
  _len_bins(len_bins),
  _pos_bins(pos_bins)
 {}
@@ -137,7 +142,12 @@ void PosWeightTable::increment_expected(size_t len, double pos)
 void PosWeightTable::increment_expected(size_t l, size_t p)
 {
     WriteLock lock(_lock);
-    _expected.increment(l, p, 0);
+    _expected.increment(l, p, 1);
+}
+
+void PosWeightTable::normalize_expected()
+{
+    _expected.set_logged(true);
 }
 
 void PosWeightTable::increment_observed(size_t len, double pos, double normalized_mass)
@@ -240,6 +250,14 @@ void BiasBoss::update_expectations(const Transcript& trans)
         _5_seq_bias.increment_expected(seq[i]);
         _3_seq_bias.increment_expected(seq[i]);
     }
+}
+
+void BiasBoss::normalize_expectations()
+{
+    _5_seq_bias.normalize_expected();
+    _3_seq_bias.normalize_expected();
+    _5_pos_bias.normalize_expected();
+    _3_pos_bias.normalize_expected();
 }
 
 void BiasBoss::update_observed(const FragHit& hit, double normalized_mass)
