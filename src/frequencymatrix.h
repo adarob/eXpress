@@ -15,9 +15,9 @@
  * The FrequencyMatrix class keeps track of the frequency parameters
  * in order to allow for constant-time probability look-ups and updates.
  * The table is rectangular to allow for multiple distributions to be
- * stored in one FrequencyMatrix.  Rows are distributions. All values 
- * are stored and returned in log space.
- *  @author    Adam Roberts
+ * stored in one FrequencyMatrix.  Rows are distributions. Values
+ * are in log space by default.
+ * @author    Adam Roberts
  *  @date      2011
  *  @copyright Artistic License 2.0
  **/
@@ -43,7 +43,9 @@ class FrequencyMatrix
      */
     size_t _N;
     
-    //FIX
+    /**
+     * a private bool that specifies if the table is in log space
+     */
     bool _logged;
     
 public:
@@ -58,22 +60,22 @@ public:
      * @param m a size_t specifying the number of distributions (rows)
      * @param n a size_t specifying the number of values in each distribution (columns)
      * @param alpha a double specifying the intial psuedo-counts (un-logged)
-     * FIX
+     * @param logged bool that specifies if the table is in log space
      */   
     FrequencyMatrix(size_t m, size_t n, double alpha, bool logged = true);
    
     /**
-     * a member function to extract the logged probability of a given position in the matrix
+     * a member function to extract the probability of a given position in the matrix (logged if table is logged)
      * @param i the distribution (row)
      * @param j the value (column)
-     * @return a double specifying the logged probability of the given value in the given distribution
+     * @return a double specifying the probability of the given value in the given distribution (logged if table is logged)
      */  
     double operator()(size_t i, size_t j) const;
     
     /**
-     * a member function to extract the logged probability of a given position in the flattened matrix
+     * a member function to extract the probability of a given position in the flattened matrix (logged if table is logged)
      * @param k the array position
-     * @return a double specifying the logged probability of the given position in the flattened matrix
+     * @return a double specifying the probability of the given position in the flattened matrix (logged if table is logged)
      */  
     double operator()(size_t k) const;
     
@@ -81,14 +83,14 @@ public:
      * a member function to increase the mass of a given position in the matrix
      * @param i the distribution (row)
      * @param j the value (column)
-     * @param incr_amt the logged amount to increase the mass by
+     * @param incr_amt the amount to increase the mass by (logged if table is logged)
      */ 
     void increment(size_t i, size_t j, double incr_amt);
     
     /**
-     * a member function to increase the mass of a given position in the flattened matrix
+     * a member function to increase the mass of a given position in the flattened matrix (logged if table is logged)
      * @param k the array position
-     * @param incr_amt the logged amount to increase the mass by
+     * @param incr_amt the amount to increase the mass by (logged if table is logged)
      */ 
     void increment(size_t k, double incr_amt);
     
@@ -106,7 +108,10 @@ public:
      */ 
     double row(size_t i) const { return _rowsums[i]; } 
     
-    //FIX
+    /**
+     * a member function that converts the table between log-space and non-log space
+     * @param logged bool specifying if the table should be converted to logged or non-logged space
+     */ 
     void set_logged(bool logged);
 };
 

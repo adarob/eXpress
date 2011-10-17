@@ -135,7 +135,11 @@ TranscriptTable::TranscriptTable(const string& trans_fasta_file, const TransInde
   _trans_map(trans_index.size(), NULL),
   _alpha(alpha)
 {
-    cout << "Loading target sequences from " << trans_fasta_file << "...\n\n";
+    cout << "Loading target sequences"
+    if (globs->bias_table)
+        cout << " and measuring bias background";
+    cout << "...\n\n";
+    
     ifstream infile (trans_fasta_file.c_str());
     string line;
     string seq = "";

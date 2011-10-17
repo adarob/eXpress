@@ -63,7 +63,9 @@ public:
      */
     void increment_expected(char c); 
     
-    //FIX
+    /**
+     * a member function that normalizes the expected counts and converts them to the log scale
+     */
     void normalize_expected();
     
     /**
@@ -159,7 +161,9 @@ public:
      */
     void increment_expected(size_t l, size_t p); 
 
-    //FIX
+    /**
+     * a member function that normalizes the expected counts and converts them to the log scale
+     */
     void normalize_expected();
     
     /**
@@ -250,7 +254,9 @@ public:
      */
     void update_expectations(const Transcript& trans);
     
-    //FIX
+    /**
+     * a member function that normalizes the expected counts and converts them to the log scale
+     */
     void normalize_expectations();
     
     /**

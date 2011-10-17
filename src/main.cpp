@@ -6,12 +6,6 @@
 //  Copyright 2011 Adam Roberts. All rights reserved.
 //
 
-//TODO: Use Bundle objects
-//TODO: Use SAM/BAM indices
-//TODO: Switch to compressed_matrix for covars
-//TODO: Add additional EM step
-//TODO: Speed up bias initialization (using non-logged values)
-
 #include <boost/filesystem.hpp>
 #include <boost/program_options.hpp>
 #include <boost/thread.hpp>
@@ -238,8 +232,6 @@ void process_fragment(double mass_n, Fragment* frag_p, TranscriptTable* trans_ta
         
         m.probability = sexp(p);
         
-        if (m.probability == 0)
-            continue;
         assert(!isinf(m.probability));
         
         // update parameters
