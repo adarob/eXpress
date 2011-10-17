@@ -42,7 +42,6 @@ Transcript::Transcript(const TransID id, const std::string& name, const std::str
 
 void Transcript::add_mass(double p, double mass) 
 { 
-    assert(sexp(p) != 0);
     _mass = log_sum(_mass, p+mass);
     _tot_counts++;
     if (p != 0.0)
@@ -135,7 +134,7 @@ TranscriptTable::TranscriptTable(const string& trans_fasta_file, const TransInde
   _trans_map(trans_index.size(), NULL),
   _alpha(alpha)
 {
-    cout << "Loading target sequences"
+    cout << "Loading target sequences";
     if (globs->bias_table)
         cout << " and measuring bias background";
     cout << "...\n\n";
