@@ -247,7 +247,7 @@ bool process_fragment(double mass_n, Fragment* frag_p, TranscriptTable* trans_ta
     
     // merge bundles
     Bundle* bundle = frag.hits()[0]->mapped_trans->bundle();
-    if (iteration != LAST)
+    if (iteration != FIRST)
     {
         bundle->incr_counts();
     }
@@ -331,6 +331,7 @@ size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TranscriptTable* 
     boost::thread* bias_update = NULL;
     
     size_t n = 1;
+    size_t all_n = 1;
     double mass_n = 0;
     Fragment* frag;
     cout << setiosflags(ios::left);
@@ -355,7 +356,7 @@ size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TranscriptTable* 
             break;
         }
                 
-        if (n == burn_in)
+        if (iteration != LAST && n == burn_in)
         {
             bias_update = new boost::thread(&TranscriptTable::threaded_bias_update, trans_table);
             if (globs.mismatch_table)
@@ -363,7 +364,7 @@ size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TranscriptTable* 
         }
         
         // Output progress
-        if (n % 1000000 == 1)
+        if (all_n % 1000000 == 1)
         {
             if (output_running && (iteration == ONLY || iteration == LAST))
             {
@@ -398,6 +399,7 @@ size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TranscriptTable* 
             }
         }
         
+        all_n += 1;
         if (process_fragment(mass_n, frag, trans_table, globs))
         {
             n += 1;
@@ -417,7 +419,7 @@ size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TranscriptTable* 
     if (vis)
         cout << "99\n";
     else
-        cout << "COMPLETED: Processed " << n << " fragments, targets are in " << trans_table->num_bundles() << " bundles\n";
+        cout << "COMPLETED: Processed " << all_n-1 << " mapped fragments, targets are in " << trans_table->num_bundles() << " bundles\n";
     
     parse.join();
     if (bias_update)
