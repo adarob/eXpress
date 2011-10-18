@@ -197,7 +197,7 @@ void process_fragment(double mass_n, Fragment* frag_p, TranscriptTable* trans_ta
     
     // calculate marginal likelihoods
     vector<double> likelihoods(frag.num_hits());
-    double total_likelihood = 0.0;
+    double total_likelihood = HUGE_VAL;
     for(size_t i = 0; i < frag.num_hits(); ++i)
     {
         const FragHit& m = *frag.hits()[i];
@@ -237,7 +237,7 @@ void process_fragment(double mass_n, Fragment* frag_p, TranscriptTable* trans_ta
         // update parameters
         if (iteration != LAST)
         {
-            if (i==0 && frag.num_hits()==1)
+            if (frag.num_hits()==1)
                 t->incr_uniq_counts();
 
             t->add_mass(p, mass_n);

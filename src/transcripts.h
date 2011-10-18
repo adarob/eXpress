@@ -118,11 +118,6 @@ class Transcript
     double _avg_bias;
     
     /**
-     * a private double storing the (non-logged) initial effective length of the transcript (based on the prior FLD), ignoring bias
-     */
-    double _ub_eff_len;
-    
-    /**
      * a private double storing the most recently updated (logged) effective length as calculated by the bias updater thread
      */
     double _cached_eff_len;
@@ -173,7 +168,7 @@ public:
      */
     double mass_var() const { return _mass_var; }
     
-    //DOC
+    //FIX
     double est_counts() const { return _est_counts; }
         
     double est_counts_var() const { return _est_counts_var; }
@@ -209,7 +204,7 @@ public:
      */
     void add_mass(double p, double mass);
     
-    // DOC
+    // FIX
     void add_prob_count(double p);
 
     /**
@@ -231,19 +226,19 @@ public:
 
     
     /**
-     * a member function that calcualtes and returns the effective length of the transcript (non-logged)
+     * a member function that calcualtes and returns the effective length of the transcript (logged)
      * @return the effective length of the transcript calculated as \f$ \tilde{l} = \sum_{l=1}^{L(t)}\sum_{i=1}^{L(t)} D(l)b_5[i]*b_3[i+l] \f$
      */
     double effective_length() const;
     
     /**
-     * a member function that calcualtes and returns the estimated effective length of the transcript (non-logged) using the avg bias
+     * a member function that calcualtes and returns the estimated effective length of the transcript (logged) using the avg bias
      * @return the estimated effective length of the transcript calculated as \f$ \tilde{l} = \bar{bias}\sum_{l=1}^{L(t)} D(l)(L(t) - l + 1) \f$
      */
     double est_effective_length() const;
     
     /**
-     * a member function that returns the most recently estimated effective length as calculated by the bias updater thread 
+     * a member function that returns the most recently estimated effective length (logged) as calculated by the bias updater thread 
      * @return the cached effective length of the transcript calculated
      */
     double cached_effective_length() const;

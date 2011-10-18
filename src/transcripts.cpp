@@ -35,9 +35,8 @@ Transcript::Transcript(const TransID id, const std::string& name, const std::str
     _end_bias(std::vector<double>(seq.length(),0)),
     _avg_bias(0)
 {   
-    _ub_eff_len = est_effective_length();
-    _cached_eff_len = log(est_effective_length());
-    _mass = log(_ub_eff_len*alpha); 
+    _cached_eff_len = est_effective_length();
+    _mass = _cached_eff_len+log(alpha); 
 }
 
 void Transcript::add_mass(double p, double mass) 
@@ -83,15 +82,15 @@ double Transcript::log_likelihood(const FragHit& frag) const
 
 double Transcript::est_effective_length() const
 {
-    double eff_len = 0.0;
+    double eff_len = HUGE_VAL;
     
     for(size_t l = 1; l <= min(length(), (_globs->fld)->max_val()); l++)
     {
-        eff_len += sexp((_globs->fld)->pdf(l))*(length()-l+1);
+        eff_len = log_sum(eff_len, (_globs->fld)->pdf(l)+log(length()-l+1));
     }
     
     boost::mutex::scoped_lock lock(_bias_lock);
-    eff_len *= sexp(_avg_bias);
+    eff_len += _avg_bias;
     return eff_len;
 }
 
