@@ -109,9 +109,9 @@ double Transcript::effective_length() const
         double len_bias = 0;
         for (size_t i = 0; i < length()-l+1; i++)
         {
-            len_bias += sexp(_start_bias[i] + _end_bias[i+l]);
+            len_bias = log_sum(len_bias, _start_bias[i] + _end_bias[i+l]);
         }
-        eff_len += sexp((_globs->fld)->pdf(l))*len_bias;
+        eff_len += log_sum(eff_len, (_globs->fld)->pdf(l) + len_bias);
     }
     
     return eff_len;
@@ -401,7 +401,7 @@ void TranscriptTable::output_results(string output_dir, size_t tot_counts, bool 
             for (size_t i = 0; i < bundle_trans.size(); ++i)
             {
                 Transcript& trans = *bundle_trans[i];
-                double eff_len = trans.est_effective_length();
+                double eff_len = sexp(trans.est_effective_length());
 
                 double count_var = (multi_iteration) ? trans.est_counts_var():min(sexp(trans.mass_var() + l_var_renorm), 0.25*trans.tot_counts());
                 double eff_count_norm = (double)trans.length()/eff_len;
@@ -438,7 +438,7 @@ void TranscriptTable::output_results(string output_dir, size_t tot_counts, bool 
             for (size_t i = 0; i < bundle_trans.size(); ++i)
             {
                 Transcript& trans = *bundle_trans[i];
-                fprintf(expr_file, "" SIZE_T_FMT "\t%s\t" SIZE_T_FMT "\t%f\t%d\t%d\t%f\t%f\t%f\t%f\t%f\t%f\t%f\n", bundle_id, trans.name().c_str(), trans.length(), trans.est_effective_length(), 0, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+                fprintf(expr_file, "" SIZE_T_FMT "\t%s\t" SIZE_T_FMT "\t%f\t%d\t%d\t%f\t%f\t%f\t%f\t%f\t%f\t%f\n", bundle_id, trans.name().c_str(), trans.length(), sexp(trans.est_effective_length()), 0, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
                 
                 if (output_varcov)
                 {
