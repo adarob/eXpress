@@ -87,7 +87,7 @@ double Transcript::est_effective_length() const
     
     for(size_t l = 1; l <= min(length(), (_globs->fld)->max_val()); l++)
     {
-        eff_len = log_sum(eff_len, (_globs->fld)->pdf(l)+log(length()-l+1));
+        eff_len = log_sum(eff_len, (_globs->fld)->pdf(l)+log((double)length()-l+1));
     }
     
     boost::mutex::scoped_lock lock(_bias_lock);
