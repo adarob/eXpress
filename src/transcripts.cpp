@@ -37,6 +37,7 @@ Transcript::Transcript(const TransID id, const std::string& name, const std::str
 {   
     _cached_eff_len = est_effective_length();
     _mass = _cached_eff_len+log(alpha); 
+    assert(!islzero(_mass));
 }
 
 void Transcript::add_mass(double p, double mass) 
@@ -61,7 +62,7 @@ double Transcript::log_likelihood(const FragHit& frag) const
     double ll = mass();
     if (_globs->mismatch_table)
         ll += (_globs->mismatch_table)->log_likelihood(frag);
-
+    
     const PairStatus ps = frag.pair_status();
     {
         boost::mutex::scoped_lock lock(_bias_lock);
@@ -128,9 +129,10 @@ void Transcript::update_transcript_bias()
     _cached_eff_len = est_effective_length();
 }
 
-TranscriptTable::TranscriptTable(const string& trans_fasta_file, const TransIndex& trans_index, double alpha, const Globals* globs)
+TranscriptTable::TranscriptTable(const string& trans_fasta_file, const TransIndex& trans_index, bool single_round, double alpha, const Globals* globs)
 : _globs(globs),
   _trans_map(trans_index.size(), NULL),
+  _single_round(single_round),
   _alpha(alpha)
 {
     cout << "Loading target sequences";
@@ -223,33 +225,6 @@ Transcript* TranscriptTable::get_trans(TransID id)
     return _trans_map[id];
 }
 
-void TranscriptTable::update_covar(TransID trans1, TransID trans2, double covar)
-{
-    size_t pair_id = size()*min(trans1, trans2)+max(trans1, trans2);
-    if (_covar_map.count(pair_id))
-    {
-        _covar_map[pair_id] = log_sum(covar, _covar_map[pair_id]);
-    }
-    else
-    {
-        _covar_map[pair_id] = covar;
-    }
-}
-
-double TranscriptTable::get_covar(TransID trans1, TransID trans2)
-{
-    size_t pair_id = size()*min(trans1, trans2)+max(trans1, trans2);
-    if (_covar_map.count(pair_id))
-    {
-        return _covar_map[pair_id];
-    }
-    else
-    {
-        return HUGE_VAL;
-    }
-}
-
-
 Bundle* TranscriptTable::merge_bundles(Bundle* b1, Bundle* b2)
 {
     if (b1 != b2)
@@ -335,8 +310,10 @@ void project_to_polytope(vector<Transcript*> bundle_trans, vector<double>& trans
     }
 }
 
-void TranscriptTable::output_results(string output_dir, size_t tot_counts, bool output_varcov, bool multi_iteration)
+void TranscriptTable::output_results(string output_dir, size_t tot_counts, bool output_varcov)
 {
+    bool multi_iteration = !_single_round;
+ 
     FILE * expr_file = fopen((output_dir + "/results.xprs").c_str(), "w");
     ofstream varcov_file;
     if (output_varcov)
@@ -424,7 +401,7 @@ void TranscriptTable::output_results(string output_dir, size_t tot_counts, bool 
                         if (i==j)
                             varcov_file << scientific << count_var;
                         else if (multi_iteration)
-                            varcov_file << scientific << -get_covar(trans.id(), bundle_trans[j]->id());
+                            varcov_file << scientific << -sexp(get_covar(trans.id(), bundle_trans[j]->id()));
                         else
                             varcov_file << scientific << -sexp(get_covar(trans.id(), bundle_trans[j]->id()) + l_var_renorm);
                            

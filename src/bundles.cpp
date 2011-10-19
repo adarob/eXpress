@@ -12,6 +12,33 @@
 
 using namespace std;
 
+void CovarTable::increment(TransID trans1, TransID trans2, double incr_amt)
+{
+    size_t pair_id = size()*min(trans1, trans2)+max(trans1, trans2);
+    if (_covar_map.count(pair_id))
+    {
+            _covar_map[pair_id] = log_sum(_covar_map[pair_id], incr_amt);
+    }
+    else
+    {
+        _covar_map[pair_id] = incr_amt;
+    }
+}
+
+
+double CovarTable::get(TransID trans1, TransID trans2)
+{
+    size_t pair_id = size()*min(trans1, trans2)+max(trans1, trans2);
+    if (_covar_map.count(pair_id))
+    {
+        return _covar_map[pair_id];
+    }
+    else
+    {
+        return HUGE_VAL;
+    }
+}
+
 Bundle::Bundle(Transcript* trans)
 : _counts(trans->tot_counts())
 { _transcripts.push_back(trans); }

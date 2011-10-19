@@ -14,6 +14,46 @@
 #include <boost/unordered_map.hpp>
 
 class Transcript;
+typedef size_t TransID;
+typedef boost::unordered_map<size_t, double> CovarMap;
+
+//FIX
+class CovarTable
+{
+    /**
+     * a private map to look up the covariance for pairs of Transcripts by their combined hashed TransIDs
+     * these values are stored positive and logged, even though they are negative
+     */
+    CovarMap _covar_map;
+
+public:
+    
+    CovarTable() {};
+    
+    /**
+     * a member function that increases the covariance between two transcripts by the specified amount (logged)
+     * these values are stored positive even though they are negative
+     * @param trans1 one of the transcripts in the pair
+     * @param trans2 the other transcript in the pair
+     * @param covar a double specifying the amount to increase the pair's covariance by (logged)
+     */
+    void increment(TransID trans1, TransID trans2, double covar);
+    
+    /**
+     * a member function that returns the covariance between two transcripts
+     * these returned value will be the the negative of the true value (logged)
+     * @param trans1 one of the transcripts in the pair
+     * @param trans2 the other transcript in the pair
+     * @return the negative of the pair's covariance (logged)
+     */
+    double get(TransID trans1, TransID trans2);
+    
+    /**
+     * a member function that returns the number of pairs of transcripts with non-zero covariance
+     * @return the number of transcript pairs with non-zero covariance
+     */
+    size_t size() const { return _covar_map.size(); }
+};
 
 /** 
  * The Bundle class keeps track of a group of transcripts that have shared ambiguous (multi-mapped)

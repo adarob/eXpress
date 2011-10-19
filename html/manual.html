@@ -308,28 +308,28 @@
 	  
       <h2 id="covar">Count Variance-Covariance (varcov.xprs)</h2>
       <p>This file is produced only when the <tt>--calc-covars</tt> option flag is used as described <a href="#running">above</a>.  The file contains the estimated variances and covariances on the counts between pairs of targets that shared multi-mapped reads, primarily to be used in differential expression analysis.  Since the covariance between targets in different bundles is always 0, the full sparse matrix is broken up into smaller tab-delimited matrices for each bundle.  An example of this output for the sample dataset used in the <a href=tutorial.html#example>Getting Starting</a> tutorial is shown below:</p>
- 	  <ol><li><pre class="output"><code>>1: NM_018953, NM_153633, NM_153693, NR_003084, NM_014620, NM_004503
-2.021010e+01	-0.000000e+00	-0.000000e+00	-2.021010e+01	-0.000000e+00	-0.000000e+00
--0.000000e+00	2.862072e+02	-0.000000e+00	-0.000000e+00	-2.862072e+02	-0.000000e+00
--0.000000e+00	-0.000000e+00	9.592328e+01	-1.257430e+00	-2.109273e+01	-7.357312e+01
--2.021010e+01	-0.000000e+00	-1.257430e+00	2.929937e+01	-7.831844e+00	-0.000000e+00
--0.000000e+00	-2.862072e+02	-2.109273e+01	-7.831844e+00	3.151318e+02	-0.000000e+00
--0.000000e+00	-0.000000e+00	-7.357312e+01	-0.000000e+00	-0.000000e+00	7.357312e+01
->2: NM_006897
+ 	  <ol><li><pre class="output"><code>>>1: NM_014212
 0.000000e+00
->3: NM_017410
+>2: NM_001168316, NM_174914, NR_031764
+3.234847e+02	-2.570762e+02	-6.640854e+01
+-2.570762e+02	4.082292e+02	-0.000000e+00
+-6.640854e+01	-0.000000e+00	2.175616e+02
+>3: NM_022658
 0.000000e+00
->4: NR_031764, NM_001168316, NM_174914
-3.388948e+02	-1.057088e+02	-2.331861e+02
--1.057088e+02	5.047717e+02	-3.990630e+02
--2.331861e+02	-3.990630e+02	6.322490e+02
->5: NM_022658
+>4: NM_173860
 0.000000e+00
->6: NM_173860
+>5: NM_014620, NM_153693, NR_003084, NM_153633, NM_018953, NM_004503
+2.067753e+02	-0.000000e+00	-0.000000e+00	-0.000000e+00	-0.000000e+00	-0.000000e+00
+-0.000000e+00	6.035824e+01	-0.000000e+00	-0.000000e+00	-0.000000e+00	-0.000000e+00
+-0.000000e+00	-0.000000e+00	1.731434e+01	-0.000000e+00	-0.000000e+00	-0.000000e+00
+-0.000000e+00	-0.000000e+00	-0.000000e+00	1.879961e+02	-0.000000e+00	-2.499948e-01
+-0.000000e+00	-0.000000e+00	-0.000000e+00	-0.000000e+00	1.149211e+01	-0.000000e+00
+-0.000000e+00	-0.000000e+00	-0.000000e+00	-2.499948e-01	-0.000000e+00	4.581855e+01
+>6: NM_017409
 0.000000e+00
->7: NM_017409
+>7: NM_017410
 0.000000e+00
->8: NM_014212
+>8: NM_006897
 0.000000e+00</code></pre></li></ol>
       <p>Each bundle's matrix is headed by an identifier line that begins with a greater than symbol (>) followed by the bundle id and a comma-separated list of targets in the bundle.  The ordering of this list provides the indices for the matrix that is to follow.  For example, in bundle 1 of the output above, the fifth value in the second row (-2.862072e+02) is the covariance between NM_153633 and NM_014620. Notice that an identical value is also in the second column of the fifth row, as the variance-covariance matrix will always be symmetric.</p>
 	  <p>See the <a href="overview.html#methods">Methods</a> for more details on how these values are calculated.</p> 

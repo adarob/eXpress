@@ -192,20 +192,26 @@ void process_fragment(double mass_n, Fragment* frag_p, TranscriptTable* trans_ta
     Fragment& frag = *frag_p;
     
     assert(frag.num_hits());
-    
-    // hits to multiple locations
-    
+        
     // calculate marginal likelihoods
-    vector<double> likelihoods(frag.num_hits());
+    vector<double> likelihoods(frag.num_hits(),0);
     double total_likelihood = HUGE_VAL;
-    for(size_t i = 0; i < frag.num_hits(); ++i)
+    
+    if (frag.num_hits()>1)
     {
-        const FragHit& m = *frag.hits()[i];
-        Transcript* t = m.mapped_trans;
-        likelihoods[i] = t->log_likelihood(m);
-        total_likelihood = (i) ? log_sum(total_likelihood, likelihoods[i]):likelihoods[i];
+        for(size_t i = 0; i < frag.num_hits(); ++i)
+        {
+            const FragHit& m = *frag.hits()[i];
+            Transcript* t = m.mapped_trans;
+            likelihoods[i] = t->log_likelihood(m);
+            total_likelihood = log_sum(total_likelihood, likelihoods[i]);
+        }
     }
-
+    else
+    {
+        total_likelihood = likelihoods[0];
+    }
+    
     assert(!islzero(total_likelihood));
     
     // merge bundles
@@ -214,7 +220,6 @@ void process_fragment(double mass_n, Fragment* frag_p, TranscriptTable* trans_ta
     {
         bundle->incr_counts();
     }
-    
     for(size_t i = 1; i < frag.num_hits(); ++i)
     {
         bundle = trans_table->merge_bundles(bundle, frag.hits()[i]->mapped_trans->bundle());
@@ -336,7 +341,7 @@ size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TranscriptTable* 
                     cerr << e.what() << endl;
                     exit(1);
                 }
-                trans_table->output_results(dir, n-1, false, iteration==LAST);
+                trans_table->output_results(dir, n-1, false);
                 ofstream paramfile((dir + "/params.xprs").c_str());
                 (globs.fld)->append_output(paramfile);
                 if (globs.mismatch_table)
@@ -412,7 +417,7 @@ int main (int argc, char ** argv)
     globs.bias_table = (bias_correct) ? new BiasBoss(bias_alpha):NULL;
     globs.mismatch_table = (error_model) ? new MismatchTable(mm_alpha):NULL;
     ThreadedMapParser map_parser(in_map_file_name, out_map_file_name, iteration==ONLY);
-    TranscriptTable trans_table(fasta_file_name, map_parser.trans_index(), expr_alpha, &globs);
+    TranscriptTable trans_table(fasta_file_name, map_parser.trans_index(), iteration==ONLY, expr_alpha, &globs);
 
     double num_trans = (double)map_parser.trans_index().size();
     
@@ -435,7 +440,7 @@ int main (int argc, char ** argv)
     
 	cout << "Writing results to file...\n";
     
-    trans_table.output_results(output_dir, tot_counts, calc_covar, iteration!=ONLY);
+    trans_table.output_results(output_dir, tot_counts, calc_covar);
     ofstream paramfile((output_dir + "/params.xprs").c_str());
     (globs.fld)->append_output(paramfile);
     if (globs.mismatch_table)

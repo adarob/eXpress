@@ -254,7 +254,7 @@
 		  <p>Before you begin, you must prepare your Bowtie index. Since you wish to allow many multi-mappings, it is useful to build the index with a small offrate (in this case 1).  The smaller the offrate, the larger the index and the faster the mapping.  If you have disk space to spare, always use an offrate of 1. Build the index with the following commands.</p>
 		  <ol><li><pre class="sc"><code>$ cd &lt;YOUR_EXPRESS_DIR&gt;/sample_data <br />$ bowtie-build --offrate 1 transcripts.fasta transcripts</code></pre></li></ol>
 		  <p>This command will populate your directory with several index files that allow Bowtie to more easily align reads to the transcripts.</p>
-		  <p>You can now map the reads to the transcript sequences using the following Bowtie command, which outputs in SAM (<code>-S</code>), allows for unlimited multi-mappings (<code>-a</code>), a maximum insert distance of 800 bp between the paired-ends (<code>-X 800</code>), and 3 mismatches (<code>-v 3</code>). The first three options (<code>a,S,X</code>) are highly recommended for best results.  You should also allow for many mismatches, since eXpress models sequencing errors.  The SAM output from Bowtie is piped into SAMtools in order to compress it to BAM format.  This conversion is optional.
+		  <p>You can now map the reads to the transcript sequences using the following Bowtie command, which outputs in SAM (<code>-S</code>), allows for unlimited multi-mappings (<code>-a</code>), a maximum insert distance of 800 bp between the paired-ends (<code>-X 800</code>), and 3 mismatches (<code>-v 3</code>). The first three options (<code>a,S,X</code>) are highly recommended for best results.  You should also allow for many mismatches, since eXpress models sequencing errors.  Furthermore, you will want to take advantage of multiple processors when mapping large files using the <tt>-p</tt> option.  See the <a href=http://bowtie-bio.sourceforge.net/manual.shtml>Bowtie Manual</a> for more details on various parameters and options.  <br><br>The SAM output from Bowtie is piped into SAMtools in order to compress it to BAM format.  This conversion is optional, but will greatly reduce the size of the alignment file.
 		  <ol><li><pre class="sc"><code>$ bowtie -aS -X 800 --offrate 1 -v 3 transcripts -1 reads_1.fastq -2 reads_2.fastq | samtools view -Sb - > hits.bam </code></pre></li></ol></p>
 		  <h2 id="fromfile">Input from SAM/BAM file</h2>
 		  <p>Once you have aligned your reads to the transcriptome and stored them in a SAM or BAM file, you can run eXpress in default mode with the command:
@@ -271,21 +271,21 @@
    		  <ol><li><pre class="sc"><code>$ more results.xprs</code></pre></li></ol></p>
    		  <p>Your results should look identical to this:</p>
    		  <ol><li><pre class="output"><code>bundle_id	target_id	length	eff_length	tot_counts	uniq_counts	post_count_mean	post_count_var	eff_count_mean	eff_count_var	fpkm	fpkm_conf_low	fpkm_conf_high
-1	NM_018953	1612	1435.345862	228	91	210.676950	20.210096	236.605861	25.490910	14677.782957	12560.527707	16795.038207
-1	NM_153633	1666	1489.345862	762	10	385.490714	190.500000	431.214499	238.371236	25883.223229	22660.357788	29106.088670
-1	NM_153693	2072	1895.345862	481	5	78.139173	95.923278	85.422069	114.637464	4122.686743	2730.510974	5514.862512
-1	NR_003084	1640	1463.345862	266	0	21.453309	29.299371	24.043138	36.800356	1466.045028	492.373431	2439.716626
-1	NM_014620	2300	2123.345862	958	77	558.763369	239.500000	605.250314	281.008664	26315.231038	23654.001373	28976.460703
-1	NM_004503	1681	1504.345862	384	37	330.476484	73.573120	369.284075	91.866931	21968.118688	19295.729889	24640.507487
-2	NM_006897	1541	1364.345862	664	664	664.000000	0.000000	749.974056	0.000000	48668.011426	44890.641161	52445.381692
-3	NM_017410	2396	2219.345862	42	42	42.000000	0.000000	45.343090	0.000000	1892.449515	1308.426915	2476.472115
-4	NR_031764	1853	1676.345862	1244	7	312.021225	311.000000	344.902172	380.000330	18613.177134	15635.224471	21591.129797
-4	NM_001168316	2283	2106.345862	1546	11	511.698937	386.500000	554.613891	454.048195	24293.205911	21447.522513	27138.889310
-4	NM_174914	2385	2208.345862	1737	37	940.279838	434.250000	1015.496464	506.503453	42578.468077	39220.782774	45936.153380
-5	NM_022658	2288	2111.345862	4881	4881	4881.000000	0.000000	5289.388253	0.000000	231179.556505	224561.583092	237797.529917
-6	NM_173860	849	672.345862	962	962	962.000000	0.000000	1214.758722	0.000000	143081.121548	133854.880533	152307.362562
-7	NM_017409	1959	1782.345862	47	47	47.000000	0.000000	51.658324	0.000000	2636.974170	1867.689740	3406.258600
-8	NM_014212	2037	1860.345862	55	55	55.000000	0.000000	60.222673	0.000000	2956.439505	2159.147062	3753.731949
+1	NM_014212	2037	1860.344811	55	55	55.000000	0.000000	60.222707	0.000000	2956.441176	2159.148282	3753.734070
+2	NM_001168316	2283	2106.344801	1553	11	490.464379	323.484694	531.598709	380.020153	23285.094562	20576.156053	25994.033070
+2	NM_174914	2385	2208.344796	1746	37	972.339885	408.229227	1050.121625	476.153627	44030.256810	40665.201633	47395.311987
+2	NR_031764	1853	1676.344818	1244	7	301.195736	217.561604	332.936096	265.831461	17967.409393	15250.039453	20684.779334
+3	NM_022658	2288	2111.344800	4881	4881	4881.000000	0.000000	5289.390912	0.000000	231179.672749	224561.696008	237797.649489
+4	NM_173860	849	672.344859	962	962	962.000000	0.000000	1214.760534	0.000000	143081.334934	133855.080160	152307.589708
+5	NM_014620	2300	2123.344800	958	77	557.465287	206.775338	603.844539	242.612608	26254.110375	23650.208989	28858.011762
+5	NM_153693	2072	1895.344809	481	5	76.024964	60.358241	83.110854	72.133934	4011.141613	2778.825258	5243.457969
+5	NR_003084	1640	1463.344827	266	0	18.774253	17.314338	21.040684	21.747043	1282.968511	461.921014	2104.016007
+5	NM_153633	1666	1489.344826	762	10	387.720723	187.996063	433.709315	235.238405	26032.972100	22810.870870	29255.073330
+5	NM_018953	1612	1435.344828	228	91	215.337538	11.492112	241.840221	14.494974	15002.495114	12903.924157	17101.066072
+5	NM_004503	1681	1504.344825	384	37	329.677234	45.818550	368.391224	57.211321	21915.004374	19338.771416	24491.237332
+6	NM_017409	1959	1782.344814	47	47	47.000000	0.000000	51.658354	0.000000	2636.975721	1867.690839	3406.260603
+7	NM_017410	2396	2219.344796	42	42	42.000000	0.000000	45.343112	0.000000	1892.450424	1308.427544	2476.473304
+8	NM_006897	1541	1364.344831	664	664	664.000000	0.000000	749.974623	0.000000	48668.048205	44890.675085	52445.421325
 </code></pre></li></ol>
    		  <p>While it may be difficult to read in your
         terminal, opening the file with R or Excel should help you to

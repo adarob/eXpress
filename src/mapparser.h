@@ -288,12 +288,21 @@ struct ParseThreadSafety
     Fragment* next_frag;
     
     /**
-     * FIX
+     * a mutex for the conditional variable
      */
     boost::mutex mut;
     
+    /**
+     * a conditional variable where the processor waits for a new Fragment and the parser waits
+     * for the Fragment pointer to be copied by the processor
+     */
     boost::condition_variable cond;
     
+    
+    /**
+     * a bool specifying the condition that the current next_frag pointer is clean, meaning that it
+     * hasn't been copied by the processor
+     */
     bool frag_clean;
     
     ParseThreadSafety() : next_frag(NULL), frag_clean(false) {}
