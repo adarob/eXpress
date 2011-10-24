@@ -343,26 +343,6 @@ size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TranscriptTable* 
         // Output progress
         if (n % 1000000 == 1)
         {
-            if (output_running && last_round)
-            {
-                char buff[500];
-                sprintf(buff, "%s/x_" SIZE_T_FMT "", output_dir.c_str(), n-1);
-                string dir(buff);
-                try { fs::create_directories(dir); }
-                catch (fs::filesystem_error& e)
-                {
-                    cerr << e.what() << endl;
-                    exit(1);
-                }
-                trans_table->output_results(dir, n-1, false);
-                ofstream paramfile((dir + "/params.xprs").c_str());
-                (globs.fld)->append_output(paramfile);
-                if (globs.mismatch_table)
-                    (globs.mismatch_table)->append_output(paramfile);
-                if (globs.bias_table)
-                    (globs.bias_table)->append_output(paramfile);
-                paramfile.close();
-            }
             if (vis)
             {
                 cout << "0 " << (globs.fld)->to_string() << '\n';
@@ -448,7 +428,7 @@ int main (int argc, char ** argv)
     first_round = false;
     while (!last_round)
     {
-        if (batch_mode)
+        if (output_running)
         {
             char buff[500];
             sprintf(buff, "%s/x_" SIZE_T_FMT "", output_dir.c_str(), remaining_rounds);
