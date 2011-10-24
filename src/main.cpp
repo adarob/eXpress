@@ -77,6 +77,7 @@ bool running = true;
 // used for multiple rounds of EM
 bool first_round = true;
 bool last_round = true;
+bool batch_mode = false;
 size_t remaining_rounds = 0;
 
 bool parse_options(int ac, char ** av)
@@ -102,6 +103,7 @@ bool parse_options(int ac, char ** av)
     ("single-round", "")
     ("visualizer-output,v","")
     ("output-running", "")
+    ("batch-mode","")
     ("forget-param,f", po::value<double>(&ff_param)->default_value(0.9),"")
     ("stop-at", po::value<size_t>(&stop_at)->default_value(0),"")
     ("sam-file", po::value<string>(&in_map_file_name)->default_value(""),"")
@@ -168,6 +170,7 @@ bool parse_options(int ac, char ** av)
     error_model = !(vm.count("no-error-model"));
     vis = vm.count("visualizer-output");
     output_running = vm.count("output-running");
+    batch_mode = vm.count("batch-mode");
     
     if (remaining_rounds > 0 && in_map_file_name != "")
         last_round = false;
@@ -251,8 +254,11 @@ void process_fragment(double mass_n, Fragment* frag_p, TranscriptTable* trans_ta
         {
             if (frag.num_hits()==1)
                 t->incr_uniq_counts();
-
-            t->add_mass(p, mass_n);
+            
+            if (batch_mode)
+                t->add_prob_count(p);
+            else
+                t->add_mass(p, mass_n);
             
             if (m.pair_status() == PAIRED)
                 (globs.fld)->add_val(m.length(), mass_t);
@@ -435,9 +441,26 @@ int main (int argc, char ** argv)
     }
     
     size_t tot_counts = threaded_calc_abundances(map_parser, &trans_table, globs);
+    
+    if (batch_mode)
+        trans_table.round_reset();
+  
     first_round = false;
     while (!last_round)
     {
+        if (batch_mode)
+        {
+            char buff[500];
+            sprintf(buff, "%s/x_" SIZE_T_FMT "", output_dir.c_str(), remaining_rounds);
+            string dir(buff);
+            try { fs::create_directories(dir); }
+            catch (fs::filesystem_error& e)
+            {
+                cerr << e.what() << endl;
+                exit(1);
+            }
+            trans_table.output_results(dir, tot_counts, false);
+        }
         remaining_rounds--;
         cout << "\nRe-estimating counts with additional round of EM (" << remaining_rounds << " remaining)...\n";
         last_round = (remaining_rounds == 0);
