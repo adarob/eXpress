@@ -95,6 +95,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 Public Member Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_bias_boss.html#a052e534308afcc766eb417b6656cdd39">BiasBoss</a> (double alpha)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_bias_boss.html#a0be8a21ce7edf3206111bf3e8d04910e">update_expectations</a> (const <a class="el" href="class_transcript.html">Transcript</a> &amp;trans)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_bias_boss.html#a59aa886bbdf042aba90348b5fc89020c">normalize_expectations</a> ()</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_bias_boss.html#a4a3d5e083c77d567db176d45339de79c">update_observed</a> (const <a class="el" href="struct_frag_hit.html">FragHit</a> &amp;hit, double mass)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_bias_boss.html#af215929f1bb48658260104af729c7bfa">get_transcript_bias</a> (std::vector&lt; double &gt; &amp;start_bias, std::vector&lt; double &gt; &amp;end_bias, const <a class="el" href="class_transcript.html">Transcript</a> &amp;trans) const </td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_bias_boss.html#a849af7bee4868e29367aa4a3e47262a0">to_string</a> () const </td></tr>
@@ -105,7 +106,7 @@ Public Member Functions</h2></td></tr>
 <dl class="author"><dt><b>Author:</b></dt><dd>Adam Roberts </dd></dl>
 <dl class="date"><dt><b>Date:</b></dt><dd>2011  Artistic License 2.0 </dd></dl>
 
-<p>Definition at line <a class="el" href="biascorrection_8h_source.html#l00208">208</a> of file <a class="el" href="biascorrection_8h_source.html">biascorrection.h</a>.</p>
+<p>Definition at line <a class="el" href="biascorrection_8h_source.html#l00220">220</a> of file <a class="el" href="biascorrection_8h_source.html">biascorrection.h</a>.</p>
 </div><hr/><h2>Constructor &amp; Destructor Documentation</h2>
 <a class="anchor" id="a052e534308afcc766eb417b6656cdd39"></a><!-- doxytag: member="BiasBoss::BiasBoss" ref="a052e534308afcc766eb417b6656cdd39" args="(double alpha)" -->
 <div class="memitem">
@@ -129,7 +130,7 @@ Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="biascorrection_8cpp_source.html#l00218">218</a> of file <a class="el" href="biascorrection_8cpp_source.html">biascorrection.cpp</a>.</p>
+<p>Definition at line <a class="el" href="biascorrection_8cpp_source.html#l00228">228</a> of file <a class="el" href="biascorrection_8cpp_source.html">biascorrection.cpp</a>.</p>
 
 </div>
 </div>
@@ -199,7 +200,26 @@ Public Member Functions</h2></td></tr>
 </dl>
 <dl class="return"><dt><b>Returns:</b></dt><dd>the product of the average 5' and 3' bias (logged) </dd></dl>
 
-<p>Definition at line <a class="el" href="biascorrection_8cpp_source.html#l00284">284</a> of file <a class="el" href="biascorrection_8cpp_source.html">biascorrection.cpp</a>.</p>
+<p>Definition at line <a class="el" href="biascorrection_8cpp_source.html#l00302">302</a> of file <a class="el" href="biascorrection_8cpp_source.html">biascorrection.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a59aa886bbdf042aba90348b5fc89020c"></a><!-- doxytag: member="BiasBoss::normalize_expectations" ref="a59aa886bbdf042aba90348b5fc89020c" args="()" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void BiasBoss::normalize_expectations </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>a member function that normalizes the expected counts and converts them to the log scale </p>
+
+<p>Definition at line <a class="el" href="biascorrection_8cpp_source.html#l00255">255</a> of file <a class="el" href="biascorrection_8cpp_source.html">biascorrection.cpp</a>.</p>
 
 </div>
 </div>
@@ -219,7 +239,7 @@ Public Member Functions</h2></td></tr>
 <p>a member function that returns a string containing the observed positional nucleotide probabilities (non-logged) in column-major order (A,C,G,T) </p>
 <dl class="return"><dt><b>Returns:</b></dt><dd>the string representation of the observed probabilities </dd></dl>
 
-<p>Definition at line <a class="el" href="biascorrection_8cpp_source.html#l00313">313</a> of file <a class="el" href="biascorrection_8cpp_source.html">biascorrection.cpp</a>.</p>
+<p>Definition at line <a class="el" href="biascorrection_8cpp_source.html#l00331">331</a> of file <a class="el" href="biascorrection_8cpp_source.html">biascorrection.cpp</a>.</p>
 
 </div>
 </div>
@@ -245,7 +265,7 @@ Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="biascorrection_8cpp_source.html#l00225">225</a> of file <a class="el" href="biascorrection_8cpp_source.html">biascorrection.cpp</a>.</p>
+<p>Definition at line <a class="el" href="biascorrection_8cpp_source.html#l00235">235</a> of file <a class="el" href="biascorrection_8cpp_source.html">biascorrection.cpp</a>.</p>
 
 </div>
 </div>
@@ -282,7 +302,7 @@ Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="biascorrection_8cpp_source.html#l00245">245</a> of file <a class="el" href="biascorrection_8cpp_source.html">biascorrection.cpp</a>.</p>
+<p>Definition at line <a class="el" href="biascorrection_8cpp_source.html#l00263">263</a> of file <a class="el" href="biascorrection_8cpp_source.html">biascorrection.cpp</a>.</p>
 
 </div>
 </div>
@@ -295,7 +315,7 @@ Public Member Functions</h2></td></tr>
   <div id="nav-path" class="navpath">
     <ul>
       <li class="navelem"><a class="el" href="class_bias_boss.html">BiasBoss</a>      </li>
-      <li class="footer">Generated on Sat Oct 8 2011 22:41:38 for eXpress by&#160;
+      <li class="footer">Generated on Wed Oct 19 2011 12:47:24 for eXpress by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </li>
     </ul>

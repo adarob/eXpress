@@ -112,7 +112,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00029"></a>00029     
 <a name="l00030"></a>00030     <span class="keywordtype">double</span> tot = log(alpha*max_val);
 <a name="l00031"></a>00031     
-<a name="l00032"></a>00032     <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 1; i &lt;= <a class="code" href="class_f_l_d.html#a624f122ba9707476ce3803ad8e611963">max_val</a>; ++i)
+<a name="l00032"></a>00032     <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt;= <a class="code" href="class_f_l_d.html#a624f122ba9707476ce3803ad8e611963">max_val</a>; ++i)
 <a name="l00033"></a>00033     {  
 <a name="l00034"></a>00034         <span class="keywordtype">double</span> mass = tot + log(boost::math::cdf(norm,i+0.5) - boost::math::cdf(norm,i-0.5));
 <a name="l00035"></a>00035         _hist[i] = mass;
@@ -128,61 +128,76 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00045"></a>00045 
 <a name="l00046"></a><a class="code" href="class_f_l_d.html#aafea35b064bab5e68a0f8db14e2a3ae0">00046</a> <span class="keywordtype">void</span> <a class="code" href="class_f_l_d.html#aafea35b064bab5e68a0f8db14e2a3ae0">FLD::add_val</a>(<span class="keywordtype">size_t</span> len, <span class="keywordtype">double</span> mass)
 <a name="l00047"></a>00047 {
-<a name="l00048"></a>00048     <span class="keywordflow">if</span> (len &gt; <a class="code" href="class_f_l_d.html#a624f122ba9707476ce3803ad8e611963">max_val</a>()) <span class="keywordflow">return</span>;
-<a name="l00049"></a>00049     <span class="keywordflow">if</span> (len &lt; _min) _min = len;
-<a name="l00050"></a>00050     
-<a name="l00051"></a>00051     <span class="keywordtype">size_t</span> offset = len - KERNEL.size()/2; 
+<a name="l00048"></a>00048     WriteLock lock(_lock);
+<a name="l00049"></a>00049     
+<a name="l00050"></a>00050     <span class="keywordflow">if</span> (len &gt; <a class="code" href="class_f_l_d.html#a624f122ba9707476ce3803ad8e611963">max_val</a>()) len = <a class="code" href="class_f_l_d.html#a624f122ba9707476ce3803ad8e611963">max_val</a>();
+<a name="l00051"></a>00051     <span class="keywordflow">if</span> (len &lt; _min) _min = len;
 <a name="l00052"></a>00052     
-<a name="l00053"></a>00053     <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; KERNEL.size(); i++)
-<a name="l00054"></a>00054     {
-<a name="l00055"></a>00055         <span class="keywordtype">double</span> k_mass = mass + KERNEL[i];
-<a name="l00056"></a>00056         _hist[offset] = log_sum(_hist[offset], k_mass);
-<a name="l00057"></a>00057         _sum = log_sum(_sum, log((<span class="keywordtype">double</span>)offset++)+k_mass);
-<a name="l00058"></a>00058     }
-<a name="l00059"></a>00059     _tot_mass = log_sum(_tot_mass, mass);
-<a name="l00060"></a>00060 }
-<a name="l00061"></a>00061 
-<a name="l00062"></a><a class="code" href="class_f_l_d.html#a5cebe7ff0e8b8127485374db714287f7">00062</a> <span class="keywordtype">double</span> <a class="code" href="class_f_l_d.html#a5cebe7ff0e8b8127485374db714287f7">FLD::pdf</a>(<span class="keywordtype">size_t</span> len)<span class="keyword"> const</span>
-<a name="l00063"></a>00063 <span class="keyword"></span>{
-<a name="l00064"></a>00064     <span class="keywordflow">if</span> (len &lt; 1 || len &gt; <a class="code" href="class_f_l_d.html#a624f122ba9707476ce3803ad8e611963">max_val</a>())
-<a name="l00065"></a>00065         <span class="keywordflow">return</span> HUGE_VAL;
-<a name="l00066"></a>00066     <span class="keywordflow">return</span> _hist[len]-_tot_mass;
-<a name="l00067"></a>00067 }
-<a name="l00068"></a>00068 
-<a name="l00069"></a><a class="code" href="class_f_l_d.html#a64ff0d5ea2fe39be8033c9f834548b53">00069</a> <span class="keywordtype">double</span> <a class="code" href="class_f_l_d.html#a64ff0d5ea2fe39be8033c9f834548b53">FLD::tot_mass</a>()<span class="keyword"> const</span>
-<a name="l00070"></a>00070 <span class="keyword"></span>{
-<a name="l00071"></a>00071     <span class="keywordflow">return</span> _tot_mass;
-<a name="l00072"></a>00072 }
-<a name="l00073"></a>00073 
-<a name="l00074"></a><a class="code" href="class_f_l_d.html#ac4cc93c389045e5cfcc4af363ebba5b9">00074</a> <span class="keywordtype">double</span> <a class="code" href="class_f_l_d.html#ac4cc93c389045e5cfcc4af363ebba5b9">FLD::mean</a>()<span class="keyword"> const</span>
-<a name="l00075"></a>00075 <span class="keyword"></span>{
-<a name="l00076"></a>00076     <span class="keywordflow">return</span> _sum - <a class="code" href="class_f_l_d.html#a64ff0d5ea2fe39be8033c9f834548b53">tot_mass</a>();
-<a name="l00077"></a>00077 }
-<a name="l00078"></a>00078 
-<a name="l00079"></a><a class="code" href="class_f_l_d.html#adfa05cc215ef20fac8e265c23986d38c">00079</a> <span class="keywordtype">string</span> <a class="code" href="class_f_l_d.html#adfa05cc215ef20fac8e265c23986d38c">FLD::to_string</a>()<span class="keyword"> const</span>
-<a name="l00080"></a>00080 <span class="keyword"></span>{
-<a name="l00081"></a>00081     <span class="keywordtype">string</span> s = <span class="stringliteral">&quot;&quot;</span>;
-<a name="l00082"></a>00082     <span class="keywordtype">char</span> buffer[50];
-<a name="l00083"></a>00083     <span class="keywordflow">for</span>(<span class="keywordtype">size_t</span> i = 0; i &lt;= <a class="code" href="class_f_l_d.html#a624f122ba9707476ce3803ad8e611963">max_val</a>(); i++)
-<a name="l00084"></a>00084     {
-<a name="l00085"></a>00085         sprintf(buffer, <span class="stringliteral">&quot;%e\t&quot;</span>,sexp(<a class="code" href="class_f_l_d.html#a5cebe7ff0e8b8127485374db714287f7">pdf</a>(i)));
-<a name="l00086"></a>00086         s += buffer; 
-<a name="l00087"></a>00087     }
-<a name="l00088"></a>00088     s.erase(s.length()-1,1);
-<a name="l00089"></a>00089     <span class="keywordflow">return</span> s;
-<a name="l00090"></a>00090 }
-<a name="l00091"></a>00091 
-<a name="l00092"></a>00092 <span class="keywordtype">void</span> <a class="code" href="class_f_l_d.html#a0f1b3982b8a86a6bd687c0f41546645b">FLD::append_output</a>(ofstream&amp; outfile)<span class="keyword"> const</span>
-<a name="l00093"></a>00093 <span class="keyword"></span>{
-<a name="l00094"></a>00094     outfile &lt;&lt; <span class="stringliteral">&quot;&gt;Fragment Length Distribution (0-&quot;</span> &lt;&lt; <a class="code" href="class_f_l_d.html#a624f122ba9707476ce3803ad8e611963">max_val</a>() &lt;&lt; <span class="stringliteral">&quot;)\n&quot;</span>;
-<a name="l00095"></a>00095     outfile &lt;&lt; <a class="code" href="class_f_l_d.html#adfa05cc215ef20fac8e265c23986d38c">to_string</a>() &lt;&lt; endl;
-<a name="l00096"></a>00096 }
+<a name="l00053"></a>00053     <span class="keywordtype">size_t</span> offset = len - KERNEL.size()/2; 
+<a name="l00054"></a>00054     
+<a name="l00055"></a>00055     <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; KERNEL.size(); i++)
+<a name="l00056"></a>00056     {
+<a name="l00057"></a>00057         <span class="keywordflow">if</span> (offset &gt; 0 &amp;&amp; offset &lt;= <a class="code" href="class_f_l_d.html#a624f122ba9707476ce3803ad8e611963">max_val</a>())
+<a name="l00058"></a>00058         {
+<a name="l00059"></a>00059             <span class="keywordtype">double</span> k_mass = mass + KERNEL[i];
+<a name="l00060"></a>00060             _hist[offset] = log_sum(_hist[offset], k_mass);
+<a name="l00061"></a>00061             _sum = log_sum(_sum, log((<span class="keywordtype">double</span>)offset)+k_mass);
+<a name="l00062"></a>00062             _tot_mass = log_sum(_tot_mass, k_mass);
+<a name="l00063"></a>00063         }
+<a name="l00064"></a>00064         offset++;
+<a name="l00065"></a>00065     }
+<a name="l00066"></a>00066 }
+<a name="l00067"></a>00067 
+<a name="l00068"></a><a class="code" href="class_f_l_d.html#a5cebe7ff0e8b8127485374db714287f7">00068</a> <span class="keywordtype">double</span> <a class="code" href="class_f_l_d.html#a5cebe7ff0e8b8127485374db714287f7">FLD::pdf</a>(<span class="keywordtype">size_t</span> len)<span class="keyword"> const</span>
+<a name="l00069"></a>00069 <span class="keyword"></span>{
+<a name="l00070"></a>00070     ReadLock lock(_lock);
+<a name="l00071"></a>00071     
+<a name="l00072"></a>00072     <span class="keywordflow">if</span> (len &gt; <a class="code" href="class_f_l_d.html#a624f122ba9707476ce3803ad8e611963">max_val</a>()) len = <a class="code" href="class_f_l_d.html#a624f122ba9707476ce3803ad8e611963">max_val</a>();
+<a name="l00073"></a>00073     <span class="keywordflow">return</span> _hist[len]-_tot_mass;
+<a name="l00074"></a>00074 }
+<a name="l00075"></a>00075 
+<a name="l00076"></a><a class="code" href="class_f_l_d.html#a64ff0d5ea2fe39be8033c9f834548b53">00076</a> <span class="keywordtype">double</span> <a class="code" href="class_f_l_d.html#a64ff0d5ea2fe39be8033c9f834548b53">FLD::tot_mass</a>()<span class="keyword"> const</span>
+<a name="l00077"></a>00077 <span class="keyword"></span>{
+<a name="l00078"></a>00078     ReadLock lock(_lock);
+<a name="l00079"></a>00079 
+<a name="l00080"></a>00080     <span class="keywordflow">return</span> _tot_mass;
+<a name="l00081"></a>00081 }
+<a name="l00082"></a>00082 
+<a name="l00083"></a><a class="code" href="class_f_l_d.html#ac4cc93c389045e5cfcc4af363ebba5b9">00083</a> <span class="keywordtype">double</span> <a class="code" href="class_f_l_d.html#ac4cc93c389045e5cfcc4af363ebba5b9">FLD::mean</a>()<span class="keyword"> const</span>
+<a name="l00084"></a>00084 <span class="keyword"></span>{
+<a name="l00085"></a>00085     ReadLock lock(_lock);
+<a name="l00086"></a>00086 
+<a name="l00087"></a>00087     <span class="keywordflow">return</span> _sum - <a class="code" href="class_f_l_d.html#a64ff0d5ea2fe39be8033c9f834548b53">tot_mass</a>();
+<a name="l00088"></a>00088 }
+<a name="l00089"></a>00089 
+<a name="l00090"></a><a class="code" href="class_f_l_d.html#adfa05cc215ef20fac8e265c23986d38c">00090</a> <span class="keywordtype">string</span> <a class="code" href="class_f_l_d.html#adfa05cc215ef20fac8e265c23986d38c">FLD::to_string</a>()<span class="keyword"> const</span>
+<a name="l00091"></a>00091 <span class="keyword"></span>{
+<a name="l00092"></a>00092     ReadLock lock(_lock);
+<a name="l00093"></a>00093 
+<a name="l00094"></a>00094     <span class="keywordtype">string</span> s = <span class="stringliteral">&quot;&quot;</span>;
+<a name="l00095"></a>00095     <span class="keywordtype">char</span> buffer[50];
+<a name="l00096"></a>00096     <span class="keywordflow">for</span>(<span class="keywordtype">size_t</span> i = 0; i &lt;= <a class="code" href="class_f_l_d.html#a624f122ba9707476ce3803ad8e611963">max_val</a>(); i++)
+<a name="l00097"></a>00097     {
+<a name="l00098"></a>00098         sprintf(buffer, <span class="stringliteral">&quot;%e\t&quot;</span>,sexp(<a class="code" href="class_f_l_d.html#a5cebe7ff0e8b8127485374db714287f7">pdf</a>(i)));
+<a name="l00099"></a>00099         s += buffer; 
+<a name="l00100"></a>00100     }
+<a name="l00101"></a>00101     s.erase(s.length()-1,1);
+<a name="l00102"></a>00102     <span class="keywordflow">return</span> s;
+<a name="l00103"></a>00103 }
+<a name="l00104"></a>00104 
+<a name="l00105"></a>00105 <span class="keywordtype">void</span> <a class="code" href="class_f_l_d.html#a0f1b3982b8a86a6bd687c0f41546645b">FLD::append_output</a>(ofstream&amp; outfile)<span class="keyword"> const</span>
+<a name="l00106"></a>00106 <span class="keyword"></span>{
+<a name="l00107"></a>00107     ReadLock lock(_lock);
+<a name="l00108"></a>00108 
+<a name="l00109"></a>00109     outfile &lt;&lt; <span class="stringliteral">&quot;&gt;Fragment Length Distribution (0-&quot;</span> &lt;&lt; <a class="code" href="class_f_l_d.html#a624f122ba9707476ce3803ad8e611963">max_val</a>() &lt;&lt; <span class="stringliteral">&quot;)\n&quot;</span>;
+<a name="l00110"></a>00110     outfile &lt;&lt; <a class="code" href="class_f_l_d.html#adfa05cc215ef20fac8e265c23986d38c">to_string</a>() &lt;&lt; endl;
+<a name="l00111"></a>00111 }
 </pre></div></div>
 </div>
   <div id="nav-path" class="navpath">
     <ul>
       <li class="navelem"><b>fld.cpp</b>      </li>
-      <li class="footer">Generated on Sat Oct 8 2011 22:41:37 for eXpress by&#160;
+      <li class="footer">Generated on Wed Oct 19 2011 12:47:23 for eXpress by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </li>
     </ul>

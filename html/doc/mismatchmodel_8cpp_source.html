@@ -129,25 +129,25 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00046"></a>00046         {
 <a name="l00047"></a>00047             index = (prev &lt;&lt; 2) + ref;
 <a name="l00048"></a>00048             ll += left_mm[i](index, cur);
-<a name="l00049"></a>00049             assert(!isnan(ll));
-<a name="l00050"></a>00050         }
-<a name="l00051"></a>00051         prev = ref;
-<a name="l00052"></a>00052     }
-<a name="l00053"></a>00053     
-<a name="l00054"></a>00054     <span class="keywordtype">size_t</span> r_len = f.<a class="code" href="struct_frag_hit.html#aef2e4300e8ec030142f7af9d0cc37e9c">seq_r</a>.length();
-<a name="l00055"></a>00055     prev = 0;
-<a name="l00056"></a>00056     <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 1; i &lt; r_len; i++)
-<a name="l00057"></a>00057     {
-<a name="l00058"></a>00058         ref = ctoi_r(t_seq[f.<a class="code" href="struct_frag_hit.html#a56b767b37618e037513600954ad8e663">right</a>-i-1]);
-<a name="l00059"></a>00059         cur = ctoi_r(f.<a class="code" href="struct_frag_hit.html#aef2e4300e8ec030142f7af9d0cc37e9c">seq_r</a>[r_len-i-1]);
-<a name="l00060"></a>00060         <span class="keywordflow">if</span> (prev != 4 &amp;&amp; cur != 4 &amp;&amp; ref != 4)
-<a name="l00061"></a>00061         {
-<a name="l00062"></a>00062             index = (prev &lt;&lt; 2) + ref;
-<a name="l00063"></a>00063             ll += right_mm[i](index, cur);
-<a name="l00064"></a>00064             assert(!isnan(ll));
-<a name="l00065"></a>00065         }
-<a name="l00066"></a>00066         prev = ref;
-<a name="l00067"></a>00067     }
+<a name="l00049"></a>00049         }
+<a name="l00050"></a>00050         prev = ref;
+<a name="l00051"></a>00051     }
+<a name="l00052"></a>00052     
+<a name="l00053"></a>00053     <span class="keywordtype">size_t</span> r_len = f.<a class="code" href="struct_frag_hit.html#aef2e4300e8ec030142f7af9d0cc37e9c">seq_r</a>.length();
+<a name="l00054"></a>00054     prev = 0;
+<a name="l00055"></a>00055     <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 1; i &lt; r_len; i++)
+<a name="l00056"></a>00056     {
+<a name="l00057"></a>00057         ref = ctoi_r(t_seq[f.<a class="code" href="struct_frag_hit.html#a56b767b37618e037513600954ad8e663">right</a>-i-1]);
+<a name="l00058"></a>00058         cur = ctoi_r(f.<a class="code" href="struct_frag_hit.html#aef2e4300e8ec030142f7af9d0cc37e9c">seq_r</a>[r_len-i-1]);
+<a name="l00059"></a>00059         <span class="keywordflow">if</span> (prev != 4 &amp;&amp; cur != 4 &amp;&amp; ref != 4)
+<a name="l00060"></a>00060         {
+<a name="l00061"></a>00061             index = (prev &lt;&lt; 2) + ref;
+<a name="l00062"></a>00062             ll += right_mm[i](index, cur);
+<a name="l00063"></a>00063         }
+<a name="l00064"></a>00064         prev = ref;
+<a name="l00065"></a>00065     }
+<a name="l00066"></a>00066     
+<a name="l00067"></a>00067     assert(!(isnan(ll)||isinf(ll)));
 <a name="l00068"></a>00068     <span class="keywordflow">return</span> ll;
 <a name="l00069"></a>00069 }
 <a name="l00070"></a>00070 
@@ -280,7 +280,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div id="nav-path" class="navpath">
     <ul>
       <li class="navelem"><b>mismatchmodel.cpp</b>      </li>
-      <li class="footer">Generated on Sat Oct 8 2011 22:41:37 for eXpress by&#160;
+      <li class="footer">Generated on Wed Oct 19 2011 12:47:23 for eXpress by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </li>
     </ul>

@@ -93,19 +93,23 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <table class="memberdecls">
 <tr><td colspan="2"><h2><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_threaded_map_parser.html#a9cef85368c7b4cc7f64e6dc9ba16f866">ThreadedMapParser</a> (std::string input_file, std::string output_file)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_threaded_map_parser.html#a932bcde8510748310959b1d7cbed3ba5">ThreadedMapParser</a> (std::string input_file, std::string output_file, bool write_active)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_threaded_map_parser.html#ac1722833023002b9dfc4e8245e05d473">~ThreadedMapParser</a> ()</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_threaded_map_parser.html#a4661c112c0109a6d9cf26d9a72c3f2d6">threaded_parse</a> (<a class="el" href="struct_parse_thread_safety.html">ParseThreadSafety</a> *thread_safety, <a class="el" href="class_transcript_table.html">TranscriptTable</a> *trans_table)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">const TransIndex &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_threaded_map_parser.html#af4d55d77872b29e1ba0073dc18675123">trans_index</a> ()</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0fd1dcdf0b8b665ff4f15850f20e5a84"></a><!-- doxytag: member="ThreadedMapParser::write_active" ref="a0fd1dcdf0b8b665ff4f15850f20e5a84" args="(bool b)" -->
+void&#160;</td><td class="memItemRight" valign="bottom"><b>write_active</b> (bool b)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ac6afab8a3e2e8975553e64c634a9f428"></a><!-- doxytag: member="ThreadedMapParser::reset_reader" ref="ac6afab8a3e2e8975553e64c634a9f428" args="()" -->
+void&#160;</td><td class="memItemRight" valign="bottom"><b>reset_reader</b> ()</td></tr>
 </table>
 <hr/><a name="_details"></a><h2>Detailed Description</h2>
 <div class="textblock"><p>The <a class="el" href="class_threaded_map_parser.html">ThreadedMapParser</a> class is meant to be run on as a separate thread from the main processing. Once started, this thread will read input from a file or stream in SAM/BAM format, parse, and collect read alignments into fragment alignments, and fragment alignments into fragments, which are placed on a buffer for the processing thread. Once the processing thread copies the fragment address from the buffer, the parser is unlocked to load the next fragment. The process stops when EOF is reached </p>
 <dl class="author"><dt><b>Author:</b></dt><dd>Adam Roberts </dd></dl>
 <dl class="date"><dt><b>Date:</b></dt><dd>2011  Artistic License 2.0 </dd></dl>
 
-<p>Definition at line <a class="el" href="mapparser_8h_source.html#l00306">306</a> of file <a class="el" href="mapparser_8h_source.html">mapparser.h</a>.</p>
+<p>Definition at line <a class="el" href="mapparser_8h_source.html#l00321">321</a> of file <a class="el" href="mapparser_8h_source.html">mapparser.h</a>.</p>
 </div><hr/><h2>Constructor &amp; Destructor Documentation</h2>
-<a class="anchor" id="a9cef85368c7b4cc7f64e6dc9ba16f866"></a><!-- doxytag: member="ThreadedMapParser::ThreadedMapParser" ref="a9cef85368c7b4cc7f64e6dc9ba16f866" args="(std::string input_file, std::string output_file)" -->
+<a class="anchor" id="a932bcde8510748310959b1d7cbed3ba5"></a><!-- doxytag: member="ThreadedMapParser::ThreadedMapParser" ref="a932bcde8510748310959b1d7cbed3ba5" args="(std::string input_file, std::string output_file, bool write_active)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -119,7 +123,13 @@ Public Member Functions</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">std::string&#160;</td>
-          <td class="paramname"><em>output_file</em>&#160;</td>
+          <td class="paramname"><em>output_file</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>write_active</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -130,6 +140,13 @@ Public Member Functions</h2></td></tr>
 </div>
 <div class="memdoc">
 <p><a class="el" href="class_threaded_map_parser.html">ThreadedMapParser</a> constructor determines what format the input is in and initializes the correct parser. </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramname">input_file</td><td>string containing the path to the input SAM/BAM file </td></tr>
+    <tr><td class="paramname">output_file</td><td>string containing the path the output file less its extension (empty if writing is to be disabled) </td></tr>
+  </table>
+  </dd>
+</dl>
 
 <p>Definition at line <a class="el" href="mapparser_8cpp_source.html#l00051">51</a> of file <a class="el" href="mapparser_8cpp_source.html">mapparser.cpp</a>.</p>
 
@@ -150,7 +167,7 @@ Public Member Functions</h2></td></tr>
 <div class="memdoc">
 <p><a class="el" href="class_threaded_map_parser.html">ThreadedMapParser</a> destructor deletes the parser and writer (if it exists). </p>
 
-<p>Definition at line <a class="el" href="mapparser_8cpp_source.html#l00109">109</a> of file <a class="el" href="mapparser_8cpp_source.html">mapparser.cpp</a>.</p>
+<p>Definition at line <a class="el" href="mapparser_8cpp_source.html#l00115">115</a> of file <a class="el" href="mapparser_8cpp_source.html">mapparser.cpp</a>.</p>
 
 </div>
 </div>
@@ -188,7 +205,7 @@ Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="mapparser_8cpp_source.html#l00116">116</a> of file <a class="el" href="mapparser_8cpp_source.html">mapparser.cpp</a>.</p>
+<p>Definition at line <a class="el" href="mapparser_8cpp_source.html#l00122">122</a> of file <a class="el" href="mapparser_8cpp_source.html">mapparser.cpp</a>.</p>
 
 </div>
 </div>
@@ -208,7 +225,7 @@ Public Member Functions</h2></td></tr>
 <p>a member function that returns the transcript-to-index map </p>
 <dl class="return"><dt><b>Returns:</b></dt><dd>the transcript-to-index map </dd></dl>
 
-<p>Definition at line <a class="el" href="mapparser_8h_source.html#l00342">342</a> of file <a class="el" href="mapparser_8h_source.html">mapparser.h</a>.</p>
+<p>Definition at line <a class="el" href="mapparser_8h_source.html#l00361">361</a> of file <a class="el" href="mapparser_8h_source.html">mapparser.h</a>.</p>
 
 </div>
 </div>
@@ -221,7 +238,7 @@ Public Member Functions</h2></td></tr>
   <div id="nav-path" class="navpath">
     <ul>
       <li class="navelem"><a class="el" href="class_threaded_map_parser.html">ThreadedMapParser</a>      </li>
-      <li class="footer">Generated on Sat Oct 8 2011 22:41:39 for eXpress by&#160;
+      <li class="footer">Generated on Wed Oct 19 2011 12:47:25 for eXpress by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </li>
     </ul>

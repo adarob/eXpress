@@ -95,6 +95,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 Public Member Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_seq_weight_table.html#a9c086928447f2c5af25355d1ac37f236">SeqWeightTable</a> (size_t window_size, double alpha)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_seq_weight_table.html#a13cd8c32772af8496636d1e87940e5db">increment_expected</a> (char c)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_seq_weight_table.html#a683d5829e92c085c6c05a8209aab47e7">normalize_expected</a> ()</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_seq_weight_table.html#aa5020845c29f7b9f4eee4ecc40a50428">increment_observed</a> (std::string &amp;seq, double normalized_mass)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_seq_weight_table.html#a82ab529aaad5e124b2cf4591af1b3a4a">get_weight</a> (const std::string &amp;seq, int i) const </td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_seq_weight_table.html#adf3524646dd6b27e493be0855832bc70">to_string</a> () const </td></tr>
@@ -105,7 +106,7 @@ Public Member Functions</h2></td></tr>
 <dl class="author"><dt><b>Author:</b></dt><dd>Adam Roberts </dd></dl>
 <dl class="date"><dt><b>Date:</b></dt><dd>2011  Artistic License 2.0 </dd></dl>
 
-<p>Definition at line <a class="el" href="biascorrection_8h_source.html#l00029">29</a> of file <a class="el" href="biascorrection_8h_source.html">biascorrection.h</a>.</p>
+<p>Definition at line <a class="el" href="biascorrection_8h_source.html#l00032">32</a> of file <a class="el" href="biascorrection_8h_source.html">biascorrection.h</a>.</p>
 </div><hr/><h2>Constructor &amp; Destructor Documentation</h2>
 <a class="anchor" id="a9c086928447f2c5af25355d1ac37f236"></a><!-- doxytag: member="SeqWeightTable::SeqWeightTable" ref="a9c086928447f2c5af25355d1ac37f236" args="(size_t window_size, double alpha)" -->
 <div class="memitem">
@@ -266,6 +267,25 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
+<a class="anchor" id="a683d5829e92c085c6c05a8209aab47e7"></a><!-- doxytag: member="SeqWeightTable::normalize_expected" ref="a683d5829e92c085c6c05a8209aab47e7" args="()" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void SeqWeightTable::normalize_expected </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>a member function that normalizes the expected counts and converts them to the log scale </p>
+
+<p>Definition at line <a class="el" href="biascorrection_8cpp_source.html#l00044">44</a> of file <a class="el" href="biascorrection_8cpp_source.html">biascorrection.cpp</a>.</p>
+
+</div>
+</div>
 <a class="anchor" id="adf3524646dd6b27e493be0855832bc70"></a><!-- doxytag: member="SeqWeightTable::to_string" ref="adf3524646dd6b27e493be0855832bc70" args="() const " -->
 <div class="memitem">
 <div class="memproto">
@@ -282,7 +302,7 @@ Public Member Functions</h2></td></tr>
 <p>a member function that returns a string containing the positional nucleotide probabilities in column-major order (A,C,G,T) </p>
 <dl class="return"><dt><b>Returns:</b></dt><dd>the string representation of the positional nucleotide probabilities </dd></dl>
 
-<p>Definition at line <a class="el" href="biascorrection_8cpp_source.html#l00068">68</a> of file <a class="el" href="biascorrection_8cpp_source.html">biascorrection.cpp</a>.</p>
+<p>Definition at line <a class="el" href="biascorrection_8cpp_source.html#l00073">73</a> of file <a class="el" href="biascorrection_8cpp_source.html">biascorrection.cpp</a>.</p>
 
 </div>
 </div>
@@ -295,7 +315,7 @@ Public Member Functions</h2></td></tr>
   <div id="nav-path" class="navpath">
     <ul>
       <li class="navelem"><a class="el" href="class_seq_weight_table.html">SeqWeightTable</a>      </li>
-      <li class="footer">Generated on Sat Oct 8 2011 22:41:38 for eXpress by&#160;
+      <li class="footer">Generated on Wed Oct 19 2011 12:47:25 for eXpress by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </li>
     </ul>

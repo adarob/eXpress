@@ -6,6 +6,11 @@
 //  Copyright 2011 Adam Roberts. All rights reserved.
 //
 
+//TODO: Check for matching lengths
+//TODO: Update params between rounds
+//TODO: Additional rounds
+//TODO: Indels
+
 #include <boost/filesystem.hpp>
 #include <boost/program_options.hpp>
 #include <boost/thread.hpp>
@@ -70,8 +75,9 @@ Direction direction = BOTH;
 bool running = true;
 
 // used for multiple rounds of EM
-enum Iteration{ FIRST, LAST, ONLY };
-Iteration iteration = ONLY;
+bool first_round = true;
+bool last_round = true;
+size_t remaining_rounds = 0;
 
 bool parse_options(int ac, char ** av)
 {
@@ -81,6 +87,7 @@ bool parse_options(int ac, char ** av)
     ("output-dir,o", po::value<string>(&output_dir)->default_value("."), "write all output files to this directory")
     ("frag-len-mean,m", po::value<int>(&def_fl_mean)->default_value(200), "prior estimate for average fragment length")
     ("frag-len-stddev,s", po::value<int>(&def_fl_stddev)->default_value(80), "prior estimate for fragment length std deviation")
+    ("additional-rounds,N", po::value<size_t>(&remaining_rounds)->default_value(1), "number of additional EM rounds after online round")
     ("output-alignments", "output alignments (sam/bam) with probabilistic assignments")
     ("fr-stranded", "accept only forward->reverse alignments (second-stranded protocols)")
     ("rf-stranded", "accept only reverse->forward alignments (first-stranded protocols)")
@@ -162,12 +169,12 @@ bool parse_options(int ac, char ** av)
     vis = vm.count("visualizer-output");
     output_running = vm.count("output-running");
     
-    if (!vm.count("single-round") && in_map_file_name != "")
-        iteration = FIRST;
+    if (remaining_rounds > 0 && in_map_file_name != "")
+        last_round = false;
 
     if (vm.count("output-alignments"))
     {
-        out_map_file_name = output_dir + "hits.prob";
+        out_map_file_name = output_dir + "/hits.prob";
     }
     
 #ifndef WIN32
@@ -216,7 +223,7 @@ void process_fragment(double mass_n, Fragment* frag_p, TranscriptTable* trans_ta
     
     // merge bundles
     Bundle* bundle = frag.hits()[0]->mapped_trans->bundle();
-    if (iteration != FIRST)
+    if (last_round)
     {
         bundle->incr_counts();
     }
@@ -240,7 +247,7 @@ void process_fragment(double mass_n, Fragment* frag_p, TranscriptTable* trans_ta
         assert(!isinf(m.probability));
         
         // update parameters
-        if (iteration != LAST)
+        if (first_round)
         {
             if (frag.num_hits()==1)
                 t->incr_uniq_counts();
@@ -256,10 +263,10 @@ void process_fragment(double mass_n, Fragment* frag_p, TranscriptTable* trans_ta
         }
         else
         {
-            t->add_prob_count(m.probability);
+            t->add_prob_count(p);
         }
         
-        if (calc_covar && (iteration != FIRST))
+        if (calc_covar && last_round)
         {
             for(size_t j = i+1; j < frag.num_hits(); ++j)
             {
@@ -269,7 +276,7 @@ void process_fragment(double mass_n, Fragment* frag_p, TranscriptTable* trans_ta
                     continue;
                 
                 double covar = p + p2;
-                if (iteration == ONLY)
+                if (first_round && last_round)
                     covar += 2*mass_n;
                 
                 trans_table->update_covar(m.trans_id, m2.trans_id, covar); 
@@ -320,7 +327,7 @@ size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TranscriptTable* 
             break;
         }
                 
-        if (iteration != LAST && n == burn_in)
+        if (first_round && n == burn_in)
         {
             bias_update = new boost::thread(&TranscriptTable::threaded_bias_update, trans_table);
             if (globs.mismatch_table)
@@ -330,7 +337,7 @@ size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TranscriptTable* 
         // Output progress
         if (n % 1000000 == 1)
         {
-            if (output_running && (iteration == ONLY || iteration == LAST))
+            if (output_running && last_round)
             {
                 char buff[500];
                 sprintf(buff, "%s/x_" SIZE_T_FMT "", output_dir.c_str(), n-1);
@@ -416,8 +423,8 @@ int main (int argc, char ** argv)
     globs.fld = new FLD(fld_alpha, def_fl_max, def_fl_mean, def_fl_stddev);
     globs.bias_table = (bias_correct) ? new BiasBoss(bias_alpha):NULL;
     globs.mismatch_table = (error_model) ? new MismatchTable(mm_alpha):NULL;
-    ThreadedMapParser map_parser(in_map_file_name, out_map_file_name, iteration==ONLY);
-    TranscriptTable trans_table(fasta_file_name, map_parser.trans_index(), iteration==ONLY, expr_alpha, &globs);
+    ThreadedMapParser map_parser(in_map_file_name, out_map_file_name, last_round);
+    TranscriptTable trans_table(fasta_file_name, map_parser.trans_index(), expr_alpha, &globs);
 
     double num_trans = (double)map_parser.trans_index().size();
     
@@ -428,14 +435,16 @@ int main (int argc, char ** argv)
     }
     
     size_t tot_counts = threaded_calc_abundances(map_parser, &trans_table, globs);
-    
-    if (iteration == FIRST)
+    first_round = false;
+    while (!last_round)
     {
-        cout << "\nRe-estimating counts with second round of EM...\n";
-        iteration = LAST;
+        remaining_rounds--;
+        cout << "\nRe-estimating counts with additional round of EM (" << remaining_rounds << " remaining)...\n";
+        last_round = (remaining_rounds == 0);
+        map_parser.write_active(last_round);
         map_parser.reset_reader();
-        map_parser.write_active(true);
         tot_counts = threaded_calc_abundances(map_parser, &trans_table, globs);
+        trans_table.round_reset();
     }
     
 	cout << "Writing results to file...\n";

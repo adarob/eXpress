@@ -94,42 +94,49 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00011"></a>00011 <span class="preprocessor"></span>
 <a name="l00012"></a>00012 <span class="preprocessor">#include &lt;vector&gt;</span>
 <a name="l00013"></a>00013 <span class="preprocessor">#include &lt;string&gt;</span>
-<a name="l00014"></a>00014 
-<a name="l00021"></a><a class="code" href="class_f_l_d.html">00021</a> <span class="keyword">class </span><a class="code" href="class_f_l_d.html">FLD</a>
-<a name="l00022"></a>00022 {
-<a name="l00026"></a>00026     std::vector&lt;double&gt; _hist;
-<a name="l00027"></a>00027     
-<a name="l00031"></a>00031     <span class="keywordtype">double</span> _tot_mass;
-<a name="l00032"></a>00032     
-<a name="l00036"></a>00036     <span class="keywordtype">double</span> _sum;
-<a name="l00037"></a>00037     
-<a name="l00041"></a>00041     <span class="keywordtype">size_t</span> _min;
-<a name="l00042"></a>00042     
-<a name="l00043"></a>00043 <span class="keyword">public</span>:
-<a name="l00051"></a>00051     <a class="code" href="class_f_l_d.html#aca5ac96ea6c11e1e4ae59c17f56d35df">FLD</a>(<span class="keywordtype">double</span> alpha, <span class="keywordtype">size_t</span> <a class="code" href="class_f_l_d.html#a624f122ba9707476ce3803ad8e611963">max_val</a>, <span class="keywordtype">size_t</span> <a class="code" href="class_f_l_d.html#ac4cc93c389045e5cfcc4af363ebba5b9">mean</a>, <span class="keywordtype">size_t</span> std_dev);
-<a name="l00052"></a>00052     
-<a name="l00057"></a>00057     <span class="keywordtype">size_t</span> <a class="code" href="class_f_l_d.html#a624f122ba9707476ce3803ad8e611963">max_val</a>() <span class="keyword">const</span>;
-<a name="l00058"></a>00058     
-<a name="l00063"></a>00063     <span class="keywordtype">double</span> <a class="code" href="class_f_l_d.html#ac4cc93c389045e5cfcc4af363ebba5b9">mean</a>() <span class="keyword">const</span>;
-<a name="l00064"></a>00064     
-<a name="l00070"></a>00070     <span class="keywordtype">void</span> <a class="code" href="class_f_l_d.html#aafea35b064bab5e68a0f8db14e2a3ae0">add_val</a>(<span class="keywordtype">size_t</span> len, <span class="keywordtype">double</span> mass);
-<a name="l00071"></a>00071     
-<a name="l00077"></a>00077     <span class="keywordtype">double</span> <a class="code" href="class_f_l_d.html#a5cebe7ff0e8b8127485374db714287f7">pdf</a>(<span class="keywordtype">size_t</span> len) <span class="keyword">const</span>;
-<a name="l00078"></a>00078     
-<a name="l00083"></a>00083     <span class="keywordtype">double</span> <a class="code" href="class_f_l_d.html#a64ff0d5ea2fe39be8033c9f834548b53">tot_mass</a>() <span class="keyword">const</span>;
-<a name="l00084"></a>00084     
-<a name="l00089"></a>00089     std::string <a class="code" href="class_f_l_d.html#adfa05cc215ef20fac8e265c23986d38c">to_string</a>() <span class="keyword">const</span>;
-<a name="l00090"></a>00090 
-<a name="l00095"></a>00095     <span class="keywordtype">void</span> <a class="code" href="class_f_l_d.html#a0f1b3982b8a86a6bd687c0f41546645b">append_output</a>(std::ofstream&amp; outfile) <span class="keyword">const</span>;
-<a name="l00096"></a>00096 };
-<a name="l00097"></a>00097 
-<a name="l00098"></a>00098 <span class="preprocessor">#endif</span>
+<a name="l00014"></a>00014 <span class="preprocessor">#include &lt;boost/thread.hpp&gt;</span>
+<a name="l00015"></a>00015 
+<a name="l00016"></a>00016 <span class="keyword">typedef</span> boost::shared_lock&lt;boost::shared_mutex&gt; ReadLock;
+<a name="l00017"></a>00017 <span class="keyword">typedef</span> boost::unique_lock&lt;boost::shared_mutex&gt; WriteLock;
+<a name="l00018"></a>00018 
+<a name="l00025"></a><a class="code" href="class_f_l_d.html">00025</a> <span class="keyword">class </span><a class="code" href="class_f_l_d.html">FLD</a>
+<a name="l00026"></a>00026 {
+<a name="l00030"></a>00030     std::vector&lt;double&gt; _hist;
+<a name="l00031"></a>00031     
+<a name="l00035"></a>00035     <span class="keywordtype">double</span> _tot_mass;
+<a name="l00036"></a>00036     
+<a name="l00040"></a>00040     <span class="keywordtype">double</span> _sum;
+<a name="l00041"></a>00041     
+<a name="l00045"></a>00045     <span class="keywordtype">size_t</span> _min;
+<a name="l00046"></a>00046     
+<a name="l00050"></a>00050     <span class="keyword">mutable</span> boost::shared_mutex _lock;
+<a name="l00051"></a>00051     
+<a name="l00052"></a>00052 <span class="keyword">public</span>:
+<a name="l00060"></a>00060     <a class="code" href="class_f_l_d.html#aca5ac96ea6c11e1e4ae59c17f56d35df">FLD</a>(<span class="keywordtype">double</span> alpha, <span class="keywordtype">size_t</span> <a class="code" href="class_f_l_d.html#a624f122ba9707476ce3803ad8e611963">max_val</a>, <span class="keywordtype">size_t</span> <a class="code" href="class_f_l_d.html#ac4cc93c389045e5cfcc4af363ebba5b9">mean</a>, <span class="keywordtype">size_t</span> std_dev);
+<a name="l00061"></a>00061     
+<a name="l00066"></a>00066     <span class="keywordtype">size_t</span> <a class="code" href="class_f_l_d.html#a624f122ba9707476ce3803ad8e611963">max_val</a>() <span class="keyword">const</span>;
+<a name="l00067"></a>00067     
+<a name="l00073"></a>00073     <span class="keywordtype">double</span> <a class="code" href="class_f_l_d.html#ac4cc93c389045e5cfcc4af363ebba5b9">mean</a>() <span class="keyword">const</span>;
+<a name="l00074"></a>00074     
+<a name="l00081"></a>00081     <span class="keywordtype">void</span> <a class="code" href="class_f_l_d.html#aafea35b064bab5e68a0f8db14e2a3ae0">add_val</a>(<span class="keywordtype">size_t</span> len, <span class="keywordtype">double</span> mass);
+<a name="l00082"></a>00082     
+<a name="l00089"></a>00089     <span class="keywordtype">double</span> <a class="code" href="class_f_l_d.html#a5cebe7ff0e8b8127485374db714287f7">pdf</a>(<span class="keywordtype">size_t</span> len) <span class="keyword">const</span>;
+<a name="l00090"></a>00090     
+<a name="l00095"></a>00095     <span class="keywordtype">double</span> <a class="code" href="class_f_l_d.html#a64ff0d5ea2fe39be8033c9f834548b53">tot_mass</a>() <span class="keyword">const</span>;
+<a name="l00096"></a>00096     
+<a name="l00102"></a>00102     std::string <a class="code" href="class_f_l_d.html#adfa05cc215ef20fac8e265c23986d38c">to_string</a>() <span class="keyword">const</span>;
+<a name="l00103"></a>00103 
+<a name="l00109"></a>00109     <span class="keywordtype">void</span> <a class="code" href="class_f_l_d.html#a0f1b3982b8a86a6bd687c0f41546645b">append_output</a>(std::ofstream&amp; outfile) <span class="keyword">const</span>;
+<a name="l00110"></a>00110     
+<a name="l00111"></a>00111 };
+<a name="l00112"></a>00112 
+<a name="l00113"></a>00113 <span class="preprocessor">#endif</span>
 </pre></div></div>
 </div>
   <div id="nav-path" class="navpath">
     <ul>
       <li class="navelem"><b>fld.h</b>      </li>
-      <li class="footer">Generated on Sat Oct 8 2011 22:41:37 for eXpress by&#160;
+      <li class="footer">Generated on Wed Oct 19 2011 12:47:23 for eXpress by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </li>
     </ul>

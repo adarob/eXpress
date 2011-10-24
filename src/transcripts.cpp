@@ -45,15 +45,23 @@ void Transcript::add_mass(double p, double mass)
     _mass = log_sum(_mass, p+mass);
     _tot_counts++;
     if (p != 0.0)
-    {
         _mass_var = log_sum(_mass_var, 2*mass + p + log(1-sexp(p)));
-    }
+    
 }  
 
 void Transcript::add_prob_count(double p)
 {
-    _est_counts += p;
-    _est_counts_var += p*(1-p);
+    _est_counts = log_sum(_est_counts, p);
+    if (p != 0.0)
+        _est_counts_var = log_sum(_est_counts_var, p + log(1-sexp(p)));
+}
+
+void Transcript::round_reset()
+{
+    _mass = _est_counts;
+    _mass_var = _est_counts_var;
+    _est_counts = HUGE_VAL;
+    _est_counts_var = HUGE_VAL;
 }
 
 double Transcript::log_likelihood(const FragHit& frag) const
@@ -129,16 +137,17 @@ void Transcript::update_transcript_bias()
     _cached_eff_len = est_effective_length();
 }
 
-TranscriptTable::TranscriptTable(const string& trans_fasta_file, const TransIndex& trans_index, bool single_round, double alpha, const Globals* globs)
+TranscriptTable::TranscriptTable(const string& trans_fasta_file, const TransIndex& trans_index, double alpha, const Globals* globs)
 : _globs(globs),
   _trans_map(trans_index.size(), NULL),
-  _single_round(single_round),
   _alpha(alpha)
 {
     cout << "Loading target sequences";
     if (globs->bias_table)
         cout << " and measuring bias background";
     cout << "...\n\n";
+    
+    boost::unordered_set<string> target_names;
     
     ifstream infile (trans_fasta_file.c_str());
     string line;
@@ -156,6 +165,12 @@ TranscriptTable::TranscriptTable(const string& trans_fasta_file, const TransInde
                     add_trans(name, seq, trans_index);
                 }
                 name = line.substr(1,line.find(' ')-1);
+                if (target_names.count(name))
+                {
+                    cerr << "ERROR: Target '" << name << "' is duplicated in the input FASTA.  Ensure all target names are unique and re-map before re-running eXpress\n";
+                    exit(1);
+                }
+                target_names.insert(name);
                 seq = "";
             }
             else
@@ -239,6 +254,13 @@ size_t TranscriptTable::num_bundles()
     return _bundle_table.size();
 }
 
+void TranscriptTable::round_reset()
+{
+    foreach(Transcript* trans, _trans_map)
+    {
+        trans->round_reset();
+    }
+}
 
 void TranscriptTable::threaded_bias_update()
 {
@@ -311,9 +333,7 @@ void project_to_polytope(vector<Transcript*> bundle_trans, vector<double>& trans
 }
 
 void TranscriptTable::output_results(string output_dir, size_t tot_counts, bool output_varcov)
-{
-    bool multi_iteration = !_single_round;
- 
+{ 
     FILE * expr_file = fopen((output_dir + "/results.xprs").c_str(), "w");
     ofstream varcov_file;
     if (output_varcov)
@@ -362,7 +382,7 @@ void TranscriptTable::output_results(string output_dir, size_t tot_counts, bool 
             {
                 Transcript& trans = *bundle_trans[i];
                 double l_trans_frac = trans.mass() - l_bundle_mass;
-                trans_counts[i] = (multi_iteration) ? trans.est_counts():sexp(l_trans_frac + l_bundle_counts);
+                trans_counts[i] = sexp(l_trans_frac + l_bundle_counts);
                 if (trans_counts[i] - (double)trans.tot_counts() > EPSILON ||  (double)trans.uniq_counts() - trans_counts[i] > EPSILON)
                     requires_projection = true;
             }
@@ -380,7 +400,7 @@ void TranscriptTable::output_results(string output_dir, size_t tot_counts, bool 
                 Transcript& trans = *bundle_trans[i];
                 double eff_len = sexp(trans.est_effective_length());
 
-                double count_var = (multi_iteration) ? trans.est_counts_var():min(sexp(trans.mass_var() + l_var_renorm), 0.25*trans.tot_counts());
+                double count_var = min(sexp(trans.mass_var() + l_var_renorm), 0.25*trans.tot_counts());
                 double eff_count_norm = (double)trans.length()/eff_len;
                 
                 double fpkm_std_dev = sqrt(trans_counts[i] + count_var);
@@ -400,8 +420,6 @@ void TranscriptTable::output_results(string output_dir, size_t tot_counts, bool 
                         
                         if (i==j)
                             varcov_file << scientific << count_var;
-                        else if (multi_iteration)
-                            varcov_file << scientific << -sexp(get_covar(trans.id(), bundle_trans[j]->id()));
                         else
                             varcov_file << scientific << -sexp(get_covar(trans.id(), bundle_trans[j]->id()) + l_var_renorm);
                            

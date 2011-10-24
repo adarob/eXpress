@@ -104,32 +104,36 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00040"></a>00040     
 <a name="l00044"></a>00044     <span class="keywordtype">size_t</span> _N;
 <a name="l00045"></a>00045     
-<a name="l00046"></a>00046 <span class="keyword">public</span>:
-<a name="l00047"></a>00047     
-<a name="l00051"></a><a class="code" href="class_frequency_matrix.html#a9bf1c990b218963fe22abb434862f930">00051</a>     <a class="code" href="class_frequency_matrix.html#a9bf1c990b218963fe22abb434862f930">FrequencyMatrix</a>(){};
+<a name="l00049"></a>00049     <span class="keywordtype">bool</span> _logged;
+<a name="l00050"></a>00050     
+<a name="l00051"></a>00051 <span class="keyword">public</span>:
 <a name="l00052"></a>00052     
-<a name="l00059"></a>00059     <a class="code" href="class_frequency_matrix.html#a9bf1c990b218963fe22abb434862f930">FrequencyMatrix</a>(<span class="keywordtype">size_t</span> m, <span class="keywordtype">size_t</span> n, <span class="keywordtype">double</span> alpha);
-<a name="l00060"></a>00060    
-<a name="l00067"></a>00067     <span class="keywordtype">double</span> <a class="code" href="class_frequency_matrix.html#aa182384d4cd1ccf03d51eabc1a6511a5">operator()</a>(<span class="keywordtype">size_t</span> i, <span class="keywordtype">size_t</span> j) <span class="keyword">const</span>;
-<a name="l00068"></a>00068     
-<a name="l00074"></a>00074     <span class="keywordtype">double</span> <a class="code" href="class_frequency_matrix.html#aa182384d4cd1ccf03d51eabc1a6511a5">operator()</a>(<span class="keywordtype">size_t</span> k) <span class="keyword">const</span>;
-<a name="l00075"></a>00075     
-<a name="l00082"></a>00082     <span class="keywordtype">void</span> <a class="code" href="class_frequency_matrix.html#ab5b9c15d7d7660ea5804d6081a672991">increment</a>(<span class="keywordtype">size_t</span> i, <span class="keywordtype">size_t</span> j, <span class="keywordtype">double</span> incr_amt);
-<a name="l00083"></a>00083     
-<a name="l00089"></a>00089     <span class="keywordtype">void</span> <a class="code" href="class_frequency_matrix.html#ab5b9c15d7d7660ea5804d6081a672991">increment</a>(<span class="keywordtype">size_t</span> k, <span class="keywordtype">double</span> incr_amt);
-<a name="l00090"></a>00090     
-<a name="l00096"></a><a class="code" href="class_frequency_matrix.html#af833fe86c53b4cf735d24a71a176182b">00096</a>     <span class="keywordtype">double</span> <a class="code" href="class_frequency_matrix.html#af833fe86c53b4cf735d24a71a176182b">arr</a>(<span class="keywordtype">size_t</span> k)<span class="keyword"> const </span>{ <span class="keywordflow">return</span> _array[k]; }
-<a name="l00097"></a>00097     
-<a name="l00103"></a><a class="code" href="class_frequency_matrix.html#af4aef437a9a3b739f84bbeb13a366f52">00103</a>     <span class="keywordtype">double</span> <a class="code" href="class_frequency_matrix.html#af4aef437a9a3b739f84bbeb13a366f52">row</a>(<span class="keywordtype">size_t</span> i)<span class="keyword"> const </span>{ <span class="keywordflow">return</span> _rowsums[i]; } 
-<a name="l00104"></a>00104 };
-<a name="l00105"></a>00105 
-<a name="l00106"></a>00106 <span class="preprocessor">#endif</span>
+<a name="l00056"></a><a class="code" href="class_frequency_matrix.html#a9bf1c990b218963fe22abb434862f930">00056</a>     <a class="code" href="class_frequency_matrix.html#a9bf1c990b218963fe22abb434862f930">FrequencyMatrix</a>(){};
+<a name="l00057"></a>00057     
+<a name="l00065"></a>00065     <a class="code" href="class_frequency_matrix.html#a9bf1c990b218963fe22abb434862f930">FrequencyMatrix</a>(<span class="keywordtype">size_t</span> m, <span class="keywordtype">size_t</span> n, <span class="keywordtype">double</span> alpha, <span class="keywordtype">bool</span> logged = <span class="keyword">true</span>);
+<a name="l00066"></a>00066    
+<a name="l00073"></a>00073     <span class="keywordtype">double</span> <a class="code" href="class_frequency_matrix.html#aa182384d4cd1ccf03d51eabc1a6511a5">operator()</a>(<span class="keywordtype">size_t</span> i, <span class="keywordtype">size_t</span> j) <span class="keyword">const</span>;
+<a name="l00074"></a>00074     
+<a name="l00080"></a>00080     <span class="keywordtype">double</span> <a class="code" href="class_frequency_matrix.html#aa182384d4cd1ccf03d51eabc1a6511a5">operator()</a>(<span class="keywordtype">size_t</span> k) <span class="keyword">const</span>;
+<a name="l00081"></a>00081     
+<a name="l00088"></a>00088     <span class="keywordtype">void</span> <a class="code" href="class_frequency_matrix.html#ab5b9c15d7d7660ea5804d6081a672991">increment</a>(<span class="keywordtype">size_t</span> i, <span class="keywordtype">size_t</span> j, <span class="keywordtype">double</span> incr_amt);
+<a name="l00089"></a>00089     
+<a name="l00095"></a>00095     <span class="keywordtype">void</span> <a class="code" href="class_frequency_matrix.html#ab5b9c15d7d7660ea5804d6081a672991">increment</a>(<span class="keywordtype">size_t</span> k, <span class="keywordtype">double</span> incr_amt);
+<a name="l00096"></a>00096     
+<a name="l00102"></a><a class="code" href="class_frequency_matrix.html#af833fe86c53b4cf735d24a71a176182b">00102</a>     <span class="keywordtype">double</span> <a class="code" href="class_frequency_matrix.html#af833fe86c53b4cf735d24a71a176182b">arr</a>(<span class="keywordtype">size_t</span> k)<span class="keyword"> const </span>{ <span class="keywordflow">return</span> _array[k]; }
+<a name="l00103"></a>00103     
+<a name="l00109"></a><a class="code" href="class_frequency_matrix.html#af4aef437a9a3b739f84bbeb13a366f52">00109</a>     <span class="keywordtype">double</span> <a class="code" href="class_frequency_matrix.html#af4aef437a9a3b739f84bbeb13a366f52">row</a>(<span class="keywordtype">size_t</span> i)<span class="keyword"> const </span>{ <span class="keywordflow">return</span> _rowsums[i]; } 
+<a name="l00110"></a>00110     
+<a name="l00115"></a>00115     <span class="keywordtype">void</span> <a class="code" href="class_frequency_matrix.html#a51d153eb0ea0b398fb82fc97a66fed91">set_logged</a>(<span class="keywordtype">bool</span> logged);
+<a name="l00116"></a>00116 };
+<a name="l00117"></a>00117 
+<a name="l00118"></a>00118 <span class="preprocessor">#endif</span>
 </pre></div></div>
 </div>
   <div id="nav-path" class="navpath">
     <ul>
       <li class="navelem"><b>frequencymatrix.h</b>      </li>
-      <li class="footer">Generated on Sat Oct 8 2011 22:41:37 for eXpress by&#160;
+      <li class="footer">Generated on Wed Oct 19 2011 12:47:23 for eXpress by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </li>
     </ul>
