@@ -426,8 +426,8 @@ stop:
 void SAMParser::reset()
 {
     // Rewind input file
-    _in->seekg(0, ios::beg); 
     _in->clear();
+    _in->seekg(0, ios::beg); 
     
     // Load first alignment
     char line_buff[BUFF_SIZE];

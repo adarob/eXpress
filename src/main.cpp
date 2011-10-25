@@ -8,7 +8,6 @@
 
 //TODO: Check for matching lengths
 //TODO: Update params between rounds
-//TODO: Additional rounds
 //TODO: Indels
 
 #include <boost/filesystem.hpp>
