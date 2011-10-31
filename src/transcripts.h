@@ -60,6 +60,8 @@ class Transcript
      */
     std::string _seq;
     
+    double _alpha;
+    
     /**
      * a private double that stores the (logged) mass based on observed fragment mappings
      */
@@ -239,8 +241,9 @@ public:
      * originated from this transcript
      * @param frag a FragHit to return the likelihood of being originated from this transcript
      * @return (a value proportional to) the log likelihood the given fragment originated from this transcript
+     * FIX
      */
-    double log_likelihood(const FragHit& frag) const;
+    double log_likelihood(const FragHit& frag, bool with_pseudo) const;
 
     
     /**

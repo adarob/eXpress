@@ -212,7 +212,7 @@ void process_fragment(double mass_n, Fragment* frag_p, TranscriptTable* trans_ta
         {
             const FragHit& m = *frag.hits()[i];
             Transcript* t = m.mapped_trans;
-            likelihoods[i] = t->log_likelihood(m);
+            likelihoods[i] = t->log_likelihood(m, first_round);
             total_likelihood = log_sum(total_likelihood, likelihoods[i]);
         }
     }
