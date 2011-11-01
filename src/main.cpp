@@ -346,7 +346,7 @@ size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TranscriptTable* 
                 (globs.mismatch_table)->activate();
         }
         
-        if (output_running_reads && n == i*pow(10.,(double)j))
+        if (output_running_reads && abs(n - i*pow(10.,(double)j)) < EPSILON)
         {
             char buff[500];
             sprintf(buff, "%s/x_" SIZE_T_FMT "", output_dir.c_str(), n);
