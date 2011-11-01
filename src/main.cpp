@@ -346,7 +346,7 @@ size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TranscriptTable* 
                 (globs.mismatch_table)->activate();
         }
         
-        if (output_running_reads && abs(n - i*pow(10.,(double)j)) < EPSILON)
+        if (output_running_reads && n == i*pow(10.,(double)j))
         {
             char buff[500];
             sprintf(buff, "%s/x_" SIZE_T_FMT "", output_dir.c_str(), n);
@@ -358,6 +358,12 @@ size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TranscriptTable* 
                 exit(1);
             }
             trans_table->output_results(dir, n, false);
+            
+            if (i++ == 9)
+            {
+                i = 1;
+                j++;
+            }
         }
         
         // Output progress
@@ -379,14 +385,6 @@ size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TranscriptTable* 
         process_fragment(mass_n, frag, trans_table, globs);
         n += 1;
         mass_n += ff_param*log((double)n-1) - log(pow(n,ff_param) - 1);
-        
-        //For log scale output
-        if (i++ == 9)
-        {
-			i = 1;
-			j++;
-        }
-         
     }
     
     {
