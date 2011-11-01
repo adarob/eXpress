@@ -366,7 +366,7 @@ size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TranscriptTable* 
         
         process_fragment(mass_n, frag, trans_table, globs);
         
-        if (output_running_reads && n-1 == i*pow(10.,(double)j))
+        if (output_running_reads && n == i*pow(10.,(double)j))
         {
             char buff[500];
             sprintf(buff, "%s/x_" SIZE_T_FMT "", output_dir.c_str(), n);
