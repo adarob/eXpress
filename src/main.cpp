@@ -346,7 +346,27 @@ size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TranscriptTable* 
                 (globs.mismatch_table)->activate();
         }
         
-        if (output_running_reads && n == i*pow(10.,(double)j))
+
+        
+        // Output progress
+        if (n % 1000000 == 1)
+        {
+            if (vis)
+            {
+                cout << "0 " << (globs.fld)->to_string() << '\n';
+                cout << "1 " << (globs.mismatch_table)->to_string() << '\n';
+                cout << "2 " << (globs.bias_table)->to_string() << '\n';
+                cout << "3 " << n << '\n';
+            }
+            else
+            {
+                cout << "Fragments Processed: " << setw(9) << n-1 << "\t Number of Bundles: "<< trans_table->num_bundles() << endl;
+            }
+        }
+        
+        process_fragment(mass_n, frag, trans_table, globs);
+        
+        if (output_running_reads && n-1 == i*pow(10.,(double)j))
         {
             char buff[500];
             sprintf(buff, "%s/x_" SIZE_T_FMT "", output_dir.c_str(), n);
@@ -366,23 +386,6 @@ size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TranscriptTable* 
             }
         }
         
-        // Output progress
-        if (n % 1000000 == 1)
-        {
-            if (vis)
-            {
-                cout << "0 " << (globs.fld)->to_string() << '\n';
-                cout << "1 " << (globs.mismatch_table)->to_string() << '\n';
-                cout << "2 " << (globs.bias_table)->to_string() << '\n';
-                cout << "3 " << n << '\n';
-            }
-            else
-            {
-                cout << "Fragments Processed: " << setw(9) << n-1 << "\t Number of Bundles: "<< trans_table->num_bundles() << endl;
-            }
-        }
-        
-        process_fragment(mass_n, frag, trans_table, globs);
         n += 1;
         mass_n += ff_param*log((double)n-1) - log(pow(n,ff_param) - 1);
     }
