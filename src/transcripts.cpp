@@ -343,7 +343,7 @@ void TranscriptTable::output_results(string output_dir, size_t tot_counts, bool 
     if (output_varcov)
         varcov_file.open((output_dir + "/varcov.xprs").c_str());    
     
-    fprintf(expr_file, "bundle_id\ttarget_id\tlength\teff_length\ttot_counts\tuniq_counts\tpost_count_mean\tpost_count_var\teff_count_mean\teff_count_var\tfpkm\tfpkm_conf_low\tfpkm_conf_high\n");
+    fprintf(expr_file, "bundle_id\ttarget_id\tlength\teff_length\ttot_counts\tuniq_counts\tpost_count_mean\tpost_count_var\tfpkm\tfpkm_conf_low\tfpkm_conf_high\n");
 
     double l_bil = log(1000000000.);
     double l_tot_counts = log((double)tot_counts);

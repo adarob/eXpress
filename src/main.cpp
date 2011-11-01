@@ -65,7 +65,8 @@ bool bias_correct = true;
 bool calc_covar = false;
 bool vis = false;
 bool output_alignments = false;
-bool output_running = false;
+bool output_running_rounds = false;
+bool output_running_reads = false;
 
 // directional parameters
 enum Direction{ BOTH, FR, RF };
@@ -101,7 +102,8 @@ bool parse_options(int ac, char ** av)
     ("no-error-model","")
     ("single-round", "")
     ("visualizer-output,v","")
-    ("output-running", "")
+    ("output-running-rounds", "")    
+    ("output-running-reads", "")
     ("batch-mode","")
     ("forget-param,f", po::value<double>(&ff_param)->default_value(0.9),"")
     ("stop-at", po::value<size_t>(&stop_at)->default_value(0),"")
@@ -168,7 +170,8 @@ bool parse_options(int ac, char ** av)
     bias_correct = !(vm.count("no-bias-correct"));
     error_model = !(vm.count("no-error-model"));
     vis = vm.count("visualizer-output");
-    output_running = vm.count("output-running");
+    output_running_rounds = vm.count("output-running-rounds");
+    output_running_reads = vm.count("output-running-reads");
     batch_mode = vm.count("batch-mode");
     
     if (remaining_rounds > 0 && in_map_file_name != "")
@@ -312,6 +315,10 @@ size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TranscriptTable* 
     Fragment* frag;
     cout << setiosflags(ios::left);
     
+    // For log-scale output
+    size_t i = 1;
+    size_t j = 0;
+    
     while(!stop_at || n <= stop_at)
     {
         {
@@ -339,6 +346,20 @@ size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TranscriptTable* 
                 (globs.mismatch_table)->activate();
         }
         
+        if (output_running_reads && n == i*pow(10.,(double)j))
+        {
+            char buff[500];
+            sprintf(buff, "%s/x_" SIZE_T_FMT "", output_dir.c_str(), n);
+            string dir(buff);
+            try { fs::create_directories(dir); }
+            catch (fs::filesystem_error& e)
+            {
+                cerr << e.what() << endl;
+                exit(1);
+            }
+            trans_table->output_results(dir, n, false);
+        }
+        
         // Output progress
         if (n % 1000000 == 1)
         {
@@ -358,6 +379,14 @@ size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TranscriptTable* 
         process_fragment(mass_n, frag, trans_table, globs);
         n += 1;
         mass_n += ff_param*log((double)n-1) - log(pow(n,ff_param) - 1);
+        
+        //For log scale output
+        if (i++ == 9)
+        {
+			i = 1;
+			j++;
+        }
+         
     }
     
     {
@@ -427,7 +456,7 @@ int main (int argc, char ** argv)
     first_round = false;
     while (!last_round)
     {
-        if (output_running)
+        if (output_running_rounds)
         {
             char buff[500];
             sprintf(buff, "%s/x_" SIZE_T_FMT "", output_dir.c_str(), remaining_rounds);
