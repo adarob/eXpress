@@ -69,16 +69,16 @@ double Transcript::log_likelihood(const FragHit& frag, bool with_pseudo) const
 
     double ll = mass();
     
-    if (with_pseudo)
-        ll = log_sum(ll, _alpha+_cached_eff_len);
-    
     if (_globs->mismatch_table)
         ll += (_globs->mismatch_table)->log_likelihood(frag);
     
     const PairStatus ps = frag.pair_status();
     {
         boost::mutex::scoped_lock lock(_bias_lock);
-
+        
+        if (with_pseudo)
+            ll = log_sum(ll, _alpha+_cached_eff_len);
+        
         if (ps != RIGHT_ONLY)
             ll += _start_bias[frag.left];
         if (ps != LEFT_ONLY)

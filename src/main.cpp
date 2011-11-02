@@ -346,8 +346,6 @@ size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TranscriptTable* 
                 (globs.mismatch_table)->activate();
         }
         
-
-        
         // Output progress
         if (n % 1000000 == 1)
         {
