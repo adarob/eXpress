@@ -313,6 +313,7 @@ size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TranscriptTable* 
     boost::thread* bias_update = NULL;
     
     size_t n = 1;
+    size_t round_end = stop_at;
     double mass_n = 0;
     Fragment* frag;
     cout << setiosflags(ios::left);
@@ -325,8 +326,8 @@ size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TranscriptTable* 
         ParseThreadSafety ts;
         running = true;
         boost::thread parse(&ThreadedMapParser::threaded_parse, &map_parser, &ts, trans_table);
-
-        while(!stop_at || n <= stop_at)
+        
+        while(!stop_at || n <= round_end)
         {
             {
                 boost::unique_lock<boost::mutex> lock(ts.mut);
@@ -403,12 +404,18 @@ size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TranscriptTable* 
         }
 
         parse.join();
-
+        if (bias_update)
+        {
+            bias_update->join();
+            delete bias_update;
+        }
+        
         if (online_additional && remaining_rounds--)
         {
             map_parser.reset_reader();
             first_round = false;
             last_round = (remaining_rounds==0);
+            round_end += stop_at;
         }
         else
         {
@@ -425,11 +432,6 @@ size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TranscriptTable* 
     else
         cout << "COMPLETED: Processed " << n << " mapped fragments, targets are in " << trans_table->num_bundles() << " bundles\n";
     
-    if (bias_update)
-    {
-        bias_update->join();
-        delete bias_update;
-    }
     return n;
 }
 
