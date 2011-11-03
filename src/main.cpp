@@ -232,16 +232,15 @@ void process_fragment(double mass_n, Fragment* frag_p, TranscriptTable* trans_ta
     {
         bundle->incr_counts();
     }
-    for(size_t i = 1; i < frag.num_hits(); ++i)
-    {
-        bundle = trans_table->merge_bundles(bundle, frag.hits()[i]->mapped_trans->bundle());
-    }
-
+    
     // normalize marginal likelihoods
     for(size_t i = 0; i < frag.num_hits(); ++i)
     {
         FragHit& m = *frag.hits()[i];
         Transcript* t  = m.mapped_trans;
+ 
+        bundle = trans_table->merge_bundles(bundle, t->bundle());
+        
         double p = likelihoods[i]-total_likelihood;
         double mass_t = mass_n + p;
         

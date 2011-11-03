@@ -29,8 +29,8 @@ Transcript::Transcript(const TransID id, const std::string& name, const std::str
     _alpha(log(alpha)),
     _mass(HUGE_VAL),
     _mass_var(HUGE_VAL),
-    _est_counts(0),
-    _est_counts_var(0),
+    _est_counts(HUGE_VAL),
+    _est_counts_var(HUGE_VAL),
     _uniq_counts(0),
     _tot_counts(0),
     _start_bias(std::vector<double>(seq.length(),0)),
@@ -52,6 +52,7 @@ void Transcript::add_mass(double p, double mass)
 void Transcript::add_prob_count(double p)
 {
     _est_counts = log_sum(_est_counts, p);
+    assert(sexp(_est_counts) <= _tot_counts);
     if (p != 0.0)
         _est_counts_var = log_sum(_est_counts_var, p + log(1-sexp(p)));
 }
