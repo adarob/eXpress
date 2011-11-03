@@ -52,7 +52,6 @@ void Transcript::add_mass(double p, double mass)
 void Transcript::add_prob_count(double p)
 {
     _est_counts = log_sum(_est_counts, p);
-    assert(sexp(_est_counts) <= _tot_counts);
     if (p != 0.0)
         _est_counts_var = log_sum(_est_counts_var, p + log(1-sexp(p)));
 }
