@@ -78,6 +78,7 @@ bool running = true;
 bool first_round = true;
 bool last_round = true;
 bool batch_mode = false;
+bool online_additional = false;
 size_t remaining_rounds = 0;
 
 bool parse_options(int ac, char ** av)
@@ -88,7 +89,7 @@ bool parse_options(int ac, char ** av)
     ("output-dir,o", po::value<string>(&output_dir)->default_value("."), "write all output files to this directory")
     ("frag-len-mean,m", po::value<int>(&def_fl_mean)->default_value(200), "prior estimate for average fragment length")
     ("frag-len-stddev,s", po::value<int>(&def_fl_stddev)->default_value(80), "prior estimate for fragment length std deviation")
-    ("additional-rounds,N", po::value<size_t>(&remaining_rounds)->default_value(1), "number of additional EM rounds after online round")
+    ("additional-rounds,N", po::value<size_t>(&remaining_rounds)->default_value(1), "number of additional batch EM rounds after online round")
     ("output-alignments", "output alignments (sam/bam) with probabilistic assignments")
     ("fr-stranded", "accept only forward->reverse alignments (second-stranded protocols)")
     ("rf-stranded", "accept only reverse->forward alignments (first-stranded protocols)")
@@ -105,6 +106,7 @@ bool parse_options(int ac, char ** av)
     ("output-running-rounds", "")    
     ("output-running-reads", "")
     ("batch-mode","")
+    ("online-N", po::value<size_t>(&remaining_rounds)->default_value(1), "number of additional online EM rounds after initial")
     ("forget-param,f", po::value<double>(&ff_param)->default_value(0.9),"")
     ("stop-at", po::value<size_t>(&stop_at)->default_value(0),"")
     ("sam-file", po::value<string>(&in_map_file_name)->default_value(""),"")
@@ -173,6 +175,7 @@ bool parse_options(int ac, char ** av)
     output_running_rounds = vm.count("output-running-rounds");
     output_running_reads = vm.count("output-running-reads");
     batch_mode = vm.count("batch-mode");
+    online_additional = vm.count("online-N");
     
     if (remaining_rounds > 0 && in_map_file_name != "")
         last_round = false;
@@ -228,7 +231,7 @@ void process_fragment(double mass_n, Fragment* frag_p, TranscriptTable* trans_ta
     
     // merge bundles
     Bundle* bundle = frag.hits()[0]->mapped_trans->bundle();
-    if (last_round)
+    if (first_round)
     {
         bundle->incr_counts();
     }
@@ -270,10 +273,13 @@ void process_fragment(double mass_n, Fragment* frag_p, TranscriptTable* trans_ta
         }
         else
         {
-            t->add_prob_count(p);
+            if (online_additional)
+                t->add_mass(p, mass_n);
+            else
+                t->add_prob_count(p);
         }
         
-        if (calc_covar && last_round)
+        if (calc_covar && (last_round || online_additional))
         {
             for(size_t j = i+1; j < frag.num_hits(); ++j)
             {
@@ -283,7 +289,7 @@ void process_fragment(double mass_n, Fragment* frag_p, TranscriptTable* trans_ta
                     continue;
                 
                 double covar = p + p2;
-                if (first_round && last_round)
+                if ((first_round && last_round) || online_additional)
                     covar += 2*mass_n;
                 
                 trans_table->update_covar(m.trans_id, m2.trans_id, covar); 
@@ -303,10 +309,7 @@ void process_fragment(double mass_n, Fragment* frag_p, TranscriptTable* trans_ta
 size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TranscriptTable* trans_table, Globals& globs)
 {
     cout << "Processing input fragment alignments...\n";
-    running = true;
     
-    ParseThreadSafety ts;
-    boost::thread parse(&ThreadedMapParser::threaded_parse, &map_parser, &ts, trans_table);
     boost::thread* bias_update = NULL;
     
     size_t n = 1;
@@ -317,82 +320,102 @@ size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TranscriptTable* 
     // For log-scale output
     size_t i = 1;
     size_t j = 0;
-    
-    while(!stop_at || n <= stop_at)
+    while (true)
     {
+        ParseThreadSafety ts;
+        running = true;
+        boost::thread parse(&ThreadedMapParser::threaded_parse, &map_parser, &ts, trans_table);
+
+        while(!stop_at || n <= stop_at)
         {
-            boost::unique_lock<boost::mutex> lock(ts.mut);
-            while(!ts.frag_clean)
             {
-                ts.cond.wait(lock);
+                boost::unique_lock<boost::mutex> lock(ts.mut);
+                while(!ts.frag_clean)
+                {
+                    ts.cond.wait(lock);
+                }
+                
+                frag = ts.next_frag;
+                
+                ts.frag_clean = false;
+                ts.cond.notify_one();
             }
             
-            frag = ts.next_frag;
+            if (!frag)
+            {
+                break;
+            }
+                    
+            if (first_round && n == burn_in)
+            {
+                bias_update = new boost::thread(&TranscriptTable::threaded_bias_update, trans_table);
+                if (globs.mismatch_table)
+                    (globs.mismatch_table)->activate();
+            }
             
+            // Output progress
+            if (n % 1000000 == 1)
+            {
+                if (vis)
+                {
+                    cout << "0 " << (globs.fld)->to_string() << '\n';
+                    cout << "1 " << (globs.mismatch_table)->to_string() << '\n';
+                    cout << "2 " << (globs.bias_table)->to_string() << '\n';
+                    cout << "3 " << n << '\n';
+                }
+                else
+                {
+                    cout << "Fragments Processed: " << setw(9) << n-1 << "\t Number of Bundles: "<< trans_table->num_bundles() << endl;
+                }
+            }
+            
+            process_fragment(mass_n, frag, trans_table, globs);
+            
+            if (output_running_reads && n == i*pow(10.,(double)j))
+            {
+                char buff[500];
+                sprintf(buff, "%s/x_" SIZE_T_FMT "", output_dir.c_str(), n);
+                string dir(buff);
+                try { fs::create_directories(dir); }
+                catch (fs::filesystem_error& e)
+                {
+                    cerr << e.what() << endl;
+                    exit(1);
+                }
+                trans_table->output_results(dir, n, false);
+                
+                if (i++ == 9)
+                {
+                    i = 1;
+                    j++;
+                }
+            }
+            
+            n += 1;
+            mass_n += ff_param*log((double)n-1) - log(pow(n,ff_param) - 1);
+        }
+    
+        {
+            boost::unique_lock<boost::mutex> lock(ts.mut);
+            running = false;
             ts.frag_clean = false;
             ts.cond.notify_one();
         }
-        
-        if (!frag)
+
+        parse.join();
+
+        if (online_additional && remaining_rounds--)
+        {
+            map_parser.reset_reader();
+            first_round = false;
+        }
+        else
         {
             break;
         }
-                
-        if (first_round && n == burn_in)
-        {
-            bias_update = new boost::thread(&TranscriptTable::threaded_bias_update, trans_table);
-            if (globs.mismatch_table)
-                (globs.mismatch_table)->activate();
-        }
-        
-        // Output progress
-        if (n % 1000000 == 1)
-        {
-            if (vis)
-            {
-                cout << "0 " << (globs.fld)->to_string() << '\n';
-                cout << "1 " << (globs.mismatch_table)->to_string() << '\n';
-                cout << "2 " << (globs.bias_table)->to_string() << '\n';
-                cout << "3 " << n << '\n';
-            }
-            else
-            {
-                cout << "Fragments Processed: " << setw(9) << n-1 << "\t Number of Bundles: "<< trans_table->num_bundles() << endl;
-            }
-        }
-        
-        process_fragment(mass_n, frag, trans_table, globs);
-        
-        if (output_running_reads && n == i*pow(10.,(double)j))
-        {
-            char buff[500];
-            sprintf(buff, "%s/x_" SIZE_T_FMT "", output_dir.c_str(), n);
-            string dir(buff);
-            try { fs::create_directories(dir); }
-            catch (fs::filesystem_error& e)
-            {
-                cerr << e.what() << endl;
-                exit(1);
-            }
-            trans_table->output_results(dir, n, false);
-            
-            if (i++ == 9)
-            {
-                i = 1;
-                j++;
-            }
-        }
-        
-        n += 1;
-        mass_n += ff_param*log((double)n-1) - log(pow(n,ff_param) - 1);
     }
     
-    {
-        boost::unique_lock<boost::mutex> lock(ts.mut);
-        running = false;
-        ts.frag_clean = false;
-        ts.cond.notify_one();
-    }
+
     
     n -= 1;
     
@@ -401,7 +424,6 @@ size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TranscriptTable* 
     else
         cout << "COMPLETED: Processed " << n << " mapped fragments, targets are in " << trans_table->num_bundles() << " bundles\n";
     
-    parse.join();
     if (bias_update)
     {
         bias_update->join();
