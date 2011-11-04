@@ -419,6 +419,7 @@ size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TranscriptTable* 
             last_round = (remaining_rounds==0);
             map_parser.write_active(last_round);
             map_parser.reset_reader();
+            num_frags = 0;
         }
         else
         {
