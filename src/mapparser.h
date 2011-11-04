@@ -138,6 +138,7 @@ public:
      */
     bool next_fragment(Fragment& f);
     
+    //FIX
     void reset();
 };
 
@@ -362,6 +363,7 @@ public:
     
     void write_active(bool b) { _write_active = b; }
     
+    //FIX
     void reset_reader() { _parser->reset(); }
     
 };
