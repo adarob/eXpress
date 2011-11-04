@@ -327,7 +327,7 @@ size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TranscriptTable* 
         running = true;
         boost::thread parse(&ThreadedMapParser::threaded_parse, &map_parser, &ts, trans_table);
         
-        while(!stop_at || n < num_frags)
+        while(!stop_at || num_frags < stop_at)
         {
             {
                 boost::unique_lock<boost::mutex> lock(ts.mut);
