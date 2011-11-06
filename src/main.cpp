@@ -380,6 +380,7 @@ size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TranscriptTable* 
             {
                 char buff[500];
                 sprintf(buff, "%s/x_" SIZE_T_FMT "", output_dir.c_str(), n);
+                cout << "Writing results to " << buff << endl;
                 string dir(buff);
                 try { fs::create_directories(dir); }
                 catch (fs::filesystem_error& e)
@@ -442,7 +443,7 @@ size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TranscriptTable* 
 
 
 int main (int argc, char ** argv)
-{      
+{     
     int parse_ret = parse_options(argc,argv);
     if (parse_ret)
         return parse_ret;
