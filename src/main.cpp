@@ -79,6 +79,7 @@ bool first_round = true;
 bool last_round = true;
 bool batch_mode = false;
 bool online_additional = false;
+bool both = false;
 size_t remaining_rounds = 0;
 
 bool parse_options(int ac, char ** av)
@@ -107,6 +108,7 @@ bool parse_options(int ac, char ** av)
     ("output-running-reads", "")
     ("batch-mode","")
     ("online-N","")
+    ("both","")
     ("forget-param,f", po::value<double>(&ff_param)->default_value(0.9),"")
     ("stop-at", po::value<size_t>(&stop_at)->default_value(0),"")
     ("sam-file", po::value<string>(&in_map_file_name)->default_value(""),"")
@@ -176,6 +178,7 @@ bool parse_options(int ac, char ** av)
     output_running_reads = vm.count("output-running-reads");
     batch_mode = vm.count("batch-mode");
     online_additional = vm.count("online-N");
+    both = vm.count("both");
     
     if (remaining_rounds > 0 && in_map_file_name != "")
         last_round = false;
@@ -474,6 +477,9 @@ int main (int argc, char ** argv)
     }
     
     size_t tot_counts = threaded_calc_abundances(map_parser, &trans_table, globs);
+    
+    if (both)
+        remaining_rounds = 1;
     
     if (batch_mode)
         trans_table.round_reset();
