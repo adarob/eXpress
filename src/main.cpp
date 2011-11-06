@@ -420,7 +420,7 @@ size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TranscriptTable* 
         {
             cout << remaining_rounds << " remaining rounds." << endl;
             first_round = false;
-            last_round = (remaining_rounds==0);
+            last_round = (remaining_rounds==0 && !both);
             map_parser.write_active(last_round);
             map_parser.reset_reader();
             num_frags = 0;
