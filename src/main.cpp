@@ -418,6 +418,19 @@ size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TranscriptTable* 
         
         if (online_additional && remaining_rounds--)
         {
+            if (output_running_rounds)
+            {
+                char buff[500];
+                sprintf(buff, "%s/x_" SIZE_T_FMT "", output_dir.c_str(), remaining_rounds);
+                string dir(buff);
+                try { fs::create_directories(dir); }
+                catch (fs::filesystem_error& e)
+                {
+                    cerr << e.what() << endl;
+                    exit(1);
+                }
+                trans_table->output_results(dir, num_frags, false);
+            }
             cout << remaining_rounds << " remaining rounds." << endl;
             first_round = false;
             last_round = (remaining_rounds==0 && !both);
