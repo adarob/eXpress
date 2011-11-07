@@ -480,7 +480,10 @@ int main (int argc, char ** argv)
     size_t tot_counts = threaded_calc_abundances(map_parser, &trans_table, globs);
     
     if (both)
+    {
         remaining_rounds = 1;
+        online_additional = false;
+    }
     
     if (batch_mode)
         trans_table.round_reset();
