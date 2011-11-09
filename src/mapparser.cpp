@@ -190,6 +190,7 @@ BAMParser::BAMParser(BamTools::BamReader* reader)
     foreach(const BamTools::RefData& ref, _reader->GetReferenceData())
     {
         _trans_index[ref.RefName] = index++;
+        _trans_lengths[ref.RefName] = ref.RefLength;
     }
     
     // Get first valid FragHit
@@ -310,15 +311,22 @@ SAMParser::SAMParser(istream* in)
         size_t idx = str.find("SN:");
         if (idx!=string::npos)
         {
-            str = str.substr(str.find("SN:")+3);
-            str = str.substr(0,str.find_first_of("\n\t "));
-            if (_trans_index.find(str) == _trans_index.end())
+            string name = str.substr(str.find("SN:")+3);
+            name = name.substr(0,name.find_first_of("\n\t "));
+            if (_trans_index.find(name) == _trans_index.end())
             {
-                _trans_index[str] = index++;
+                _trans_index[name] = index++;
             }
             else
             {
                 cerr << "Warning: Target '" << str << "' appears twice in the SAM index.\n";
+            }
+            
+            if (str.find("LN:") != string::npos)
+            {
+                string len = str.substr(str.find("LN:")+3);
+                len = len.substr(0,len.find_first_of("\n\t "));
+                _trans_lengths[name] = atoi(len.c_str());
             }
         }
     }

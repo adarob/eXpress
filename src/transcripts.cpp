@@ -141,7 +141,7 @@ void Transcript::update_transcript_bias()
     _cached_eff_len = est_effective_length();
 }
 
-TranscriptTable::TranscriptTable(const string& trans_fasta_file, const TransIndex& trans_index, double alpha, const Globals* globs)
+TranscriptTable::TranscriptTable(const string& trans_fasta_file, const TransIndex& trans_index, const TransIndex& trans_lengths, double alpha, const Globals* globs)
 : _globs(globs),
   _trans_map(trans_index.size(), NULL),
   _alpha(alpha)
@@ -166,7 +166,7 @@ TranscriptTable::TranscriptTable(const string& trans_fasta_file, const TransInde
             {
                 if (!name.empty())
                 {
-                    add_trans(name, seq, trans_index);
+                    add_trans(name, seq, trans_index, trans_lengths);
                 }
                 name = line.substr(1,line.find(' ')-1);
                 if (target_names.count(name))
@@ -185,7 +185,7 @@ TranscriptTable::TranscriptTable(const string& trans_fasta_file, const TransInde
         }
         if (!name.empty())
         {
-            add_trans(name, seq, trans_index);
+            add_trans(name, seq, trans_index, trans_lengths);
         }
         infile.close();
         if (globs->bias_table)
@@ -223,13 +223,19 @@ TranscriptTable::~TranscriptTable()
     }
 }
 
-void TranscriptTable::add_trans(const string& name, const string& seq, const TransIndex& trans_index)
+void TranscriptTable::add_trans(const string& name, const string& seq, const TransIndex& trans_index, const TransIndex& trans_lengths)
 {
     TransIndex::const_iterator it = trans_index.find(name);
     if(it == trans_index.end())
     {
         cerr << "Warning: Target '" << name << "' exists in MultiFASTA but not alignment (SAM/BAM) file.\n";
         return;
+    }
+    
+    if (trans_lengths.find(name)->second != seq.length())
+    {
+        cerr << "ERROR: Target '" << name << "' differs in length between MultiFASTA and alignment (SAM/BAM) files ("<< seq.length() << " vs. " << trans_lengths.find(name)->second << ").\n";
+        exit(1);
     }
 
     Transcript* trans = new Transcript(it->second, name, seq, _alpha, _globs);

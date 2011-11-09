@@ -48,12 +48,19 @@ public:
     virtual const TransIndex& trans_index() const=0;
     
     /**
+     * a member function that returns the transcript-to-length map
+     * @return the transcript-to-length map
+     */
+    virtual const TransIndex& trans_lengths() const=0;
+    
+    /**
      * a member function that loads all mappings of the next fragment
      * @param f the empty Fragment to add mappings to
      * @return true if more reads remain in the SAM/BAM file/stream, false otherwise
      */
     virtual bool next_fragment(Fragment& f)=0;
 
+    //FIX
     virtual void reset() = 0;
 };
 
@@ -96,6 +103,9 @@ class BAMParser : public Parser
      */
     TransIndex _trans_index; 
     
+    //FIX
+    TransIndex _trans_lengths;
+    
     /**
      * a private pointer to the current fragment mapping being parsed
      */
@@ -130,6 +140,12 @@ public:
      * @return the transcript-to-index map
      */
     const TransIndex& trans_index() const { return _trans_index; }
+    
+    /**
+     * a member function that returns the transcript-to-length map
+     * @return the transcript-to-length map
+     */
+    const TransIndex& trans_lengths() const { return _trans_lengths; }
     
     /**
      * a member function that loads all mappings of the next fragment
@@ -195,6 +211,9 @@ class SAMParser : public Parser
      */
     TransIndex _trans_index; 
     
+    //FIX
+    TransIndex _trans_lengths;
+    
     /**
      * a private pointer to the current fragment mapping being parsed
      */
@@ -211,6 +230,7 @@ class SAMParser : public Parser
      */
     bool map_end_from_line(char* line);
     
+    //FIX
     void reset();
     
 public:
@@ -230,6 +250,12 @@ public:
      * @return the transcript-to-index map
      */
     const TransIndex& trans_index() const { return _trans_index; }
+    
+    /**
+     * a member function that returns the transcript-to-length map
+     * @return the transcript-to-length map
+     */
+    const TransIndex& trans_lengths() const { return _trans_lengths; }
     
     /**
      * a member function that loads all mappings of the next fragment
@@ -299,7 +325,6 @@ struct ParseThreadSafety
      */
     boost::condition_variable cond;
     
-    
     /**
      * a bool specifying the condition that the current next_frag pointer is clean, meaning that it
      * hasn't been copied by the processor
@@ -361,6 +386,13 @@ public:
      */
     const TransIndex& trans_index() { return _parser->trans_index(); }
     
+    /**
+     * a member function that returns the transcript-to-length map
+     * @return the transcript-to-length map
+     */
+    const TransIndex& trans_lengths() { return _parser->trans_lengths(); }
+    
+    //FIX
     void write_active(bool b) { _write_active = b; }
     
     //FIX

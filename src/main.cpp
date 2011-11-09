@@ -481,7 +481,7 @@ int main (int argc, char ** argv)
     globs.bias_table = (bias_correct) ? new BiasBoss(bias_alpha):NULL;
     globs.mismatch_table = (error_model) ? new MismatchTable(mm_alpha):NULL;
     ThreadedMapParser map_parser(in_map_file_name, out_map_file_name, last_round);
-    TranscriptTable trans_table(fasta_file_name, map_parser.trans_index(), expr_alpha, &globs);
+    TranscriptTable trans_table(fasta_file_name, map_parser.trans_index(), map_parser.trans_lengths(), expr_alpha, &globs);
 
     double num_trans = (double)map_parser.trans_index().size();
     

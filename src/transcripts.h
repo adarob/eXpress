@@ -315,9 +315,10 @@ class TranscriptTable
      * a private function that adds a transcript pointer to the table
      * @param name the name of the trancript
      * @param seq the sequence of the transcript
-     * @param trans_idex the transcript-to-index map
+     * @param trans_index the transcript-to-index map
+     //FIX
      */
-    void add_trans(const std::string& name, const std::string& seq, const TransIndex& trans_index);  
+    void add_trans(const std::string& name, const std::string& seq, const TransIndex& trans_index, const TransIndex& trans_lengths);  
     
 public:
     /**
@@ -327,8 +328,9 @@ public:
      * @param alpha a double that specifies the intial pseudo-counts for each bp of the transcripts (non-logged)
      * @param single_round a bool that is true when the algorithm is being run completely online (as opposed to with additional rounds)
      * @param globs a pointer to the struct containing pointers to the global parameter tables (bias_table, mismatch_table, fld)
+     //FIX
      */
-    TranscriptTable(const std::string& trans_fasta_file, const TransIndex& trans_index, double alpha, const Globals* globs);
+    TranscriptTable(const std::string& trans_fasta_file, const TransIndex& trans_index, const TransIndex& trans_lengths, double alpha, const Globals* globs);
     
     /**
      * TranscriptTable Destructor
