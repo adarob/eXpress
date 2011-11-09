@@ -263,7 +263,10 @@ void process_fragment(double mass_n, Fragment* frag_p, TranscriptTable* trans_ta
                 t->incr_uniq_counts();
             
             if (batch_mode)
+            {
                 t->add_prob_count(p);
+                t->add_mass(HUGE_VAL, HUGE_VAL);
+            }
             else
                 t->add_mass(p, mass_n);
             
@@ -443,8 +446,6 @@ size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TranscriptTable* 
             break;
         }
     }
-    
-
         
     if (vis)
         cout << "99\n";
