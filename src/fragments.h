@@ -186,6 +186,11 @@ public:
      * @return a vector containing pointers to the FragHit multi-mappings
      */
     const std::vector<FragHit*>& hits() const { return _frag_hits; }
+    
+    //FIX
+    const FragHit* sample_hit() const;
+
+    
 };
 
 

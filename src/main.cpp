@@ -6,7 +6,6 @@
 //  Copyright 2011 Adam Roberts. All rights reserved.
 //
 
-//TODO: Check for matching lengths
 //TODO: Update params between rounds
 //TODO: Indels
 
@@ -32,6 +31,10 @@
 using namespace std;
 namespace po = boost::program_options;
 namespace fs = boost::filesystem;
+
+
+// global pseudo-random number generator
+boost::mt19937 random_gen;
 
 // the forgetting factor parameter controls the growth of the fragment mass
 double ff_param = 0.9;
@@ -91,7 +94,8 @@ bool parse_options(int ac, char ** av)
     ("frag-len-mean,m", po::value<int>(&def_fl_mean)->default_value(200), "prior estimate for average fragment length")
     ("frag-len-stddev,s", po::value<int>(&def_fl_stddev)->default_value(80), "prior estimate for fragment length std deviation")
     ("additional-rounds,N", po::value<size_t>(&remaining_rounds)->default_value(1), "number of additional batch EM rounds after online round")
-    ("output-alignments", "output alignments (sam/bam) with probabilistic assignments")
+    ("output-align-prob", "output alignments (sam/bam) with probabilistic assignments")
+    ("output-align-samp", "output alignments (sam/bam) with sampled assignments")
     ("fr-stranded", "accept only forward->reverse alignments (second-stranded protocols)")
     ("rf-stranded", "accept only reverse->forward alignments (first-stranded protocols)")
     ("calc-covar", "calculate and output covariance matrix")
@@ -183,10 +187,16 @@ bool parse_options(int ac, char ** av)
     if (remaining_rounds > 0 && in_map_file_name != "")
         last_round = false;
 
-    if (vm.count("output-alignments"))
+    if (vm.count("output-align-prob"))
     {
         out_map_file_name = output_dir + "/hits.prob";
     }
+    
+    if (vm.count("output-align-samp"))
+    {
+        out_map_file_name = output_dir + "/hits.samp";
+    }
+    
     
 #ifndef WIN32
     if (!vm.count("no-update-check"))
@@ -480,6 +490,7 @@ int main (int argc, char ** argv)
     globs.fld = new FLD(fld_alpha, def_fl_max, def_fl_mean, def_fl_stddev);
     globs.bias_table = (bias_correct) ? new BiasBoss(bias_alpha):NULL;
     globs.mismatch_table = (error_model) ? new MismatchTable(mm_alpha):NULL;
+    
     ThreadedMapParser map_parser(in_map_file_name, out_map_file_name, last_round);
     TranscriptTable trans_table(fasta_file_name, map_parser.trans_index(), map_parser.trans_lengths(), expr_alpha, &globs);
 

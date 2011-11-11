@@ -13,8 +13,10 @@
 #include <cassert>
 #include <algorithm>
 #include <boost/foreach.hpp>
+#include <boost/random/mersenne_twister.hpp>
 
 #define foreach BOOST_FOREACH
+
 
 class BiasBoss;
 class MismatchTable;
@@ -29,6 +31,11 @@ struct Globals
     MismatchTable* mismatch_table;
     BiasBoss* bias_table;
 };
+
+/**
+ * a global pseudo-random number generator
+ */ 
+extern boost::mt19937 random_gen;
 
 /**
  * a global bool that is true when processing is still occuring

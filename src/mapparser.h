@@ -73,6 +73,12 @@ public:
  **/
 class Writer
 {
+    /**
+     * a private bool that specifies if a single alignment should be sampled (true) or all output with
+     * their respective probabilities (false)
+     */
+    bool _sample;
+    
 public:
     virtual ~Writer(){};
     
@@ -171,12 +177,21 @@ class BAMWriter : public Writer
      */
     BamTools::BamWriter* _writer;
     
+    /**
+     * a private bool that specifies if a single alignment should be sampled (true) or all output with
+     * their respective probabilities (false)
+     */
+    bool _sample;
+    
 public:
     
     /**
      * BAMWriter constructor stores a pointer to the BAM file
+     * @param writer pointer to the BAM file object
+     * @param sample specifies if a single alignment should be sampled (true) or all output with
+     * their respective probabilities (false)
      */
-    BAMWriter(BamTools::BamWriter* writer);
+    BAMWriter(BamTools::BamWriter* writer, bool sample);
     
     /**
      * BAMWriter destructor flushes and deletes the Bamtools::BamWriter
@@ -280,12 +295,21 @@ class SAMWriter : public Writer
      */
     std::ostream* _out;
     
+    /**
+     * a private bool that specifies if a single alignment should be sampled (true) or all output with
+     * their respective probabilities (false)
+     */
+    bool _sample;
+    
 public:
     
     /**
      * SAMWriter constructor stores a pointer to the output stream
+     * @param out SAM output stream
+     * @param sample specifies if a single alignment should be sampled (true) or all output with
+     * their respective probabilities (false)
      */
-    SAMWriter(std::ostream* out);
+    SAMWriter(std::ostream* out, bool sample);
 
     /**
      * SAMWriter destructor flushes and deletes output stream

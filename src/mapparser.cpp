@@ -74,7 +74,7 @@ ThreadedMapParser::ThreadedMapParser(string in_file, string out_file, bool write
                 BamTools::BamWriter* writer = new BamTools::BamWriter();
                 if (writer->Open(out_file, reader->GetHeader(), reader->GetReferenceData()))
                 {
-                    _writer = new BAMWriter(writer);
+                    _writer = new BAMWriter(writer, out_file.substr(out_file.length()-8,4)=="samp");
                 }
                 else
                 {
@@ -108,7 +108,7 @@ ThreadedMapParser::ThreadedMapParser(string in_file, string out_file, bool write
             exit(1);
         }
         *ofs << _parser->header();
-        _writer = new SAMWriter(ofs);
+        _writer = new SAMWriter(ofs, out_file.substr(out_file.length()-8,4)=="samp");
     }
 }
 
@@ -270,7 +270,10 @@ void BAMParser::reset()
     do {_reader->GetNextAlignment(a);} while(!map_end_from_alignment(a));
 }
 
-BAMWriter::BAMWriter(BamTools::BamWriter* writer) : _writer(writer) {}
+BAMWriter::BAMWriter(BamTools::BamWriter* writer, bool sample) 
+ : _writer(writer),
+   _sample(sample) {}
+
 BAMWriter::~BAMWriter() 
 { 
     _writer->Close(); 
@@ -279,12 +282,21 @@ BAMWriter::~BAMWriter()
 
 void BAMWriter::write_fragment(Fragment& f)
 {
-    foreach(FragHit* hit, f.hits())
+    if (_sample)
     {
-        hit->bam_l.AddTag("XP","f",(float)hit->probability);
-        hit->bam_r.AddTag("XP","f",(float)hit->probability);
+        const FragHit* hit = f.sample_hit();
         _writer->SaveAlignment(hit->bam_l);
         _writer->SaveAlignment(hit->bam_r);
+    }
+    else
+    {
+        foreach(FragHit* hit, f.hits())
+        {
+            hit->bam_l.AddTag("XP","f",(float)hit->probability);
+            hit->bam_r.AddTag("XP","f",(float)hit->probability);
+            _writer->SaveAlignment(hit->bam_l);
+            _writer->SaveAlignment(hit->bam_r);
+        }
     }
 }
 
@@ -456,7 +468,10 @@ void SAMParser::reset()
     }
 }
 
-SAMWriter::SAMWriter(ostream* out) : _out(out) {}
+SAMWriter::SAMWriter(ostream* out, bool sample) 
+ : _out(out),
+   _sample(sample){}
+
 SAMWriter::~SAMWriter() 
 { 
     _out->flush(); 
@@ -465,9 +480,18 @@ SAMWriter::~SAMWriter()
 
 void SAMWriter::write_fragment(Fragment& f)
 {
-    foreach(FragHit* hit, f.hits())
+    if (_sample)
     {
-        *_out << hit->sam_l << " XP:f:" << (float)hit->probability << endl;
-        *_out << hit->sam_r << " XP:f:" << (float)hit->probability << endl;
+        const FragHit* hit = f.sample_hit();
+        *_out << hit->sam_l << endl;
+        *_out << hit->sam_r << endl;       
+    }
+    else
+    {
+        foreach(FragHit* hit, f.hits())
+        {
+            *_out << hit->sam_l << " XP:f:" << (float)hit->probability << endl;
+            *_out << hit->sam_r << " XP:f:" << (float)hit->probability << endl;
+        }
     }
 }
