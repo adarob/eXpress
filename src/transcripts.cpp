@@ -33,10 +33,18 @@ Transcript::Transcript(const TransID id, const std::string& name, const std::str
     _est_counts_var(HUGE_VAL),
     _uniq_counts(0),
     _tot_counts(0),
-    _start_bias(std::vector<float>(seq.length(),0)),
-    _end_bias(std::vector<float>(seq.length(),0)),
     _avg_bias(0)
-{   
+{ 
+    if (globs->bias_table)
+    {
+        _start_bias = new std::vector<float>(seq.length(),0);
+        _end_bias = new std::vector<float>(seq.length(),0);
+    }
+    else
+    {
+        _start_bias = NULL;
+        _end_bias = NULL;
+    }
     _cached_eff_len = est_effective_length();
 }
 
@@ -78,11 +86,13 @@ double Transcript::log_likelihood(const FragHit& frag, bool with_pseudo) const
         
         if (with_pseudo)
             ll = log_sum(ll, _alpha+_cached_eff_len);
-        
-        if (ps != RIGHT_ONLY)
-            ll += _start_bias[frag.left];
-        if (ps != LEFT_ONLY)
-            ll += _end_bias[frag.right-1];            
+        if (_globs->bias_table)
+        {
+            if (ps != RIGHT_ONLY)
+                ll += _start_bias->at(frag.left);
+            if (ps != LEFT_ONLY)
+                ll += _end_bias->at(frag.right-1);  
+        }
         ll -= _cached_eff_len;
     }
     
@@ -112,23 +122,23 @@ double Transcript::cached_effective_length() const
     return _cached_eff_len;
 }
 
-double Transcript::effective_length() const
-{
-    double eff_len = 0.0;
-    boost::mutex::scoped_lock lock(_bias_lock);
-    
-    for(size_t l = 1; l <= min(length(), (_globs->fld)->max_val()); l++)
-    {
-        double len_bias = 0;
-        for (size_t i = 0; i < length()-l+1; i++)
-        {
-            len_bias = log_sum(len_bias, _start_bias[i] + _end_bias[i+l]);
-        }
-        eff_len += log_sum(eff_len, (_globs->fld)->pdf(l) + len_bias);
-    }
-    
-    return eff_len;
-}
+//double Transcript::effective_length() const
+//{
+//    double eff_len = 0.0;
+//    boost::mutex::scoped_lock lock(_bias_lock);
+//    
+//    for(size_t l = 1; l <= min(length(), (_globs->fld)->max_val()); l++)
+//    {
+//        double len_bias = 0;
+//        for (size_t i = 0; i < length()-l+1; i++)
+//        {
+//            len_bias = log_sum(len_bias, _start_bias[i] + _end_bias[i+l]);
+//        }
+//        eff_len += log_sum(eff_len, (_globs->fld)->pdf(l) + len_bias);
+//    }
+//    
+//    return eff_len;
+//}
 
 
 void Transcript::update_transcript_bias()
@@ -136,7 +146,7 @@ void Transcript::update_transcript_bias()
     if (_globs->bias_table)
     {
         boost::mutex::scoped_lock lock(_bias_lock);
-        _avg_bias = (_globs->bias_table)->get_transcript_bias(_start_bias, _end_bias, *this);
+        _avg_bias = (_globs->bias_table)->get_transcript_bias(*_start_bias, *_end_bias, *this);
     }
     _cached_eff_len = est_effective_length();
 }
