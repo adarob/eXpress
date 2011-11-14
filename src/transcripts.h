@@ -109,12 +109,12 @@ class Transcript
     /**
      * a private double vector storing the (logged) 5' bias at each position (accessed by multiple threads)
      */
-    std::vector<double> _start_bias;
+    std::vector<float> _start_bias;
     
     /**
      * a private double vector storing the (logged) 3' bias at each position (accessed by multiple threads)
      */
-    std::vector<double> _end_bias;
+    std::vector<float> _end_bias;
     
     /**
      * a private double storing the (logged) product of the average 3' and 5' biases for the transcript (accessed by multiple threads)

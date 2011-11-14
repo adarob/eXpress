@@ -275,7 +275,7 @@ public:
      * @param trans the transcript for which to calculate the logged bias
      * @return the product of the average 5' and 3' bias (logged)
      */
-    double get_transcript_bias(std::vector<double>& start_bias, std::vector<double>& end_bias, const Transcript& trans) const;
+    double get_transcript_bias(std::vector<float>& start_bias, std::vector<float>& end_bias, const Transcript& trans) const;
     
     /**
      * a member function that returns a string containing the observed positional nucleotide probabilities (non-logged) in column-major order (A,C,G,T)
