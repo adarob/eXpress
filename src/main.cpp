@@ -15,6 +15,8 @@
 #include <iostream>
 #include <fstream>
 #include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
 #include "main.h"
 #include "bundles.h"
 #include "transcripts.h"
@@ -23,6 +25,7 @@
 #include "biascorrection.h"
 #include "mismatchmodel.h"
 #include "mapparser.h"
+
 
 #ifndef WIN32
     #include "update_check.h"
@@ -34,7 +37,7 @@ namespace fs = boost::filesystem;
 
 
 // global pseudo-random number generator
-boost::mt19937 random_gen;
+//boost::mt19937 random_gen;
 
 // the forgetting factor parameter controls the growth of the fragment mass
 double ff_param = 0.9;
@@ -468,6 +471,7 @@ size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TranscriptTable* 
 
 int main (int argc, char ** argv)
 {     
+    srand ( time(NULL) );
     int parse_ret = parse_options(argc,argv);
     if (parse_ret)
         return parse_ret;

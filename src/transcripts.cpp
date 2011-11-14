@@ -33,8 +33,8 @@ Transcript::Transcript(const TransID id, const std::string& name, const std::str
     _est_counts_var(HUGE_VAL),
     _uniq_counts(0),
     _tot_counts(0),
-    _start_bias(std::vector<double>(seq.length(),0)),
-    _end_bias(std::vector<double>(seq.length(),0)),
+    _start_bias(std::vector<float>(seq.length(),0)),
+    _end_bias(std::vector<float>(seq.length(),0)),
     _avg_bias(0)
 {   
     _cached_eff_len = est_effective_length();

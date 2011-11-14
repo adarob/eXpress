@@ -300,7 +300,7 @@ void BiasBoss::update_observed(const FragHit& hit, double normalized_mass)
     }
 }
 
-double BiasBoss::get_transcript_bias(std::vector<double>& start_bias, std::vector<double>& end_bias, const Transcript& trans) const
+double BiasBoss::get_transcript_bias(std::vector<float>& start_bias, std::vector<float>& end_bias, const Transcript& trans) const
 {
     double tot_start = HUGE_VAL;
     double tot_end = HUGE_VAL;

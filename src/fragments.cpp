@@ -9,7 +9,8 @@
 #include "fragments.h"
 #include "main.h"
 #include <string.h>
-#include <boost/random/discrete_distribution.hpp>
+#include <stdlib.h>
+//#include <boost/random/discrete_distribution.hpp>
 
 using namespace std;
 
@@ -93,11 +94,16 @@ void Fragment::add_open_mate(FragHit* new_p)
 const FragHit* Fragment::sample_hit() const
 {
     vector<double> probs(_frag_hits.size());
-    for (size_t i=0; i < _frag_hits.size(); ++i)
+    probs[0] = _frag_hits[0]->probability;
+    for (size_t i=1; i < _frag_hits.size(); ++i)
     {
-        probs[i] = _frag_hits[i]->probability;
+        probs[i] = probs[i-1] + _frag_hits[i]->probability;
     }
-    boost::random::discrete_distribution<> dist(probs);
-    return _frag_hits[dist(random_gen)];
+
+//   boost::random::discrete_distribution<> dist(probs);
+//   return _frag_hits[dist(random_gen)];
+    double r = rand()/double(RAND_MAX)*probs.back();
+    size_t i = lower_bound(probs.begin(), probs.end(), r) - probs.begin();
+    return _frag_hits[i];
 }
 
