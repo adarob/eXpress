@@ -287,6 +287,7 @@ void BiasBoss::update_observed(const FragHit& hit, double normalized_mass)
     if (hit.pair_status() != LEFT_ONLY)
     {
         int left_window = hit.right - CENTER;
+        assert(left_window < t_seq.length());
         string seq_3 = t_seq.substr(left_window, WINDOW);
         int overhang =left_window + WINDOW - (int)t_seq.length();
         if (overhang > 0)
