@@ -107,14 +107,14 @@ class Transcript
     mutable boost::mutex _bias_lock;
     
     /**
-     * a private double vector storing the (logged) 5' bias at each position (accessed by multiple threads)
+     * a point to a private double vector storing the (logged) 5' bias at each position (accessed by multiple threads)
      */
-    std::vector<float> _start_bias;
+    std::vector<float>* _start_bias;
     
     /**
-     * a private double vector storing the (logged) 3' bias at each position (accessed by multiple threads)
+     * a pointer to a private double vector storing the (logged) 3' bias at each position (accessed by multiple threads)
      */
-    std::vector<float> _end_bias;
+    std::vector<float>* _end_bias;
     
     /**
      * a private double storing the (logged) product of the average 3' and 5' biases for the transcript (accessed by multiple threads)
@@ -137,6 +137,13 @@ public:
      */
     Transcript(const size_t id, const std::string& name, const std::string& seq, double alpha, const Globals* globs);
     
+    ~Transcript()
+    {
+        if (_start_bias)
+            delete _start_bias;
+        if (_end_bias)
+            delete _end_bias;
+    }
     /**
      * a member function that returns the transcript name
      * @return string containing transcript name
@@ -250,7 +257,7 @@ public:
      * a member function that calcualtes and returns the effective length of the transcript (logged)
      * @return the effective length of the transcript calculated as \f$ \tilde{l} = \sum_{l=1}^{L(t)}\sum_{i=1}^{L(t)} D(l)b_5[i]*b_3[i+l] \f$
      */
-    double effective_length() const;
+    //double effective_length() const;
     
     /**
      * a member function that calcualtes and returns the estimated effective length of the transcript (logged) using the avg bias
