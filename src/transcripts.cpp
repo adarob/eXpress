@@ -186,6 +186,8 @@ TranscriptTable::TranscriptTable(const string& trans_fasta_file, const TransInde
                 }
                 target_names.insert(name);
                 seq = "";
+                if (target_names.size() % 10000 == 0)
+                    cout << target_names.size() << endl;
             }
             else
             {

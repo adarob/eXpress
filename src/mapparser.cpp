@@ -142,7 +142,7 @@ void ThreadedMapParser::threaded_parse(ParseThreadSafety* thread_safety, Transcr
             Transcript* t = trans_table->get_trans(m.trans_id);
             if (!t)
             {
-                cerr << "ERROR: Target sequence at index '" << m.trans_id << "' not found. Input same FASTA file used in alignment.\n";
+                cerr << "ERROR: Target sequence at index '" << m.trans_id << "' not found. Verify that it is in the SAM/BAM header and FASTA file.\n";
                 exit(1);
             }
             m.mapped_trans = t;
@@ -403,6 +403,11 @@ bool SAMParser::map_end_from_line(char* line)
             case 2:
                 if(p[0] == '*')
                     goto stop;
+                if (!_trans_index.count(p))
+                {
+                    cerr << "ERROR: Target sequence '" << p << "' not found. Verify that it is in the SAM/BAM header and FASTA file.\n";
+                    exit(1);
+                }
                 f.trans_id = _trans_index[p];
                 break;
             case 3:
