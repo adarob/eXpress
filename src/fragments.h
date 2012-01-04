@@ -187,7 +187,11 @@ public:
      */
     const std::vector<FragHit*>& hits() const { return _frag_hits; }
     
-    //FIX
+    /**
+     * a member function that returns a single FragHit of the fragment sampled at random
+     * based on the probabalistic assignment
+     * @return a randomly sampled FragHit
+     */
     const FragHit* sample_hit() const;
 
     

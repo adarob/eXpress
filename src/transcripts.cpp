@@ -28,6 +28,7 @@ Transcript::Transcript(const TransID id, const std::string& name, const std::str
     _seq(seq),
     _alpha(log(alpha)),
     _mass(HUGE_VAL),
+    _tot_mass(HUGE_VAL),
     _mass_var(HUGE_VAL),
     _est_counts(HUGE_VAL),
     _est_counts_var(HUGE_VAL),
@@ -51,6 +52,7 @@ Transcript::Transcript(const TransID id, const std::string& name, const std::str
 void Transcript::add_mass(double p, double mass) 
 { 
     _mass = log_sum(_mass, p+mass);
+    _tot_mass = log_sum(_mass, mass);
     _tot_counts++;
     if (p != 0.0)
         _mass_var = log_sum(_mass_var, 2*mass + p + log(1-sexp(p)));
@@ -420,7 +422,11 @@ void TranscriptTable::output_results(string output_dir, size_t tot_counts, bool 
                 Transcript& trans = *bundle_trans[i];
                 double l_eff_len = trans.est_effective_length();
 
+                // Calculate count variance
                 double count_var = min(sexp(trans.mass_var() + l_var_renorm), 0.25*trans.tot_counts());
+                double avg_p = sexp(trans.mass() - trans.tot_mass());
+                assert (avg_p >=0 && avg_p <= 1);
+                double eff_n = count_var/(avg_p*(1-avg_p));
                 
                 double fpkm_std_dev = sqrt(trans_counts[i] + count_var);
                 double fpkm_constant = sexp(l_bil - l_eff_len - l_tot_counts);

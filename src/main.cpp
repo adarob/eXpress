@@ -96,7 +96,7 @@ bool parse_options(int ac, char ** av)
     ("output-dir,o", po::value<string>(&output_dir)->default_value("."), "write all output files to this directory")
     ("frag-len-mean,m", po::value<int>(&def_fl_mean)->default_value(200), "prior estimate for average fragment length")
     ("frag-len-stddev,s", po::value<int>(&def_fl_stddev)->default_value(80), "prior estimate for fragment length std deviation")
-    ("additional-rounds,N", po::value<size_t>(&remaining_rounds)->default_value(1), "number of additional batch EM rounds after online round")
+    ("additional-rounds,N", po::value<size_t>(&remaining_rounds)->default_value(0), "number of additional batch EM rounds after online round")
     ("output-align-prob", "output alignments (sam/bam) with probabilistic assignments")
     ("output-align-samp", "output alignments (sam/bam) with sampled assignments")
     ("fr-stranded", "accept only forward->reverse alignments (second-stranded protocols)")
@@ -141,6 +141,12 @@ bool parse_options(int ac, char ** av)
     }
     po::notify(vm);
     
+    if (ff_param > 1.0 || ff_param < 0.5)
+    {
+        cerr << "Command-Line Argument Error: forget-param/f option must be between 0.5 and 1.0\n\n";
+        error= true;
+    }
+        
     if (fasta_file_name == "")
     {
         cerr << "Command-Line Argument Error: target sequence fasta file required\n\n";

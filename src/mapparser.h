@@ -60,7 +60,9 @@ public:
      */
     virtual bool next_fragment(Fragment& f)=0;
 
-    //FIX
+    /**
+     * a member function that resets the parser and rewinds to the beginning of the input
+     */
     virtual void reset() = 0;
 };
 
@@ -105,11 +107,13 @@ class BAMParser : public Parser
     BamTools::BamReader* _reader;
     
     /**
-     * the private returns transcript-to-index map
+     * the private transcript-to-index map
      */
     TransIndex _trans_index; 
     
-    //FIX
+    /**
+     * the private transcript-to-length map 
+     */
     TransIndex _trans_lengths;
     
     /**
@@ -160,7 +164,9 @@ public:
      */
     bool next_fragment(Fragment& f);
     
-    //FIX
+    /**
+     * a member function that resets the parser and rewinds to the beginning of the BAM file
+     */
     void reset();
 };
 
@@ -226,7 +232,9 @@ class SAMParser : public Parser
      */
     TransIndex _trans_index; 
     
-    //FIX
+    /**
+     * the private transcript-to-length map
+     */
     TransIndex _trans_lengths;
     
     /**
@@ -245,7 +253,9 @@ class SAMParser : public Parser
      */
     bool map_end_from_line(char* line);
     
-    //FIX
+    /**
+     * a member function that resets the parser and rewinds to the beginning of the SAM file
+     */
     void reset();
     
 public:
@@ -416,10 +426,16 @@ public:
      */
     const TransIndex& trans_lengths() { return _parser->trans_lengths(); }
     
-    //FIX
+    /**
+     * a member function that sets the write-active status of the parser
+     * this specifies whether or not the alignments (sampled or with probs) sould be ouptut
+     * @param b updated write-active status
+     */    
     void write_active(bool b) { _write_active = b; }
     
-    //FIX
+    /**
+     * a member function that resets the input parser
+     */
     void reset_reader() { _parser->reset(); }
     
 };

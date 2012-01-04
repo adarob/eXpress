@@ -63,7 +63,7 @@ class Transcript
     double _alpha;
     
     /**
-     * a private double that stores the (logged) mass based on observed fragment mappings
+     * a private double that stores the (logged) mass based on observed fragment mapping probabilities
      */
     double _mass;
 
@@ -71,6 +71,11 @@ class Transcript
      * a private double that stores the (logged) variance of the mass
      */
     double _mass_var;
+    
+    /**
+     * a private double that stores the total (logged) mass of all fragments mapped to the transcript
+     */
+    double _tot_mass;
     
     /**
      * a private double that stores the estimated counts of observed fragment mappings
@@ -174,6 +179,13 @@ public:
     double mass() const { return _mass; }
     
     /**
+     * a member function that returns the total (logged) mass of all fragments mapped to the transcript
+     * @return logged total mass
+     */
+    double tot_mass() const { return _tot_mass; }
+    
+    
+    /**
      * a member function that returns the current (logged) variance
      * @return logged mass variance
      */
@@ -193,7 +205,9 @@ public:
      */
     double est_counts_var() const { return _est_counts_var; }
 
-    //FIX
+    /**
+     * a member function that readies the transcript object for the next round of batch EM
+     */
     void round_reset();
     
     /**
@@ -247,11 +261,10 @@ public:
      * a member function that returns (a value proportional to) the log likelihood the given fragment
      * originated from this transcript
      * @param frag a FragHit to return the likelihood of being originated from this transcript
+     * @param with_pseudo a FragHit specifying whether or not pseudo-counts should be included in the calculation
      * @return (a value proportional to) the log likelihood the given fragment originated from this transcript
-     * FIX
      */
     double log_likelihood(const FragHit& frag, bool with_pseudo) const;
-
     
     /**
      * a member function that calcualtes and returns the effective length of the transcript (logged)
@@ -319,11 +332,11 @@ class TranscriptTable
     double _alpha;
     
     /**
-     * a private function that adds a transcript pointer to the table
+     * a private function that validates and adds a transcript pointer to the table
      * @param name the name of the trancript
      * @param seq the sequence of the transcript
-     * @param trans_index the transcript-to-index map
-     //FIX
+     * @param trans_index the transcript-to-index map from the alignment file
+     * @param trans_lengths the transcript-to-length map from the alignment file (for validation)
      */
     void add_trans(const std::string& name, const std::string& seq, const TransIndex& trans_index, const TransIndex& trans_lengths);  
     
@@ -331,11 +344,10 @@ public:
     /**
      * TranscriptTable Constructor
      * @param trans_fasta_file a string storing the path to the fasta file from which to load transcripts
-     * @param trans_index the transcript-to-index map
+     * @param trans_index the transcript-to-index map from the alignment file
+     * @param trans_lengths the transcript-to-length map from the alignment file
      * @param alpha a double that specifies the intial pseudo-counts for each bp of the transcripts (non-logged)
-     * @param single_round a bool that is true when the algorithm is being run completely online (as opposed to with additional rounds)
      * @param globs a pointer to the struct containing pointers to the global parameter tables (bias_table, mismatch_table, fld)
-     //FIX
      */
     TranscriptTable(const std::string& trans_fasta_file, const TransIndex& trans_index, const TransIndex& trans_lengths, double alpha, const Globals* globs);
     
@@ -352,7 +364,9 @@ public:
      */
     Transcript* get_trans(TransID id);
     
-    //FIX
+    /**
+     * a member function that readies all Transcript objects in the table for the next round of batch EM
+     */
     void round_reset();
     
     /**
