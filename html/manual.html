@@ -197,6 +197,12 @@
 		  </td></tr> 
 		  
 		  <tr><td VALIGN=top nowrap> 
+		  <tt>-N/--additional-rounds &lt;int&gt;</tt> 
+		  </td><td VALIGN=top> 
+		  Specifies the number of additional batch EM rounds to perform on the data using the initial results from the online EM as a seed.  Can improve accuracy at the cost of time.
+		  </td></tr> 
+		  
+		  <tr><td VALIGN=top nowrap> 
 		  <tt>-m/--frag-len-mean &lt;int&gt;</tt> 
 		  </td><td VALIGN=top> 
 		  Specifies the mean fragment length.  While the empirical distribution is estimated from paired-end reads on-the-fly, this value paramaterizes the prior distribution.  If only single-end reads are available, this prior distribution is also used to determine the effective length.  Default is 200.
@@ -209,9 +215,15 @@
 		  </td></tr> 
 		  
 		  <tr><td VALIGN=top nowrap> 
-		  <tt>--output-alignments</tt> 
+		  <tt>--output-align-prob</tt> 
 		  </td><td VALIGN=top> 
 		  With this option, eXpress outputs an additional file called <tt>hits.prob.(sam/bam)</tt> containing identical copies of all input alignments with an additional <tt>XP</tt> tag that contains the estimated probability that each alignment of the read (pair) is the "correct" one.  The <tt>XP</tt> values for all alignments of of the same read (pair) will sum to 1. 
+		  </td></tr> 
+
+		  <tr><td VALIGN=top nowrap> 
+		  <tt>--output-align-samp</tt> 
+		  </td><td VALIGN=top> 
+		  With this option, eXpress outputs an additional file called <tt>hits.samp.(sam/bam)</tt> containing a single alignment for each fragment sampled at random based on the alignment likelihoods calculated by eXpress.
 		  </td></tr> 
 		  
 		  <tr><td VALIGN=top nowrap> 
@@ -283,11 +295,13 @@
    	  <tr><th scope="row">6</th><td>uniq_counts</td><td><tt>7</tt></td><td>The number of fragments uniquely mapping to this target.</td></tr> 
 	  <tr><th scope="row">7</th><td>post_counts_mean</td><td><tt>26.702456</tt></td><td>The estimated number of fragments generated from this target in the sequencing experiment.</td></tr> 
   	  <tr><th scope="row">8</th><td>post_counts_var</td><td><tt>28.090470</tt></td><td>The estimated variance on the number of fragments generated from this target in the sequencing experiment due to uncertainty in assignment of multi-mapped reads.</td></tr> 
+<!--  
 	  <tr><th scope="row">9</th><td>eff_counts_mean</td><td><tt>74.399258</tt></td><td>The estimated number of fragments generated from this target in the sequencing experiment, adjusted for fragment bias.</td></tr> 
   	  <tr><th scope="row">10</th><td>eff_counts_var</td><td><tt>207.293653</tt></td><td>The estimated variance on the number of fragments generated from this target in the sequencing experiment due to uncertainty in assignment of multi-mapped reads, adjusted for fragment bias.</td></tr> 
-   	  <tr><th scope="row">11</th><td>fpkm</td><td><tt>3.514176</tt></td><td>The estimated relative abundance of this target in the sample in units of <b>f</b>ragments <b>p</b>er <b>k</b>ilobase per <b>m</b>illion sequenced. This value is proportional to est_counts divided by eff_length.</td></tr> 
-   	  <tr><th scope="row">12</th><td>fpkm_conf_low</td><td><tt>2.119151</tt></td><td>The lower bound of the 95% confidence interval for the FPKM.</td></tr> 
-   	  <tr><th scope="row">13</th><td>fpkm_conf_high</td><td><tt>4.909200</tt></td><td>The upper bound of the 95% confidence interval for the FPKM.</td></tr> 
+--!>
+   	  <tr><th scope="row">9</th><td>fpkm</td><td><tt>3.514176</tt></td><td>The estimated relative abundance of this target in the sample in units of <b>f</b>ragments <b>p</b>er <b>k</b>ilobase per <b>m</b>illion sequenced. This value is proportional to est_counts divided by eff_length.</td></tr> 
+   	  <tr><th scope="row">10</th><td>fpkm_conf_low</td><td><tt>2.119151</tt></td><td>The lower bound of the 95% confidence interval for the FPKM.</td></tr> 
+   	  <tr><th scope="row">11</th><td>fpkm_conf_high</td><td><tt>4.909200</tt></td><td>The upper bound of the 95% confidence interval for the FPKM.</td></tr> 
 	  </table></p>
 	  <p>See the <a href="overview.html#methods">Methods</a> for more details on how these values are calculated.</p>
 	  

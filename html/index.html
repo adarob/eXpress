@@ -165,6 +165,9 @@
           <p><b>Release Notes:</b>
    		  <ul>
    		  <li>Greatly increased speed of BAM parsing (thanks to improvements in BamTools)</li>
+   		  <li>Fixed bug where software stalled on first additional EM round in some cases</li>
+   		  <li>--output-alignments option has been renamed to --output-align-prob</li>
+   		  <li>Added new option (--output-align-samp) that outputs one alignment for each fragment, sampled at random based on the alignment likelihood
    		  <li>Additional EM rounds now defaults to 0 (instead of 1)</li>
    		  <li>Removed effective count fields (which can be easily calculated from other fields)</li>
    		  </ul></p>
