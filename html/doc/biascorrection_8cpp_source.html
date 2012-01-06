@@ -27,7 +27,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
  <tr style="height: 56px;">
   <td id="projectlogo"><img alt="Logo" src="logo_small.png"></td>
   <td style="padding-left: 0.5em;">
-   <div id="projectname">eXpress&#160;<span id="projectnumber">0.90 BETA</span></div>
+   <div id="projectname">eXpress&#160;<span id="projectnumber">0.9.4 BETA</span></div>
    <div id="projectbrief"><a href=http://bio.math.berkeley.edu/eXpress>http://bio.math.berkeley.edu/eXpress</a></div>
   </td>
  </tr>
@@ -370,70 +370,71 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00287"></a>00287     <span class="keywordflow">if</span> (hit.<a class="code" href="struct_frag_hit.html#a2bb956b0fa92820eefc5bf7a13a74d47">pair_status</a>() != LEFT_ONLY)
 <a name="l00288"></a>00288     {
 <a name="l00289"></a>00289         <span class="keywordtype">int</span> left_window = hit.<a class="code" href="struct_frag_hit.html#a56b767b37618e037513600954ad8e663">right</a> - CENTER;
-<a name="l00290"></a>00290         <span class="keywordtype">string</span> seq_3 = t_seq.substr(left_window, WINDOW);
-<a name="l00291"></a>00291         <span class="keywordtype">int</span> overhang =left_window + WINDOW - (int)t_seq.length();
-<a name="l00292"></a>00292         <span class="keywordflow">if</span> (overhang &gt; 0)
-<a name="l00293"></a>00293         {
-<a name="l00294"></a>00294             seq_3 += PADDING.substr(0, overhang);
-<a name="l00295"></a>00295         }
-<a name="l00296"></a>00296         
-<a name="l00297"></a>00297         _3_seq_bias.<a class="code" href="class_seq_weight_table.html#aa5020845c29f7b9f4eee4ecc40a50428">increment_observed</a>(seq_3, normalized_mass);
-<a name="l00298"></a>00298         _3_pos_bias.<a class="code" href="class_pos_weight_table.html#a19332116f6dbaf65eba3e3f8477ae266">increment_observed</a>(t_seq.length(), (double)(hit.<a class="code" href="struct_frag_hit.html#a56b767b37618e037513600954ad8e663">right</a>-1)/t_seq.length(), normalized_mass);
-<a name="l00299"></a>00299     }
-<a name="l00300"></a>00300 }
-<a name="l00301"></a>00301 
-<a name="l00302"></a><a class="code" href="class_bias_boss.html#af215929f1bb48658260104af729c7bfa">00302</a> <span class="keywordtype">double</span> <a class="code" href="class_bias_boss.html#af215929f1bb48658260104af729c7bfa">BiasBoss::get_transcript_bias</a>(std::vector&lt;double&gt;&amp; start_bias, std::vector&lt;double&gt;&amp; end_bias, <span class="keyword">const</span> <a class="code" href="class_transcript.html">Transcript</a>&amp; trans)<span class="keyword"> const</span>
-<a name="l00303"></a>00303 <span class="keyword"></span>{
-<a name="l00304"></a>00304     <span class="keywordtype">double</span> tot_start = HUGE_VAL;
-<a name="l00305"></a>00305     <span class="keywordtype">double</span> tot_end = HUGE_VAL;
-<a name="l00306"></a>00306     
-<a name="l00307"></a>00307     <span class="keywordtype">size_t</span> l = upper_bound(_5_pos_bias.len_bins().begin(),_5_pos_bias.len_bins().end(), trans.<a class="code" href="class_transcript.html#ae20e7dbb485307ba815584c45e54e4d5">length</a>()) - _5_pos_bias.len_bins().begin();
-<a name="l00308"></a>00308     
-<a name="l00309"></a>00309     <span class="keywordtype">size_t</span> p = 0;
-<a name="l00310"></a>00310     <span class="keywordtype">double</span> next_bin_start = trans.<a class="code" href="class_transcript.html#ae20e7dbb485307ba815584c45e54e4d5">length</a>() * _5_pos_bias.pos_bins()[p];
-<a name="l00311"></a>00311     <span class="keywordtype">double</span> curr_5_pos_bias = _5_pos_bias.<a class="code" href="class_pos_weight_table.html#aee234ee1eaf81c9050922133403b42e5">get_weight</a>(l,p);
-<a name="l00312"></a>00312     <span class="keywordtype">double</span> curr_3_pos_bias = _3_pos_bias.<a class="code" href="class_pos_weight_table.html#aee234ee1eaf81c9050922133403b42e5">get_weight</a>(l,p);
-<a name="l00313"></a>00313     <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; trans.<a class="code" href="class_transcript.html#ae20e7dbb485307ba815584c45e54e4d5">length</a>(); ++i)
-<a name="l00314"></a>00314     {
-<a name="l00315"></a>00315         <span class="keywordflow">if</span> (i &gt;= next_bin_start)
-<a name="l00316"></a>00316         {
-<a name="l00317"></a>00317             next_bin_start = trans.<a class="code" href="class_transcript.html#ae20e7dbb485307ba815584c45e54e4d5">length</a>() * _5_pos_bias.pos_bins()[++p];
-<a name="l00318"></a>00318             curr_5_pos_bias = _5_pos_bias.<a class="code" href="class_pos_weight_table.html#aee234ee1eaf81c9050922133403b42e5">get_weight</a>(l,p);
-<a name="l00319"></a>00319             curr_3_pos_bias = _3_pos_bias.<a class="code" href="class_pos_weight_table.html#aee234ee1eaf81c9050922133403b42e5">get_weight</a>(l,p);
-<a name="l00320"></a>00320         }
-<a name="l00321"></a>00321         start_bias[i] = _5_seq_bias.<a class="code" href="class_seq_weight_table.html#a82ab529aaad5e124b2cf4591af1b3a4a">get_weight</a>(trans.<a class="code" href="class_transcript.html#abdf9e6054e345ed9f1a49f0be3a0ccc7">seq</a>(), (int)i) + curr_5_pos_bias;
-<a name="l00322"></a>00322         end_bias[i] = _3_seq_bias.<a class="code" href="class_seq_weight_table.html#a82ab529aaad5e124b2cf4591af1b3a4a">get_weight</a>(trans.<a class="code" href="class_transcript.html#abdf9e6054e345ed9f1a49f0be3a0ccc7">seq</a>(), (int)i) + curr_3_pos_bias;
-<a name="l00323"></a>00323         tot_start = log_sum(tot_start, start_bias[i]);
-<a name="l00324"></a>00324         tot_end = log_sum(tot_start, end_bias[i]);
-<a name="l00325"></a>00325     }
-<a name="l00326"></a>00326     
-<a name="l00327"></a>00327     <span class="keywordtype">double</span> avg_bias = (tot_start + tot_end) - (2*log((<span class="keywordtype">double</span>)trans.<a class="code" href="class_transcript.html#ae20e7dbb485307ba815584c45e54e4d5">length</a>()));
-<a name="l00328"></a>00328     <span class="keywordflow">return</span> avg_bias;
-<a name="l00329"></a>00329 }
-<a name="l00330"></a>00330 
-<a name="l00331"></a><a class="code" href="class_bias_boss.html#a849af7bee4868e29367aa4a3e47262a0">00331</a> <span class="keywordtype">string</span> <a class="code" href="class_bias_boss.html#a849af7bee4868e29367aa4a3e47262a0">BiasBoss::to_string</a>()<span class="keyword"> const</span>
-<a name="l00332"></a>00332 <span class="keyword"></span>{
-<a name="l00333"></a>00333     <span class="keywordflow">return</span> _5_seq_bias.<a class="code" href="class_seq_weight_table.html#adf3524646dd6b27e493be0855832bc70">to_string</a>();
-<a name="l00334"></a>00334 }
-<a name="l00335"></a>00335 
-<a name="l00336"></a>00336 <span class="keywordtype">void</span> <a class="code" href="class_bias_boss.html#a33a06af813884a0aa4b98b51a72bc1eb">BiasBoss::append_output</a>(ofstream&amp; outfile)<span class="keyword"> const</span>
-<a name="l00337"></a>00337 <span class="keyword"></span>{
-<a name="l00338"></a>00338     outfile&lt;&lt;<span class="stringliteral">&quot;&gt;5&#39; Sequence-Specific Bias\n&quot;</span>;
-<a name="l00339"></a>00339     _5_seq_bias.<a class="code" href="class_seq_weight_table.html#a27a3e01993d3edff481f7537885d12f8">append_output</a>(outfile);
-<a name="l00340"></a>00340     outfile&lt;&lt;<span class="stringliteral">&quot;&gt;3&#39; Sequence-Specific Bias\n&quot;</span>;
-<a name="l00341"></a>00341     _3_seq_bias.<a class="code" href="class_seq_weight_table.html#a27a3e01993d3edff481f7537885d12f8">append_output</a>(outfile);
-<a name="l00342"></a>00342     outfile&lt;&lt;<span class="stringliteral">&quot;&gt;5&#39; Fractional Position Bias\n&quot;</span>;
-<a name="l00343"></a>00343     _5_pos_bias.<a class="code" href="class_pos_weight_table.html#ae54047d708b8699b33898da9df8a649c">append_output</a>(outfile);
-<a name="l00344"></a>00344     outfile&lt;&lt;<span class="stringliteral">&quot;&gt;3&#39; Fractional Position Bias\n&quot;</span>;
-<a name="l00345"></a>00345     _3_pos_bias.<a class="code" href="class_pos_weight_table.html#ae54047d708b8699b33898da9df8a649c">append_output</a>(outfile);
-<a name="l00346"></a>00346 }
-<a name="l00347"></a>00347 
+<a name="l00290"></a>00290         assert(left_window &lt; t_seq.length());
+<a name="l00291"></a>00291         <span class="keywordtype">string</span> seq_3 = t_seq.substr(left_window, WINDOW);
+<a name="l00292"></a>00292         <span class="keywordtype">int</span> overhang =left_window + WINDOW - (int)t_seq.length();
+<a name="l00293"></a>00293         <span class="keywordflow">if</span> (overhang &gt; 0)
+<a name="l00294"></a>00294         {
+<a name="l00295"></a>00295             seq_3 += PADDING.substr(0, overhang);
+<a name="l00296"></a>00296         }
+<a name="l00297"></a>00297         
+<a name="l00298"></a>00298         _3_seq_bias.<a class="code" href="class_seq_weight_table.html#aa5020845c29f7b9f4eee4ecc40a50428">increment_observed</a>(seq_3, normalized_mass);
+<a name="l00299"></a>00299         _3_pos_bias.<a class="code" href="class_pos_weight_table.html#a19332116f6dbaf65eba3e3f8477ae266">increment_observed</a>(t_seq.length(), (double)(hit.<a class="code" href="struct_frag_hit.html#a56b767b37618e037513600954ad8e663">right</a>-1)/t_seq.length(), normalized_mass);
+<a name="l00300"></a>00300     }
+<a name="l00301"></a>00301 }
+<a name="l00302"></a>00302 
+<a name="l00303"></a><a class="code" href="class_bias_boss.html#a84827b7389687fa2591c8bacf5e7e3a7">00303</a> <span class="keywordtype">double</span> <a class="code" href="class_bias_boss.html#a84827b7389687fa2591c8bacf5e7e3a7">BiasBoss::get_transcript_bias</a>(std::vector&lt;float&gt;&amp; start_bias, std::vector&lt;float&gt;&amp; end_bias, <span class="keyword">const</span> <a class="code" href="class_transcript.html">Transcript</a>&amp; trans)<span class="keyword"> const</span>
+<a name="l00304"></a>00304 <span class="keyword"></span>{
+<a name="l00305"></a>00305     <span class="keywordtype">double</span> tot_start = HUGE_VAL;
+<a name="l00306"></a>00306     <span class="keywordtype">double</span> tot_end = HUGE_VAL;
+<a name="l00307"></a>00307     
+<a name="l00308"></a>00308     <span class="keywordtype">size_t</span> l = upper_bound(_5_pos_bias.len_bins().begin(),_5_pos_bias.len_bins().end(), trans.<a class="code" href="class_transcript.html#ae20e7dbb485307ba815584c45e54e4d5">length</a>()) - _5_pos_bias.len_bins().begin();
+<a name="l00309"></a>00309     
+<a name="l00310"></a>00310     <span class="keywordtype">size_t</span> p = 0;
+<a name="l00311"></a>00311     <span class="keywordtype">double</span> next_bin_start = trans.<a class="code" href="class_transcript.html#ae20e7dbb485307ba815584c45e54e4d5">length</a>() * _5_pos_bias.pos_bins()[p];
+<a name="l00312"></a>00312     <span class="keywordtype">double</span> curr_5_pos_bias = _5_pos_bias.<a class="code" href="class_pos_weight_table.html#aee234ee1eaf81c9050922133403b42e5">get_weight</a>(l,p);
+<a name="l00313"></a>00313     <span class="keywordtype">double</span> curr_3_pos_bias = _3_pos_bias.<a class="code" href="class_pos_weight_table.html#aee234ee1eaf81c9050922133403b42e5">get_weight</a>(l,p);
+<a name="l00314"></a>00314     <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; trans.<a class="code" href="class_transcript.html#ae20e7dbb485307ba815584c45e54e4d5">length</a>(); ++i)
+<a name="l00315"></a>00315     {
+<a name="l00316"></a>00316         <span class="keywordflow">if</span> (i &gt;= next_bin_start)
+<a name="l00317"></a>00317         {
+<a name="l00318"></a>00318             next_bin_start = trans.<a class="code" href="class_transcript.html#ae20e7dbb485307ba815584c45e54e4d5">length</a>() * _5_pos_bias.pos_bins()[++p];
+<a name="l00319"></a>00319             curr_5_pos_bias = _5_pos_bias.<a class="code" href="class_pos_weight_table.html#aee234ee1eaf81c9050922133403b42e5">get_weight</a>(l,p);
+<a name="l00320"></a>00320             curr_3_pos_bias = _3_pos_bias.<a class="code" href="class_pos_weight_table.html#aee234ee1eaf81c9050922133403b42e5">get_weight</a>(l,p);
+<a name="l00321"></a>00321         }
+<a name="l00322"></a>00322         start_bias[i] = _5_seq_bias.<a class="code" href="class_seq_weight_table.html#a82ab529aaad5e124b2cf4591af1b3a4a">get_weight</a>(trans.<a class="code" href="class_transcript.html#abdf9e6054e345ed9f1a49f0be3a0ccc7">seq</a>(), (int)i) + curr_5_pos_bias;
+<a name="l00323"></a>00323         end_bias[i] = _3_seq_bias.<a class="code" href="class_seq_weight_table.html#a82ab529aaad5e124b2cf4591af1b3a4a">get_weight</a>(trans.<a class="code" href="class_transcript.html#abdf9e6054e345ed9f1a49f0be3a0ccc7">seq</a>(), (int)i) + curr_3_pos_bias;
+<a name="l00324"></a>00324         tot_start = log_sum(tot_start, start_bias[i]);
+<a name="l00325"></a>00325         tot_end = log_sum(tot_start, end_bias[i]);
+<a name="l00326"></a>00326     }
+<a name="l00327"></a>00327     
+<a name="l00328"></a>00328     <span class="keywordtype">double</span> avg_bias = (tot_start + tot_end) - (2*log((<span class="keywordtype">double</span>)trans.<a class="code" href="class_transcript.html#ae20e7dbb485307ba815584c45e54e4d5">length</a>()));
+<a name="l00329"></a>00329     <span class="keywordflow">return</span> avg_bias;
+<a name="l00330"></a>00330 }
+<a name="l00331"></a>00331 
+<a name="l00332"></a><a class="code" href="class_bias_boss.html#a849af7bee4868e29367aa4a3e47262a0">00332</a> <span class="keywordtype">string</span> <a class="code" href="class_bias_boss.html#a849af7bee4868e29367aa4a3e47262a0">BiasBoss::to_string</a>()<span class="keyword"> const</span>
+<a name="l00333"></a>00333 <span class="keyword"></span>{
+<a name="l00334"></a>00334     <span class="keywordflow">return</span> _5_seq_bias.<a class="code" href="class_seq_weight_table.html#adf3524646dd6b27e493be0855832bc70">to_string</a>();
+<a name="l00335"></a>00335 }
+<a name="l00336"></a>00336 
+<a name="l00337"></a>00337 <span class="keywordtype">void</span> <a class="code" href="class_bias_boss.html#a33a06af813884a0aa4b98b51a72bc1eb">BiasBoss::append_output</a>(ofstream&amp; outfile)<span class="keyword"> const</span>
+<a name="l00338"></a>00338 <span class="keyword"></span>{
+<a name="l00339"></a>00339     outfile&lt;&lt;<span class="stringliteral">&quot;&gt;5&#39; Sequence-Specific Bias\n&quot;</span>;
+<a name="l00340"></a>00340     _5_seq_bias.<a class="code" href="class_seq_weight_table.html#a27a3e01993d3edff481f7537885d12f8">append_output</a>(outfile);
+<a name="l00341"></a>00341     outfile&lt;&lt;<span class="stringliteral">&quot;&gt;3&#39; Sequence-Specific Bias\n&quot;</span>;
+<a name="l00342"></a>00342     _3_seq_bias.<a class="code" href="class_seq_weight_table.html#a27a3e01993d3edff481f7537885d12f8">append_output</a>(outfile);
+<a name="l00343"></a>00343     outfile&lt;&lt;<span class="stringliteral">&quot;&gt;5&#39; Fractional Position Bias\n&quot;</span>;
+<a name="l00344"></a>00344     _5_pos_bias.<a class="code" href="class_pos_weight_table.html#ae54047d708b8699b33898da9df8a649c">append_output</a>(outfile);
+<a name="l00345"></a>00345     outfile&lt;&lt;<span class="stringliteral">&quot;&gt;3&#39; Fractional Position Bias\n&quot;</span>;
+<a name="l00346"></a>00346     _3_pos_bias.<a class="code" href="class_pos_weight_table.html#ae54047d708b8699b33898da9df8a649c">append_output</a>(outfile);
+<a name="l00347"></a>00347 }
+<a name="l00348"></a>00348 
 </pre></div></div>
 </div>
   <div id="nav-path" class="navpath">
     <ul>
       <li class="navelem"><b>biascorrection.cpp</b>      </li>
-      <li class="footer">Generated on Wed Oct 19 2011 12:47:23 for eXpress by&#160;
+      <li class="footer">Generated on Thu Jan 5 2012 14:34:16 for eXpress by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </li>
     </ul>

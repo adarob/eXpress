@@ -30,6 +30,7 @@ Transcript::Transcript(const TransID id, const std::string& name, const std::str
     _mass(HUGE_VAL),
     _mass_var(HUGE_VAL),
     _tot_mass(HUGE_VAL),
+    _tot_unc(HUGE_VAL),
     _est_counts(HUGE_VAL),
     _est_counts_var(HUGE_VAL),
     _uniq_counts(0),
@@ -49,9 +50,10 @@ Transcript::Transcript(const TransID id, const std::string& name, const std::str
     _cached_eff_len = est_effective_length();
 }
 
-void Transcript::add_mass(double p, double mass) 
+void Transcript::add_mass(double p, double v, double mass) 
 { 
     _mass = log_sum(_mass, p+mass);
+    _tot_unc = log_sum(_tot_unc, v+mass);
     _tot_mass = log_sum(_mass, mass);
     _tot_counts++;
     if (p != 0.0)
@@ -59,6 +61,7 @@ void Transcript::add_mass(double p, double mass)
     
 }  
 
+//FIX
 void Transcript::add_prob_count(double p)
 {
     _est_counts = log_sum(_est_counts, p);
@@ -423,10 +426,14 @@ void TranscriptTable::output_results(string output_dir, size_t tot_counts, bool 
                 double l_eff_len = trans.est_effective_length();
 
                 // Calculate count variance
-                double count_var = min(sexp(trans.mass_var() + l_var_renorm), 0.25*trans.tot_counts());
-                double avg_p = sexp(trans.mass() - trans.tot_mass());
-                assert (avg_p >=0 && avg_p <= 1);
-                double eff_n = count_var/(avg_p*(1-avg_p));
+                double binom_var = min(sexp(trans.mass_var() + l_var_renorm), 0.25*trans.tot_counts());
+                double p = sexp(trans.mass() - trans.tot_mass());
+                double v = sexp(trans.tot_uncertainty() - trans.tot_mass());
+                assert (p >=0 && p <= 1);
+                double n = binom_var/(p*(1-p));
+                double a = p*(p*(1-p)/v - 1);
+                double b = (1-p)*(p*(1-p)/v -1);
+                double count_var = n*a*b*(a+b+n)/((a+b)*(a+b)*(a+b+1));
                 
                 double fpkm_std_dev = sqrt(trans_counts[i] + count_var);
                 double fpkm_constant = sexp(l_bil - l_eff_len - l_tot_counts);

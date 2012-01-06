@@ -27,7 +27,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
  <tr style="height: 56px;">
   <td id="projectlogo"><img alt="Logo" src="logo_small.png"></td>
   <td style="padding-left: 0.5em;">
-   <div id="projectname">eXpress&#160;<span id="projectnumber">0.90 BETA</span></div>
+   <div id="projectname">eXpress&#160;<span id="projectnumber">0.9.4 BETA</span></div>
    <div id="projectbrief"><a href=http://bio.math.berkeley.edu/eXpress>http://bio.math.berkeley.edu/eXpress</a></div>
   </td>
  </tr>
@@ -92,91 +92,110 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00009"></a>00009 <span class="preprocessor">#include &quot;fragments.h&quot;</span>
 <a name="l00010"></a>00010 <span class="preprocessor">#include &quot;main.h&quot;</span>
 <a name="l00011"></a>00011 <span class="preprocessor">#include &lt;string.h&gt;</span>
-<a name="l00012"></a>00012 <span class="keyword">using namespace </span>std;
-<a name="l00013"></a>00013 
-<a name="l00014"></a><a class="code" href="class_fragment.html#afafef6f55cd0df3527e50d6ce01a182a">00014</a> <a class="code" href="class_fragment.html#afafef6f55cd0df3527e50d6ce01a182a">Fragment::~Fragment</a>()
-<a name="l00015"></a>00015 {
-<a name="l00016"></a>00016     <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; num_hits(); i++)
-<a name="l00017"></a>00017     {
-<a name="l00018"></a>00018         <span class="keyword">delete</span> _frag_hits[i];
-<a name="l00019"></a>00019     }
-<a name="l00020"></a>00020     
-<a name="l00021"></a>00021     <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; _open_mates.size(); i++)
-<a name="l00022"></a>00022     {
-<a name="l00023"></a>00023         <span class="keyword">delete</span> _open_mates[i];
-<a name="l00024"></a>00024     }
-<a name="l00025"></a>00025 }
-<a name="l00026"></a>00026 
-<a name="l00027"></a><a class="code" href="class_fragment.html#a29dc3beb491b6267b1e983d3e5b1a790">00027</a> <span class="keywordtype">bool</span> <a class="code" href="class_fragment.html#a29dc3beb491b6267b1e983d3e5b1a790">Fragment::add_map_end</a>(<a class="code" href="struct_frag_hit.html">FragHit</a>* h)
-<a name="l00028"></a>00028 {
-<a name="l00029"></a>00029     <span class="keywordflow">if</span> (_name.empty())
-<a name="l00030"></a>00030     {
-<a name="l00031"></a>00031         _name = h-&gt;<a class="code" href="struct_frag_hit.html#a429885700bdb7a6e097ae966e56c56e8">name</a>;
-<a name="l00032"></a>00032     }
-<a name="l00033"></a>00033     <span class="keywordflow">else</span> <span class="keywordflow">if</span> (_name != h-&gt;<a class="code" href="struct_frag_hit.html#a429885700bdb7a6e097ae966e56c56e8">name</a>)
-<a name="l00034"></a>00034     {
-<a name="l00035"></a>00035         <span class="keywordflow">return</span> <span class="keyword">false</span>;
-<a name="l00036"></a>00036     }
-<a name="l00037"></a>00037     
-<a name="l00038"></a>00038     <span class="keywordflow">if</span> (h-&gt;<a class="code" href="struct_frag_hit.html#ab2cc7d8b6992532a68bed7c8e0ba28fc">mate_l</a> &gt;= 0)
-<a name="l00039"></a>00039     {
-<a name="l00040"></a>00040         add_open_mate(h);
-<a name="l00041"></a>00041     }
-<a name="l00042"></a>00042     <span class="keywordflow">else</span>
-<a name="l00043"></a>00043     <span class="comment">// single-end fragment</span>
-<a name="l00044"></a>00044     {
-<a name="l00045"></a>00045         _frag_hits.push_back(h);
-<a name="l00046"></a>00046     }
-<a name="l00047"></a>00047     
-<a name="l00048"></a>00048     <span class="keywordflow">return</span> <span class="keyword">true</span>;
-<a name="l00049"></a>00049 }
-<a name="l00050"></a>00050 
-<a name="l00051"></a>00051 <span class="keywordtype">void</span> Fragment::add_open_mate(<a class="code" href="struct_frag_hit.html">FragHit</a>* new_p)
-<a name="l00052"></a>00052 {
-<a name="l00053"></a>00053     <span class="keywordtype">bool</span> found = <span class="keyword">false</span>;
-<a name="l00054"></a>00054     
-<a name="l00055"></a>00055     <a class="code" href="struct_frag_hit.html">FragHit</a>&amp; nm = *new_p;
-<a name="l00056"></a>00056     <span class="keywordflow">for</span>( vector&lt;FragHit*&gt;::iterator it = _open_mates.begin(); it != _open_mates.end(); ++it)
-<a name="l00057"></a>00057     {
-<a name="l00058"></a>00058         <a class="code" href="struct_frag_hit.html">FragHit</a>&amp; om = **it;
-<a name="l00059"></a>00059         <span class="keywordflow">if</span> (nm.<a class="code" href="struct_frag_hit.html#a601050f9689b3d843ed9ce55671c7f01">trans_id</a> == om.<a class="code" href="struct_frag_hit.html#a601050f9689b3d843ed9ce55671c7f01">trans_id</a> &amp;&amp; nm.<a class="code" href="struct_frag_hit.html#ab2cc7d8b6992532a68bed7c8e0ba28fc">mate_l</a> == om.<a class="code" href="struct_frag_hit.html#af50781d0435f9ce5cecd0bfc67e35c83">left</a> &amp;&amp; om.<a class="code" href="struct_frag_hit.html#ab2cc7d8b6992532a68bed7c8e0ba28fc">mate_l</a> == nm.<a class="code" href="struct_frag_hit.html#af50781d0435f9ce5cecd0bfc67e35c83">left</a>)
-<a name="l00060"></a>00060         {
-<a name="l00061"></a>00061             <span class="keywordflow">if</span> (nm.<a class="code" href="struct_frag_hit.html#af50781d0435f9ce5cecd0bfc67e35c83">left</a> &lt; om.<a class="code" href="struct_frag_hit.html#af50781d0435f9ce5cecd0bfc67e35c83">left</a>)
-<a name="l00062"></a>00062             {
-<a name="l00063"></a>00063                 assert(nm.<a class="code" href="struct_frag_hit.html#aef2e4300e8ec030142f7af9d0cc37e9c">seq_r</a>.empty());
-<a name="l00064"></a>00064                 nm.<a class="code" href="struct_frag_hit.html#a56b767b37618e037513600954ad8e663">right</a> = om.<a class="code" href="struct_frag_hit.html#a56b767b37618e037513600954ad8e663">right</a>;
-<a name="l00065"></a>00065                 nm.<a class="code" href="struct_frag_hit.html#aef2e4300e8ec030142f7af9d0cc37e9c">seq_r</a> = om.<a class="code" href="struct_frag_hit.html#aef2e4300e8ec030142f7af9d0cc37e9c">seq_r</a>;
-<a name="l00066"></a>00066                 nm.sam_r = om.sam_r;
-<a name="l00067"></a>00067                 nm.bam_r = om.bam_r;
-<a name="l00068"></a>00068             }
-<a name="l00069"></a>00069             <span class="keywordflow">else</span>
-<a name="l00070"></a>00070             {
-<a name="l00071"></a>00071                 assert(nm.<a class="code" href="struct_frag_hit.html#a7dc9ae8da797e1a0df2b576218c59f48">seq_l</a>.empty());
-<a name="l00072"></a>00072                 nm.<a class="code" href="struct_frag_hit.html#af50781d0435f9ce5cecd0bfc67e35c83">left</a> = om.<a class="code" href="struct_frag_hit.html#af50781d0435f9ce5cecd0bfc67e35c83">left</a>;
-<a name="l00073"></a>00073                 nm.<a class="code" href="struct_frag_hit.html#a7dc9ae8da797e1a0df2b576218c59f48">seq_l</a> = om.<a class="code" href="struct_frag_hit.html#a7dc9ae8da797e1a0df2b576218c59f48">seq_l</a>;
-<a name="l00074"></a>00074                 nm.sam_l = om.sam_l;
-<a name="l00075"></a>00075                 nm.bam_l = om.bam_l;
-<a name="l00076"></a>00076             }
-<a name="l00077"></a>00077             
-<a name="l00078"></a>00078             assert(nm.<a class="code" href="struct_frag_hit.html#a671e366df876333590ebc8a94c0deb33">left_first</a> == om.<a class="code" href="struct_frag_hit.html#a671e366df876333590ebc8a94c0deb33">left_first</a>);
-<a name="l00079"></a>00079             found = <span class="keyword">true</span>;
-<a name="l00080"></a>00080             <span class="keyword">delete</span> *it;
-<a name="l00081"></a>00081             _frag_hits.push_back(&amp;nm);
-<a name="l00082"></a>00082             _open_mates.erase(it);
-<a name="l00083"></a>00083             <span class="keywordflow">break</span>;
-<a name="l00084"></a>00084         }
-<a name="l00085"></a>00085     }
-<a name="l00086"></a>00086     
-<a name="l00087"></a>00087     <span class="keywordflow">if</span> (!found)
-<a name="l00088"></a>00088         _open_mates.push_back(&amp;nm);
-<a name="l00089"></a>00089 }
-<a name="l00090"></a>00090 
+<a name="l00012"></a>00012 <span class="preprocessor">#include &lt;stdlib.h&gt;</span>
+<a name="l00013"></a>00013 <span class="comment">//#include &lt;boost/random/discrete_distribution.hpp&gt;</span>
+<a name="l00014"></a>00014 
+<a name="l00015"></a>00015 <span class="keyword">using namespace </span>std;
+<a name="l00016"></a>00016 
+<a name="l00017"></a><a class="code" href="class_fragment.html#afafef6f55cd0df3527e50d6ce01a182a">00017</a> <a class="code" href="class_fragment.html#afafef6f55cd0df3527e50d6ce01a182a">Fragment::~Fragment</a>()
+<a name="l00018"></a>00018 {
+<a name="l00019"></a>00019     <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; num_hits(); i++)
+<a name="l00020"></a>00020     {
+<a name="l00021"></a>00021         <span class="keyword">delete</span> _frag_hits[i];
+<a name="l00022"></a>00022     }
+<a name="l00023"></a>00023     
+<a name="l00024"></a>00024     <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; _open_mates.size(); i++)
+<a name="l00025"></a>00025     {
+<a name="l00026"></a>00026         <span class="keyword">delete</span> _open_mates[i];
+<a name="l00027"></a>00027     }
+<a name="l00028"></a>00028 }
+<a name="l00029"></a>00029 
+<a name="l00030"></a><a class="code" href="class_fragment.html#a29dc3beb491b6267b1e983d3e5b1a790">00030</a> <span class="keywordtype">bool</span> <a class="code" href="class_fragment.html#a29dc3beb491b6267b1e983d3e5b1a790">Fragment::add_map_end</a>(<a class="code" href="struct_frag_hit.html">FragHit</a>* h)
+<a name="l00031"></a>00031 {
+<a name="l00032"></a>00032     <span class="keywordflow">if</span> (_name.empty())
+<a name="l00033"></a>00033     {
+<a name="l00034"></a>00034         _name = h-&gt;<a class="code" href="struct_frag_hit.html#a429885700bdb7a6e097ae966e56c56e8">name</a>;
+<a name="l00035"></a>00035     }
+<a name="l00036"></a>00036     <span class="keywordflow">else</span> <span class="keywordflow">if</span> (_name != h-&gt;<a class="code" href="struct_frag_hit.html#a429885700bdb7a6e097ae966e56c56e8">name</a>)
+<a name="l00037"></a>00037     {
+<a name="l00038"></a>00038         <span class="keywordflow">return</span> <span class="keyword">false</span>;
+<a name="l00039"></a>00039     }
+<a name="l00040"></a>00040     
+<a name="l00041"></a>00041     <span class="keywordflow">if</span> (h-&gt;<a class="code" href="struct_frag_hit.html#ab2cc7d8b6992532a68bed7c8e0ba28fc">mate_l</a> &gt;= 0)
+<a name="l00042"></a>00042     {
+<a name="l00043"></a>00043         add_open_mate(h);
+<a name="l00044"></a>00044     }
+<a name="l00045"></a>00045     <span class="keywordflow">else</span>
+<a name="l00046"></a>00046     <span class="comment">// single-end fragment</span>
+<a name="l00047"></a>00047     {
+<a name="l00048"></a>00048         _frag_hits.push_back(h);
+<a name="l00049"></a>00049     }
+<a name="l00050"></a>00050     
+<a name="l00051"></a>00051     <span class="keywordflow">return</span> <span class="keyword">true</span>;
+<a name="l00052"></a>00052 }
+<a name="l00053"></a>00053 
+<a name="l00054"></a>00054 <span class="keywordtype">void</span> Fragment::add_open_mate(<a class="code" href="struct_frag_hit.html">FragHit</a>* new_p)
+<a name="l00055"></a>00055 {
+<a name="l00056"></a>00056     <span class="keywordtype">bool</span> found = <span class="keyword">false</span>;
+<a name="l00057"></a>00057     
+<a name="l00058"></a>00058     <a class="code" href="struct_frag_hit.html">FragHit</a>&amp; nm = *new_p;
+<a name="l00059"></a>00059     <span class="keywordflow">for</span>( vector&lt;FragHit*&gt;::iterator it = _open_mates.begin(); it != _open_mates.end(); ++it)
+<a name="l00060"></a>00060     {
+<a name="l00061"></a>00061         <a class="code" href="struct_frag_hit.html">FragHit</a>&amp; om = **it;
+<a name="l00062"></a>00062         <span class="keywordflow">if</span> (nm.<a class="code" href="struct_frag_hit.html#a601050f9689b3d843ed9ce55671c7f01">trans_id</a> == om.<a class="code" href="struct_frag_hit.html#a601050f9689b3d843ed9ce55671c7f01">trans_id</a> &amp;&amp; nm.<a class="code" href="struct_frag_hit.html#ab2cc7d8b6992532a68bed7c8e0ba28fc">mate_l</a> == om.<a class="code" href="struct_frag_hit.html#af50781d0435f9ce5cecd0bfc67e35c83">left</a> &amp;&amp; om.<a class="code" href="struct_frag_hit.html#ab2cc7d8b6992532a68bed7c8e0ba28fc">mate_l</a> == nm.<a class="code" href="struct_frag_hit.html#af50781d0435f9ce5cecd0bfc67e35c83">left</a>)
+<a name="l00063"></a>00063         {
+<a name="l00064"></a>00064             <span class="keywordflow">if</span> (nm.<a class="code" href="struct_frag_hit.html#af50781d0435f9ce5cecd0bfc67e35c83">left</a> &lt; om.<a class="code" href="struct_frag_hit.html#af50781d0435f9ce5cecd0bfc67e35c83">left</a>)
+<a name="l00065"></a>00065             {
+<a name="l00066"></a>00066                 assert(nm.<a class="code" href="struct_frag_hit.html#aef2e4300e8ec030142f7af9d0cc37e9c">seq_r</a>.empty());
+<a name="l00067"></a>00067                 nm.<a class="code" href="struct_frag_hit.html#a56b767b37618e037513600954ad8e663">right</a> = om.<a class="code" href="struct_frag_hit.html#a56b767b37618e037513600954ad8e663">right</a>;
+<a name="l00068"></a>00068                 nm.<a class="code" href="struct_frag_hit.html#aef2e4300e8ec030142f7af9d0cc37e9c">seq_r</a> = om.<a class="code" href="struct_frag_hit.html#aef2e4300e8ec030142f7af9d0cc37e9c">seq_r</a>;
+<a name="l00069"></a>00069                 nm.sam_r = om.sam_r;
+<a name="l00070"></a>00070                 nm.bam_r = om.bam_r;
+<a name="l00071"></a>00071             }
+<a name="l00072"></a>00072             <span class="keywordflow">else</span>
+<a name="l00073"></a>00073             {
+<a name="l00074"></a>00074                 assert(nm.<a class="code" href="struct_frag_hit.html#a7dc9ae8da797e1a0df2b576218c59f48">seq_l</a>.empty());
+<a name="l00075"></a>00075                 nm.<a class="code" href="struct_frag_hit.html#af50781d0435f9ce5cecd0bfc67e35c83">left</a> = om.<a class="code" href="struct_frag_hit.html#af50781d0435f9ce5cecd0bfc67e35c83">left</a>;
+<a name="l00076"></a>00076                 nm.<a class="code" href="struct_frag_hit.html#a7dc9ae8da797e1a0df2b576218c59f48">seq_l</a> = om.<a class="code" href="struct_frag_hit.html#a7dc9ae8da797e1a0df2b576218c59f48">seq_l</a>;
+<a name="l00077"></a>00077                 nm.sam_l = om.sam_l;
+<a name="l00078"></a>00078                 nm.bam_l = om.bam_l;
+<a name="l00079"></a>00079             }
+<a name="l00080"></a>00080             
+<a name="l00081"></a>00081             assert(nm.<a class="code" href="struct_frag_hit.html#a671e366df876333590ebc8a94c0deb33">left_first</a> == om.<a class="code" href="struct_frag_hit.html#a671e366df876333590ebc8a94c0deb33">left_first</a>);
+<a name="l00082"></a>00082             found = <span class="keyword">true</span>;
+<a name="l00083"></a>00083             <span class="keyword">delete</span> *it;
+<a name="l00084"></a>00084             _frag_hits.push_back(&amp;nm);
+<a name="l00085"></a>00085             _open_mates.erase(it);
+<a name="l00086"></a>00086             <span class="keywordflow">break</span>;
+<a name="l00087"></a>00087         }
+<a name="l00088"></a>00088     }
+<a name="l00089"></a>00089     
+<a name="l00090"></a>00090     <span class="keywordflow">if</span> (!found)
+<a name="l00091"></a>00091         _open_mates.push_back(&amp;nm);
+<a name="l00092"></a>00092 }
+<a name="l00093"></a>00093 
+<a name="l00094"></a><a class="code" href="class_fragment.html#ada58f148f77e7040d2bdf4c70a978974">00094</a> <span class="keyword">const</span> <a class="code" href="struct_frag_hit.html">FragHit</a>* <a class="code" href="class_fragment.html#ada58f148f77e7040d2bdf4c70a978974">Fragment::sample_hit</a>()<span class="keyword"> const</span>
+<a name="l00095"></a>00095 <span class="keyword"></span>{
+<a name="l00096"></a>00096     vector&lt;double&gt; probs(_frag_hits.size());
+<a name="l00097"></a>00097     probs[0] = _frag_hits[0]-&gt;probability;
+<a name="l00098"></a>00098     <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i=1; i &lt; _frag_hits.size(); ++i)
+<a name="l00099"></a>00099     {
+<a name="l00100"></a>00100         probs[i] = probs[i-1] + _frag_hits[i]-&gt;probability;
+<a name="l00101"></a>00101     }
+<a name="l00102"></a>00102 
+<a name="l00103"></a>00103 <span class="comment">//   boost::random::discrete_distribution&lt;&gt; dist(probs);</span>
+<a name="l00104"></a>00104 <span class="comment">//   return _frag_hits[dist(random_gen)];</span>
+<a name="l00105"></a>00105     <span class="keywordtype">double</span> r = rand()/double(RAND_MAX)*probs.back();
+<a name="l00106"></a>00106     <span class="keywordtype">size_t</span> i = lower_bound(probs.begin(), probs.end(), r) - probs.begin();
+<a name="l00107"></a>00107     <span class="keywordflow">return</span> _frag_hits[i];
+<a name="l00108"></a>00108 }
+<a name="l00109"></a>00109 
 </pre></div></div>
 </div>
   <div id="nav-path" class="navpath">
     <ul>
       <li class="navelem"><b>fragments.cpp</b>      </li>
-      <li class="footer">Generated on Wed Oct 19 2011 12:47:23 for eXpress by&#160;
+      <li class="footer">Generated on Thu Jan 5 2012 14:34:16 for eXpress by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </li>
     </ul>

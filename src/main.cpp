@@ -232,7 +232,9 @@ void process_fragment(double mass_n, Fragment* frag_p, TranscriptTable* trans_ta
         
     // calculate marginal likelihoods
     vector<double> likelihoods(frag.num_hits(),0);
+    vector<double> variances(frag.num_hits(), 0);
     double total_likelihood = HUGE_VAL;
+    double total_mass = HUGE_VAL;
     
     if (frag.num_hits()>1)
     {
@@ -242,6 +244,7 @@ void process_fragment(double mass_n, Fragment* frag_p, TranscriptTable* trans_ta
             Transcript* t = m.mapped_trans;
             likelihoods[i] = t->log_likelihood(m, first_round);
             total_likelihood = log_sum(total_likelihood, likelihoods[i]);
+            total_mass = log_sum(total_mass, t->mass());
         }
     }
     else
@@ -268,6 +271,7 @@ void process_fragment(double mass_n, Fragment* frag_p, TranscriptTable* trans_ta
         
         double p = likelihoods[i]-total_likelihood;
         double mass_t = mass_n + p;
+        double v = log_sum(t->mass_var(), t->mass()) - 2*total_mass;
         
         assert(!(isnan(mass_t)||isinf(mass_t)));
         
@@ -284,10 +288,10 @@ void process_fragment(double mass_n, Fragment* frag_p, TranscriptTable* trans_ta
             if (batch_mode)
             {
                 t->add_prob_count(p);
-                t->add_mass(HUGE_VAL, HUGE_VAL);
+                t->add_mass(HUGE_VAL, HUGE_VAL, HUGE_VAL);
             }
             else
-                t->add_mass(p, mass_n);
+                t->add_mass(p, v, mass_n);
             
             if (m.pair_status() == PAIRED)
                 (globs.fld)->add_val(m.length(), mass_t);
@@ -299,7 +303,7 @@ void process_fragment(double mass_n, Fragment* frag_p, TranscriptTable* trans_ta
         else
         {
             if (online_additional)
-                t->add_mass(p, mass_n);
+                t->add_mass(p, v, mass_n);
             else
                 t->add_prob_count(p);
         }

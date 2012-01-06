@@ -1,6 +1,6 @@
 #!/bin/bash
 
-VERSION=0.9.3
+VERSION=0.9.4
 MAC=express-$VERSION-macosx_x86_64
 LINUX=express-$VERSION-linux_x86_64
 WIN=express-$VERSION-win32_x86_64
