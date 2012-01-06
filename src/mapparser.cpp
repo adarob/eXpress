@@ -54,10 +54,10 @@ size_t cigar_length(vector<BamTools::CigarOp> cigar_vec, vector<Indel>& inserts,
     deletes.clear();
     size_t i = 0; // read index
     size_t j = 0; // genomic index
-    for (size_t i = 0; i < cigar_vec.size(); ++i)
+    for (size_t k = 0; k < cigar_vec.size(); ++k)
     {
-        char op_char = cigar_vec[i].Type;
-        size_t op_len = cigar_vec[i].Length;
+        char op_char = cigar_vec[k].Type;
+        size_t op_len = cigar_vec[k].Length;
         switch(op_char)
         {
             case 'I':
