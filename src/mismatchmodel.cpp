@@ -18,6 +18,8 @@ using namespace std;
 MismatchTable::MismatchTable(double alpha)
 : _first_read_mm(MAX_READ_LEN, FrequencyMatrix(16, 4, alpha)),
   _second_read_mm(MAX_READ_LEN, FrequencyMatrix(16, 4, alpha)),
+  _insert_params(1, MAX_READ_LEN, alpha),  
+  _delete_params(1, MAX_READ_LEN, alpha),
   _max_len(0),
   _active(false)
 {}
@@ -35,33 +37,108 @@ double MismatchTable::log_likelihood(const FragHit& f) const
     
     size_t cur;
     size_t ref;
-    size_t prev = 0;
+    size_t prev;
     size_t index;
     
-    for (size_t i = 0; i < f.seq_l.length(); i++)
+    size_t i = 0; // read index
+    size_t j = f.left; // genomic index
+    
+    size_t del_len = 0;
+    vector<Indel>::const_iterator ins = f.inserts_l.begin();
+    vector<Indel>::const_iterator del = f.deletes_l.begin();
+    
+    while (i < f.seq_l.length())
     {
-        cur = ctoi(f.seq_l[i]);
-        ref = ctoi(t_seq[f.left+i]);
-        if (prev != 4 && cur != 4 && ref != 4)
+        
+        if (del != f.deletes_l.end() && del->pos == i)
         {
-            index = (prev << 2) + ref;
-            ll += left_mm[i](index, cur);
+            ll += _delete_params(del->len);
+            j += del->len;
+            del_len = del->len;
+            del++;
         }
-        prev = ref;
+        else if (ins != f.inserts_l.end() && ins->pos == i)
+        {
+            ll += _insert_params(ins->len);
+            i += ins->len;
+            if (ins->len > del_len)
+                ll += (ins->len-del_len)*_delete_params(0); //FIX: Assymetric
+            del_len = 0;
+            ins++;
+        }
+        else
+        {
+            if (!del_len)
+            {
+                ll += _delete_params(0);
+                del_len = 0;
+            }
+            ll += _insert_params(0);
+            
+            cur = ctoi(f.seq_l[i]);
+            prev = (i) ? ctoi(f.seq_l[i-1]) : 0;
+            ref = ctoi(t_seq[j]);
+            if (prev != 4 && cur != 4 && ref != 4)
+            {
+                index = (prev << 2) + ref;
+                ll += left_mm[i](index, cur);
+            }
+            i++;
+            j++;
+            prev = cur;
+        }
     }
     
     size_t r_len = f.seq_r.length();
-    prev = 0;
-    for (size_t i = 1; i < r_len; i++)
-    {
-        ref = ctoi_r(t_seq[f.right-i-1]);
-        cur = ctoi_r(f.seq_r[r_len-i-1]);
-        if (prev != 4 && cur != 4 && ref != 4)
+    i = r_len-1;
+    j = f.right-1;
+    ins = f.inserts_r.end()-1;
+    del = f.deletes_r.end()-1;
+    
+    while (true)
+    { 
+        if (del != f.deletes_l.begin()-1 && del->pos == i)
         {
-            index = (prev << 2) + ref;
-            ll += right_mm[i](index, cur);
+            ll += _delete_params(del->len);
+            assert(j > del->len);
+            j -= del->len;
+            del_len = del->len;
+            del--;
         }
-        prev = ref;
+        else if (ins != f.inserts_l.begin()-1 && ins->pos == i)
+        {
+            ll += _insert_params(ins->len);
+            if (ins->len > del_len)
+                ll += (ins->len-del_len)*_delete_params(0);
+            del_len = 0;
+            
+            if (i < ins->len)
+                break;
+            
+            i -= ins->len;
+            ins--;
+        }
+        else
+        {
+            if (!del_len)
+                ll += _delete_params(0);
+            del_len = 0;
+            ll += _insert_params(0);
+            
+            cur = ctoi(f.seq_r[i]);
+            prev = (i!=r_len-1) ? ctoi_r(f.seq_r[i+1]) : 0;
+            ref = ctoi_r(t_seq[j]);
+            if (prev != 4 && cur != 4 && ref != 4)
+            {
+                index = (prev << 2) + ref;
+                ll += right_mm[i](index, cur);
+            }
+            if (i==0)
+                break;
+            i--;
+            assert(j!=0);
+            j--;
+        }
     }
     
     assert(!(isnan(ll)||isinf(ll)));
@@ -78,33 +155,107 @@ void MismatchTable::update(const FragHit& f, double mass)
     
     size_t cur;
     size_t ref;
-    size_t prev = 0;
+    size_t prev;
     size_t index;
     
-    for (size_t i = 0; i < f.seq_l.length(); i++)
+    size_t i = 0; // read index
+    size_t j = f.left; // genomic index
+    
+    size_t del_len = 0;
+    vector<Indel>::const_iterator ins = f.inserts_l.begin();
+    vector<Indel>::const_iterator del = f.deletes_l.begin();
+    
+    while (i < f.seq_l.length())
     {
-        cur = ctoi(f.seq_l[i]);
-        ref = ctoi(t_seq[f.left+i]);
-        if (prev != 4 && cur != 4 && ref != 4)
+        if (del != f.deletes_l.end() && del->pos == i)
         {
-            index = (prev << 2) + ref;
-            left_mm[i].increment(index, cur, mass);
+            _delete_params.increment(del->len, mass);
+            j += del->len;
+            del_len = del->len;
+            del++;
         }
-        prev = ref;
+        else if (ins != f.inserts_l.end() && ins->pos == i)
+        {
+            _insert_params.increment(ins->len, mass);
+            i += ins->len;
+            if (ins->len > del_len)
+                _delete_params.increment(0, mass); //FIX: Assymetric
+            del_len = 0;
+            ins++;
+        }
+        else
+        {
+            if (!del_len)
+            {
+                _delete_params.increment(0, mass);
+                del_len = 0;
+            }
+            _insert_params.increment(0, mass);
+            
+            cur = ctoi(f.seq_l[i]);
+            prev = (i) ? ctoi(f.seq_l[i-1]) : 0;
+            ref = ctoi(t_seq[j]);
+            if (prev != 4 && cur != 4 && ref != 4)
+            {
+                index = (prev << 2) + ref;
+                left_mm[i].increment(index, cur, mass);
+            }
+            i++;
+            j++;
+            prev = cur;
+        }
     }
     
     size_t r_len = f.seq_r.length();
-    prev = 0;
-    for (size_t i = 0; i < r_len; i++)
-    {
-        ref = ctoi_r(t_seq[f.right-i-1]);
-        cur = ctoi_r(f.seq_r[r_len-i-1]);
-        if (prev != 4 && cur != 4 && ref != 4)
+    i = r_len-1;
+    j = f.right-1;
+    ins = f.inserts_r.end()-1;
+    del = f.deletes_r.end()-1;
+    
+    while (true)
+    { 
+        if (del != f.deletes_l.begin()-1 && del->pos == i)
         {
-            index = (prev << 2) + ref;
-            right_mm[i].increment(index, cur, mass);
+            _delete_params.increment(del->len, mass);
+            assert(j > del->len);
+            j -= del->len;
+            del_len = del->len;
+            del--;
         }
-        prev = ref;
+        else if (ins != f.inserts_l.begin()-1 && ins->pos == i)
+        {
+            _insert_params.increment(ins->len, mass);
+            if (ins->len > del_len)
+                _delete_params.increment(0, mass);
+            del_len = 0;
+            
+            if (i < ins->len)
+                break;
+            
+            i -= ins->len;
+            ins--;
+        }
+        else
+        {
+            if (!del_len)
+                _delete_params.increment(0, mass);
+            del_len = 0;
+            _insert_params.increment(0, mass);
+            
+            cur = ctoi(f.seq_r[i]);
+            prev = (i!=r_len-1) ? ctoi_r(f.seq_r[i+1]) : 0;
+            ref = ctoi_r(t_seq[j]);
+            if (prev != 4 && cur != 4 && ref != 4)
+            {
+                index = (prev << 2) + ref;
+                right_mm[i].increment(index, cur, mass);
+            }
+            if (i==0)
+                break;
+            i--;
+            assert(j!=0);
+            j--;
+        }
     }
     
     _max_len = max(_max_len, max(f.seq_l.length(), f.seq_r.length())); 

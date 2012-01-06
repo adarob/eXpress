@@ -33,6 +33,10 @@ class MismatchTable
      */
     std::vector<FrequencyMatrix> _second_read_mm;
     
+    //FIX
+    FrequencyMatrix _insert_params;
+    FrequencyMatrix _delete_params;
+    
     /**
      * a size_t storing the maximum observed read length
      */

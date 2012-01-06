@@ -15,37 +15,68 @@ using namespace std;
 
 const size_t BUFF_SIZE = 9999;
 
-int cigar_length(const char* cigar_str)
+size_t cigar_length(const char* cigar_str, vector<Indel>& inserts, vector<Indel>& deletes)
 {
+    inserts.clear();
+    deletes.clear();
     const char* p_cig = cigar_str;
-    int tot_len = 0;
+    size_t i = 0; // read index
+    size_t j = 0; // genomic index
     while (*p_cig) 
     {
         char* t;
-        int op_len = (int)strtol(p_cig, &t, 10);
+        size_t op_len = (size_t)strtol(p_cig, &t, 10);
         char op_char = toupper(*t);
-        if (op_char == 'M' || op_char == 'N') 
+        switch(op_char)
         {
-            tot_len += op_len;
+            case 'I':
+                inserts.push_back(Indel(i, op_len));
+                i += op_len;
+                break;
+            case 'D':
+                deletes.push_back(Indel(i, op_len));
+                j += op_len;
+                break;
+            case 'M':
+            case 'N':
+                i += op_len;
+                j += op_len;
+                break;
         }
-        
         p_cig = t + 1;
     }
-    return tot_len;
+    return j;
 }
 
-int cigar_length(vector<BamTools::CigarOp> cigar_vec)
+size_t cigar_length(vector<BamTools::CigarOp> cigar_vec, vector<Indel>& inserts, vector<Indel>& deletes)
 {
-    int tot_len = 0;
+    inserts.clear();
+    deletes.clear();
+    size_t i = 0; // read index
+    size_t j = 0; // genomic index
     for (size_t i = 0; i < cigar_vec.size(); ++i)
     {
-        if (cigar_vec[i].Type == 'M' || cigar_vec[i].Type == 'N') 
+        char op_char = cigar_vec[i].Type;
+        size_t op_len = cigar_vec[i].Length;
+        switch(op_char)
         {
-            tot_len += cigar_vec[i].Length;
+            case 'I':
+                inserts.push_back(Indel(i, op_len));
+                i += op_len;
+                break;
+            case 'D':
+                deletes.push_back(Indel(i, op_len));
+                j += op_len;
+                break;
+            case 'M':
+            case 'N':
+                i += op_len;
+                j += op_len;
+                break;
         }
     }
     
-    return tot_len;
+    return j;
 }
 
 ThreadedMapParser::ThreadedMapParser(string in_file, string out_file, bool write_active) 
@@ -243,18 +274,19 @@ bool BAMParser::map_end_from_alignment(BamTools::BamAlignment& a)
     f.name = a.Name;
     f.trans_id = a.RefID;
     f.left = a.Position;
-    f.right = f.left + cigar_length(a.CigarData);
     f.mate_l = a.MatePosition;
     
     if (a.IsReverseStrand())
     {
         f.seq_r = a.QueryBases;
         f.bam_r = a;
+        f.right = f.left + cigar_length(a.CigarData, f.inserts_r, f.deletes_r);
     }
     else
     {
         f.seq_l = a.QueryBases;
         f.bam_l = a;
+        f.right = f.left + cigar_length(a.CigarData, f.inserts_l, f.deletes_l);
     }
     
     return true;
@@ -411,12 +443,19 @@ bool SAMParser::map_end_from_line(char* line)
                 f.trans_id = _trans_index[p];
                 break;
             case 3:
-                f.left = atoi(p)-1;
+                f.left = (size_t)(atoi(p)-1);
                 break;
             case 4:
                 break;
             case 5:
-                f.right = f.left + cigar_length(p);
+                if (sam_flag & 0x10)
+                {
+                    f.right = f.left + cigar_length(p, f.inserts_r, f.deletes_r);
+                }
+                else
+                {
+                    f.right = f.left + cigar_length(p, f.inserts_l, f.deletes_l);
+                }
                 break;
             case 6:
                 // skip if only one end mapped of paired-end read

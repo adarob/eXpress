@@ -15,7 +15,7 @@ using namespace std;
 
 FrequencyMatrix::FrequencyMatrix(size_t m, size_t n, double alpha, bool logged)
 : _array(m*n, logged ? log(alpha):alpha),
-   _rowsums(m, logged ? log(n*alpha):n*alpha),
+  _rowsums(m, logged ? log(n*alpha):n*alpha),
   _M(m),
   _N(n),
   _logged(logged)

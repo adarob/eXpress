@@ -28,6 +28,15 @@ class TranscriptTable;
  */
 enum PairStatus { PAIRED, LEFT_ONLY, RIGHT_ONLY };
 
+//FIX
+struct Indel
+{
+    size_t pos;
+    size_t len;
+    
+    Indel(size_t p, size_t l) { pos = p; len = l; }
+};
+
 /**
  *  The FragHit struct stores the information for a single (multi-)mapping of a fragment.
  *  @author    Adam Roberts
@@ -62,16 +71,16 @@ struct FragHit
     std::string seq_r;
     
     /**
-     * a public int containing the 0-based leftmost coordinate mapped to in the transcript
+     * a public size_t containing the 0-based leftmost coordinate mapped to in the transcript
      * valid only if PairStatus is PAIRED or LEFT_ONLY
      */
-    int left;
+    size_t left;
     
     /**
-     * a public int containing the position following the 0-based rightmost coordinate mapped to in the transcript
+     * a public size_t containing the position following the 0-based rightmost coordinate mapped to in the transcript
      * valid only if PairStatus is PAIRED or RIGHT_ONLY
      */
-    int right;
+    size_t right;
     
     /**
      * a public int containing the left position for the mate of the first read read in from the SAM file 
@@ -87,13 +96,20 @@ struct FragHit
      */
     bool left_first;
     
+    //FIX
+    std::vector<Indel> inserts_l;
+    std::vector<Indel> deletes_l;
+    std::vector<Indel> inserts_r;
+    std::vector<Indel> deletes_r;
+    
     /**
      * a member function returning the length of the fragment according to this mapping
      * note, that this result will be invalid if the fragment is single-end
      * @return int length of fragment mapping
      */
-    int length() const
+    size_t length() const
     {
+        assert (right >= left);
         return right - left;
     }
     

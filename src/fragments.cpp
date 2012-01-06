@@ -68,6 +68,8 @@ void Fragment::add_open_mate(FragHit* new_p)
                 nm.seq_r = om.seq_r;
                 nm.sam_r = om.sam_r;
                 nm.bam_r = om.bam_r;
+                nm.inserts_r = om.inserts_r;
+                nm.deletes_r = om.deletes_r;
             }
             else
             {
@@ -76,6 +78,8 @@ void Fragment::add_open_mate(FragHit* new_p)
                 nm.seq_l = om.seq_l;
                 nm.sam_l = om.sam_l;
                 nm.bam_l = om.bam_l;
+                nm.inserts_l = om.inserts_l;
+                nm.deletes_l = om.deletes_l;
             }
             
             assert(nm.left_first == om.left_first);
