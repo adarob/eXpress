@@ -244,7 +244,7 @@ void process_fragment(double mass_n, Fragment* frag_p, TranscriptTable* trans_ta
             Transcript* t = m.mapped_trans;
             likelihoods[i] = t->log_likelihood(m, first_round);
             total_likelihood = log_sum(total_likelihood, likelihoods[i]);
-            total_mass = log_sum(total_mass, t->mass());
+            total_mass = log_sum(total_mass, t->mass(true));
         }
     }
     else
