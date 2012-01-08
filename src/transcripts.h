@@ -177,9 +177,10 @@ public:
     
     /**
      * a member function that returns the current (logged) probabilistically assigned fragment mass
+     * FIX
      * @return logged mass
      */
-    double mass() const { return _mass; }
+    double mass(bool with_pseudo = false) const;
     
     /**
      * a member function that returns the total (logged) mass of all fragments mapped to the transcript
@@ -187,13 +188,11 @@ public:
      */
     double tot_mass() const { return _tot_mass; }
     
-    
     /**
      * a member function that returns the current (logged) variance
      * @return logged mass variance
      */
     double mass_var() const { return _mass_var; }
-    
     
     //FIX
     double tot_uncertainty() const { return _tot_unc; }

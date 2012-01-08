@@ -77,6 +77,14 @@ void Transcript::round_reset()
     _est_counts_var = HUGE_VAL;
 }
 
+double Transcript::mass(bool with_pseudo) const
+{
+    if (!with_pseudo)
+        return _mass;
+    boost::mutex::scoped_lock lock(_bias_lock);
+    return log_sum(_mass, _alpha+_cached_eff_len);
+}
+
 double Transcript::log_likelihood(const FragHit& frag, bool with_pseudo) const
 {
 
