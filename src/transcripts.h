@@ -176,7 +176,7 @@ public:
     size_t length() const { return _seq.length(); }
     
     /**
-     * a member function that returns the current (logged) fragment mass
+     * a member function that returns the current (logged) probabilistically assigned fragment mass
      * @return logged mass
      */
     double mass() const { return _mass; }

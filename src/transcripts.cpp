@@ -426,14 +426,19 @@ void TranscriptTable::output_results(string output_dir, size_t tot_counts, bool 
                 double l_eff_len = trans.est_effective_length();
 
                 // Calculate count variance
-                double binom_var = min(sexp(trans.mass_var() + l_var_renorm), 0.25*trans.tot_counts());
-                double p = sexp(trans.mass() - trans.tot_mass());
-                double v = sexp(trans.tot_uncertainty() - trans.tot_mass());
-                assert (p >=0 && p <= 1);
-                double n = binom_var/(p*(1-p));
-                double a = p*(p*(1-p)/v - 1);
-                double b = (1-p)*(p*(1-p)/v -1);
-                double count_var = n*a*b*(a+b+n)/((a+b)*(a+b)*(a+b+1));
+                double count_var = 0;
+                if (trans.tot_counts() != trans.uniq_counts())
+                {
+                    double binom_var = min(sexp(trans.mass_var() + l_var_renorm), 0.25*trans.tot_counts());
+                    double p = sexp(trans.mass() - trans.tot_mass());
+                    double v = sexp(trans.tot_uncertainty() - trans.tot_mass());
+                    assert (p >=0 && p <= 1);
+                    double n = binom_var/(p*(1-p));
+                    double a = p*(p*(1-p)/v - 1);
+                    double b = (1-p)*(p*(1-p)/v -1);
+                    count_var = n*a*b*(a+b+n)/((a+b)*(a+b)*(a+b+1));
+                    assert(!isnan(count_var) && !isinf(count_var));
+                }
                 
                 double fpkm_std_dev = sqrt(trans_counts[i] + count_var);
                 double fpkm_constant = sexp(l_bil - l_eff_len - l_tot_counts);

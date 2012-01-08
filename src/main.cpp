@@ -271,8 +271,13 @@ void process_fragment(double mass_n, Fragment* frag_p, TranscriptTable* trans_ta
         
         double p = likelihoods[i]-total_likelihood;
         double mass_t = mass_n + p;
-        double v = log_sum(t->mass_var(), t->mass()) - 2*total_mass;
+        double v = HUGE_VAL;
         
+        // only calculate v if at least one of the transcripts has mass
+        if (total_mass != HUGE_VAL) 
+            v = log_sum(t->mass_var(), t->mass()) - 2*total_mass;
+        
+        assert(!isnan(v));
         assert(!(isnan(mass_t)||isinf(mass_t)));
         
         m.probability = sexp(p);
