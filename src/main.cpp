@@ -274,7 +274,7 @@ void process_fragment(double mass_n, Fragment* frag_p, TranscriptTable* trans_ta
         double v = HUGE_VAL;
         
         // only calculate v if at least one of the transcripts has mass
-        if (total_mass != HUGE_VAL) 
+        if (frag.num_hits() > 1) 
             v = log_sum(t->mass_var(), t->mass(true)) - 2*total_mass;
         
         assert(!isnan(v));

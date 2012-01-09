@@ -444,7 +444,10 @@ void TranscriptTable::output_results(string output_dir, size_t tot_counts, bool 
                     double n = binom_var/(p*(1-p));
                     double a = p*(p*(1-p)/v - 1);
                     double b = (1-p)*(p*(1-p)/v -1);
-                    count_var = n*a*b*(a+b+n)/((a+b)*(a+b)*(a+b+1));
+                    if (a < 0 || b < 0)
+                        count_var = binom_var;
+                    else
+                        count_var = n*a*b*(a+b+n)/((a+b)*(a+b)*(a+b+1));
                     assert(!isnan(count_var) && !isinf(count_var));
                 }
                 
