@@ -27,9 +27,12 @@ Transcript::Transcript(const TransID id, const std::string& name, const std::str
     _name(name),
     _seq(seq),
     _alpha(log(alpha)),
-    _mass(HUGE_VAL),
-    _mass_var(HUGE_VAL),
+    _mass(HUGE_VAL),    
+    _ambig_mass(HUGE_VAL),
+    _binom_var(HUGE_VAL),
+    _samp_var(HUGE_VAL),
     _tot_mass(HUGE_VAL),
+    _tot_ambig_mass(HUGE_VAL),
     _tot_unc(HUGE_VAL),
     _est_counts(HUGE_VAL),
     _est_counts_var(HUGE_VAL),
@@ -52,13 +55,18 @@ Transcript::Transcript(const TransID id, const std::string& name, const std::str
 
 void Transcript::add_mass(double p, double v, double mass) 
 { 
-    _mass = log_sum(_mass, p+mass);
-    _tot_unc = log_sum(_tot_unc, v+mass);
-    _tot_mass = log_sum(_mass, mass);
     _tot_counts++;
+    _mass = log_sum(_mass, p+mass);
+    _tot_mass = log_sum(_mass, mass);
+    _samp_var = log_sum(_samp_var, 2*mass+p);
     if (p != 0.0)
-        _mass_var = log_sum(_mass_var, 2*mass + p + log(1-sexp(p)));
-    
+    {
+        _binom_var = log_sum(_binom_var, 2*mass + p + log(1-sexp(p)));
+        _tot_unc = log_sum(_tot_unc, v+mass);
+        _ambig_mass = log_sum(_ambig_mass, mass+p);
+        if (p!=HUGE_VAL)
+            _tot_ambig_mass = log_sum(_tot_ambig_mass, mass);
+    }
 }  
 
 //FIX
@@ -72,7 +80,7 @@ void Transcript::add_prob_count(double p)
 void Transcript::round_reset()
 {
     _mass = _est_counts;
-    _mass_var = _est_counts_var;
+    _binom_var = _est_counts_var;
     _est_counts = HUGE_VAL;
     _est_counts_var = HUGE_VAL;
 }
@@ -445,11 +453,11 @@ void TranscriptTable::output_results(string output_dir, size_t tot_counts, bool 
                 
                 if (trans.tot_counts() != trans.uniq_counts())
                 {
-                    binom_var = min(sexp(trans.mass_var() + l_var_renorm), 0.25*trans.tot_counts());
-                    p = sexp(trans.mass() - trans.tot_mass());
-                    v = sexp(trans.tot_uncertainty() - trans.tot_mass());
+                    binom_var = min(sexp(trans.binom_var() + l_var_renorm), 0.25*trans.tot_counts());
+                    p = sexp(trans.ambig_mass() - trans.tot_ambig_mass());
+                    v = sexp(trans.tot_uncertainty() - trans.tot_ambig_mass());
                     assert (p >=0 && p <= 1);
-                    n = binom_var/(p*(1-p));
+                    n = trans.tot_counts()-trans.uniq_counts();
                     a = p*(p*(1-p)/v - 1);
                     b = (1-p)*(p*(1-p)/v -1);
                     if (a < 0 || b < 0)

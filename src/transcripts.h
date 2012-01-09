@@ -66,16 +66,25 @@ class Transcript
      * a private double that stores the (logged) mass based on observed fragment mapping probabilities
      */
     double _mass;
+    
+    //FIX
+    double _ambig_mass;
 
     /**
      * a private double that stores the (logged) binomal variance of the mass
      */
-    double _mass_var;
+    double _binom_var;
+    
+    //FIX
+    double _samp_var;
     
     /**
      * a private double that stores the total (logged) mass of all fragments mapped to the transcript
      */
     double _tot_mass;
+    
+    //FIX
+    double _tot_ambig_mass;
     
     //FIX
     double _tot_unc;
@@ -182,17 +191,26 @@ public:
      */
     double mass(bool with_pseudo = false) const;
     
+    //FIX
+    double ambig_mass() const { return _ambig_mass; }
+    
     /**
      * a member function that returns the total (logged) mass of all fragments mapped to the transcript
      * @return logged total mass
      */
     double tot_mass() const { return _tot_mass; }
     
+    //FIX
+    double tot_ambig_mass() const { return _tot_ambig_mass; }
+    
     /**
-     * a member function that returns the current (logged) variance
+     * a member function that returns the current (logged) binomial variance
      * @return logged mass variance
      */
-    double mass_var() const { return _mass_var; }
+    double binom_var() const { return _binom_var; }
+    
+    //FIX
+    double samp_var() const { return _samp_var; }
     
     //FIX
     double tot_uncertainty() const { return _tot_unc; }
