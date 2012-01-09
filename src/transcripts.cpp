@@ -435,15 +435,23 @@ void TranscriptTable::output_results(string output_dir, size_t tot_counts, bool 
 
                 // Calculate count variance
                 double count_var = 0;
+                
+                double p=0;
+                double v=0;
+                double n=0;
+                double a=0;
+                double b=0;
+                double binom_var=0;
+                
                 if (trans.tot_counts() != trans.uniq_counts())
                 {
-                    double binom_var = min(sexp(trans.mass_var() + l_var_renorm), 0.25*trans.tot_counts());
-                    double p = sexp(trans.mass() - trans.tot_mass());
-                    double v = sexp(trans.tot_uncertainty() - trans.tot_mass());
+                    binom_var = min(sexp(trans.mass_var() + l_var_renorm), 0.25*trans.tot_counts());
+                    p = sexp(trans.mass() - trans.tot_mass());
+                    v = sexp(trans.tot_uncertainty() - trans.tot_mass());
                     assert (p >=0 && p <= 1);
-                    double n = binom_var/(p*(1-p));
-                    double a = p*(p*(1-p)/v - 1);
-                    double b = (1-p)*(p*(1-p)/v -1);
+                    n = binom_var/(p*(1-p));
+                    a = p*(p*(1-p)/v - 1);
+                    b = (1-p)*(p*(1-p)/v -1);
                     if (a < 0 || b < 0)
                         count_var = binom_var;
                     else
@@ -457,7 +465,7 @@ void TranscriptTable::output_results(string output_dir, size_t tot_counts, bool 
                 double fpkm_lo = max(0.0, (trans_counts[i] - 2*fpkm_std_dev) * fpkm_constant);
                 double fpkm_hi = (trans_counts[i] + 2*fpkm_std_dev) * fpkm_constant;
                 
-                fprintf(expr_file, "" SIZE_T_FMT "\t%s\t" SIZE_T_FMT "\t%f\t" SIZE_T_FMT "\t" SIZE_T_FMT "\t%f\t%f\t%f\t%f\t%f\n", bundle_id, trans.name().c_str(), trans.length(), sexp(l_eff_len), trans.tot_counts(), trans.uniq_counts(), trans_counts[i], count_var,trans_fpkm, fpkm_lo, fpkm_hi);
+                fprintf(expr_file, "" SIZE_T_FMT "\t%s\t" SIZE_T_FMT "\t%f\t" SIZE_T_FMT "\t" SIZE_T_FMT "\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\n", bundle_id, trans.name().c_str(), trans.length(), sexp(l_eff_len), trans.tot_counts(), trans.uniq_counts(), trans_counts[i], count_var,trans_fpkm, fpkm_lo, fpkm_hi, p,v,n,a,b,binom_var);
             
                 if (output_varcov)
                 {
