@@ -287,8 +287,7 @@ void process_fragment(double mass_n, Fragment* frag_p, TranscriptTable* trans_ta
         // update parameters
         if (first_round)
         {
-            if (frag.num_hits()==1)
-                t->incr_uniq_counts();
+            t->incr_counts(frag.num_hits()==1);
             
             if (batch_mode)
             {

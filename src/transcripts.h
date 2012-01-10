@@ -274,12 +274,14 @@ public:
     void add_prob_count(double p);
 
     /**
-     * a member function that increases the ccount of fragments uniquely mapped to this transcript
+     * a member function that increases the count of fragments mapped to this transcript
+     * @param uniq a bool specifying whether or not the fragment uniquely maps to this transcript
      * @param incr_amt a size_t to increase the counts by
      */
-    void incr_uniq_counts(size_t incr_amt = 1)
+    void incr_counts(bool uniq, size_t incr_amt = 1)
     {
-        _uniq_counts += incr_amt;
+        _tot_counts += incr_amt;
+        _uniq_counts += incr_amt*uniq;
     }
     
     /**

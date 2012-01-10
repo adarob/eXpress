@@ -55,7 +55,6 @@ Transcript::Transcript(const TransID id, const std::string& name, const std::str
 
 void Transcript::add_mass(double p, double v, double mass) 
 { 
-    _tot_counts++;
     _mass = log_sum(_mass, p+mass);
     _tot_mass = log_sum(_mass, mass);
     _samp_var = log_sum(_samp_var, 2*mass+p);
