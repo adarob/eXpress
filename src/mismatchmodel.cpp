@@ -49,7 +49,6 @@ double MismatchTable::log_likelihood(const FragHit& f) const
     
     while (i < f.seq_l.length())
     {
-        
         if (del != f.deletes_l.end() && del->pos == i)
         {
             ll += _delete_params(del->len);
@@ -69,10 +68,8 @@ double MismatchTable::log_likelihood(const FragHit& f) const
         else
         {
             if (!del_len)
-            {
                 ll += _delete_params(0);
-                del_len = 0;
-            }
+            del_len = 0;
             ll += _insert_params(0);
             
             cur = ctoi(f.seq_l[i]);
@@ -85,7 +82,6 @@ double MismatchTable::log_likelihood(const FragHit& f) const
             }
             i++;
             j++;
-            prev = cur;
         }
     }
     
@@ -186,10 +182,8 @@ void MismatchTable::update(const FragHit& f, double mass)
         else
         {
             if (!del_len)
-            {
                 _delete_params.increment(0, mass);
-                del_len = 0;
-            }
+            del_len = 0;
             _insert_params.increment(0, mass);
             
             cur = ctoi(f.seq_l[i]);
@@ -202,7 +196,6 @@ void MismatchTable::update(const FragHit& f, double mass)
             }
             i++;
             j++;
-            prev = cur;
         }
     }
     

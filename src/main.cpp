@@ -353,7 +353,7 @@ size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TranscriptTable* 
     
     // For log-scale output
     size_t i = 1;
-    size_t j = 0;
+    size_t j = 6;
     while (true)
     {
         ParseThreadSafety ts;
