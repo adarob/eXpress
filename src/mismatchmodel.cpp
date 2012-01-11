@@ -121,7 +121,7 @@ double MismatchTable::log_likelihood(const FragHit& f) const
             del_len = 0;
             ll += _insert_params(0);
             
-            cur = ctoi(f.seq_r[i]);
+            cur = ctoi_r(f.seq_r[i]);
             prev = (i!=r_len-1) ? ctoi_r(f.seq_r[i+1]) : 0;
             ref = ctoi_r(t_seq[j]);
             if (prev != 4 && cur != 4 && ref != 4)
@@ -235,7 +235,7 @@ void MismatchTable::update(const FragHit& f, double mass)
             del_len = 0;
             _insert_params.increment(0, mass);
             
-            cur = ctoi(f.seq_r[i]);
+            cur = ctoi_r(f.seq_r[i]);
             prev = (i!=r_len-1) ? ctoi_r(f.seq_r[i+1]) : 0;
             ref = ctoi_r(t_seq[j]);
             if (prev != 4 && cur != 4 && ref != 4)
