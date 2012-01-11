@@ -459,7 +459,7 @@ void TranscriptTable::output_results(string output_dir, size_t tot_counts, bool 
                     n = trans.tot_counts()-trans.uniq_counts();
                     a = p*(p*(1-p)/v - 1);
                     b = (1-p)*(p*(1-p)/v -1);
-                    if (a < 0 || b < 0)
+                    if (v == 0 || a < 0 || b < 0)
                         count_var = binom_var;
                     else
                         count_var = n*a*b*(a+b+n)/((a+b)*(a+b)*(a+b+1));
