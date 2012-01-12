@@ -20,6 +20,7 @@
 
 using namespace std;
 
+double LOG_FOURTH = log(0.25);
 
 Transcript::Transcript(const TransID id, const std::string& name, const std::string& seq, double alpha, const Globals* globs)
 :   _globs(globs),
@@ -90,6 +91,14 @@ double Transcript::mass(bool with_pseudo) const
         return _mass;
     boost::mutex::scoped_lock lock(_bias_lock);
     return log_sum(_mass, _alpha+_cached_eff_len);
+}
+
+double Transcript::binom_var(bool with_pseudo) const
+{
+    if (!with_pseudo)
+        return _binom_var;
+    boost::mutex::scoped_lock lock(_bias_lock);
+    return log_sum(_binom_var, LOG_FOURTH+_alpha+_cached_eff_len);    
 }
 
 double Transcript::log_likelihood(const FragHit& frag, bool with_pseudo) const

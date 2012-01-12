@@ -206,8 +206,9 @@ public:
     /**
      * a member function that returns the current (logged) binomial variance
      * @return logged mass variance
+     * FIX
      */
-    double binom_var() const { return _binom_var; }
+    double binom_var(bool with_pseudo = false) const;
     
     //FIX
     double samp_var() const { return _samp_var; }
