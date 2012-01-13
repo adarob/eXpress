@@ -274,8 +274,8 @@ void process_fragment(double mass_n, Fragment* frag_p, TranscriptTable* trans_ta
         double v = HUGE_VAL;
         
         // only calculate v if at least one of the transcripts has mass
-        if (frag.num_hits() > 1) 
-            v = log_sum(t->binom_var(true), t->samp_var()) - 2*total_mass;
+        if ((last_round || output_running_rounds) && frag.num_hits() > 1) 
+            v = log_sum(t->binom_var(), t->samp_var()) - 2*total_mass;
         
         assert(!isnan(v));
         assert(!(isnan(mass_t)||isinf(mass_t)));
@@ -284,18 +284,12 @@ void process_fragment(double mass_n, Fragment* frag_p, TranscriptTable* trans_ta
         
         assert(!isinf(m.probability));
         
+        t->add_mass(p, v, mass_n);
+        
         // update parameters
         if (first_round)
         {
             t->incr_counts(frag.num_hits()==1);
-            
-            if (batch_mode)
-            {
-                t->add_prob_count(p);
-                t->add_mass(HUGE_VAL, HUGE_VAL, HUGE_VAL);
-            }
-            else
-                t->add_mass(p, v, mass_n);
             
             if (m.pair_status() == PAIRED)
                 (globs.fld)->add_val(m.length(), mass_t);
@@ -303,13 +297,6 @@ void process_fragment(double mass_n, Fragment* frag_p, TranscriptTable* trans_ta
                 (globs.bias_table)->update_observed(m, mass_t - t->mass() + t->cached_effective_length());
             if (globs.mismatch_table)
                 (globs.mismatch_table)->update(m, mass_t);
-        }
-        else
-        {
-            if (online_additional)
-                t->add_mass(p, v, mass_n);
-            else
-                t->add_prob_count(p);
         }
         
         if (calc_covar && (last_round || online_additional))
@@ -528,9 +515,8 @@ int main (int argc, char ** argv)
         online_additional = false;
     }
     
-    if (batch_mode)
-        trans_table.round_reset();
-  
+    trans_table.round_reset();
+    ff_param = 1.0;
     first_round = false;
     while (!last_round)
     {

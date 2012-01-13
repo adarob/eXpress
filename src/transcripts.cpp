@@ -20,23 +20,13 @@
 
 using namespace std;
 
-double LOG_FOURTH = log(0.25);
-
 Transcript::Transcript(const TransID id, const std::string& name, const std::string& seq, double alpha, const Globals* globs)
 :   _globs(globs),
     _id(id),
     _name(name),
     _seq(seq),
     _alpha(log(alpha)),
-    _mass(HUGE_VAL),    
-    _ambig_mass(HUGE_VAL),
-    _binom_var(HUGE_VAL),
-    _samp_var(HUGE_VAL),
-    _tot_mass(HUGE_VAL),
-    _tot_ambig_mass(HUGE_VAL),
-    _tot_unc(HUGE_VAL),
-    _est_counts(HUGE_VAL),
-    _est_counts_var(HUGE_VAL),
+    _ret_params(&_curr_params),
     _uniq_counts(0),
     _tot_counts(0),
     _avg_bias(0)
@@ -56,55 +46,37 @@ Transcript::Transcript(const TransID id, const std::string& name, const std::str
 
 void Transcript::add_mass(double p, double v, double mass) 
 { 
-    _mass = log_sum(_mass, p+mass);
-    _tot_mass = log_sum(_mass, mass);
-    _samp_var = log_sum(_samp_var, 2*mass+p);
+    _curr_params.mass = log_sum(_curr_params.mass, p+mass);
+    _curr_params.samp_var = log_sum(_curr_params.samp_var, 2*mass+p);
     if (p != 0.0)
     {
-        _binom_var = log_sum(_binom_var, 2*mass + p + log(1-sexp(p)));
-        _tot_unc = log_sum(_tot_unc, v+mass);
-        _ambig_mass = log_sum(_ambig_mass, mass+p);
+        _curr_params.binom_var = log_sum(_curr_params.binom_var, 2*mass + p + log(1-sexp(p)));
+        _curr_params.tot_unc = log_sum(_curr_params.tot_unc, v+mass);
+        _curr_params.ambig_mass = log_sum(_curr_params.ambig_mass, mass+p);
         if (p!=HUGE_VAL)
-            _tot_ambig_mass = log_sum(_tot_ambig_mass, mass);
+            _curr_params.tot_ambig_mass = log_sum(_curr_params.tot_ambig_mass, mass);
     }
 }  
 
-//FIX
-void Transcript::add_prob_count(double p)
-{
-    _est_counts = log_sum(_est_counts, p);
-    if (p != 0.0)
-        _est_counts_var = log_sum(_est_counts_var, p + log(1-sexp(p)));
-}
-
 void Transcript::round_reset()
 {
-    _mass = _est_counts;
-    _binom_var = _est_counts_var;
-    _est_counts = HUGE_VAL;
-    _est_counts_var = HUGE_VAL;
+    _last_params = _curr_params;
+    _curr_params = RoundParams();
+    _ret_params = &_last_params;
 }
 
 double Transcript::mass(bool with_pseudo) const
 {
     if (!with_pseudo)
-        return _mass;
+        return _ret_params->mass;
     boost::mutex::scoped_lock lock(_bias_lock);
-    return log_sum(_mass, _alpha+_cached_eff_len);
-}
-
-double Transcript::binom_var(bool with_pseudo) const
-{
-    if (!with_pseudo)
-        return _binom_var;
-    boost::mutex::scoped_lock lock(_bias_lock);
-    return log_sum(_binom_var, LOG_FOURTH+_alpha+_cached_eff_len);    
+    return log_sum(_ret_params->mass, _alpha+_cached_eff_len);
 }
 
 double Transcript::log_likelihood(const FragHit& frag, bool with_pseudo) const
 {
 
-    double ll = mass();
+    double ll = 0;
     
     if (_globs->mismatch_table)
         ll += (_globs->mismatch_table)->log_likelihood(frag);
@@ -114,7 +86,10 @@ double Transcript::log_likelihood(const FragHit& frag, bool with_pseudo) const
         boost::mutex::scoped_lock lock(_bias_lock);
         
         if (with_pseudo)
-            ll = log_sum(ll, _alpha+_cached_eff_len);
+            ll += log_sum(_ret_params->mass, _alpha+_cached_eff_len);
+        else
+            ll += _ret_params->mass;
+        
         if (_globs->bias_table)
         {
             if (ps != RIGHT_ONLY)
