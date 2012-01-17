@@ -155,10 +155,9 @@ void Transcript::update_transcript_bias()
     _cached_eff_len = est_effective_length();
 }
 
-TranscriptTable::TranscriptTable(const string& trans_fasta_file, const TransIndex& trans_index, const TransIndex& trans_lengths, double alpha, const Globals* globs)
+TranscriptTable::TranscriptTable(const string& trans_fasta_file, const TransIndex& trans_index, const TransIndex& trans_lengths, double alpha, const AlphaMap* alpha_map, const Globals* globs)
 : _globs(globs),
-  _trans_map(trans_index.size(), NULL),
-  _alpha(alpha)
+  _trans_map(trans_index.size(), NULL)
 {
     cout << "Loading target sequences";
     if (globs->bias_table)
@@ -166,6 +165,15 @@ TranscriptTable::TranscriptTable(const string& trans_fasta_file, const TransInde
     cout << "...\n\n";
     
     boost::unordered_set<string> target_names;
+    
+    double alpha_renorm = 1.0;
+    if (alpha_map)
+    {
+        double alpha_total = 0;
+        for(AlphaMap::const_iterator it = alpha_map->begin(); it != alpha_map->end(); ++it)
+            alpha_total += it->second;
+        alpha_renorm = (alpha * alpha_map->size())/alpha_total;
+    }
     
     ifstream infile (trans_fasta_file.c_str());
     string line;
@@ -180,7 +188,7 @@ TranscriptTable::TranscriptTable(const string& trans_fasta_file, const TransInde
             {
                 if (!name.empty())
                 {
-                    add_trans(name, seq, trans_index, trans_lengths);
+                    add_trans(name, seq, (alpha_map) ? alpha_renorm * alpha_map->find(name)->second : alpha, trans_index, trans_lengths);
                 }
                 name = line.substr(1,line.find(' ')-1);
                 if (target_names.count(name))
@@ -188,6 +196,12 @@ TranscriptTable::TranscriptTable(const string& trans_fasta_file, const TransInde
                     cerr << "ERROR: Target '" << name << "' is duplicated in the input FASTA.  Ensure all target names are unique and re-map before re-running eXpress\n";
                     exit(1);
                 }
+                if (alpha_map && !alpha_map->count(name))
+                {
+                    cerr << "ERROR: Target '" << name << "' is was not found in the prior paramater file.\n";
+                    exit(1);
+                }
+
                 target_names.insert(name);
                 seq = "";
             }
@@ -199,7 +213,7 @@ TranscriptTable::TranscriptTable(const string& trans_fasta_file, const TransInde
         }
         if (!name.empty())
         {
-            add_trans(name, seq, trans_index, trans_lengths);
+            add_trans(name, seq, (alpha_map) ? alpha_renorm * alpha_map->find(name)->second : alpha, trans_index, trans_lengths);
         }
         infile.close();
         if (globs->bias_table)
@@ -237,7 +251,7 @@ TranscriptTable::~TranscriptTable()
     }
 }
 
-void TranscriptTable::add_trans(const string& name, const string& seq, const TransIndex& trans_index, const TransIndex& trans_lengths)
+void TranscriptTable::add_trans(const string& name, const string& seq, double alpha, const TransIndex& trans_index, const TransIndex& trans_lengths)
 {
     TransIndex::const_iterator it = trans_index.find(name);
     if(it == trans_index.end())
@@ -252,7 +266,7 @@ void TranscriptTable::add_trans(const string& name, const string& seq, const Tra
         exit(1);
     }
 
-    Transcript* trans = new Transcript(it->second, name, seq, _alpha, _globs);
+    Transcript* trans = new Transcript(it->second, name, seq, alpha, _globs);
     if (_globs->bias_table)
         (_globs->bias_table)->update_expectations(*trans);
     _trans_map[trans->id()] = trans;
@@ -363,7 +377,7 @@ void TranscriptTable::output_results(string output_dir, size_t tot_counts, bool 
     if (output_varcov)
         varcov_file.open((output_dir + "/varcov.xprs").c_str());    
     
-    fprintf(expr_file, "bundle_id\ttarget_id\tlength\teff_length\ttot_counts\tuniq_counts\tpost_count_mean\tpost_count_var\tfpkm\tfpkm_conf_low\tfpkm_conf_high\n");
+    fprintf(expr_file, "bundle_id\ttarget_id\tlength\teff_length\ttot_counts\tuniq_counts\tpost_count_mode\tpost_count_var\tfpkm\tfpkm_conf_low\tfpkm_conf_high\n");
 
     double l_bil = log(1000000000.);
     double l_tot_counts = log((double)tot_counts);
@@ -427,22 +441,16 @@ void TranscriptTable::output_results(string output_dir, size_t tot_counts, bool 
                 // Calculate count variance
                 double count_var = 0;
                 
-                double p=0;
-                double v=0;
-                double n=0;
-                double a=0;
-                double b=0;
-                double binom_var=0;
                 
                 if (trans.tot_counts() != trans.uniq_counts())
                 {
-                    binom_var = min(sexp(trans.binom_var() + l_var_renorm), 0.25*trans.tot_counts());
-                    p = sexp(trans.ambig_mass() - trans.tot_ambig_mass());
-                    v = sexp(trans.tot_uncertainty() - trans.tot_ambig_mass());
+                    double binom_var = min(sexp(trans.binom_var() + l_var_renorm), 0.25*trans.tot_counts());
+                    double p = sexp(trans.ambig_mass() - trans.tot_ambig_mass());
+                    double v = sexp(trans.tot_uncertainty() - trans.tot_ambig_mass());
                     assert (p >=0 && p <= 1);
-                    n = trans.tot_counts()-trans.uniq_counts();
-                    a = p*(p*(1-p)/v - 1);
-                    b = (1-p)*(p*(1-p)/v -1);
+                    double n = trans.tot_counts()-trans.uniq_counts();
+                    double a = p*(p*(1-p)/v - 1);
+                    double b = (1-p)*(p*(1-p)/v -1);
                     if (v == 0 || a < 0 || b < 0)
                         count_var = binom_var;
                     else
@@ -456,7 +464,7 @@ void TranscriptTable::output_results(string output_dir, size_t tot_counts, bool 
                 double fpkm_lo = max(0.0, (trans_counts[i] - 2*fpkm_std_dev) * fpkm_constant);
                 double fpkm_hi = (trans_counts[i] + 2*fpkm_std_dev) * fpkm_constant;
                 
-                fprintf(expr_file, "" SIZE_T_FMT "\t%s\t" SIZE_T_FMT "\t%f\t" SIZE_T_FMT "\t" SIZE_T_FMT "\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\n", bundle_id, trans.name().c_str(), trans.length(), sexp(l_eff_len), trans.tot_counts(), trans.uniq_counts(), trans_counts[i], count_var,trans_fpkm, fpkm_lo, fpkm_hi, p,v,n,a,b,binom_var);
+                fprintf(expr_file, "" SIZE_T_FMT "\t%s\t" SIZE_T_FMT "\t%f\t" SIZE_T_FMT "\t" SIZE_T_FMT "\t%f\t%f\t%f\t%f\t%f\n", bundle_id, trans.name().c_str(), trans.length(), sexp(l_eff_len), trans.tot_counts(), trans.uniq_counts(), trans_counts[i], count_var,trans_fpkm, fpkm_lo, fpkm_hi);
             
                 if (output_varcov)
                 {

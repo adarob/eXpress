@@ -48,7 +48,7 @@ struct RoundParams
     //FIX
     double tot_unc;
     
-    RoundParams() : mass(HUGE_VAL), ambig_mass(HUGE_VAL), binom_var(HUGE_VAL), samp_var(HUGE_VAL), tot_ambig_mass(HUGE_VAL), tot_unc(HUGE_VAL){}
+    RoundParams() : mass(HUGE_VAL), ambig_mass(HUGE_VAL), tot_ambig_mass(HUGE_VAL), binom_var(HUGE_VAL), samp_var(HUGE_VAL), tot_unc(HUGE_VAL){}
 };
 
 typedef size_t TransID;
@@ -291,6 +291,7 @@ public:
 typedef std::vector<Transcript*> TransMap;
 typedef boost::unordered_map<std::string, size_t> TransIndex;
 typedef boost::unordered_map<size_t, double> CovarMap;
+typedef boost::unordered_map<std::string, double> AlphaMap;
 
 /**
  * The TranscriptTable class is used to keep track of the Transcript objects for a run.
@@ -322,20 +323,16 @@ class TranscriptTable
      * these values are stored positive, even though they are negative
      */
     CovarTable _covar_table;
-    
-    /**
-     * a private double specifying the initial Transcript mass pseudo-counts for each bp (non-logged)
-     */
-    double _alpha;
-    
+        
     /**
      * a private function that validates and adds a transcript pointer to the table
      * @param name the name of the trancript
      * @param seq the sequence of the transcript
+     // FIX
      * @param trans_index the transcript-to-index map from the alignment file
      * @param trans_lengths the transcript-to-length map from the alignment file (for validation)
      */
-    void add_trans(const std::string& name, const std::string& seq, const TransIndex& trans_index, const TransIndex& trans_lengths);  
+    void add_trans(const std::string& name, const std::string& seq, double alpha, const TransIndex& trans_index, const TransIndex& trans_lengths);  
     
 public:
     /**
@@ -344,9 +341,10 @@ public:
      * @param trans_index the transcript-to-index map from the alignment file
      * @param trans_lengths the transcript-to-length map from the alignment file
      * @param alpha a double that specifies the intial pseudo-counts for each bp of the transcripts (non-logged)
+     //FIX
      * @param globs a pointer to the struct containing pointers to the global parameter tables (bias_table, mismatch_table, fld)
      */
-    TranscriptTable(const std::string& trans_fasta_file, const TransIndex& trans_index, const TransIndex& trans_lengths, double alpha, const Globals* globs);
+    TranscriptTable(const std::string& trans_fasta_file, const TransIndex& trans_index, const TransIndex& trans_lengths, double alpha, const AlphaMap* alpha_map, const Globals* globs);
     
     /**
      * TranscriptTable Destructor

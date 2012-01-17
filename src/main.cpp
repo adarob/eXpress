@@ -9,6 +9,7 @@
 //TODO: Update params between rounds
 //TODO: Indels
 
+#include <boost/unordered_map.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/program_options.hpp>
 #include <boost/thread.hpp>
@@ -34,10 +35,6 @@
 using namespace std;
 namespace po = boost::program_options;
 namespace fs = boost::filesystem;
-
-
-// global pseudo-random number generator
-//boost::mt19937 random_gen;
 
 // the forgetting factor parameter controls the growth of the fragment mass
 double ff_param = 0.9;
@@ -88,15 +85,45 @@ bool online_additional = false;
 bool both = false;
 size_t remaining_rounds = 0;
 
+typedef boost::unordered_map<string, double> AlphaMap;
+AlphaMap* expr_alpha_map = NULL;
+
+AlphaMap* parse_priors(string in_file)
+{
+    ifstream ifs(in_file.c_str());
+    if(!ifs.is_open())
+    {
+        cerr << "ERROR: Unable to open input priors file '" << in_file << "'.\n" ; 
+        exit(1);
+    }
+    AlphaMap* alphas = new AlphaMap();
+    
+    string line;
+    
+    while(ifs.good())
+    {
+        getline(ifs,line);
+        
+        size_t idx = line.find_first_of("\t ");
+        if (idx!=string::npos)
+        {
+            string name = line.substr(0,idx);
+            string val = line.substr(idx+1);
+            (*alphas)[name] = atof(val.c_str());
+        }
+    }
+    return alphas;
+};
+
 bool parse_options(int ac, char ** av)
 {
     po::options_description generic("Allowed options");
     generic.add_options()
     ("help,h", "produce help message")
     ("output-dir,o", po::value<string>(&output_dir)->default_value("."), "write all output files to this directory")
-    ("frag-len-mean,m", po::value<int>(&def_fl_mean)->default_value(200), "prior estimate for average fragment length")
-    ("frag-len-stddev,s", po::value<int>(&def_fl_stddev)->default_value(80), "prior estimate for fragment length std deviation")
-    ("additional-rounds,N", po::value<size_t>(&remaining_rounds)->default_value(0), "number of additional batch EM rounds after online round")
+    ("frag-len-mean,m", po::value<int>(&def_fl_mean)->default_value(def_fl_mean), "prior estimate for average fragment length")
+    ("frag-len-stddev,s", po::value<int>(&def_fl_stddev)->default_value(def_fl_stddev), "prior estimate for fragment length std deviation")
+    ("additional-rounds,N", po::value<size_t>(&remaining_rounds)->default_value(remaining_rounds), "number of additional batch EM rounds after online round")
     ("output-align-prob", "output alignments (sam/bam) with probabilistic assignments")
     ("output-align-samp", "output alignments (sam/bam) with sampled assignments")
     ("fr-stranded", "accept only forward->reverse alignments (second-stranded protocols)")
@@ -104,6 +131,8 @@ bool parse_options(int ac, char ** av)
     ("calc-covar", "calculate and output covariance matrix")
     ("no-update-check", "disables automatic check for update via web")
     ;
+    
+    string prior_file = "";
     
     po::options_description hidden("Hidden options");
     hidden.add_options()
@@ -116,7 +145,9 @@ bool parse_options(int ac, char ** av)
     ("batch-mode","")
     ("online-N","")
     ("both","")
-    ("forget-param,f", po::value<double>(&ff_param)->default_value(0.9),"")
+    ("prior-params", po::value<string>(&prior_file)->default_value(""), "")
+    ("forget-param,f", po::value<double>(&ff_param)->default_value(ff_param),"")
+    ("expr-alpha", po::value<double>(&expr_alpha)->default_value(expr_alpha),"")
     ("stop-at", po::value<size_t>(&stop_at)->default_value(0),"")
     ("sam-file", po::value<string>(&in_map_file_name)->default_value(""),"")
     ("fasta-file", po::value<string>(&fasta_file_name)->default_value(""),"")
@@ -206,6 +237,10 @@ bool parse_options(int ac, char ** av)
         out_map_file_name = output_dir + "/hits.samp";
     }
     
+    if (prior_file != "")
+    {
+        expr_alpha_map = parse_priors(prior_file);
+    }
     
 #ifndef WIN32
     if (!vm.count("no-update-check"))
@@ -214,7 +249,6 @@ bool parse_options(int ac, char ** av)
     
     return 0;
 }
-
 
 /**
  * This function handles the probabilistic assignment of multi-mapped reads.  The marginal likelihoods are calculated for each mapping,
@@ -497,7 +531,7 @@ int main (int argc, char ** argv)
     globs.mismatch_table = (error_model) ? new MismatchTable(mm_alpha):NULL;
     
     ThreadedMapParser map_parser(in_map_file_name, out_map_file_name, last_round);
-    TranscriptTable trans_table(fasta_file_name, map_parser.trans_index(), map_parser.trans_lengths(), expr_alpha, &globs);
+    TranscriptTable trans_table(fasta_file_name, map_parser.trans_index(), map_parser.trans_lengths(), expr_alpha, expr_alpha_map, &globs);
 
     double num_trans = (double)map_parser.trans_index().size();
     

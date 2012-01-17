@@ -355,7 +355,7 @@ SAMParser::SAMParser(istream* in)
         size_t idx = str.find("SN:");
         if (idx!=string::npos)
         {
-            string name = str.substr(str.find("SN:")+3);
+            string name = str.substr(idx+3);
             name = name.substr(0,name.find_first_of("\n\t "));
             if (_trans_index.find(name) == _trans_index.end())
             {
@@ -366,9 +366,10 @@ SAMParser::SAMParser(istream* in)
                 cerr << "Warning: Target '" << str << "' appears twice in the SAM index.\n";
             }
             
-            if (str.find("LN:") != string::npos)
+            idx = str.find("LN:");
+            if (idx != string::npos)
             {
-                string len = str.substr(str.find("LN:")+3);
+                string len = str.substr(idx+3);
                 len = len.substr(0,len.find_first_of("\n\t "));
                 _trans_lengths[name] = atoi(len.c_str());
             }
