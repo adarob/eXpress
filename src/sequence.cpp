@@ -118,6 +118,6 @@ void Sequence::set(const std::string& seq, bool rev)
 
 size_t Sequence::operator[](const size_t index) const
 {
-    assert(index < _len); 
+//    assert(index < _len); 
     return _encoded_seq[index]; 
 }

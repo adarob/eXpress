@@ -189,7 +189,6 @@ TranscriptTable::TranscriptTable(const string& trans_fasta_file, const TransInde
             {
                 if (!name.empty())
                 {
-                    cout << _trans_map.size() << endl;
                     add_trans(name, seq, (alpha_map) ? alpha_renorm * alpha_map->find(name)->second : alpha, trans_index, trans_lengths);
                 }
                 name = line.substr(1,line.find(' ')-1);

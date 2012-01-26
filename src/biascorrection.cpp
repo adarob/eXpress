@@ -257,9 +257,9 @@ void BiasBoss::update_expectations(const Transcript& trans)
         }
         _5_pos_bias.increment_expected(l,p);
         _3_pos_bias.increment_expected(l,p);
-        _5_seq_bias.increment_expected(seq_fwd);
-        _3_seq_bias.increment_expected(seq_rev);
     }
+    _5_seq_bias.increment_expected(seq_fwd);
+    _3_seq_bias.increment_expected(seq_rev);
 }
 
 void BiasBoss::normalize_expectations()
