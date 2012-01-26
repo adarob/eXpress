@@ -6,7 +6,7 @@
 //  Copyright 2011 Adam Roberts. All rights reserved.
 //
 
-#include <assert.h>
+#include <cassert>
 #include "frequencymatrix.h"
 #include "main.h"
 #include <boost/array.hpp>
@@ -39,15 +39,16 @@ double FrequencyMatrix::operator()(size_t k) const
 
 void FrequencyMatrix::increment(size_t i, size_t j, double incr_amt)
 {
-    assert(i*_N+j < _M*_N);
+    size_t k = i*_N+j;
+    assert(k < _M*_N);
     if (_logged)
     {
-        _array[i*_N+j] = log_sum(_array[i*_N+j], incr_amt);
+        _array[k] = log_sum(_array[k], incr_amt);
         _rowsums[i] = log_sum(_rowsums[i], incr_amt);
     }
     else
     {
-        _array[i*_N+j] += incr_amt;
+        _array[k] += incr_amt;
         _rowsums[i] += incr_amt;
     }
     assert(!isnan(_rowsums[i]) && !isinf(_rowsums[i]));

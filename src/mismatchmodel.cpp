@@ -10,6 +10,7 @@
 #include "mismatchmodel.h"
 #include "transcripts.h"
 #include "fragments.h"
+#include "sequence.h"
 #include <iostream>
 #include <fstream>
 
@@ -29,7 +30,10 @@ double MismatchTable::log_likelihood(const FragHit& f) const
     if (!_active)
         return 0;
     
-    const string& t_seq = f.mapped_trans->seq();
+    const Transcript& trans = *f.mapped_trans;
+    const Sequence& t_seq_fwd = trans.seq(0);
+    const Sequence& t_seq_rev = trans.seq(1);
+
     double ll = 0;
     
     const vector<FrequencyMatrix>& left_mm = (f.left_first) ? _first_read_mm : _second_read_mm;
@@ -72,9 +76,10 @@ double MismatchTable::log_likelihood(const FragHit& f) const
             del_len = 0;
             ll += _insert_params(0);
             
-            cur = ctoi(f.seq_l[i]);
-            prev = (i) ? ctoi(f.seq_l[i-1]) : 0;
-            ref = ctoi(t_seq[j]);
+            cur = f.seq_l[i];
+            prev = (i) ? f.seq_l[i-1] : 0;
+            ref = t_seq_fwd[j];
+            
             if (prev != 4 && cur != 4 && ref != 4)
             {
                 index = (prev << 2) + ref;
@@ -86,32 +91,28 @@ double MismatchTable::log_likelihood(const FragHit& f) const
     }
     
     size_t r_len = f.seq_r.length();
-    i = r_len-1;
-    j = f.right-1;
+    i = 0;
+    j = trans.length()-f.right;
     ins = f.inserts_r.end()-1;
     del = f.deletes_r.end()-1;
     
-    while (true)
+    while (i < r_len)
     { 
-        if (del != f.deletes_l.begin()-1 && del->pos == i)
+        if (del != f.deletes_l.begin()-1 && del->pos == r_len-i-1)
         {
             ll += _delete_params(del->len);
-            assert(j > del->len);
-            j -= del->len;
+            j += del->len;
             del_len = del->len;
             del--;
         }
-        else if (ins != f.inserts_l.begin()-1 && ins->pos == i)
+        else if (ins != f.inserts_l.begin()-1 && ins->pos == r_len-i-1)
         {
             ll += _insert_params(ins->len);
             if (ins->len > del_len)
                 ll += (ins->len-del_len)*_delete_params(0);
             del_len = 0;
             
-            if (i < ins->len)
-                break;
-            
-            i -= ins->len;
+            i += ins->len;
             ins--;
         }
         else
@@ -121,19 +122,17 @@ double MismatchTable::log_likelihood(const FragHit& f) const
             del_len = 0;
             ll += _insert_params(0);
             
-            cur = ctoi_r(f.seq_r[i]);
-            prev = (i!=r_len-1) ? ctoi_r(f.seq_r[i+1]) : 0;
-            ref = ctoi_r(t_seq[j]);
+            cur = f.seq_r[i];
+            prev = (i) ? f.seq_r[i-1] : 0;
+            ref = t_seq_rev[j];
             if (prev != 4 && cur != 4 && ref != 4)
             {
                 index = (prev << 2) + ref;
                 ll += right_mm[i](index, cur);
             }
-            if (i==0)
-                break;
-            i--;
-            assert(j!=0);
-            j--;
+
+            i++;
+            j++;
         }
     }
     
@@ -144,7 +143,9 @@ double MismatchTable::log_likelihood(const FragHit& f) const
 
 void MismatchTable::update(const FragHit& f, double mass)
 {
-    const string& t_seq = f.mapped_trans->seq();
+    const Transcript& trans = *f.mapped_trans;
+    const Sequence& t_seq_fwd = trans.seq(0);
+    const Sequence& t_seq_rev = trans.seq(1);
     
     vector<FrequencyMatrix>& left_mm = (f.left_first) ? _first_read_mm : _second_read_mm;
     vector<FrequencyMatrix>& right_mm = (!f.left_first) ? _first_read_mm : _second_read_mm;
@@ -186,9 +187,9 @@ void MismatchTable::update(const FragHit& f, double mass)
             del_len = 0;
             _insert_params.increment(0, mass);
             
-            cur = ctoi(f.seq_l[i]);
-            prev = (i) ? ctoi(f.seq_l[i-1]) : 0;
-            ref = ctoi(t_seq[j]);
+            cur = f.seq_l[i];
+            prev = (i) ? f.seq_l[i-1] : 0;
+            ref = t_seq_fwd[j];
             if (prev != 4 && cur != 4 && ref != 4)
             {
                 index = (prev << 2) + ref;
@@ -198,34 +199,30 @@ void MismatchTable::update(const FragHit& f, double mass)
             j++;
         }
     }
-    
+
     size_t r_len = f.seq_r.length();
-    i = r_len-1;
-    j = f.right-1;
+    i = 0;
+    j = trans.length()-f.right;
     ins = f.inserts_r.end()-1;
     del = f.deletes_r.end()-1;
-    
-    while (true)
+
+    while (i < r_len)
     { 
-        if (del != f.deletes_l.begin()-1 && del->pos == i)
+        if (del != f.deletes_l.begin()-1 && del->pos == r_len-i-1)
         {
             _delete_params.increment(del->len, mass);
-            assert(j > del->len);
-            j -= del->len;
+            j += del->len;
             del_len = del->len;
             del--;
         }
-        else if (ins != f.inserts_l.begin()-1 && ins->pos == i)
+        else if (ins != f.inserts_l.begin()-1 && ins->pos == r_len-i-1)
         {
             _insert_params.increment(ins->len, mass);
             if (ins->len > del_len)
                 _delete_params.increment(0, mass);
             del_len = 0;
             
-            if (i < ins->len)
-                break;
-            
-            i -= ins->len;
+            i += ins->len;
             ins--;
         }
         else
@@ -235,19 +232,16 @@ void MismatchTable::update(const FragHit& f, double mass)
             del_len = 0;
             _insert_params.increment(0, mass);
             
-            cur = ctoi_r(f.seq_r[i]);
-            prev = (i!=r_len-1) ? ctoi_r(f.seq_r[i+1]) : 0;
-            ref = ctoi_r(t_seq[j]);
+            cur = f.seq_r[i];
+            prev = (i) ? f.seq_r[i-1] : 0;
+            ref = t_seq_rev[j];
             if (prev != 4 && cur != 4 && ref != 4)
             {
                 index = (prev << 2) + ref;
                 right_mm[i].increment(index, cur, mass);
             }
-            if (i==0)
-                break;
-            i--;
-            assert(j!=0);
-            j--;
+            i++;
+            j++;
         }
     }
     
@@ -271,7 +265,7 @@ string MismatchTable::to_string() const
                 size_t arr_i = (col_i << 2) + obs;
                 for (size_t k = 0; k < MAX_READ_LEN; k++)
                 {
-                    double val =  _first_read_mm[k].arr(arr_i);
+                    double val = _first_read_mm[k].arr(arr_i);
                     mass[obs] = log_sum(mass[obs], val);
                     tot = log_sum(tot, val);
                 }

@@ -15,7 +15,7 @@
 #include <iostream>
 #include <fstream>
 #include <math.h>
-#include <assert.h>
+#include <cassert>
 #include <stdio.h>
 
 using namespace std;
@@ -24,7 +24,8 @@ Transcript::Transcript(const TransID id, const std::string& name, const std::str
 :   _globs(globs),
     _id(id),
     _name(name),
-    _seq(seq),
+    _seq_f(seq, 0),
+    _seq_r(seq, 1),
     _alpha(log(alpha)),
     _ret_params(&_curr_params),
     _uniq_counts(0),
@@ -188,6 +189,7 @@ TranscriptTable::TranscriptTable(const string& trans_fasta_file, const TransInde
             {
                 if (!name.empty())
                 {
+                    cout << _trans_map.size() << endl;
                     add_trans(name, seq, (alpha_map) ? alpha_renorm * alpha_map->find(name)->second : alpha, trans_index, trans_lengths);
                 }
                 name = line.substr(1,line.find(' ')-1);

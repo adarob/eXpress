@@ -130,7 +130,7 @@ inline size_t ctoi(const char c)
         case 't':
             return 3;
         default:
-            return 4;
+            return 0;
     }
 }
 
@@ -156,7 +156,7 @@ inline size_t ctoi_r(const char c)
         case 't':
             return 0;
         default:
-            return 4;
+            return 3;
     }
 }
 

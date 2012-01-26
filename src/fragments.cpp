@@ -104,8 +104,6 @@ const FragHit* Fragment::sample_hit() const
         probs[i] = probs[i-1] + _frag_hits[i]->probability;
     }
 
-//   boost::random::discrete_distribution<> dist(probs);
-//   return _frag_hits[dist(random_gen)];
     double r = rand()/double(RAND_MAX)*probs.back();
     size_t i = lower_bound(probs.begin(), probs.end(), r) - probs.begin();
     return _frag_hits[i];

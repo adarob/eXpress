@@ -13,6 +13,7 @@
 #include <vector>
 #include <string>
 #include <boost/thread.hpp>
+#include "markovmodel.h"
 #include "frequencymatrix.h"
 
 class Transcript;
@@ -32,16 +33,16 @@ typedef boost::unique_lock<boost::shared_mutex> WriteLock;
 class SeqWeightTable
 {
     /**
-     * a private FrequencyMatrix that stores the observed nucleotide frequencies (logged) in the bias window
+     * a private MarkovModel that stores the observed conditional nucleotide frequencies (logged) in the bias window
      * surrounding the fragment end
      */
-    FrequencyMatrix _observed;
+    MarkovModel _observed;
     
     /**
-     * a private FrequencyMatrix that stores the expected nucleotide frequencies (logged) based on an assumption
+     * a private MarkovModel that stores the expected condtional nucleotide frequencies (logged) based on an assumption
      * of equal expression of all transcripts
      */
-    FrequencyMatrix _expected;
+    MarkovModel _expected;
     
     /**
      * a private mutex block access for multi-threaded bias updating
@@ -59,9 +60,9 @@ public:
     
     /**
      * a member function that increments the expected counts for the given nucleotide by 1 (logged)
-     * @param c a char representing a nucleotide that has been observed in the transcriptome
+     * FIX @param c a char representing a nucleotide that has been observed in the transcriptome
      */
-    void increment_expected(char c); 
+    void increment_expected(const Sequence& seq); 
     
     /**
      * a member function that normalizes the expected counts and converts them to the log scale
@@ -70,10 +71,10 @@ public:
     
     /**
      * a member function that increments the observed counts for the given fragment sequence by some mass (logged)
-     * @param seq a string of nucleotides in the bias window for the sequenced fragment end
+     * FIX @param seq a string of nucleotides in the bias window for the sequenced fragment end
      * @param normalized_mass the mass (logged probabilistic assignment) of the fragment normalized by its estimated expression
      */
-    void increment_observed(std::string& seq, double normalized_mass);
+    void increment_observed(const Sequence& seq, size_t i, double normalized_mass);
     
     /**
      * a member function that calculates the bias weight (logged) of a bias window
@@ -81,7 +82,7 @@ public:
      * @param i the fragment end point (the central point of the bias window)
      * @return the bias weight for the bias window which is the product of the individual nucleotide bias weights
      */
-    double get_weight(const std::string& seq, int i) const;
+    double get_weight(const Sequence& seq, size_t i) const;
     
     /**
      * a member function that returns a string containing the positional nucleotide probabilities in column-major order (A,C,G,T)

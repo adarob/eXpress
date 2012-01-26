@@ -18,6 +18,7 @@
 #include <fstream>
 #include "main.h"
 #include "bundles.h"
+#include "sequence.h"
 
 class FLD;
 class FragHit;
@@ -83,9 +84,10 @@ class Transcript
     std::string _name;
     
     /**
-     * a private string that stores the transcript sequence
+     * a private Sequence object that stores the transcript sequence
      */
-    std::string _seq;
+    Sequence _seq_f;
+    Sequence _seq_r;
     
     double _alpha;
     
@@ -172,13 +174,13 @@ public:
      * a member function that returns the transcript sequence
      * @return string containing transcript sequence
      */
-    const std::string& seq() const { return _seq; }
+    const Sequence& seq(bool rev) const { if (rev) return _seq_r; return _seq_f; }
     
     /**
      * a member function that returns the transcript length
      * @return transcript length
      */
-    size_t length() const { return _seq.length(); }
+    size_t length() const { return _seq_f.length(); }
     
     /**
      * a member function that returns the current (logged) probabilistically assigned fragment mass

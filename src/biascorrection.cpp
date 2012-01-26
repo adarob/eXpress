@@ -7,7 +7,7 @@
  *
  */
 
-#include <assert.h>
+#include <cassert>
 #include <algorithm>
 #include <boost/assign.hpp>
 #include "main.h"
@@ -15,6 +15,7 @@
 #include "transcripts.h"
 #include "fragments.h"
 #include "frequencymatrix.h"
+#include "sequence.h"
 
 using namespace std;
 
@@ -24,21 +25,18 @@ const vector<double> POS_BINS = boost::assign::list_of(0.1)(0.2)(0.3)(0.4)(0.5)(
 const int SURROUND = 10;
 const int CENTER = 11;
 const int WINDOW = 21;
-const string PADDING = "NNNNNNNNNN"; 
+const size_t FG_ORDER = 3;
+const size_t BG_ORDER = 5;
 
 SeqWeightTable::SeqWeightTable(size_t window_size, double alpha)
-:_observed(window_size, NUM_NUCS, alpha),
- _expected(1, NUM_NUCS, 0, false) 
+:_observed(FG_ORDER, window_size, window_size, alpha),
+ _expected(BG_ORDER, window_size, 1, 0, false) 
 {}
 
-void SeqWeightTable::increment_expected(char c)
+void SeqWeightTable::increment_expected(const Sequence& seq)
 {
     WriteLock lock(_lock);
-    size_t index = ctoi(c);
-    if (index != 4)
-    {
-        _expected.increment(index, 1);
-    }
+    _expected.fast_learn(seq, 1);
 }
 
 void SeqWeightTable::normalize_expected()
@@ -46,46 +44,22 @@ void SeqWeightTable::normalize_expected()
     _expected.set_logged(true);
 }
 
-void SeqWeightTable::increment_observed(string& seq, double normalized_mass)
+void SeqWeightTable::increment_observed(const Sequence& seq, size_t i, double normalized_mass)
 {
     WriteLock lock(_lock);
-    for (size_t i = 0; i < seq.length(); ++i)
-    {
-        size_t index = ctoi(seq[i]);
-        if (index != 4)
-            _observed.increment(i, index, normalized_mass);
-    }
+    int left = (int)i - SURROUND;
+    
+    _observed.update(seq, left, normalized_mass);
 }
 
-double SeqWeightTable::get_weight(const string& seq, int i) const
+double SeqWeightTable::get_weight(const Sequence& seq, size_t i) const
 {
     ReadLock lock(_lock);
-    double weight = 0;
-    for (int j = max(0, CENTER-1-i); j < min(WINDOW, CENTER-1+(int)seq.length()-i); ++j)
-    {
-        size_t index = ctoi(seq[i+j-CENTER+1]);
-        if (index != 4)
-            weight += _observed(j, index) - _expected(index);
-    }
-    return weight;
+    int left = (int)i - SURROUND;
+
+    return _observed.seq_prob(seq, left) - _expected.seq_prob(seq, left);
 }
 
-string SeqWeightTable::to_string() const
-{
-    ReadLock lock(_lock);
-    char buffer[50];
-    string s = "";
-    for(int i = 0; i < WINDOW; ++i)
-    {
-        for (size_t j = 0; j < NUM_NUCS; ++j)
-        {
-            sprintf(buffer, "%e ", sexp(_observed(i, j)));
-            s += buffer;
-        }
-    }
-    s.erase(s.length()-1,1);
-    return s;
-}
 
 void SeqWeightTable::append_output(ofstream& outfile) const
 {
@@ -93,12 +67,12 @@ void SeqWeightTable::append_output(ofstream& outfile) const
     string header = "";
     for(int i = 0; i < WINDOW; i++)
     {
-        sprintf(buff, "\t%d", i-CENTER);
+        sprintf(buff, "\t%d", i-CENTER+1);
         header += buff;
     }
     header += '\n';
     
-    outfile << "\tObserved Nucleotide Distribution\n" << header;
+    outfile << "\tObserved Marginal Distribution\n" << header;
     
     ReadLock lock(_lock);
     for(size_t j = 0; j < NUM_NUCS; j++)
@@ -106,23 +80,58 @@ void SeqWeightTable::append_output(ofstream& outfile) const
         outfile << NUCS[j] << ":\t";
         for(int i = 0; i < WINDOW; i++)
         {
-            outfile << scientific << sexp(_observed(i,j)) << "\t";
+            outfile << scientific << sexp(_observed.marginal_prob(i,j)) << "\t";
         }
         outfile<<endl;
     }
     
-    outfile << "\tBias Weights\n" << header;
+    outfile << "\tObserved Transitions\nPosition\t" << header;
     
-    for(size_t j = 0; j < NUM_NUCS; j++)
+    for(size_t j = 0; j < pow((double)NUM_NUCS, (double)FG_ORDER+1); j++)
     {
-        outfile << NUCS[j] << ":\t";
-        for(int i = 0; i < WINDOW; i++)
+        string trans = "->" + NUCS[j & 4];
+        for(size_t k = 0; k < FG_ORDER-1; ++k)
         {
-            outfile << scientific << sexp(_observed(i,j) - _expected(j)) << "\t";
+            j = j >> 2;
+            trans = NUCS[j & 4] + trans;
+        }
+        outfile << trans << '\t';
+    }
+    outfile << endl;
+    
+    for (size_t i = 0; i < WINDOW; i++)
+    {
+        outfile << (int)i-SURROUND << ":\t";
+        for(size_t j = 0; j < pow((double)NUM_NUCS, (double)FG_ORDER+1); j++)
+        {
+            outfile << scientific << sexp(_observed.transition_prob(i,j>>2,j&4)) << "\t";
         }
         outfile<<endl;
     }
-
+    
+    outfile << "\tExpected Transitions\nPosition\t" << header;
+    
+    for(size_t j = 0; j < FG_ORDER*NUM_NUCS; j++)
+    {
+        string trans = "->" + NUCS[j & 4];
+        for(size_t k = 0; k < FG_ORDER-1; ++k)
+        {
+            j = j >> 2;
+            trans = NUCS[j & 4] + trans;
+        }
+        outfile << trans << '\t';
+    }
+    outfile << endl;
+    
+    for (size_t i = 0; i < WINDOW; i++)
+    {
+        outfile << (int)i-SURROUND << ":\t";
+        for(size_t j = 0; j < FG_ORDER*NUM_NUCS; j++)
+        {
+            outfile << scientific << sexp(_expected.transition_prob(i,j>>2,j&4)) << "\t";
+        }
+        outfile<<endl;
+    }
 }
 
 PosWeightTable::PosWeightTable(const vector<size_t>& len_bins, const vector<double>& pos_bins, double alpha)
@@ -238,8 +247,9 @@ void BiasBoss::update_expectations(const Transcript& trans)
     size_t l = upper_bound(_5_pos_bias.len_bins().begin(),_5_pos_bias.len_bins().end(), trans.length()) - _5_pos_bias.len_bins().begin();
     size_t p = 0;
     double next_bin_start = trans.length() * _5_pos_bias.pos_bins()[p];
-    const string& seq = trans.seq();
-    for (size_t i = 0; i < seq.length(); ++i)
+    const Sequence& seq_fwd = trans.seq(0);
+    const Sequence& seq_rev = trans.seq(1);
+    for (size_t i = 0; i < trans.length(); ++i)
     {
         if (i >= next_bin_start)
         {
@@ -247,8 +257,8 @@ void BiasBoss::update_expectations(const Transcript& trans)
         }
         _5_pos_bias.increment_expected(l,p);
         _3_pos_bias.increment_expected(l,p);
-        _5_seq_bias.increment_expected(seq[i]);
-        _3_seq_bias.increment_expected(seq[i]);
+        _5_seq_bias.increment_expected(seq_fwd);
+        _3_seq_bias.increment_expected(seq_rev);
     }
 }
 
@@ -264,39 +274,19 @@ void BiasBoss::update_observed(const FragHit& hit, double normalized_mass)
 {
     assert (hit.pair_status() != PAIRED || hit.length() > WINDOW);
     
-    const string t_seq = hit.mapped_trans->seq();
-    
+    const Sequence& t_seq_fwd = hit.mapped_trans->seq(0);
+    const Sequence& t_seq_rev = hit.mapped_trans->seq(1);
+
     if (hit.pair_status() != RIGHT_ONLY)
     {
-        string seq_5;
-        int left_window = (int)hit.left - (CENTER-1);
-        if (left_window < 0)
-        {
-            seq_5 = PADDING.substr(0, -left_window);
-            seq_5 += t_seq.substr(0, WINDOW + left_window);
-        }
-        else
-        {
-            seq_5 = t_seq.substr(left_window, WINDOW); 
-        }
-        
-        _5_seq_bias.increment_observed(seq_5, normalized_mass);
-        _5_pos_bias.increment_observed(t_seq.length(), (double)hit.left/t_seq.length(), normalized_mass);
+        _5_seq_bias.increment_observed(t_seq_fwd, hit.left, normalized_mass);
+        _5_pos_bias.increment_observed(t_seq_fwd.length(), (double)hit.left/t_seq_fwd.length(), normalized_mass);
     }
     
     if (hit.pair_status() != LEFT_ONLY)
     {
-        int left_window = (int)hit.right - CENTER;
-        assert(left_window < t_seq.length());
-        string seq_3 = t_seq.substr(left_window, WINDOW);
-        int overhang =left_window + WINDOW - (int)t_seq.length();
-        if (overhang > 0)
-        {
-            seq_3 += PADDING.substr(0, overhang);
-        }
-        
-        _3_seq_bias.increment_observed(seq_3, normalized_mass);
-        _3_pos_bias.increment_observed(t_seq.length(), (double)(hit.right-1)/t_seq.length(), normalized_mass);
+        _3_seq_bias.increment_observed(t_seq_rev, t_seq_rev.length()-hit.right, normalized_mass);
+        _3_pos_bias.increment_observed(t_seq_rev.length(), (double)(hit.right-1)/t_seq_rev.length(), normalized_mass);
     }
 }
 
@@ -306,6 +296,9 @@ double BiasBoss::get_transcript_bias(std::vector<float>& start_bias, std::vector
     double tot_end = HUGE_VAL;
     
     size_t l = upper_bound(_5_pos_bias.len_bins().begin(),_5_pos_bias.len_bins().end(), trans.length()) - _5_pos_bias.len_bins().begin();
+    
+    const Sequence& t_seq_fwd = trans.seq(0);
+    const Sequence& t_seq_rev = trans.seq(1);
     
     size_t p = 0;
     double next_bin_start = trans.length() * _5_pos_bias.pos_bins()[p];
@@ -319,8 +312,8 @@ double BiasBoss::get_transcript_bias(std::vector<float>& start_bias, std::vector
             curr_5_pos_bias = _5_pos_bias.get_weight(l,p);
             curr_3_pos_bias = _3_pos_bias.get_weight(l,p);
         }
-        start_bias[i] = _5_seq_bias.get_weight(trans.seq(), (int)i) + curr_5_pos_bias;
-        end_bias[i] = _3_seq_bias.get_weight(trans.seq(), (int)i) + curr_3_pos_bias;
+        start_bias[i] = _5_seq_bias.get_weight(t_seq_fwd, i) + curr_5_pos_bias;
+        end_bias[i] = _3_seq_bias.get_weight(t_seq_rev, i) + curr_3_pos_bias;
         tot_start = log_sum(tot_start, start_bias[i]);
         tot_end = log_sum(tot_start, end_bias[i]);
     }
@@ -330,8 +323,8 @@ double BiasBoss::get_transcript_bias(std::vector<float>& start_bias, std::vector
 }
 
 string BiasBoss::to_string() const
-{
-    return _5_seq_bias.to_string();
+{  
+    return "";
 }
 
 void BiasBoss::append_output(ofstream& outfile) const

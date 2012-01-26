@@ -15,6 +15,7 @@
 #include <fstream>
 #include <cassert>
 #include <api/BamAlignment.h>
+#include "sequence.h"
 
 typedef size_t TransID;
 class Transcript;
@@ -63,12 +64,12 @@ struct FragHit
     /**
      * a public string containing the "left" read sequence (first according to SAM flag)
      */
-    std::string seq_l;
+    Sequence seq_l;
     
     /**
      * a public string containing the "right" read sequence (second according to SAM flag)
      */
-    std::string seq_r;
+    Sequence seq_r;
     
     /**
      * a public size_t containing the 0-based leftmost coordinate mapped to in the transcript

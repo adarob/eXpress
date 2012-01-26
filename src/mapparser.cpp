@@ -278,13 +278,13 @@ bool BAMParser::map_end_from_alignment(BamTools::BamAlignment& a)
     
     if (a.IsReverseStrand())
     {
-        f.seq_r = a.QueryBases;
+        f.seq_r.set(a.QueryBases, 1);
         f.bam_r = a;
         f.right = f.left + cigar_length(a.CigarData, f.inserts_r, f.deletes_r);
     }
     else
     {
-        f.seq_l = a.QueryBases;
+        f.seq_l.set(a.QueryBases, 0);
         f.bam_l = a;
         f.right = f.left + cigar_length(a.CigarData, f.inserts_l, f.deletes_l);
     }
@@ -471,12 +471,12 @@ bool SAMParser::map_end_from_line(char* line)
             case 9:
                 if (sam_flag & 0x10)
                 {
-                    f.seq_r = p;
+                    f.seq_r.set(p, 1);
                     f.sam_r = sam_line;
                 }
                 else
                 {
-                    f.seq_l = p;
+                    f.seq_l.set(p, 0);
                     f.sam_l = sam_line;
                 }
                 goto stop;
