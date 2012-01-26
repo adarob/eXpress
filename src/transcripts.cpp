@@ -435,7 +435,7 @@ void TranscriptTable::output_results(string output_dir, size_t tot_counts, bool 
                         count_var = binom_var;
                     else
                         count_var = n*a*b*(a+b+n)/((a+b)*(a+b)*(a+b+1));
-                    assert(!isnan(count_var) && !isinf(count_var));
+                    //assert(!isnan(count_var) && !isinf(count_var));
                 }
                 
                 double fpkm_std_dev = sqrt(trans_counts[i] + count_var);
@@ -510,7 +510,7 @@ void TranscriptTable::threaded_bias_update(boost::mutex* mut)
                 else
                     *bias_table = *(_globs->bias_table);
             }    
-            cout << "Synchronized bias tables.\n";
+            cout << "Synchronized paramater tables.\n";
         }
 
         foreach(Transcript* trans, _trans_map)

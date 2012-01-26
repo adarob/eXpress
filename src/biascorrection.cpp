@@ -81,50 +81,54 @@ void SeqWeightTable::append_output(ofstream& outfile) const
         outfile<<endl;
     }
     
-    outfile << "\tObserved Transitions\nPosition\t" << header;
+    outfile << "\tObserved Transition Probabilisties\nPosition\t";
     
     for(size_t j = 0; j < pow((double)NUM_NUCS, (double)FG_ORDER+1); j++)
     {
-        string trans = "->" + NUCS[j & 4];
-        for(size_t k = 0; k < FG_ORDER-1; ++k)
+        string trans = "->";
+        trans += NUCS[j & 3];
+        size_t cond = j >> 2;
+        for(size_t k = 0; k < FG_ORDER; ++k)
         {
-            j = j >> 2;
-            trans = NUCS[j & 4] + trans;
+            trans = NUCS[cond & 3] + trans;
+            cond = cond >> 2;
         }
         outfile << trans << '\t';
     }
     outfile << endl;
     
-    for (size_t i = 0; i < WINDOW; i++)
+    for (int i = 0; i < WINDOW; i++)
     {
-        outfile << (int)i-SURROUND << ":\t";
+        outfile << i-SURROUND << ":\t";
         for(size_t j = 0; j < pow((double)NUM_NUCS, (double)FG_ORDER+1); j++)
         {
-            outfile << scientific << sexp(_observed.transition_prob(i,j>>2,j&4)) << "\t";
+            outfile << scientific << sexp(_observed.transition_prob(i,j>>2,j&3)) << "\t";
         }
         outfile<<endl;
     }
     
-    outfile << "\tExpected Transitions\nPosition\t" << header;
+    outfile << "\tTransition Bias Weights\nPosition\t";
     
     for(size_t j = 0; j < FG_ORDER*NUM_NUCS; j++)
     {
-        string trans = "->" + NUCS[j & 4];
-        for(size_t k = 0; k < FG_ORDER-1; ++k)
+        string trans = "->";
+        trans += NUCS[j & 3];
+        size_t cond = j >> 2;
+        for(size_t k = 0; k < FG_ORDER; ++k)
         {
-            j = j >> 2;
-            trans = NUCS[j & 4] + trans;
+            trans = NUCS[cond & 3] + trans;
+            cond = cond >> 2;
         }
         outfile << trans << '\t';
     }
     outfile << endl;
     
-    for (size_t i = 0; i < WINDOW; i++)
+    for (int i = 0; i < WINDOW; i++)
     {
-        outfile << (int)i-SURROUND << ":\t";
-        for(size_t j = 0; j < FG_ORDER*NUM_NUCS; j++)
+        outfile << i-SURROUND << ":\t";
+        for(size_t j = 0; j <  pow((double)NUM_NUCS, (double)FG_ORDER+1); j++)
         {
-            outfile << scientific << sexp(_expected.transition_prob(i,j>>2,j&4)) << "\t";
+            outfile << scientific << sexp(_observed.transition_prob(i,j>>2,j&3)-_expected.transition_prob(0,j>>2,j&3)) << "\t";
         }
         outfile<<endl;
     }

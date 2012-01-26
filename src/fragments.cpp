@@ -59,7 +59,7 @@ void Fragment::add_open_mate(FragHit* new_p)
     for( vector<FragHit*>::iterator it = _open_mates.begin(); it != _open_mates.end(); ++it)
     {
         FragHit& om = **it;
-        if (nm.trans_id == om.trans_id && nm.mate_l == om.left && om.mate_l == nm.left)
+        if (nm.trans_id == om.trans_id && (size_t)nm.mate_l == om.left && (size_t)om.mate_l == nm.left)
         {
             if (nm.left < om.left)
             {

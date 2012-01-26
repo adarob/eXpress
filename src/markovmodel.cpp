@@ -55,7 +55,7 @@ void MarkovModel::fast_learn(const Sequence& seq, double mass)
     assert(_num_pos==1);
     
     size_t cond = 0;
-    for (size_t i = 0; i < _order; ++i)
+    for (int i = 0; i < _order; ++i)
     {
         cond = (cond << 2) + seq[i];
     }
@@ -72,6 +72,7 @@ void MarkovModel::fast_learn(const Sequence& seq, double mass)
 
 double MarkovModel::transition_prob(size_t p, size_t cond, size_t curr) const
 {
+    assert(p < _params.size());
     return _params[p](cond, curr);
 }
 
@@ -118,7 +119,7 @@ void MarkovModel::set_logged(bool logged)
     if (logged == _logged)
         return;
     _logged = logged;
-    for (int i = 0; i < _params.size(); ++i)
+    for (size_t i = 0; i < _params.size(); ++i)
     {
         _params[i].set_logged(logged);
     }
@@ -130,7 +131,7 @@ double MarkovModel::marginal_prob(size_t w, size_t nuc) const
     assert(w < _params.size());
     double marg = HUGE_VAL;
     double tot = HUGE_VAL;
-    for (size_t cond = 0; cond < pow((double)NUM_NUCS, (double)(_order-1)); cond++)
+    for (size_t cond = 0; cond < pow((double)NUM_NUCS, (double)(_order)); cond++)
     {
         marg = log_sum(marg, _params[w].arr((cond << 2)*NUM_NUCS + nuc));
         tot = log_sum(tot, _params[w].row(cond << 2));
