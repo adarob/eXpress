@@ -35,7 +35,6 @@ SeqWeightTable::SeqWeightTable(size_t window_size, double alpha)
 
 void SeqWeightTable::increment_expected(const Sequence& seq)
 {
-    WriteLock lock(_lock);
     _expected.fast_learn(seq, 1);
 }
 
@@ -46,7 +45,6 @@ void SeqWeightTable::normalize_expected()
 
 void SeqWeightTable::increment_observed(const Sequence& seq, size_t i, double normalized_mass)
 {
-    WriteLock lock(_lock);
     int left = (int)i - SURROUND;
     
     _observed.update(seq, left, normalized_mass);
@@ -54,7 +52,6 @@ void SeqWeightTable::increment_observed(const Sequence& seq, size_t i, double no
 
 double SeqWeightTable::get_weight(const Sequence& seq, size_t i) const
 {
-    ReadLock lock(_lock);
     int left = (int)i - SURROUND;
 
     return _observed.seq_prob(seq, left) - _expected.seq_prob(seq, left);
@@ -74,7 +71,6 @@ void SeqWeightTable::append_output(ofstream& outfile) const
     
     outfile << "\tObserved Marginal Distribution\n" << header;
     
-    ReadLock lock(_lock);
     for(size_t j = 0; j < NUM_NUCS; j++)
     {
         outfile << NUCS[j] << ":\t";
@@ -150,7 +146,6 @@ void PosWeightTable::increment_expected(size_t len, double pos)
 
 void PosWeightTable::increment_expected(size_t l, size_t p)
 {
-    WriteLock lock(_lock);
     _expected.increment(l, p, 1);
 }
 
@@ -168,7 +163,6 @@ void PosWeightTable::increment_observed(size_t len, double pos, double normalize
 
 void PosWeightTable::increment_observed(size_t l, size_t p, double normalized_mass)
 {
-    WriteLock lock(_lock);
     _observed.increment(l,p, normalized_mass);
 } 
 
@@ -176,13 +170,11 @@ double PosWeightTable::get_weight(size_t len, double pos) const
 {
     size_t l = upper_bound(len_bins().begin(),len_bins().end(), len) - len_bins().begin();
     size_t p = upper_bound(pos_bins().begin(),pos_bins().end(), pos) - pos_bins().begin();
-    ReadLock lock(_lock);
     return _observed(l,p)-_expected(l,p);
 }
 
 double PosWeightTable::get_weight(size_t l, size_t p) const
 {
-    ReadLock lock(_lock);
     return _observed(l,p)-_expected(l,p);
 }
 
@@ -203,7 +195,6 @@ void PosWeightTable::append_output(ofstream& outfile) const
         
     outfile << "\tObserved Position Distribution\n" << header;
 
-    ReadLock lock(_lock);
     sprintf(buff, "%d-" SIZE_T_FMT ":\t", 0, len_bins()[0]);
     for(size_t l = 0; l < len_bins().size(); l++)
     {

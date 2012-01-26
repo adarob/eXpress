@@ -11,10 +11,6 @@
 
 #include <vector>
 #include <string>
-#include <boost/thread.hpp>
-
-typedef boost::shared_lock<boost::shared_mutex> ReadLock;
-typedef boost::unique_lock<boost::shared_mutex> WriteLock;
 
 /**
  * The FLD class keeps track of the observed fragment length distribution.  It starts with
@@ -44,11 +40,6 @@ class FLD
      */
     size_t _min;
     
-    /**
-     * a private read/write lock
-     */
-    mutable boost::shared_mutex _lock;
-    
 public:
     /**
      * FLD Constructor
@@ -67,14 +58,12 @@ public:
     
     /**
      * a member function that returns the mean FragHit length
-     * read-locked
      * @return mean observed FragHit length
      */ 
     double mean() const;
     
     /**
      * a member function that updates the distribution based on a new FragHit observation
-     * write-locked
      * @param len an integer for the observed FragHit length
      * @param mass a double for the mass (logged) of the observed FragHit
      */
@@ -82,7 +71,6 @@ public:
     
     /**
      * a member function that returns the (logged) probability of a given FragHit length
-     * read-locked
      * @param len an integer for the FragHit length to return the probability of
      * @return (logged) probability of observing the given FragHit length
      */ 
@@ -96,14 +84,12 @@ public:
     
     /**
      * a member function that returns a string containing the current distribution
-     * read-locked
      * @return space-separated string of probabilities ordered from length 0 to max_val (non-logged)
      */ 
     std::string to_string() const;
 
     /**
      * a member function that appends the FLD parameters to the end of the given file
-     * read-locked
      * @param outfile the file to append to
      */ 
     void append_output(std::ofstream& outfile) const;

@@ -264,18 +264,13 @@ public:
      * @return (a value proportional to) the log likelihood the given fragment originated from this transcript
      */
     double log_likelihood(const FragHit& frag, bool with_pseudo) const;
-    
-    /**
-     * a member function that calcualtes and returns the effective length of the transcript (logged)
-     * @return the effective length of the transcript calculated as \f$ \tilde{l} = \sum_{l=1}^{L(t)}\sum_{i=1}^{L(t)} D(l)b_5[i]*b_3[i+l] \f$
-     */
-    //double effective_length() const;
-    
+        
     /**
      * a member function that calcualtes and returns the estimated effective length of the transcript (logged) using the avg bias
      * @return the estimated effective length of the transcript calculated as \f$ \tilde{l} = \bar{bias}\sum_{l=1}^{L(t)} D(l)(L(t) - l + 1) \f$
+     FIX
      */
-    double est_effective_length() const;
+    double est_effective_length(FLD* fld = NULL) const;
     
     /**
      * a member function that returns the most recently estimated effective length (logged) as calculated by the bias updater thread 
@@ -285,8 +280,9 @@ public:
 
     /**
      * a member function that causes the transcript bias to be re-calculated by the _bias_table based on curent parameters
+     FIX
      */
-    void update_transcript_bias();
+    void update_transcript_bias(BiasBoss* bias_table = NULL, FLD* fld = NULL);
     
 };
 
@@ -353,7 +349,7 @@ public:
      * deletes all of the transcript objects in the table
      */
     ~TranscriptTable();
-    
+        
     /**
      * a member function that returns a pointer to the transcript with the given id 
      * @param id of the transcript queried
@@ -411,11 +407,6 @@ public:
     size_t num_bundles();
     
     /**
-     * a member function for driving a thread that continuously updates the transcript bias values
-     */
-    void threaded_bias_update();
-    
-    /**
      * a member function that outputs the final expression data in a file called 'results.xprs'
      * and (optionally) the variance-covariance matrix in 'varcov.xprs' in the given output directory
      * @param output_dir the directory to output the expression file to
@@ -423,6 +414,11 @@ public:
      * @param output_varcov boolean specifying whether to also output the variance-covariance matrix
      */
     void output_results(std::string output_dir, size_t tot_counts, bool output_varcov);
+    
+    /**
+     * a member function for driving a thread that continuously updates the transcript bias values
+     */
+    void threaded_bias_update(boost::mutex* mut);
 };
 
 #endif

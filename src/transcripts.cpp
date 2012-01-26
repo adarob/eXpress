@@ -49,7 +49,7 @@ void Transcript::add_mass(double p, double v, double mass)
 { 
     _curr_params.mass = log_sum(_curr_params.mass, p+mass);
     _curr_params.samp_var = log_sum(_curr_params.samp_var, 2*mass+p);
-    if (p != 0.0)
+    if (p != 0.0 || v != HUGE_VAL)
     {
         _curr_params.binom_var = log_sum(_curr_params.binom_var, 2*mass + p + log(1-sexp(p)));
         _curr_params.tot_unc = log_sum(_curr_params.tot_unc, v+mass);
@@ -108,13 +108,18 @@ double Transcript::log_likelihood(const FragHit& frag, bool with_pseudo) const
     return ll;
 }
 
-double Transcript::est_effective_length() const
+double Transcript::est_effective_length(FLD* fld) const
 {
+    if (!fld)
+    {
+        fld = _globs->fld;
+    }
+    
     double eff_len = HUGE_VAL;
     
-    for(size_t l = 1; l <= min(length(), (_globs->fld)->max_val()); l++)
+    for(size_t l = 1; l <= min(length(), fld->max_val()); l++)
     {
-        eff_len = log_sum(eff_len, (_globs->fld)->pdf(l)+log((double)length()-l+1));
+        eff_len = log_sum(eff_len, fld->pdf(l)+log((double)length()-l+1));
     }
     
     boost::mutex::scoped_lock lock(_bias_lock);
@@ -127,33 +132,20 @@ double Transcript::cached_effective_length() const
     return _cached_eff_len;
 }
 
-//double Transcript::effective_length() const
-//{
-//    double eff_len = 0.0;
-//    boost::mutex::scoped_lock lock(_bias_lock);
-//    
-//    for(size_t l = 1; l <= min(length(), (_globs->fld)->max_val()); l++)
-//    {
-//        double len_bias = 0;
-//        for (size_t i = 0; i < length()-l+1; i++)
-//        {
-//            len_bias = log_sum(len_bias, _start_bias[i] + _end_bias[i+l]);
-//        }
-//        eff_len += log_sum(eff_len, (_globs->fld)->pdf(l) + len_bias);
-//    }
-//    
-//    return eff_len;
-//}
 
-
-void Transcript::update_transcript_bias()
+void Transcript::update_transcript_bias(BiasBoss* bias_table, FLD* fld)
 {
-    if (_globs->bias_table)
+    if (!bias_table)
+    {
+        bias_table = _globs->bias_table;
+        fld = _globs->fld;
+    }
+    if (bias_table)
     {
         boost::mutex::scoped_lock lock(_bias_lock);
-        _avg_bias = (_globs->bias_table)->get_transcript_bias(*_start_bias, *_end_bias, *this);
+        _avg_bias = bias_table->get_transcript_bias(*_start_bias, *_end_bias, *this);
     }
-    _cached_eff_len = est_effective_length();
+    _cached_eff_len = est_effective_length(fld);
 }
 
 TranscriptTable::TranscriptTable(const string& trans_fasta_file, const TransIndex& trans_index, const TransIndex& trans_lengths, double alpha, const AlphaMap* alpha_map, const Globals* globs)
@@ -301,19 +293,6 @@ void TranscriptTable::round_reset()
     }
 }
 
-void TranscriptTable::threaded_bias_update()
-{
-    while(running)
-    {
-        foreach(Transcript* trans, _trans_map)
-        {  
-            trans->update_transcript_bias();
-            if (!running)
-                break;
-        }
-    }
-}
-
 void project_to_polytope(vector<Transcript*> bundle_trans, vector<double>& trans_counts, double bundle_counts)
 {
     vector<bool> polytope_bound(bundle_trans.size(), false);
@@ -448,7 +427,7 @@ void TranscriptTable::output_results(string output_dir, size_t tot_counts, bool 
                     double binom_var = min(sexp(trans.binom_var() + l_var_renorm), 0.25*trans.tot_counts());
                     double p = sexp(trans.ambig_mass() - trans.tot_ambig_mass());
                     double v = sexp(trans.tot_uncertainty() - trans.tot_ambig_mass());
-                    assert (p >=0 && p <= 1);
+                    //assert (p >=0 && p <= 1);
                     double n = trans.tot_counts()-trans.uniq_counts();
                     double a = p*(p*(1-p)/v - 1);
                     double b = (1-p)*(p*(1-p)/v -1);
@@ -508,4 +487,42 @@ void TranscriptTable::output_results(string output_dir, size_t tot_counts, bool 
     fclose(expr_file);
     if (output_varcov)
         varcov_file.close();
+}
+
+void TranscriptTable::threaded_bias_update(boost::mutex* mut)
+{
+    BiasBoss* bias_table = NULL;
+    FLD* fld = NULL;
+    
+    while(running)
+    {
+        {
+            boost::unique_lock<boost::mutex> lock(*mut);
+            if(!fld)
+                fld = new FLD(*(_globs->fld));
+            else
+                *fld = *(_globs->fld);
+            
+            if (_globs->bias_table)
+            {
+                if (!bias_table)
+                    bias_table = new BiasBoss(*(_globs->bias_table));
+                else
+                    *bias_table = *(_globs->bias_table);
+            }    
+            cout << "Synchronized bias tables.\n";
+        }
+
+        foreach(Transcript* trans, _trans_map)
+        {  
+            trans->update_transcript_bias(bias_table, fld);
+            if (!running)
+                break;
+        }
+
+    }
+    if (fld)
+        delete fld;
+    if (bias_table)
+        delete bias_table;
 }

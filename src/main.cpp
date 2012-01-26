@@ -26,7 +26,7 @@
 #include "biascorrection.h"
 #include "mismatchmodel.h"
 #include "mapparser.h"
-
+#include "threadsafety.h"
 
 #ifndef WIN32
     #include "update_check.h"
@@ -377,38 +377,43 @@ size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TranscriptTable* 
     size_t j = 6;
     while (true)
     {
-        ParseThreadSafety ts;
+        ParseThreadSafety pts;
+        boost::mutex bu_mut;
         running = true;
-        boost::thread parse(&ThreadedMapParser::threaded_parse, &map_parser, &ts, trans_table);
+        boost::thread parse(&ThreadedMapParser::threaded_parse, &map_parser, &pts, trans_table);
         
         while(!stop_at || num_frags < stop_at)
         {
             {
-                boost::unique_lock<boost::mutex> lock(ts.mut);
-                while(!ts.frag_clean)
+                boost::unique_lock<boost::mutex> lock(pts.mut);
+                while(!pts.frag_clean)
                 {
-                    ts.cond.wait(lock);
+                    pts.cond.wait(lock);
                 }
                 
-                frag = ts.next_frag;
+                frag = pts.next_frag;
                 
-                ts.frag_clean = false;
-                ts.cond.notify_one();
+                pts.frag_clean = false;
+                pts.cond.notify_one();
             }
-            
+
             if (!frag)
             {
                 break;
-            }
+            }                
                     
             if (n == burn_in)
             {
-                bias_update = new boost::thread(&TranscriptTable::threaded_bias_update, trans_table);
+                bias_update = new boost::thread(&TranscriptTable::threaded_bias_update, trans_table, &bu_mut);
                 if (globs.mismatch_table)
                     (globs.mismatch_table)->activate();
             }
             
-            process_fragment(mass_n, frag, trans_table, globs);
+            {
+                boost::unique_lock<boost::mutex> lock(bu_mut);
+                process_fragment(mass_n, frag, trans_table, globs);
+            }
+            
             num_frags++;
             
             // Output progress
@@ -453,10 +458,11 @@ size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TranscriptTable* 
         }
     
         {
-            boost::unique_lock<boost::mutex> lock(ts.mut);
+            boost::unique_lock<boost::mutex> lock1(pts.mut);
+            boost::unique_lock<boost::mutex> lock2(bu_mut);
             running = false;
-            ts.frag_clean = false;
-            ts.cond.notify_one();
+            pts.frag_clean = false;
+            pts.cond.notify_one();
         }
 
         parse.join();
@@ -532,7 +538,8 @@ int main (int argc, char ** argv)
     
     ThreadedMapParser map_parser(in_map_file_name, out_map_file_name, last_round);
     TranscriptTable trans_table(fasta_file_name, map_parser.trans_index(), map_parser.trans_lengths(), expr_alpha, expr_alpha_map, &globs);
-
+    globs.trans_table = &trans_table;
+    
     double num_trans = (double)map_parser.trans_index().size();
     
     if (calc_covar && (double)SSIZE_MAX < num_trans*(num_trans+1))

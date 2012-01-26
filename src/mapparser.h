@@ -16,7 +16,7 @@
 #include <api/BamReader.h>
 #include <api/BamWriter.h>
 
-
+class ParseThreadSafety;
 class Fragment;
 class FragHit;
 class TranscriptTable;
@@ -334,39 +334,6 @@ public:
     void write_fragment(Fragment& f);
 };
 
-/**
- * The ParseThreadSafety struct stores objects to allow for parsing to safely occur
- * on a separate thread from processing.
- *  @author    Adam Roberts
- *  @date      2011
- *  @copyright Artistic License 2.0
- **/
-struct ParseThreadSafety
-{
-    /**
-     * a pointer to the next Fragment to be processed by the main thread
-     */
-    Fragment* next_frag;
-    
-    /**
-     * a mutex for the conditional variable
-     */
-    boost::mutex mut;
-    
-    /**
-     * a conditional variable where the processor waits for a new Fragment and the parser waits
-     * for the Fragment pointer to be copied by the processor
-     */
-    boost::condition_variable cond;
-    
-    /**
-     * a bool specifying the condition that the current next_frag pointer is clean, meaning that it
-     * hasn't been copied by the processor
-     */
-    bool frag_clean;
-    
-    ParseThreadSafety() : next_frag(NULL), frag_clean(false) {}
-};
 
 /**
  * The ThreadedMapParser class is meant to be run on as a separate thread from the main processing.

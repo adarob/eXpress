@@ -10,6 +10,7 @@
 #include "main.h"
 #include "fragments.h"
 #include "transcripts.h"
+#include "threadsafety.h"
 
 using namespace std;
 

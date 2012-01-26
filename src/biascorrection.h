@@ -12,15 +12,12 @@
 
 #include <vector>
 #include <string>
-#include <boost/thread.hpp>
 #include "markovmodel.h"
 #include "frequencymatrix.h"
+#include "fld.h"
 
 class Transcript;
 class FragHit;
-
-typedef boost::shared_lock<boost::shared_mutex> ReadLock;
-typedef boost::unique_lock<boost::shared_mutex> WriteLock;
 
 /**
  * The SeqWeightTable class keeps track of sequence-specific bias parameters.
@@ -43,11 +40,6 @@ class SeqWeightTable
      * of equal expression of all transcripts
      */
     MarkovModel _expected;
-    
-    /**
-     * a private mutex block access for multi-threaded bias updating
-     */
-    mutable boost::shared_mutex _lock;
     
 public:
     
@@ -123,17 +115,12 @@ class PosWeightTable
     /**
      * a private vector of unsigned integers specifying the bin ranges for transcript lengths
      */
-    const std::vector<size_t> _len_bins;
+    std::vector<size_t> _len_bins;
     
     /**
      * a private vector of doubles specifying the bin ranges for fractional positions
      */
-    const std::vector<double> _pos_bins;
-    
-    /**
-     * a private mutex block access for multi-threaded bias updating
-     */
-    mutable boost::shared_mutex _lock;
+    std::vector<double> _pos_bins;
     
 public:
     
