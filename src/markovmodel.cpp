@@ -133,8 +133,8 @@ double MarkovModel::marginal_prob(size_t w, size_t nuc) const
     double tot = HUGE_VAL;
     for (size_t cond = 0; cond < pow((double)NUM_NUCS, (double)(_order)); cond++)
     {
-        marg = log_sum(marg, _params[w].arr((cond << 2)*NUM_NUCS + nuc));
-        tot = log_sum(tot, _params[w].row(cond << 2));
+        marg = log_sum(marg, _params[w].arr((cond << 2) + nuc));
+        tot = log_sum(tot, _params[w].row(cond));
     }
     return marg-tot;
 }
