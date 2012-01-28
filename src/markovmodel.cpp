@@ -27,16 +27,16 @@ void MarkovModel::update(const Sequence& seq, int left, double mass)
     int i = 0;
     int j = left;
     int seq_len = (int)seq.length();
+    
+    size_t cond = 0;
+    
     if (left < _order)
     {
         i = _order-left;
-        j = _order;
-    }
-    
-    size_t cond = 0;
-    for(int k = j-_order; k < j; ++k)
-    {
-        cond = (cond << 2) + seq[k];
+        for (j=0; j < min(_order, i); j++)
+        {
+            cond = (cond << 2) + seq[j];
+        }
     }
     
     while(i < _window_size && j < seq_len)
@@ -44,7 +44,8 @@ void MarkovModel::update(const Sequence& seq, int left, double mass)
         size_t curr = seq[j];
         _params[min(i,_num_pos-1)].increment(cond, curr, mass);
         cond = (cond << 2) + curr;
-        cond -= seq[j-_order] << (_order*2);
+        if (i >= _order)
+            cond -= seq[j-_order] << (_order*2);
         i++;
         j++;
     }
@@ -52,7 +53,7 @@ void MarkovModel::update(const Sequence& seq, int left, double mass)
 
 void MarkovModel::fast_learn(const Sequence& seq, double mass)
 {
-    assert(_num_pos==1);
+    assert(_num_pos==_order+1);
     
     size_t cond = 0;
     for (int i = 0; i < _order; ++i)
@@ -64,9 +65,24 @@ void MarkovModel::fast_learn(const Sequence& seq, double mass)
     {
         size_t curr = seq[i];
         
-        _params[0].increment(cond, curr, mass);
+        _params[_order].increment(cond, curr, mass);
         cond = (cond << 2) + curr;
         cond -= seq[i-_order] << (_order*2);
+    }
+}
+
+void MarkovModel::calc_marginals()
+{
+    assert(_num_pos==_order+1);
+    for (size_t i = 0; i < _order; ++i)
+    {
+        for (size_t cond = 0; cond < pow((double)NUM_NUCS, (double)(_order)); cond++)
+        {
+            for(size_t nuc = 0; nuc < NUM_NUCS; ++nuc)
+            {
+                _params[i].increment(cond & ((1 << (2*i))-1) , nuc, _params[_order].arr((cond << 2) + nuc));
+            }
+        }
     }
 }
 
@@ -82,21 +98,18 @@ double MarkovModel::seq_prob(const Sequence& seq, int left) const
     int i = 0;
     int j = left;
     int seq_len = (int)seq.length();
+    
+    size_t cond = 0;
     if (left < _order)
     {
         i = _order-left;
-        j = _order;
+        for (j=0; j < min(_order, i); j++)
+        {
+            cond = (cond << 2) + seq[j];
+        }
     }
     
-    size_t cond = 0;
-    for(int k = j-_order; k < j; ++k)
-    {
-        cond = (cond << 2) + seq[k];
-    }
-    
-    double v = 0;
-    if (!_logged)
-        v = 1;
+    double v = (_logged) ? 0:1;
     
     while(i < _window_size && j < seq_len)
     {
@@ -106,7 +119,8 @@ double MarkovModel::seq_prob(const Sequence& seq, int left) const
         else
             v *= _params[min(i,_num_pos-1)](cond, curr);
         cond = (cond << 2) + curr;
-        cond -= seq[j-_order] << (_order*2);
+        if (i >= _order)
+            cond -= seq[j-_order] << (_order*2);
         i++;
         j++;
     }

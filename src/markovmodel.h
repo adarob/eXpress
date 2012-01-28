@@ -35,7 +35,8 @@ public:
     void update(const Sequence& seq, int left, double mass);
     
     void fast_learn(const Sequence& seq, double mass);
-
+    void calc_marginals();
+    
     void set_logged(bool logged);
 };
 
