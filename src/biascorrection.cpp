@@ -122,7 +122,7 @@ void SeqWeightTable::append_output(ofstream& outfile) const
     }
     outfile << endl;
     
-    for (int i = 0; i < BG_ORDER+1; i++)
+    for (size_t i = 0; i < BG_ORDER+1; i++)
     {
         outfile << i << ":\t";
         for(size_t j = 0; j <  pow((double)NUM_NUCS, (double)BG_ORDER+1); j++)
@@ -306,8 +306,8 @@ double BiasBoss::get_transcript_bias(std::vector<float>& start_bias, std::vector
             curr_5_pos_bias = _5_pos_bias.get_weight(l,p);
             curr_3_pos_bias = _3_pos_bias.get_weight(l,p);
         }
-        start_bias[i] = _5_seq_bias.get_weight(t_seq_fwd, i) + curr_5_pos_bias;
-        end_bias[i] = _3_seq_bias.get_weight(t_seq_rev, i) + curr_3_pos_bias;
+        start_bias[i] = _5_seq_bias.get_weight(t_seq_fwd, i);// + curr_5_pos_bias;
+        end_bias[i] = _3_seq_bias.get_weight(t_seq_rev, i);// + curr_3_pos_bias;
         tot_start = log_sum(tot_start, start_bias[i]);
         tot_end = log_sum(tot_start, end_bias[i]);
     }

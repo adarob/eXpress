@@ -74,7 +74,7 @@ void MarkovModel::fast_learn(const Sequence& seq, double mass)
 void MarkovModel::calc_marginals()
 {
     assert(_num_pos==_order+1);
-    for (size_t i = 0; i < _order; ++i)
+    for (int i = 0; i < _order; ++i)
     {
         for (size_t cond = 0; cond < pow((double)NUM_NUCS, (double)(_order)); cond++)
         {
