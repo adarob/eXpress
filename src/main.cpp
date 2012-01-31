@@ -446,6 +446,15 @@ size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TranscriptTable* 
                 }
                 trans_table->output_results(dir, n, false);
                 
+                ofstream paramfile((dir + "/params.xprs").c_str());
+                (globs.fld)->append_output(paramfile);
+                if (globs.mismatch_table)
+                    (globs.mismatch_table)->append_output(paramfile);
+                if (globs.bias_table)
+                    (globs.bias_table)->append_output(paramfile);
+                paramfile.close();
+
+                
                 if (i++ == 9)
                 {
                     i = 1;
