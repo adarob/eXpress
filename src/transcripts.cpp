@@ -98,19 +98,12 @@ double Transcript::log_likelihood(const FragHit& frag, bool with_pseudo) const
             if (ps != LEFT_ONLY)
                 ll += _end_bias->at(frag.right-1);  
         }
-        ll -= _avg_bias;
+        ll -= _cached_eff_len;
     }
     
     if (ps == PAIRED)
-    {
         ll += (_globs->fld)->pdf(frag.length());
-        ll -= log(length()-frag.length()+1);
-    }
-    else
-    {
-        ll -= log(length()-(_globs->fld)->mean()+1);
-    }
-    
+
     assert(!(isnan(ll)||isinf(ll)));
     return ll;
 }

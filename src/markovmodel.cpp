@@ -13,6 +13,8 @@
 
 using namespace std;
 
+const double LOG_QUARTER = log(0.25);
+
 MarkovModel::MarkovModel(size_t order, size_t window_size, size_t num_pos, double alpha, bool logged)
 : _order((int)order),
   _window_size((int)window_size),
@@ -100,6 +102,8 @@ double MarkovModel::seq_prob(const Sequence& seq, int left) const
     int seq_len = (int)seq.length();
     
     size_t cond = 0;
+    double v = (_logged) ? 0:1;
+
     if (left < _order)
     {
         i = _order-left;
@@ -107,10 +111,12 @@ double MarkovModel::seq_prob(const Sequence& seq, int left) const
         {
             cond = (cond << 2) + seq[j];
         }
+        if (_logged)
+            v = i*LOG_QUARTER;
+        else
+            v = pow(0.25, (double)i);
     }
-    
-    double v = (_logged) ? 0:1;
-    
+        
     while(i < _window_size && j < seq_len)
     {
         size_t curr = seq[j];
