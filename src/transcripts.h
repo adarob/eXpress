@@ -187,7 +187,7 @@ public:
      * FIX
      * @return logged mass
      */
-    double mass(bool with_pseudo=false) const;
+    double mass(bool with_pseudo=true) const;
     
     //FIX
     double ambig_mass() const { return _ret_params->ambig_mass; }
@@ -367,6 +367,8 @@ public:
      * @return number of transcripts in the table
      */
     size_t size() const { return _trans_map.size(); }
+    
+    double total_mass(bool with_pseudo=false) const;
     
     /**
      * a member function that increases the covariance between two transcripts by the specified amount

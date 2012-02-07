@@ -258,7 +258,7 @@ bool parse_options(int ac, char ** av)
  * @param trans_table pointer to the transcript table
  * @param globs a pointer to the struct containing pointers to the global parameter tables (bias_table, mismatch_table, fld)
  */
-void process_fragment(double mass_n, Fragment* frag_p, TranscriptTable* trans_table, const Globals& globs)
+void process_fragment(double mass_n, double M, Fragment* frag_p, TranscriptTable* trans_table, const Globals& globs)
 {
     Fragment& frag = *frag_p;
     
@@ -278,7 +278,7 @@ void process_fragment(double mass_n, Fragment* frag_p, TranscriptTable* trans_ta
             Transcript* t = m.mapped_trans;
             likelihoods[i] = t->log_likelihood(m, first_round);
             total_likelihood = log_sum(total_likelihood, likelihoods[i]);
-            total_mass = log_sum(total_mass, t->mass(true));
+            total_mass = log_sum(total_mass, t->mass());
         }
     }
     else
@@ -328,7 +328,7 @@ void process_fragment(double mass_n, Fragment* frag_p, TranscriptTable* trans_ta
             if (m.pair_status() == PAIRED)
                 (globs.fld)->add_val(m.length(), mass_t);
             if (globs.bias_table)
-                (globs.bias_table)->update_observed(m, mass_t - t->mass() + t->cached_effective_length());
+                (globs.bias_table)->update_observed(m, p - t->mass() + t->cached_effective_length() + M);
             if (globs.mismatch_table)
                 (globs.mismatch_table)->update(m, mass_t);
         }
@@ -369,6 +369,7 @@ size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TranscriptTable* 
     size_t n = 1;
     size_t num_frags = 0;
     double mass_n = 0;
+    double total_mass = trans_table->total_mass(true);
     Fragment* frag;
     cout << setiosflags(ios::left);
     
@@ -411,7 +412,7 @@ size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TranscriptTable* 
             
             {
                 boost::unique_lock<boost::mutex> lock(bu_mut);
-                process_fragment(mass_n, frag, trans_table, globs);
+                process_fragment(mass_n, total_mass, frag, trans_table, globs);
             }
             
             num_frags++;
@@ -464,6 +465,7 @@ size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TranscriptTable* 
             
             n++;
             mass_n += ff_param*log((double)n-1) - log(pow(n,ff_param) - 1);
+            total_mass = log_sum(total_mass, mass_n);
         }
     
         {

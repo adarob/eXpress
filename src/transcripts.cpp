@@ -129,6 +129,7 @@ double Transcript::est_effective_length(FLD* fld) const
 
 double Transcript::cached_effective_length() const
 {
+    boost::mutex::scoped_lock lock(_bias_lock);
     return _cached_eff_len;
 }
 
@@ -399,7 +400,7 @@ void TranscriptTable::output_results(string output_dir, size_t tot_counts, bool 
             for (size_t i = 0; i < bundle_trans.size(); ++i)
             {
                 Transcript& trans = *bundle_trans[i];
-                double l_trans_frac = trans.mass() - l_bundle_mass;
+                double l_trans_frac = trans.mass(false) - l_bundle_mass;
                 trans_counts[i] = sexp(l_trans_frac + l_bundle_counts);
                 if (trans_counts[i] - (double)trans.tot_counts() > EPSILON ||  (double)trans.uniq_counts() - trans_counts[i] > EPSILON)
                     requires_projection = true;
@@ -487,6 +488,16 @@ void TranscriptTable::output_results(string output_dir, size_t tot_counts, bool 
     fclose(expr_file);
     if (output_varcov)
         varcov_file.close();
+}
+
+double TranscriptTable::total_mass(bool with_pseudo) const
+{
+    double total = HUGE_VAL;
+    foreach (Transcript* trans, _trans_map)
+    {
+        total = log_sum(total, trans->mass(with_pseudo));
+    }
+    return total;
 }
 
 void TranscriptTable::threaded_bias_update(boost::mutex* mut)
