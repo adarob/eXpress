@@ -73,7 +73,6 @@ void FLD::add_val(size_t len, double mass)
 double FLD::pdf(size_t len) const
 {
     if (len > max_val()) len = max_val();
-    if (len < min_val()) return HUGE_VAL;
     return _hist[len]-_tot_mass;
 }
 

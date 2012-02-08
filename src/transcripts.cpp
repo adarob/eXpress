@@ -124,7 +124,6 @@ double Transcript::est_effective_length(FLD* fld) const
     
     boost::mutex::scoped_lock lock(_bias_lock);
     eff_len += _avg_bias;
-    assert(!(isnan(eff_len)||isinf(eff_len)));
     return eff_len;
 }
 
