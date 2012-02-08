@@ -545,7 +545,8 @@ void TranscriptTable::threaded_bias_update(boost::mutex* mut)
         foreach(Transcript* trans, _trans_map)
         {  
             trans->update_transcript_bias(bias_table, fld);
-            bg_table->update_expectations(*trans);
+            if (bg_table)
+                bg_table->update_expectations(*trans);
             if (!running)
                 break;
         }
