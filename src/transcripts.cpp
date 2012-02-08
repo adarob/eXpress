@@ -146,7 +146,12 @@ void Transcript::update_transcript_bias(BiasBoss* bias_table, FLD* fld)
     {
         boost::mutex::scoped_lock lock(_bias_lock);
         _avg_bias = bias_table->get_transcript_bias(*_start_bias, *_end_bias, *this);
-        _cached_eff_len = est_effective_length(fld);
+        
+    }
+    double eff_len = est_effective_length(fld);
+    {
+        boost::mutex::scoped_lock lock(_bias_lock);
+        _cached_eff_len = eff_len;
     }
 }
 
