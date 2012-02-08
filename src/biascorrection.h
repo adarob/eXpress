@@ -50,11 +50,14 @@ public:
      */
     SeqWeightTable(size_t window_size, double alpha);
     
+    void copy_observed(const SeqWeightTable& other);
+    void copy_expected(const SeqWeightTable& other);
+    
     /**
      * a member function that increments the expected counts for the given nucleotide by 1 (logged)
      * FIX @param c a char representing a nucleotide that has been observed in the transcriptome
      */
-    void increment_expected(const Sequence& seq); 
+    void increment_expected(const Sequence& seq, double mass); 
     
     /**
      * a member function that normalizes the expected counts and converts them to the log scale
@@ -220,12 +223,12 @@ class BiasBoss
     /**
      * a private SeqWeightTable that stores the 5' sequence-specific bias parameters (logged)
      */
-    PosWeightTable _5_pos_bias;
+//    PosWeightTable _5_pos_bias;
     
     /**
      * a private SeqWeightTable that stores the 3' sequence-specific bias parameters (logged)
      */
-    PosWeightTable _3_pos_bias;
+//    PosWeightTable _3_pos_bias;
     
 public:
     
@@ -234,6 +237,9 @@ public:
      * @param alpha a double specifying the strength of the uniform prior (logged pseudo-counts for each paramater)
      */
     BiasBoss(double alpha);
+    
+    void copy_observations(const BiasBoss& other);
+    void copy_expectations(const BiasBoss& other);
     
     /**
      * a member function that updates the expectation parameters (sequence-specific and positional)

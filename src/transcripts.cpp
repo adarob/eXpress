@@ -140,13 +140,14 @@ void Transcript::update_transcript_bias(BiasBoss* bias_table, FLD* fld)
     {
         bias_table = _globs->bias_table;
         fld = _globs->fld;
+        _cached_eff_len = est_effective_length(fld);
     }
-    if (bias_table)
+    else
     {
         boost::mutex::scoped_lock lock(_bias_lock);
         _avg_bias = bias_table->get_transcript_bias(*_start_bias, *_end_bias, *this);
+        _cached_eff_len = est_effective_length(fld);
     }
-    _cached_eff_len = est_effective_length(fld);
 }
 
 TranscriptTable::TranscriptTable(const string& trans_fasta_file, const TransIndex& trans_index, const TransIndex& trans_lengths, double alpha, const AlphaMap* alpha_map, const Globals* globs)
@@ -503,6 +504,7 @@ double TranscriptTable::total_mass(bool with_pseudo) const
 void TranscriptTable::threaded_bias_update(boost::mutex* mut)
 {
     BiasBoss* bias_table = NULL;
+    BiasBoss* bg_table = NULL;
     FLD* fld = NULL;
     
     while(running)
@@ -516,10 +518,19 @@ void TranscriptTable::threaded_bias_update(boost::mutex* mut)
             
             if (_globs->bias_table)
             {
+                BiasBoss& glob_bias_table = *(_globs->bias_table);
                 if (!bias_table)
-                    bias_table = new BiasBoss(*(_globs->bias_table));
+                {
+                    bias_table = new BiasBoss(glob_bias_table);
+                }
                 else
-                    *bias_table = *(_globs->bias_table);
+                {
+                    glob_bias_table.copy_expectations(*bg_table);
+                    bg_table->copy_observations(glob_bias_table);                    
+                    delete bias_table;
+                    bias_table = bg_table;
+                }
+                bg_table = new BiasBoss(0);
             }    
             cout << "Synchronized paramater tables.\n";
         }
@@ -527,6 +538,7 @@ void TranscriptTable::threaded_bias_update(boost::mutex* mut)
         foreach(Transcript* trans, _trans_map)
         {  
             trans->update_transcript_bias(bias_table, fld);
+            bg_table->update_expectations(*trans);
             if (!running)
                 break;
         }

@@ -30,24 +30,34 @@ const size_t BG_ORDER = 5;
 
 SeqWeightTable::SeqWeightTable(size_t window_size, double alpha)
 :_observed(FG_ORDER, window_size, window_size, alpha),
- _expected(BG_ORDER, window_size, BG_ORDER+1, 0, false) 
+ _expected(BG_ORDER, window_size, BG_ORDER+1, HUGE_VAL) 
 {}
 
-void SeqWeightTable::increment_expected(const Sequence& seq)
+void SeqWeightTable::copy_observed(const SeqWeightTable& other)
 {
-    _expected.fast_learn(seq, 1);
+    _observed = other._observed;
+}
+
+void SeqWeightTable::copy_expected(const SeqWeightTable& other)
+{
+    _expected = other._expected;
+}
+
+void SeqWeightTable::increment_expected(const Sequence& seq, double mass)
+{
+    _expected.fast_learn(seq, mass);
 }
 
 void SeqWeightTable::normalize_expected()
 {
     _expected.calc_marginals();
-    _expected.set_logged(true);
+//    _expected.set_logged(true);
 }
 
-void SeqWeightTable::increment_observed(const Sequence& seq, size_t i, double normalized_mass)
+void SeqWeightTable::increment_observed(const Sequence& seq, size_t i, double mass)
 {
     int left = (int)i - SURROUND;
-    _observed.update(seq, left, normalized_mass);
+    _observed.update(seq, left, mass);
 }
 
 double SeqWeightTable::get_weight(const Sequence& seq, size_t i) const
@@ -230,38 +240,52 @@ void PosWeightTable::append_output(ofstream& outfile) const
 
 BiasBoss::BiasBoss(double alpha)
 : _5_seq_bias(WINDOW, alpha),
-  _3_seq_bias(WINDOW, alpha),
-  _5_pos_bias(LEN_BINS, POS_BINS, alpha),
-  _3_pos_bias(LEN_BINS, POS_BINS, alpha)
+  _3_seq_bias(WINDOW, alpha)
+//  _5_pos_bias(LEN_BINS, POS_BINS, alpha),
+//  _3_pos_bias(LEN_BINS, POS_BINS, alpha)
 {}
+
+void BiasBoss::copy_observations(const BiasBoss& other)
+{
+    _5_seq_bias.copy_observed(other._5_seq_bias);
+    _3_seq_bias.copy_observed(other._3_seq_bias);
+}
+
+void BiasBoss::copy_expectations(const BiasBoss& other)
+{
+    _5_seq_bias.copy_expected(other._5_seq_bias);
+    _3_seq_bias.copy_expected(other._3_seq_bias);
+}
 
 void BiasBoss::update_expectations(const Transcript& trans)
 {
-    
-    size_t l = upper_bound(_5_pos_bias.len_bins().begin(),_5_pos_bias.len_bins().end(), trans.length()) - _5_pos_bias.len_bins().begin();
-    size_t p = 0;
-    double next_bin_start = trans.length() * _5_pos_bias.pos_bins()[p];
+
+    double mass = trans.mass() - trans.cached_effective_length();
+//    size_t l = upper_bound(_5_pos_bias.len_bins().begin(),_5_pos_bias.len_bins().end(), trans.length()) - _5_pos_bias.len_bins().begin();
+//    size_t p = 0;
+//    double next_bin_start = trans.length() * _5_pos_bias.pos_bins()[p];
+//    for (size_t i = 0; i < trans.length(); ++i)
+//    {
+//        if (i >= next_bin_start)
+//        {
+//            next_bin_start = trans.length() * _5_pos_bias.pos_bins()[++p];
+//        }
+//        _5_pos_bias.increment_expected(l,p);
+//        _3_pos_bias.increment_expected(l,p);
+//    }
     const Sequence& seq_fwd = trans.seq(0);
     const Sequence& seq_rev = trans.seq(1);
-    for (size_t i = 0; i < trans.length(); ++i)
-    {
-        if (i >= next_bin_start)
-        {
-            next_bin_start = trans.length() * _5_pos_bias.pos_bins()[++p];
-        }
-        _5_pos_bias.increment_expected(l,p);
-        _3_pos_bias.increment_expected(l,p);
-    }
-    _5_seq_bias.increment_expected(seq_fwd);
-    _3_seq_bias.increment_expected(seq_rev);
+
+    _5_seq_bias.increment_expected(seq_fwd, mass);
+    _3_seq_bias.increment_expected(seq_rev, mass);
 }
 
 void BiasBoss::normalize_expectations()
 {
     _5_seq_bias.normalize_expected();
     _3_seq_bias.normalize_expected();
-    _5_pos_bias.normalize_expected();
-    _3_pos_bias.normalize_expected();
+    //_5_pos_bias.normalize_expected();
+    //_3_pos_bias.normalize_expected();
 }
 
 void BiasBoss::update_observed(const FragHit& hit, double normalized_mass)
@@ -274,13 +298,13 @@ void BiasBoss::update_observed(const FragHit& hit, double normalized_mass)
     if (hit.pair_status() != RIGHT_ONLY)
     {
         _5_seq_bias.increment_observed(t_seq_fwd, hit.left, normalized_mass);
-        _5_pos_bias.increment_observed(t_seq_fwd.length(), (double)hit.left/t_seq_fwd.length(), normalized_mass);
+        //_5_pos_bias.increment_observed(t_seq_fwd.length(), (double)hit.left/t_seq_fwd.length(), normalized_mass);
     }
     
     if (hit.pair_status() != LEFT_ONLY)
     {
         _3_seq_bias.increment_observed(t_seq_rev, t_seq_rev.length()-hit.right, normalized_mass);
-        _3_pos_bias.increment_observed(t_seq_rev.length(), (double)(hit.right-1)/t_seq_rev.length(), normalized_mass);
+        //_3_pos_bias.increment_observed(t_seq_rev.length(), (double)(hit.right-1)/t_seq_rev.length(), normalized_mass);
     }
 }
 
@@ -289,23 +313,23 @@ double BiasBoss::get_transcript_bias(std::vector<float>& start_bias, std::vector
     double tot_start = HUGE_VAL;
     double tot_end = HUGE_VAL;
     
-    size_t l = upper_bound(_5_pos_bias.len_bins().begin(),_5_pos_bias.len_bins().end(), trans.length()) - _5_pos_bias.len_bins().begin();
+//    size_t l = upper_bound(_5_pos_bias.len_bins().begin(),_5_pos_bias.len_bins().end(), trans.length()) - _5_pos_bias.len_bins().begin();
     
     const Sequence& t_seq_fwd = trans.seq(0);
     const Sequence& t_seq_rev = trans.seq(1);
     
-    size_t p = 0;
-    double next_bin_start = trans.length() * _5_pos_bias.pos_bins()[p];
-    double curr_5_pos_bias = _5_pos_bias.get_weight(l,p);
-    double curr_3_pos_bias = _3_pos_bias.get_weight(l,p);
+//    size_t p = 0;
+//    double next_bin_start = trans.length() * _5_pos_bias.pos_bins()[p];
+//    double curr_5_pos_bias = _5_pos_bias.get_weight(l,p);
+//    double curr_3_pos_bias = _3_pos_bias.get_weight(l,p);
     for (size_t i = 0; i < trans.length(); ++i)
     {
-        if (i >= next_bin_start)
-        {
-            next_bin_start = trans.length() * _5_pos_bias.pos_bins()[++p];
-            curr_5_pos_bias = _5_pos_bias.get_weight(l,p);
-            curr_3_pos_bias = _3_pos_bias.get_weight(l,p);
-        }
+//        if (i >= next_bin_start)
+//        {
+//            next_bin_start = trans.length() * _5_pos_bias.pos_bins()[++p];
+//            curr_5_pos_bias = _5_pos_bias.get_weight(l,p);
+//            curr_3_pos_bias = _3_pos_bias.get_weight(l,p);
+//        }
         start_bias[i] = _5_seq_bias.get_weight(t_seq_fwd, i);// + curr_5_pos_bias;
         end_bias[trans.length()-i-1] = _3_seq_bias.get_weight(t_seq_rev, i);// + curr_3_pos_bias;
         tot_start = log_sum(tot_start, start_bias[i]);
@@ -327,9 +351,9 @@ void BiasBoss::append_output(ofstream& outfile) const
     _5_seq_bias.append_output(outfile);
     outfile<<">3' Sequence-Specific Bias\n";
     _3_seq_bias.append_output(outfile);
-    outfile<<">5' Fractional Position Bias\n";
-    _5_pos_bias.append_output(outfile);
-    outfile<<">3' Fractional Position Bias\n";
-    _3_pos_bias.append_output(outfile);
+//    outfile<<">5' Fractional Position Bias\n";
+//    _5_pos_bias.append_output(outfile);
+//    outfile<<">3' Fractional Position Bias\n";
+//    _3_pos_bias.append_output(outfile);
 }
 
