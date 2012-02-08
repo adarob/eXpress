@@ -509,6 +509,8 @@ void TranscriptTable::threaded_bias_update(boost::mutex* mut)
     
     while(running)
     {
+        if (bg_table)
+            bg_table->normalize_expectations();
         {
             boost::unique_lock<boost::mutex> lock(*mut);
             if(!fld)
@@ -525,7 +527,6 @@ void TranscriptTable::threaded_bias_update(boost::mutex* mut)
                 }
                 else
                 {
-                    bg_table->normalize_expectations();
                     glob_bias_table.copy_expectations(*bg_table);
                     bg_table->copy_observations(glob_bias_table);                    
                     delete bias_table;
