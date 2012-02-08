@@ -56,6 +56,8 @@ public:
      */ 
     size_t max_val() const;
     
+    size_t min_val() const;
+    
     /**
      * a member function that returns the mean FragHit length
      * @return mean observed FragHit length

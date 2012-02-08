@@ -43,6 +43,13 @@ size_t FLD::max_val() const
     return _hist.size()-1;
 }
 
+size_t FLD::min_val() const
+{
+    if (_min == max_val())
+        return 1;
+    return _min;
+}
+
 void FLD::add_val(size_t len, double mass)
 {
     if (len > max_val()) len = max_val();
@@ -66,6 +73,7 @@ void FLD::add_val(size_t len, double mass)
 double FLD::pdf(size_t len) const
 {
     if (len > max_val()) len = max_val();
+    if (len < min_val()) return HUGE_VAL;
     return _hist[len]-_tot_mass;
 }
 

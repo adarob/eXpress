@@ -434,6 +434,7 @@ size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TranscriptTable* 
 
             if (output_running_reads && n == i*pow(10.,(double)j))
             {
+                boost::unique_lock<boost::mutex> lock(bu_mut);
                 char buff[500];
                 sprintf(buff, "%s/x_" SIZE_T_FMT "", output_dir.c_str(), n);
                 cout << "Writing results to " << buff << endl;

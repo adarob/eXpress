@@ -117,13 +117,14 @@ double Transcript::est_effective_length(FLD* fld) const
     
     double eff_len = HUGE_VAL;
     
-    for(size_t l = 1; l <= min(length(), fld->max_val()); l++)
+    for(size_t l = fld->min_val(); l <= min(length(), fld->max_val()); l++)
     {
         eff_len = log_sum(eff_len, fld->pdf(l)+log((double)length()-l+1));
     }
     
     boost::mutex::scoped_lock lock(_bias_lock);
     eff_len += _avg_bias;
+    assert(!(isnan(eff_len)||isinf(eff_len)));
     return eff_len;
 }
 
