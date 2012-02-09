@@ -31,6 +31,7 @@ struct Globals
     MismatchTable* mismatch_table;
     BiasBoss* bias_table;
     TranscriptTable* trans_table;
+    double total_fpb;
 };
 
 /**

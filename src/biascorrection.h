@@ -49,7 +49,7 @@ public:
      * @param alpha a double specifying the strength of the uniform prior (logged pseudo-counts for each paramater)
      */
     SeqWeightTable(size_t window_size, double alpha);
-    
+        
     void copy_observed(const SeqWeightTable& other);
     void copy_expected(const SeqWeightTable& other);
     
@@ -237,7 +237,7 @@ public:
      * @param alpha a double specifying the strength of the uniform prior (logged pseudo-counts for each paramater)
      */
     BiasBoss(double alpha);
-    
+        
     void copy_observations(const BiasBoss& other);
     void copy_expectations(const BiasBoss& other);
     

@@ -509,13 +509,13 @@ double TranscriptTable::total_mass(bool with_pseudo) const
 void TranscriptTable::threaded_bias_update(boost::mutex* mut)
 {
     BiasBoss* bias_table = NULL;
-    BiasBoss* bg_table = NULL;
+//    BiasBoss* bg_table = NULL;
     FLD* fld = NULL;
     
     while(running)
     {
-        if (bg_table)
-            bg_table->normalize_expectations();
+//        if (bg_table)
+//            bg_table->normalize_expectations();
         {
             boost::unique_lock<boost::mutex> lock(*mut);
             if(!fld)
@@ -532,12 +532,13 @@ void TranscriptTable::threaded_bias_update(boost::mutex* mut)
                 }
                 else
                 {
-                    glob_bias_table.copy_expectations(*bg_table);
-                    bg_table->copy_observations(glob_bias_table);                    
-                    delete bias_table;
-                    bias_table = bg_table;
+//                    glob_bias_table.copy_expectations(*bg_table);
+//                    bg_table->copy_observations(glob_bias_table);                    
+//                    delete bias_table;
+//                    bias_table = bg_table;
+                    *bias_table = glob_bias_table;
                 }
-                bg_table = new BiasBoss(0);
+//                bg_table = new BiasBoss(0);
             }    
             cout << "Synchronized paramater tables.\n";
         }
@@ -545,8 +546,8 @@ void TranscriptTable::threaded_bias_update(boost::mutex* mut)
         foreach(Transcript* trans, _trans_map)
         {  
             trans->update_transcript_bias(bias_table, fld);
-            if (bg_table)
-                bg_table->update_expectations(*trans);
+//            if (bg_table)
+//                bg_table->update_expectations(*trans);
             if (!running)
                 break;
         }
