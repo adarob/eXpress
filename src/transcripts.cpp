@@ -451,12 +451,24 @@ void TranscriptTable::output_results(string output_dir, size_t tot_counts, bool 
                 if (trans.tot_counts() != trans.uniq_counts())
                 {
                     double binom_var = min(sexp(trans.binom_var() + l_var_renorm), 0.25*trans.tot_counts());
-                    double p = sexp(trans.ambig_mass() - trans.tot_ambig_mass());
+                    double m = sexp(trans.ambig_mass() - trans.tot_ambig_mass());
                     double v = sexp(trans.tot_uncertainty() - trans.tot_ambig_mass());
                     //assert (p >=0 && p <= 1);
                     double n = trans.tot_counts()-trans.uniq_counts();
-                    double a = p*(p*(1-p)/v - 1);
-                    double b = (1-p)*(p*(1-p)/v -1);
+                    
+                    double k = m/v - m*m/v;
+                    double k2 = k*k;
+                    double k3 = k2*k;
+                    double l = m/v;
+                    double y = 0.419973683 * (pow((2*k3 - 42*k2 + sqrt(4*pow((-k2 + 14*k - 3*l -1),3) +
+                                pow((2*k3 - 42*k2 + 9*k*l + 150*k - 63*l -2),2)) + 9*k*l +
+                                140*k - 63*l - 2),1.0/3)) - 
+                               (1.25992105*(-k2 + 14*k - 3*l - 1))/
+                                (3*pow((2*k3 - 42*k2 + sqrt(4*pow((-k2 + 14*k - 3*l -1),3) +
+                                pow((2*k3 - 42*k2 + 9*k*l + 150*k - 63*l - 2),2)) +
+                                        9*k*l + 150*k - 63*l - 2),1.0/3)) + (k-7)/3;
+                    double a = y*m + 1;
+                    double b = (a-1)/m + 1;
                     if (v == 0 || a < 0 || b < 0)
                         count_var = binom_var;
                     else
