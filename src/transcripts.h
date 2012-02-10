@@ -272,13 +272,13 @@ public:
      * @return the estimated effective length of the transcript calculated as \f$ \tilde{l} = \bar{bias}\sum_{l=1}^{L(t)} D(l)(L(t) - l + 1) \f$
      FIX
      */
-    double est_effective_length(FLD* fld = NULL) const;
+    double est_effective_length(FLD* fld = NULL, bool with_bias=true) const;
     
     /**
      * a member function that returns the most recently estimated effective length (logged) as calculated by the bias updater thread 
      * @return the cached effective length of the transcript calculated
      */
-    double cached_effective_length() const;
+    double cached_effective_length(bool with_bias=true) const;
 
     /**
      * a member function that causes the transcript bias to be re-calculated by the _bias_table based on curent parameters

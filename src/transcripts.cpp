@@ -42,7 +42,7 @@ Transcript::Transcript(const TransID id, const std::string& name, const std::str
         _start_bias = NULL;
         _end_bias = NULL;
     }
-    _cached_eff_len = est_effective_length();
+    _cached_eff_len = est_effective_length(NULL, false);
 }
 
 void Transcript::add_mass(double p, double v, double mass) 
@@ -72,7 +72,7 @@ void Transcript::round_reset()
 
 double Transcript::rho(bool with_pseudo) const
 {
-    double eff_len = cached_effective_length();
+    double eff_len = cached_effective_length(false);
     if (eff_len == HUGE_VAL)
         return HUGE_VAL;
     
@@ -99,7 +99,7 @@ double Transcript::log_likelihood(const FragHit& frag, bool with_pseudo) const
         boost::mutex::scoped_lock lock(_bias_lock);
         
         if (with_pseudo)
-            ll += log_sum(_ret_params->mass, _alpha+_cached_eff_len);
+            ll += log_sum(_ret_params->mass, _alpha+_cached_eff_len + _avg_bias);
         else
             ll += _ret_params->mass;
         
@@ -110,7 +110,7 @@ double Transcript::log_likelihood(const FragHit& frag, bool with_pseudo) const
             if (ps != LEFT_ONLY)
                 ll += _end_bias->at(frag.right-1);  
         }
-        ll -= _cached_eff_len;
+        ll -= _cached_eff_len + _avg_bias;
     }
     
     if (ps == PAIRED)
@@ -120,7 +120,7 @@ double Transcript::log_likelihood(const FragHit& frag, bool with_pseudo) const
     return ll;
 }
 
-double Transcript::est_effective_length(FLD* fld) const
+double Transcript::est_effective_length(FLD* fld, bool with_bias) const
 {
     if (!fld)
     {
@@ -134,14 +134,20 @@ double Transcript::est_effective_length(FLD* fld) const
         eff_len = log_sum(eff_len, fld->pdf(l)+log((double)length()-l+1));
     }
     
-    boost::mutex::scoped_lock lock(_bias_lock);
-    eff_len += _avg_bias;
+    
+    if (with_bias)
+    {
+        boost::mutex::scoped_lock lock(_bias_lock);
+        eff_len += _avg_bias;
+    }
     return eff_len;
 }
 
-double Transcript::cached_effective_length() const
+double Transcript::cached_effective_length(bool with_bias) const
 {
     boost::mutex::scoped_lock lock(_bias_lock);
+    if (with_bias)
+        return _cached_eff_len + _avg_bias;
     return _cached_eff_len;
 }
 
@@ -152,7 +158,6 @@ void Transcript::update_transcript_bias(BiasBoss* bias_table, FLD* fld)
     {
         bias_table = _globs->bias_table;
         fld = _globs->fld;
-        _cached_eff_len = est_effective_length(fld);
     }
     else
     {
@@ -161,7 +166,7 @@ void Transcript::update_transcript_bias(BiasBoss* bias_table, FLD* fld)
         assert(!isnan(_avg_bias) && !isinf(_avg_bias));
         
     }
-    double eff_len = est_effective_length(fld);
+    double eff_len = est_effective_length(fld, false);
     {
         boost::mutex::scoped_lock lock(_bias_lock);
         _cached_eff_len = eff_len;
