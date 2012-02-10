@@ -47,6 +47,7 @@ Transcript::Transcript(const TransID id, const std::string& name, const std::str
 
 void Transcript::add_mass(double p, double v, double mass) 
 { 
+    boost::mutex::scoped_lock lock(_bias_lock);
     _curr_params.mass = log_sum(_curr_params.mass, p+mass);
     _curr_params.samp_var = log_sum(_curr_params.samp_var, 2*mass+p);
     if (p != 0.0 || v != HUGE_VAL)
@@ -57,6 +58,9 @@ void Transcript::add_mass(double p, double v, double mass)
         if (p!=HUGE_VAL)
             _curr_params.tot_ambig_mass = log_sum(_curr_params.tot_ambig_mass, mass);
     }
+    
+    (_globs->trans_table)->update_total_fpb(mass - _cached_eff_len);
+    
 }  
 
 void Transcript::round_reset()
@@ -66,17 +70,25 @@ void Transcript::round_reset()
     _ret_params = &_last_params;
 }
 
+double Transcript::rho(bool with_pseudo) const
+{
+    double eff_len = cached_effective_length();
+    if (eff_len == HUGE_VAL)
+        return HUGE_VAL;
+    
+    return mass(with_pseudo) - eff_len - (_globs->trans_table)->total_fpb();
+}
+
 double Transcript::mass(bool with_pseudo) const
 {
+    boost::mutex::scoped_lock lock(_bias_lock);
     if (!with_pseudo)
         return _ret_params->mass;
-    boost::mutex::scoped_lock lock(_bias_lock);
     return log_sum(_ret_params->mass, _alpha+_cached_eff_len);
 }
 
 double Transcript::log_likelihood(const FragHit& frag, bool with_pseudo) const
 {
-
     double ll = 0;
     
     if (_globs->mismatch_table)
@@ -146,6 +158,7 @@ void Transcript::update_transcript_bias(BiasBoss* bias_table, FLD* fld)
     {
         boost::mutex::scoped_lock lock(_bias_lock);
         _avg_bias = bias_table->get_transcript_bias(*_start_bias, *_end_bias, *this);
+        assert(!isnan(_avg_bias) && !isinf(_avg_bias));
         
     }
     double eff_len = est_effective_length(fld);
@@ -155,9 +168,10 @@ void Transcript::update_transcript_bias(BiasBoss* bias_table, FLD* fld)
     }
 }
 
-TranscriptTable::TranscriptTable(const string& trans_fasta_file, const TransIndex& trans_index, const TransIndex& trans_lengths, double alpha, const AlphaMap* alpha_map, const Globals* globs)
+TranscriptTable::TranscriptTable(const string& trans_fasta_file, const TransIndex& trans_index, const TransIndex& trans_lengths, double alpha, const AlphaMap* alpha_map, Globals* globs)
 : _globs(globs),
-  _trans_map(trans_index.size(), NULL)
+  _trans_map(trans_index.size(), NULL),
+  _total_fpb(log(alpha*trans_index.size()))
 {
     cout << "Loading target sequences";
     if (globs->bias_table)
@@ -496,6 +510,18 @@ void TranscriptTable::output_results(string output_dir, size_t tot_counts, bool 
         varcov_file.close();
 }
 
+double TranscriptTable::total_fpb() const
+{
+    boost::unique_lock<boost::mutex>(_fpb_mut);
+    return _total_fpb;
+}
+
+void TranscriptTable::update_total_fpb(double incr_amt)
+{
+    boost::unique_lock<boost::mutex>(_fpb_mut);
+    _total_fpb = log_sum(_total_fpb, incr_amt);
+}
+
 double TranscriptTable::total_mass(bool with_pseudo) const
 {
     double total = HUGE_VAL;
@@ -509,13 +535,13 @@ double TranscriptTable::total_mass(bool with_pseudo) const
 void TranscriptTable::threaded_bias_update(boost::mutex* mut)
 {
     BiasBoss* bias_table = NULL;
-//    BiasBoss* bg_table = NULL;
+    BiasBoss* bg_table = NULL;
     FLD* fld = NULL;
     
     while(running)
     {
-//        if (bg_table)
-//            bg_table->normalize_expectations();
+        if (bg_table)
+            bg_table->normalize_expectations();
         {
             boost::unique_lock<boost::mutex> lock(*mut);
             if(!fld)
@@ -532,13 +558,12 @@ void TranscriptTable::threaded_bias_update(boost::mutex* mut)
                 }
                 else
                 {
-//                    glob_bias_table.copy_expectations(*bg_table);
-//                    bg_table->copy_observations(glob_bias_table);                    
-//                    delete bias_table;
-//                    bias_table = bg_table;
-                    *bias_table = glob_bias_table;
+                    glob_bias_table.copy_expectations(*bg_table);
+                    bg_table->copy_observations(glob_bias_table);                    
+                    delete bias_table;
+                    bias_table = bg_table;
                 }
-//                bg_table = new BiasBoss(0);
+                bg_table = new BiasBoss(0);
             }    
             cout << "Synchronized paramater tables.\n";
         }
@@ -546,8 +571,10 @@ void TranscriptTable::threaded_bias_update(boost::mutex* mut)
         foreach(Transcript* trans, _trans_map)
         {  
             trans->update_transcript_bias(bias_table, fld);
-//            if (bg_table)
-//                bg_table->update_expectations(*trans);
+            if (bg_table)
+            {
+                bg_table->update_expectations(*trans, trans->rho());
+            }
             if (!running)
                 break;
         }

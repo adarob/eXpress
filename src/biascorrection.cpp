@@ -257,10 +257,11 @@ void BiasBoss::copy_expectations(const BiasBoss& other)
     _3_seq_bias.copy_expected(other._3_seq_bias);
 }
 
-void BiasBoss::update_expectations(const Transcript& trans)
+void BiasBoss::update_expectations(const Transcript& trans, double mass)
 {
 
-    double mass = trans.mass() - trans.cached_effective_length();
+    if (mass == HUGE_VAL)
+        return;
 //    size_t l = upper_bound(_5_pos_bias.len_bins().begin(),_5_pos_bias.len_bins().end(), trans.length()) - _5_pos_bias.len_bins().begin();
 //    size_t p = 0;
 //    double next_bin_start = trans.length() * _5_pos_bias.pos_bins()[p];

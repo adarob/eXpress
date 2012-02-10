@@ -246,7 +246,7 @@ public:
      * assuming uniform expression of and accross the transcript's sequence
      * @param trans the transcript to measure expected counts from
      */
-    void update_expectations(const Transcript& trans);
+    void update_expectations(const Transcript& trans, double mass=0);
     
     /**
      * a member function that normalizes the expected counts and converts them to the log scale

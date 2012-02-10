@@ -324,12 +324,10 @@ void process_fragment(double mass_n, Fragment* frag_p, TranscriptTable* trans_ta
         if (first_round)
         {
             t->incr_counts(frag.num_hits()==1);
-            double eff_len = t->cached_effective_length();
-            globs.total_fpb = log_sum(globs.total_fpb, mass_t - eff_len);
             if (m.pair_status() == PAIRED)
                 (globs.fld)->add_val(m.length(), mass_t);
             if (globs.bias_table)
-                (globs.bias_table)->update_observed(m, mass_t - (t->mass() - (eff_len + globs.total_fpb)));
+                (globs.bias_table)->update_observed(m, mass_t);
             if (globs.mismatch_table)
                 (globs.mismatch_table)->update(m, mass_t);
         }
@@ -547,10 +545,9 @@ int main (int argc, char ** argv)
     globs.mismatch_table = (error_model) ? new MismatchTable(mm_alpha):NULL;
     
     ThreadedMapParser map_parser(in_map_file_name, out_map_file_name, last_round);
-    globs.bias_table = (bias_correct) ? new BiasBoss(bias_alpha * map_parser.trans_index().size()):NULL;
+    globs.bias_table = (bias_correct) ? new BiasBoss(bias_alpha):NULL;
     TranscriptTable trans_table(fasta_file_name, map_parser.trans_index(), map_parser.trans_lengths(), expr_alpha, expr_alpha_map, &globs);
     globs.trans_table = &trans_table;
-    globs.total_fpb = log(expr_alpha * trans_table.size());
     
     double num_trans = (double)map_parser.trans_index().size();
     

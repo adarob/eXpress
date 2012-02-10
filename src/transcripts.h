@@ -182,6 +182,8 @@ public:
      */
     size_t length() const { return _seq_f.length(); }
     
+    double rho(bool with_pseudo=true) const;
+    
     /**
      * a member function that returns the current (logged) probabilistically assigned fragment mass
      * FIX
@@ -304,7 +306,7 @@ class TranscriptTable
     /**
      * a private pointer to the struct containing pointers to the global parameter tables (bias_table, mismatch_table, fld)
      */
-    const Globals* _globs;
+    Globals* _globs;
         
     /**
      * a private map to look up pointers to Transcript objects by their TransID id
@@ -321,7 +323,10 @@ class TranscriptTable
      * these values are stored positive, even though they are negative
      */
     CovarTable _covar_table;
-        
+    
+    double _total_fpb;
+    mutable boost::mutex _fpb_mut;
+    
     /**
      * a private function that validates and adds a transcript pointer to the table
      * @param name the name of the trancript
@@ -342,7 +347,7 @@ public:
      //FIX
      * @param globs a pointer to the struct containing pointers to the global parameter tables (bias_table, mismatch_table, fld)
      */
-    TranscriptTable(const std::string& trans_fasta_file, const TransIndex& trans_index, const TransIndex& trans_lengths, double alpha, const AlphaMap* alpha_map, const Globals* globs);
+    TranscriptTable(const std::string& trans_fasta_file, const TransIndex& trans_index, const TransIndex& trans_lengths, double alpha, const AlphaMap* alpha_map, Globals* globs);
     
     /**
      * TranscriptTable Destructor
@@ -367,6 +372,9 @@ public:
      * @return number of transcripts in the table
      */
     size_t size() const { return _trans_map.size(); }
+    
+    double total_fpb() const;
+    void update_total_fpb(double incr_amt);
     
     double total_mass(bool with_pseudo=false) const;
     

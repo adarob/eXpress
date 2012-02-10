@@ -21,7 +21,6 @@ FrequencyMatrix::FrequencyMatrix(size_t m, size_t n, double alpha, bool logged)
   _logged(logged)
 {}
 
-
 double FrequencyMatrix::operator()(size_t i, size_t j) const
 {
     assert(i*_N+j < _M*_N);
