@@ -461,14 +461,14 @@ void TranscriptTable::output_results(string output_dir, size_t tot_counts, bool 
                     double k3 = k2*k;
                     double l = m/v;
                     double y = 0.419973683 * (pow((2*k3 - 42*k2 + sqrt(4*pow((-k2 + 14*k - 3*l -1),3) +
-                                pow((2*k3 - 42*k2 + 9*k*l + 150*k - 63*l -2),2)) + 9*k*l +
-                                140*k - 63*l - 2),1.0/3)) - 
+                                pow((2*k3 - 42*k2 + 9*k*l + 150*k - 63*l - 2),2)) + 9*k*l +
+                                150*k - 63*l - 2),1.0/3)) - 
                                (1.25992105*(-k2 + 14*k - 3*l - 1))/
                                 (3*pow((2*k3 - 42*k2 + sqrt(4*pow((-k2 + 14*k - 3*l -1),3) +
                                 pow((2*k3 - 42*k2 + 9*k*l + 150*k - 63*l - 2),2)) +
                                         9*k*l + 150*k - 63*l - 2),1.0/3)) + (k-7)/3;
                     double a = y*m + 1;
-                    double b = (a-1)/m + 1;
+                    double b = (a-1)/m + 2-a;
                     if (v == 0 || a < 0 || b < 0)
                         count_var = binom_var;
                     else
