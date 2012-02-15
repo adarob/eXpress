@@ -217,7 +217,7 @@ TranscriptTable::TranscriptTable(const string& trans_fasta_file, const TransInde
                 }
                 if (alpha_map && !alpha_map->count(name))
                 {
-                    cerr << "ERROR: Target '" << name << "' is was not found in the prior paramater file.\n";
+                    cerr << "ERROR: Target '" << name << "' is was not found in the prior parameter file.\n";
                     exit(1);
                 }
 
@@ -582,7 +582,7 @@ void TranscriptTable::threaded_bias_update(boost::mutex* mut)
                 }
                 bg_table = new BiasBoss(0);
             }    
-            cout << "Synchronized paramater tables.\n";
+            cout << "Synchronized parameter tables.\n";
         }
 
         foreach(Transcript* trans, _trans_map)

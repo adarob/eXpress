@@ -16,6 +16,13 @@ using namespace std;
 
 const size_t BUFF_SIZE = 9999;
 
+/**
+ * a helper functon that calculates the length of the reference spanned by the read and populates
+ * the indel vectors (for SAM input)
+ * @param cigar_str a pointer to the char array containing the cigar string
+ * @param inserts an empty Indel vector into which to add inserts
+ * @param deletes an empty Indel vector into which to add deletions
+ */
 size_t cigar_length(const char* cigar_str, vector<Indel>& inserts, vector<Indel>& deletes)
 {
     inserts.clear();
@@ -49,7 +56,14 @@ size_t cigar_length(const char* cigar_str, vector<Indel>& inserts, vector<Indel>
     return j;
 }
 
-size_t cigar_length(vector<BamTools::CigarOp> cigar_vec, vector<Indel>& inserts, vector<Indel>& deletes)
+/**
+ * a helper functon that calculates the length of the reference spanned by the read and populates
+ * the indel vectors (for BAM input)
+ * @param cigar_vec a vector containing thee split cigar string
+ * @param inserts an empty Indel vector into which to add inserts
+ * @param deletes an empty Indel vector into which to add deletions
+ */
+size_t cigar_length(vector<BamTools::CigarOp>& cigar_vec, vector<Indel>& inserts, vector<Indel>& deletes)
 {
     inserts.clear();
     deletes.clear();

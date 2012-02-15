@@ -33,7 +33,7 @@ class MismatchTable
      */
     std::vector<FrequencyMatrix> _second_read_mm;
     
-    //FIX
+    //DOC
     FrequencyMatrix _insert_params;
     FrequencyMatrix _delete_params;
     
@@ -63,7 +63,7 @@ public:
     void activate(bool active = true) { _active = active; }
     
     /**
-     * member function returns the log likeihood of mismatches in the mapping given the current error model paramaters
+     * member function returns the log likeihood of mismatches in the mapping given the current error model parematers
      * @param f the fragment mapping to calculate the log likelihood for
      * @return the log likelihood of the mapping based on mismatches
      */

@@ -29,12 +29,26 @@ class TranscriptTable;
  */
 enum PairStatus { PAIRED, LEFT_ONLY, RIGHT_ONLY };
 
-//FIX
-struct Indel
+/**
+ *  The Indel struct stores the information for a single insertion or deletion.
+ *  @author    Adam Roberts
+ *  @date      2012
+ *  @copyright Artistic License 2.0
+ **/struct Indel
 {
+    /**
+     * a public size_t for the position of the Indel in the read 
+     */
     size_t pos;
+    
+    /**
+     * a public size_t for the length of the Indel in the read
+     */
     size_t len;
     
+    /**
+     * Indel constructor
+     */
     Indel(size_t p, size_t l) { pos = p; len = l; }
 };
 
@@ -97,10 +111,24 @@ struct FragHit
      */
     bool left_first;
     
-    //FIX
+    /**
+     * a public vector of Indel objects storing all insertions to the reference in the left read (in order from left to right)
+     */
     std::vector<Indel> inserts_l;
+
+    /**
+     * a public vector of Indel objects storing all deletions from the reference in the left read (in order from left to right)
+     */
     std::vector<Indel> deletes_l;
+
+    /**
+     * a public vector of Indel objects storing all insertions to the reference in the right read (in order from right to left)
+     */
     std::vector<Indel> inserts_r;
+
+    /**
+     * a public vector of Indel objects storing all deletions from the reference in the left read (in order from right to left)
+     */
     std::vector<Indel> deletes_r;
     
     /**

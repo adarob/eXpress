@@ -11,6 +11,7 @@
 
 #include <string>
 
+//DOC
 class Sequence
 {
     const char* _encoded_seq;

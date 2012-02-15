@@ -46,16 +46,28 @@ public:
     /**
      * SeqWeightTable Constructor
      * @param window_size an unsigned integer specifying the size of the bias window surrounding fragment ends
-     * @param alpha a double specifying the strength of the uniform prior (logged pseudo-counts for each paramater)
+     * @param alpha a double specifying the strength of the uniform prior (logged pseudo-counts for each parameter)
      */
     SeqWeightTable(size_t window_size, double alpha);
-        
+    
+    
+    /**
+     * a member function that overwrites the "observed" parameters with those from another SeqWeightTable
+     * @param other another SeqWeightTable from which to copy the parameters
+     */
     void copy_observed(const SeqWeightTable& other);
+
+    /**
+     * a member function that overwrites the "expected" parameters with those from another SeqWeightTable
+     * @param other another SeqWeightTable from which to copy the parameters
+     */    
     void copy_expected(const SeqWeightTable& other);
     
     /**
-     * a member function that increments the expected counts for the given nucleotide by 1 (logged)
-     * FIX @param c a char representing a nucleotide that has been observed in the transcriptome
+     * a member function that increments the expected counts for a sliding window through
+     * the given transcript sequence by some mass
+     * @param seq the transcript sequence
+     * @param mass the amount of used to weight the transcript's sequence in the parameter table
      */
     void increment_expected(const Sequence& seq, double mass); 
     
@@ -66,10 +78,11 @@ public:
     
     /**
      * a member function that increments the observed counts for the given fragment sequence by some mass (logged)
-     * FIX @param seq a string of nucleotides in the bias window for the sequenced fragment end
-     * @param normalized_mass the mass (logged probabilistic assignment) of the fragment normalized by its estimated expression
+     * @param seq the transcript sequence (possibly reverse complemented) to which the fragment end maps
+     * @param i the index into the sequence at which to center the bias window (where the fragment starts/ends)
+     * @param mass the fragment's mass
      */
-    void increment_observed(const Sequence& seq, size_t i, double normalized_mass);
+    void increment_observed(const Sequence& seq, size_t i, double mass);
     
     /**
      * a member function that calculates the bias weight (logged) of a bias window
@@ -131,7 +144,7 @@ public:
      * PosWeightTable Constructor
      * @param len_bins a vector of unsigned integers specifying the bin ranges for transcript lengths
      * @param pos_bins a vector of doubles specifying the bin ranges for fractional positions
-     * @param alpha a double specifying the strength of the uniform prior (logged pseudo-counts for each paramater)
+     * @param alpha a double specifying the strength of the uniform prior (logged pseudo-counts for each parameter)
      */
     PosWeightTable(const std::vector<size_t>& len_bins, const std::vector<double>& pos_bins, double alpha);
     
@@ -234,7 +247,7 @@ public:
     
     /**
      * BiasBoss Constructor
-     * @param alpha a double specifying the strength of the uniform prior (logged pseudo-counts for each paramater)
+     * @param alpha a double specifying the strength of the uniform prior (logged pseudo-counts for each parameter)
      */
     BiasBoss(double alpha);
         
