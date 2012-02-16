@@ -25,16 +25,27 @@ class FragHit;
 class BiasBoss;
 class MismatchTable;
 
-//DOC
+/**
+ *  The RoundParams struct stores the transcript parameters unique to a given round (iteration) of EM
+ *  @author    Adam Roberts
+ *  @date      2012
+ *  @copyright Artistic License 2.0
+ **/
 struct RoundParams
 {
     /**
-     * a private double that stores the (logged) mass based on observed fragment mapping probabilities
+     * a private double that stores the (logged) assigned mass based on observed fragment mapping probabilities
      */
     double mass;
     
+    /**
+     * a private double that stores the (logged) assigned mass derived from ambiguous fragments
+     */
     double ambig_mass;
     
+    /**
+     * a private double that stores the (logged) total mass of ambiguous fragments mapping to the transcript
+     */
     double tot_ambig_mass;
 
     /**
@@ -42,10 +53,19 @@ struct RoundParams
      */
     double binom_var;
     
+    /**
+     * a private double that stores the (logged) sampling variance of the mass
+     */
     double samp_var;    
     
+    /**
+     * a private double that stores the (logged) variance due to uncertainty on p
+     */
     double tot_unc;
     
+    /**
+     * RoundParams constructor sets initial values for parameters
+     */
     RoundParams() : mass(HUGE_VAL), ambig_mass(HUGE_VAL), tot_ambig_mass(HUGE_VAL), binom_var(HUGE_VAL), samp_var(HUGE_VAL), tot_unc(HUGE_VAL){}
 };
 
@@ -193,8 +213,11 @@ public:
      */
     size_t length() const { return _seq_f.length(); }
     
-    //DOC
-    double rho(bool with_pseudo=true) const;
+    /**
+     * a member function that returns the current estimated rho (logged, w/ pseudo-counts) for the transcript
+     * @return the current estimated rho
+     */
+    double rho() const;
     
     /**
      * a member function that returns the current (logged) probabilistically assigned fragment mass
@@ -203,23 +226,35 @@ public:
      */
     double mass(bool with_pseudo=true) const;
     
-    //DOC
+    /**
+     * a member function that returns the (logged) total mass derived from ambiguous fragments mapping to the transcript
+     * @return the (logged) total mass derived from ambiguous fragments mapping to the transcript
+     */
     double ambig_mass() const { return _ret_params->ambig_mass; }
         
-    //DOC
+    /**
+     * a member function that returns the (logged) total mass of ambiguous fragments mapping to the transcript
+     * @return the (logged) total mass of ambiguous fragments mapping to the transcript
+     */
     double tot_ambig_mass() const { return _ret_params->tot_ambig_mass; }
     
     /**
      * a member function that returns the current (logged) binomial variance
-     * @return logged mass variance
-     * DOC
+     * @return logged binomial mass variance
      */
     double binom_var() const { return _ret_params->binom_var; }
     
-    //DOC
+    /**
+     * a member function that returns the (logged) sampling variance
+     * @return the (logged) sampling variance
+     */
     double samp_var() const { return _ret_params->samp_var; }
     
-    //DOC
+    
+    /**
+     * a member function that returns the (logged) variance due to uncertainty on p
+     * @return the (logged) variance due to uncertainty on p
+     */
     double tot_uncertainty() const { return _ret_params->tot_unc; }
     
     /**
@@ -339,7 +374,7 @@ class TranscriptTable
     CovarTable _covar_table;
     
     /**
-     * a private double that stores the (logged) total mass per base to allow for rho calculations
+     * a private double that stores the (logged) total mass per base (including pseudo-counts) to allow for rho calculations
      */
     double _total_fpb;
 
@@ -394,10 +429,17 @@ public:
      */
     size_t size() const { return _trans_map.size(); }
     
+    /**
+     * a member function that returns the (logged) total mass per base (including pseudo-counts)
+     * @return the (logged) total mass per base (including pseudo-counts)
+     */    
     double total_fpb() const;
-    void update_total_fpb(double incr_amt);
     
-    double total_mass(bool with_pseudo=false) const;
+    /**
+     * a member function that increments the (logged) total mass per base
+     * @param incr_amt the (logged) amount to increment by
+     */   
+    void update_total_fpb(double incr_amt);
     
     /**
      * a member function that increases the covariance between two transcripts by the specified amount

@@ -34,7 +34,8 @@ enum PairStatus { PAIRED, LEFT_ONLY, RIGHT_ONLY };
  *  @author    Adam Roberts
  *  @date      2012
  *  @copyright Artistic License 2.0
- **/struct Indel
+ **/
+struct Indel
 {
     /**
      * a public size_t for the position of the Indel in the read 

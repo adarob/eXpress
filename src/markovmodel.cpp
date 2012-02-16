@@ -3,7 +3,7 @@
 //  express
 //
 //  Created by Adam Roberts on 1/24/12.
-//  Copyright 2012 UC Berkeley. All rights reserved.
+//  Copyright 2012 Adam Roberts. All rights reserved.
 //
 
 #include "markovmodel.h"

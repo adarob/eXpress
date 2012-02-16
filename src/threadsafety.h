@@ -3,7 +3,7 @@
 //  express
 //
 //  Created by Adam Roberts on 1/25/12.
-//  Copyright 2012 UC Berkeley. All rights reserved.
+//  Copyright 2012 Adam Roberts. All rights reserved.
 //
 
 #ifndef express_thread_safety_h

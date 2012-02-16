@@ -41,9 +41,16 @@ struct Globals
 
 /**
  * a global bool that is true when processing is still occuring
- * this is primarily used to notify the bias update thread to stop
+ * this is primarily used to notify the bias update thread to stop running
  */
 extern bool running;
+
+/**
+ * a global bool that is true when the auxilary params are finished burning in
+ * this is primarily used to notify the bias update thread to stop updating 
+ * certain parameters
+ */
+extern bool burned_out;
 
 /**
  * a global size_t specifying the maximum read length supported

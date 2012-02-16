@@ -42,6 +42,8 @@ double ff_param = 0.9;
 // the burn-in parameter determines how many reads are required before the 
 // error and bias models are applied to probabilistic assignment 
 size_t burn_in = 100000;
+size_t burn_out = 5000000;
+bool burned_out = false;
 
 size_t stop_at = 0;
 
@@ -324,12 +326,16 @@ void process_fragment(double mass_n, Fragment* frag_p, TranscriptTable* trans_ta
         if (first_round)
         {
             t->incr_counts(frag.num_hits()==1);
-            if (m.pair_status() == PAIRED)
-                (globs.fld)->add_val(m.length(), mass_t);
-            if (globs.bias_table)
-                (globs.bias_table)->update_observed(m, mass_t);
-            if (globs.mismatch_table)
-                (globs.mismatch_table)->update(m, mass_t);
+            
+            if (!burned_out)
+            {
+                if (m.pair_status() == PAIRED)
+                    (globs.fld)->add_val(m.length(), mass_t);
+                if (globs.bias_table)
+                    (globs.bias_table)->update_observed(m, mass_t);
+                if (globs.mismatch_table)
+                    (globs.mismatch_table)->update(m, mass_t);
+            }
         }
         
         if (calc_covar && (last_round || online_additional))
@@ -406,6 +412,10 @@ size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TranscriptTable* 
                 bias_update = new boost::thread(&TranscriptTable::threaded_bias_update, trans_table, &bu_mut);
                 if (globs.mismatch_table)
                     (globs.mismatch_table)->activate();
+            }
+            if (n == burn_out)
+            {
+                burned_out = true;
             }
             
             {

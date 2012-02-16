@@ -70,13 +70,13 @@ void Transcript::round_reset()
     _ret_params = &_last_params;
 }
 
-double Transcript::rho(bool with_pseudo) const
+double Transcript::rho() const
 {
     double eff_len = cached_effective_length(false);
     if (eff_len == HUGE_VAL)
         return HUGE_VAL;
     
-    return mass(with_pseudo) - eff_len - (_globs->trans_table)->total_fpb();
+    return mass(true) - eff_len - (_globs->trans_table)->total_fpb();
 }
 
 double Transcript::mass(bool with_pseudo) const
@@ -539,24 +539,17 @@ void TranscriptTable::update_total_fpb(double incr_amt)
     _total_fpb = log_sum(_total_fpb, incr_amt);
 }
 
-double TranscriptTable::total_mass(bool with_pseudo) const
-{
-    double total = HUGE_VAL;
-    foreach (Transcript* trans, _trans_map)
-    {
-        total = log_sum(total, trans->mass(with_pseudo));
-    }
-    return total;
-}
-
 void TranscriptTable::threaded_bias_update(boost::mutex* mut)
 {
     BiasBoss* bias_table = NULL;
     BiasBoss* bg_table = NULL;
     FLD* fld = NULL;
     
+    bool burned_out_before = false;
+    
     while(running)
     {
+        
         if (bg_table)
             bg_table->normalize_expectations();
         {
@@ -585,6 +578,11 @@ void TranscriptTable::threaded_bias_update(boost::mutex* mut)
             cout << "Synchronized parameter tables.\n";
         }
 
+        if (burned_out && burned_out_before)
+            break;
+        
+        burned_out_before = burned_out;
+        
         foreach(Transcript* trans, _trans_map)
         {  
             trans->update_transcript_bias(bias_table, fld);
@@ -595,10 +593,12 @@ void TranscriptTable::threaded_bias_update(boost::mutex* mut)
             if (!running)
                 break;
         }
-
     }
+    
     if (fld)
         delete fld;
     if (bias_table)
         delete bias_table;
+    if (bg_table)
+        delete bg_table;
 }

@@ -33,8 +33,14 @@ class MismatchTable
      */
     std::vector<FrequencyMatrix> _second_read_mm;
     
-    //DOC
+    /**
+     * a FrequencyMatrix storing the observations of insertions of given lengths 
+     */
     FrequencyMatrix _insert_params;
+
+    /**
+     * a FrequencyMatrix storing the observations of deletions of given lengths 
+     */
     FrequencyMatrix _delete_params;
     
     /**
