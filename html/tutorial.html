@@ -33,7 +33,7 @@
   <meta name="author" content="Designed by www.1234.info / Modified: Adam Roberts" />
   <meta name="distribution" content="global" />
   <meta name="image" content="http://bio.math.berkeley.edu/eXpress/img/logo.png" />
-  <meta name="description" content="eXpress is a general quantification tool for target DNA/RNA sequences. While its primary use currently is RNA-Seq it has the potential for applications in many other areas including as allele-specific expression and metgenomics. What makes eXpress different is that it is an online (or streaming) algorithm, meaning it only makes one pass through the data. This allows it to be very light-weight and efficient using a constant amount of memory and time linear in the number of sequenced fragments being processed. Furthermore, it accepts piped SAM/BAM input, allowing users to avoid storing extremely large alignment files. eXpress models fragment biases (sequence-specific and positional), fragment lengths, and errors, allowing it to also be one of the most accurate quantification methods available." />
+  <meta name="description" content="eXpress is a general quantification tool for target DNA/RNA sequences. While its primary use currently is RNA-Seq it has the potential for applications in many other areas including as allele-specific expression and metgenomics. What makes eXpress different is that it is an online (or streaming) algorithm, meaning it only makes one pass through the data. This allows it to be very light-weight and efficient using a constant amount of memory and time linear in the number of sequenced fragments being processed. Furthermore, it accepts piped SAM/BAM input, allowing users to avoid storing extremely large alignment files. eXpress models fragment biases, fragment lengths, and errors, allowing it to also be one of the most accurate quantification methods available." />
   <meta name="keywords" content="RNA-Seq, Genomics, transcript,quantification" />
   <link rel="stylesheet" type="text/css" media="screen,projection,print" href="./css/mf54_reset.css" />
   <link rel="stylesheet" type="text/css" media="screen,projection,print" href="./css/mf54_grid.css" />
@@ -123,10 +123,10 @@
         <li><a href="#">Download<!--[if IE 7]><!--></a><!--<![endif]-->
           <!--[if lte IE 6]><table><tr><td><![endif]-->
             <ul>
-              <li><a href=downloads/express-0.9.4/express-0.9.4-macosx_x86_64.tgz onClick="_gaq.push(['_trackEvent', 'Downloads', 'Mac', 'Tutorial']);" target="_blank">Mac OS X (64-bit)</a></li>
-              <li><a href=downloads/express-0.9.4/express-0.9.4-linux_x86_64.tgz onClick="_gaq.push(['_trackEvent', 'Downloads', 'Linux', 'Tutorial']);" target="_blank">Linux (64-bit)</a></li>
-              <li><a href=downloads/express-0.9.4/express-0.9.4-win32_x86_64.zip onClick="_gaq.push(['_trackEvent', 'Downloads', 'Windows', 'Tutorial']);" target="_blank">Windows (64-bit)</a></li>
-              <li><a href=downloads/express-0.9.4/express-0.9.4-src.tgz onClick="_gaq.push(['_trackEvent', 'Downloads', 'Source', 'Tutorial']);" target="_blank">Source</a></li>
+              <li><a href=downloads/express-0.9.5/express-0.9.5-macosx_x86_64.tgz onClick="_gaq.push(['_trackEvent', 'Downloads', 'Mac', 'Tutorial']);" target="_blank">Mac OS X (64-bit)</a></li>
+              <li><a href=downloads/express-0.9.5/express-0.9.5-linux_x86_64.tgz onClick="_gaq.push(['_trackEvent', 'Downloads', 'Linux', 'Tutorial']);" target="_blank">Linux (64-bit)</a></li>
+              <li><a href=downloads/express-0.9.5/express-0.9.5-win32_x86_64.zip onClick="_gaq.push(['_trackEvent', 'Downloads', 'Windows', 'Tutorial']);" target="_blank">Windows (64-bit)</a></li>
+              <li><a href=downloads/express-0.9.5/express-0.9.5-src.tgz onClick="_gaq.push(['_trackEvent', 'Downloads', 'Source', 'Tutorial']);" target="_blank">Source</a></li>
               <li><a href="downloads" onClick="_gaq.push(['_trackEvent', 'Downloads', 'Previous','Tutorial']);">Previous Versions</a></li>
              </ul>
           <!--[if lte IE 6]></td></tr></table></a><![endif]-->
@@ -270,31 +270,36 @@
    		  <p>The output for eXpress is saved in a file called <tt>results.xprs</tt> in an easy-to-parse tab-delimited format.  Since an output directory was not specified, it is simply placed in the working directory (<tt>&lt;YOUR_EXPRESS_DIR&gt;/sample_data</tt>). You can view the output for the run using the command:
    		  <ol><li><pre class="sc"><code>$ more results.xprs</code></pre></li></ol></p>
    		  <p>Your results should look identical to this:</p>
-   		  <ol><li><pre class="output"><code>bundle_id	target_id	length	eff_length	tot_counts	uniq_counts	post_count_mean	post_count_var	eff_count_mean	eff_count_var	fpkm	fpkm_conf_low	fpkm_conf_high
-1	NM_014212	2037	1860.344811	55	55	55.000000	0.000000	60.222707	0.000000	2956.441176	2159.148282	3753.734070
-2	NM_001168316	2283	2106.344801	1553	11	490.464379	323.484694	531.598709	380.020153	23285.094562	20576.156053	25994.033070
-2	NM_174914	2385	2208.344796	1746	37	972.339885	408.229227	1050.121625	476.153627	44030.256810	40665.201633	47395.311987
-2	NR_031764	1853	1676.344818	1244	7	301.195736	217.561604	332.936096	265.831461	17967.409393	15250.039453	20684.779334
-3	NM_022658	2288	2111.344800	4881	4881	4881.000000	0.000000	5289.390912	0.000000	231179.672749	224561.696008	237797.649489
-4	NM_173860	849	672.344859	962	962	962.000000	0.000000	1214.760534	0.000000	143081.334934	133855.080160	152307.589708
-5	NM_014620	2300	2123.344800	958	77	557.465287	206.775338	603.844539	242.612608	26254.110375	23650.208989	28858.011762
-5	NM_153693	2072	1895.344809	481	5	76.024964	60.358241	83.110854	72.133934	4011.141613	2778.825258	5243.457969
-5	NR_003084	1640	1463.344827	266	0	18.774253	17.314338	21.040684	21.747043	1282.968511	461.921014	2104.016007
-5	NM_153633	1666	1489.344826	762	10	387.720723	187.996063	433.709315	235.238405	26032.972100	22810.870870	29255.073330
-5	NM_018953	1612	1435.344828	228	91	215.337538	11.492112	241.840221	14.494974	15002.495114	12903.924157	17101.066072
-5	NM_004503	1681	1504.344825	384	37	329.677234	45.818550	368.391224	57.211321	21915.004374	19338.771416	24491.237332
-6	NM_017409	1959	1782.344814	47	47	47.000000	0.000000	51.658354	0.000000	2636.975721	1867.690839	3406.260603
-7	NM_017410	2396	2219.344796	42	42	42.000000	0.000000	45.343112	0.000000	1892.450424	1308.427544	2476.473304
-8	NM_006897	1541	1364.344831	664	664	664.000000	0.000000	749.974623	0.000000	48668.048205	44890.675085	52445.421325
+   		  <ol><li><pre class="output"><code>bundle_id	target_id	length	eff_length	tot_counts	uniq_counts	post_count_mode	post_count_var	eff_count_mode	eff_count_var	fpkm	fpkm_conf_low	fpkm_conf_high
+1	NM_022658	2288	2111.031696	4881	4881	4881.000000	0.000000	5290.175426	0.000000	231213.960930	224595.002623	237832.919238
+2	NM_014212	2037	1860.067174	55	55	55.000000	0.000000	60.231696	0.000000	2956.882460	2159.470561	3754.294359
+3	NM_006897	1541	1364.137281	664	664	664.000000	0.000000	750.088729	0.000000	48675.452910	44897.505073	52453.400746
+4	NM_001168316	2283	2106.032402	1552	12	516.598635	388.000000	560.007853	455.946043	24529.472300	21673.244046	27385.700554
+4	NM_174914	2385	2208.017985	1745	38	930.845799	436.250000	1005.457041	508.987356	42157.527944	38808.437597	45506.618292
+4	NR_031764	1853	1676.093181	1243	7	316.555566	310.750000	349.967096	379.809355	18886.513572	15897.888697	21875.138448
+5	NM_017410	2396	2219.016430	42	42	42.000000	0.000000	45.349822	0.000000	1892.730465	1308.621162	2476.839768
+6	NM_017409	1959	1782.078199	47	47	47.000000	0.000000	51.666083	0.000000	2637.370236	1867.970262	3406.770211
+7	NM_173860	849	672.235093	962	962	962.000000	0.000000	1214.958886	0.000000	143104.698051	133876.936763	152332.459340
+8	NM_014620	2300	2123.029999	958	77	553.868775	239.500000	600.037768	281.092286	26088.598628	23435.145523	28742.051732
+8	NM_153693	2072	1895.062226	481	5	77.654759	95.416638	84.905212	114.066119	4097.741888	2709.327293	5486.156482
+8	NR_003084	1640	1463.123288	266	0	21.854792	29.846520	24.496814	37.498989	1493.708156	510.829610	2476.586702
+8	NM_153633	1666	1489.119613	762	10	390.173574	190.500000	436.519114	238.443675	26201.627498	22965.195823	29438.059174
+8	NM_018953	1612	1435.127246	228	91	210.455804	20.501608	236.393502	25.866471	14664.609325	12546.708897	16782.509753
+8	NM_004503	1681	1504.117493	384	37	330.992296	73.025659	369.916614	91.211035	22005.747410	19333.057547	24678.437273
 </code></pre></li></ol>
    		  <p>While it may be difficult to read in your
         terminal, opening the file with R or Excel should help you to
         visualize the columns.  An important column is FPKM,
         which reports the estimated abundance in expected
         <b>F</b>ragments <b>P</b>er <b>K</b>ilobase per <b>M</b>illion
-        mapped fragments.  Other fields include the mean (post_count_mean) and variance (post_count_var) of the posterior count distribution.  Transcripts are sorted by their bundle_id, which denotes which multi-mapping group the transcript belongs to and can help determine isoforms and gene families.  More details on the output including full descriptions of all columns can be found in the <a href=manual.html#expr>Manual</a>.</p> 
+        mapped fragments.  Other fields include the mode (post_count_mode) and variance (post_count_var) of the posterior count distribution, as well as the "effective" mode (eff_count_mode) and variance (eff_count_var) after correction for bias.  Transcripts are sorted by their bundle_id, which denotes which multi-mapping group the transcript belongs to and can help determine isoforms and gene families.  More details on the output including full descriptions of all columns can be found in the <a href=manual.html#expr>Manual</a>.</p> 
           		<p>&rarr; <a href="#top">Back to top.</a></p>
-          </div> 
+         
+        <h2 id="diff">Calculating differential expression</h2>
+        <p>If you have multiple samples and replicates, you may want to discover if there is a significant change in abundance of any genes or isoforms under different conditions.  Unfortunately, a differential expression tool does not yet exist to take advantage of the full distribution on estimated counts that we output, but we are working on one that will be available soon.  For now, we recommend inputting the rounded effective counts for your samples into a count-based differential expression tool such as <a href='http://www.bioconductor.org/packages/2.6/bioc/html/DEGseq.html'>DEGSeq</a> or <a href='http://www.bioconductor.org/packages/release/bioc/html/edgeR.html'>edgeR</a>.</p>
+        <p>&rarr; <a href="#top">Back to top.</a></p>
+
+      </div> 
           
         <div class="corner-content-1col-bottom"></div>                               
 	  </div>
@@ -321,6 +326,7 @@
 			   <li><a href="#fromfile">&rarr;Input from SAM/BAM file</a></li>
 			   <li><a href="#stream">&rarr;Streaming input from aligner</a></li>
   			   <li><a href="#output">&rarr;Understanding the output</a></li>
+  			   <li><a href="#diff">&rarr;Calculating differential expression</a></li>
 			   </ul>
 		  </ul>          
           </div> 

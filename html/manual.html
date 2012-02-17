@@ -33,7 +33,7 @@
   <meta name="author" content="Designed by www.1234.info / Modified: Adam Roberts" />
   <meta name="distribution" content="global" />
   <meta name="image" content="http://bio.math.berkeley.edu/eXpress/img/logo.png" />
-  <meta name="description" content="eXpress is a general quantification tool for target DNA/RNA sequences. While its primary use currently is RNA-Seq it has the potential for applications in many other areas including as allele-specific expression and metgenomics. What makes eXpress different is that it is an online (or streaming) algorithm, meaning it only makes one pass through the data. This allows it to be very light-weight and efficient using a constant amount of memory and time linear in the number of sequenced fragments being processed. Furthermore, it accepts piped SAM/BAM input, allowing users to avoid storing extremely large alignment files. eXpress models fragment biases (sequence-specific and positional), fragment lengths, and errors, allowing it to also be one of the most accurate quantification methods available." />
+  <meta name="description" content="eXpress is a general quantification tool for target DNA/RNA sequences. While its primary use currently is RNA-Seq it has the potential for applications in many other areas including as allele-specific expression and metgenomics. What makes eXpress different is that it is an online (or streaming) algorithm, meaning it only makes one pass through the data. This allows it to be very light-weight and efficient using a constant amount of memory and time linear in the number of sequenced fragments being processed. Furthermore, it accepts piped SAM/BAM input, allowing users to avoid storing extremely large alignment files. eXpress models fragment biases, fragment lengths, and errors, allowing it to also be one of the most accurate quantification methods available." />
   <meta name="keywords" content="RNA-Seq, Genomics, transcript,quantification" />
   <link rel="stylesheet" type="text/css" media="screen,projection,print" href="./css/mf54_reset.css" />
   <link rel="stylesheet" type="text/css" media="screen,projection,print" href="./css/mf54_grid.css" />
@@ -123,10 +123,10 @@
         <li><a href="#">Download<!--[if IE 7]><!--></a><!--<![endif]-->
           <!--[if lte IE 6]><table><tr><td><![endif]-->
             <ul>
-              <li><a href=downloads/express-0.9.4/express-0.9.4-macosx_x86_64.tgz onClick="_gaq.push(['_trackEvent', 'Downloads', 'Mac', 'Manual']);" target="_blank">Mac OS X (64-bit)</a></li>
-              <li><a href=downloads/express-0.9.4/express-0.9.4-linux_x86_64.tgz onClick="_gaq.push(['_trackEvent', 'Downloads', 'Linux', 'Manual']);" target="_blank">Linux (64-bit)</a></li>
-              <li><a href=downloads/express-0.9.4/express-0.9.4-win32_x86_64.zip onClick="_gaq.push(['_trackEvent', 'Downloads', 'Windows', 'Manual']);" target="_blank">Windows (64-bit)</a></li>
-              <li><a href=downloads/express-0.9.4/express-0.9.4-src.tgz onClick="_gaq.push(['_trackEvent', 'Downloads', 'Source', 'Manual']);" target="_blank">Source Code</a></li>
+              <li><a href=downloads/express-0.9.5/express-0.9.5-macosx_x86_64.tgz onClick="_gaq.push(['_trackEvent', 'Downloads', 'Mac', 'Manual']);" target="_blank">Mac OS X (64-bit)</a></li>
+              <li><a href=downloads/express-0.9.5/express-0.9.5-linux_x86_64.tgz onClick="_gaq.push(['_trackEvent', 'Downloads', 'Linux', 'Manual']);" target="_blank">Linux (64-bit)</a></li>
+              <li><a href=downloads/express-0.9.5/express-0.9.5-win32_x86_64.zip onClick="_gaq.push(['_trackEvent', 'Downloads', 'Windows', 'Manual']);" target="_blank">Windows (64-bit)</a></li>
+              <li><a href=downloads/express-0.9.5/express-0.9.5-src.tgz onClick="_gaq.push(['_trackEvent', 'Downloads', 'Source', 'Manual']);" target="_blank">Source Code</a></li>
               <li><a href="downloads" onClick="_gaq.push(['_trackEvent', 'Downloads', 'Previous','Manual']);">Previous Versions</a></li>
             </ul>
           <!--[if lte IE 6]></td></tr></table></a><![endif]-->
@@ -293,12 +293,10 @@
 	  <tr><th scope="row">4</th><td>eff_length</td><td><tt>783.136288</tt></td><td>The length of the target adjusted for fragment biases (length, sequence-specificity, and relative position). This number is what the fragment counts are normalized by to calculate FPKM, not the true length.</td></tr> 
    	  <tr><th scope="row">5</th><td>tot_counts</td><td><tt>99</tt></td><td>The number of fragments mapping (uniquely or ambiguously) to this target.</td></tr> 
    	  <tr><th scope="row">6</th><td>uniq_counts</td><td><tt>7</tt></td><td>The number of fragments uniquely mapping to this target.</td></tr> 
-	  <tr><th scope="row">7</th><td>post_counts_mean</td><td><tt>26.702456</tt></td><td>The estimated number of fragments generated from this target in the sequencing experiment.</td></tr> 
+	  <tr><th scope="row">7</th><td>post_counts_mode</td><td><tt>26.702456</tt></td><td>The estimated number of fragments generated from this target in the sequencing experiment.</td></tr> 
   	  <tr><th scope="row">8</th><td>post_counts_var</td><td><tt>28.090470</tt></td><td>The estimated variance on the number of fragments generated from this target in the sequencing experiment due to uncertainty in assignment of multi-mapped reads.</td></tr> 
-<!--  
-	  <tr><th scope="row">9</th><td>eff_counts_mean</td><td><tt>74.399258</tt></td><td>The estimated number of fragments generated from this target in the sequencing experiment, adjusted for fragment bias.</td></tr> 
-  	  <tr><th scope="row">10</th><td>eff_counts_var</td><td><tt>207.293653</tt></td><td>The estimated variance on the number of fragments generated from this target in the sequencing experiment due to uncertainty in assignment of multi-mapped reads, adjusted for fragment bias.</td></tr> 
---!>
+	  <tr><th scope="row">9</th><td>eff_counts_mode</td><td><tt>74.399258</tt></td><td>The estimated number of fragments generated from this target in the sequencing experiment, adjusted for fragment and length biases.  In other words, his is the expected number of reads from the experiment if these biases did not exist.  This is the value recommended for input to count-biased differential expression tools.</td></tr> 
+  	  <tr><th scope="row">10</th><td>eff_counts_var</td><td><tt>207.293653</tt></td><td>The estimated variance on the number of fragments generated from this target in the sequencing experiment due to uncertainty in assignment of multi-mapped reads, adjusted for fragment and length biases.</td></tr> 
    	  <tr><th scope="row">9</th><td>fpkm</td><td><tt>3.514176</tt></td><td>The estimated relative abundance of this target in the sample in units of <b>f</b>ragments <b>p</b>er <b>k</b>ilobase per <b>m</b>illion sequenced. This value is proportional to est_counts divided by eff_length.</td></tr> 
    	  <tr><th scope="row">10</th><td>fpkm_conf_low</td><td><tt>2.119151</tt></td><td>The lower bound of the 95% confidence interval for the FPKM.</td></tr> 
    	  <tr><th scope="row">11</th><td>fpkm_conf_high</td><td><tt>4.909200</tt></td><td>The upper bound of the 95% confidence interval for the FPKM.</td></tr> 

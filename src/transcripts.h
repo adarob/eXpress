@@ -339,7 +339,7 @@ public:
 
 typedef std::vector<Transcript*> TransMap;
 typedef boost::unordered_map<std::string, size_t> TransIndex;
-typedef boost::unordered_map<size_t, double> CovarMap;
+typedef boost::unordered_map<size_t, float> CovarMap;
 typedef boost::unordered_map<std::string, double> AlphaMap;
 
 /**

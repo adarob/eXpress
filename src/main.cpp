@@ -37,7 +37,7 @@ namespace po = boost::program_options;
 namespace fs = boost::filesystem;
 
 // the forgetting factor parameter controls the growth of the fragment mass
-double ff_param = 0.9;
+double ff_param = 0.85;
 
 // the burn-in parameter determines how many reads are required before the 
 // error and bias models are applied to probabilistic assignment 
@@ -54,7 +54,7 @@ string in_map_file_name = "";
 string out_map_file_name = "";
 
 // intial pseudo-count parameters (non-logged)
-double expr_alpha = .001;
+double expr_alpha = .1;
 double fld_alpha = 1;
 double bias_alpha = 1;
 double mm_alpha = 1;

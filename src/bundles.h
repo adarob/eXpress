@@ -15,7 +15,7 @@
 
 class Transcript;
 typedef size_t TransID;
-typedef boost::unordered_map<size_t, double> CovarMap;
+typedef boost::unordered_map<size_t, float> CovarMap;
 
 /** 
  * The CovarTable is a sparse matrix for storing and updating pairwise covariances between targets.

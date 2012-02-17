@@ -36,7 +36,7 @@
   <meta property="og:title" content="eXpress &bull; Home" />
   <meta property="og:url" content="http://bio.math.berkeley.edu/eXpress" />
   <meta property="og:image" content="http://bio.math.berkeley.edu/eXpress/img/logo.png" />
-  <meta property="og:description" content="eXpress is a general quantification tool for target DNA/RNA sequences. While its primary use currently is RNA-Seq it has the potential for applications in many other areas including as allele-specific expression and metgenomics. What makes eXpress different is that it is an online (or streaming) algorithm, meaning it only makes one pass through the data. This allows it to be very light-weight and efficient using a constant amount of memory and time linear in the number of sequenced fragments being processed. Furthermore, it accepts piped SAM/BAM input, allowing users to avoid storing extremely large alignment files. eXpress models fragment biases (sequence-specific and positional), fragment lengths, and errors, allowing it to also be one of the most accurate quantification methods available." />
+  <meta property="og:description" content="eXpress is a general quantification tool for target DNA/RNA sequences. While its primary use currently is RNA-Seq it has the potential for applications in many other areas including as allele-specific expression and metgenomics. What makes eXpress different is that it is an online (or streaming) algorithm, meaning it only makes one pass through the data. This allows it to be very light-weight and efficient using a constant amount of memory and time linear in the number of sequenced fragments being processed. Furthermore, it accepts piped SAM/BAM input, allowing users to avoid storing extremely large alignment files. eXpress models fragment biases, fragment lengths, and errors, allowing it to also be one of the most accurate quantification methods available." />
   <meta property="fb:admins" content="adarob" />
   <meta name="keywords" content="RNA-Seq, Genomics, transcript,quantification" />
   <link rel="stylesheet" type="text/css" media="screen,projection,print" href="./css/mf54_reset.css" />
@@ -129,10 +129,10 @@
         <li><a href="#">Download<!--[if IE 7]><!--></a><!--<![endif]-->
           <!--[if lte IE 6]><table><tr><td><![endif]-->
             <ul>
-              <li><a href=downloads/express-0.9.4/express-0.9.4-macosx_x86_64.tgz onClick="_gaq.push(['_trackEvent', 'Downloads', 'Mac', 'home-menu']);" target="_blank">Mac OS X (64-bit)</a></li>
-              <li><a href=downloads/express-0.9.4/express-0.9.4-linux_x86_64.tgz onClick="_gaq.push(['_trackEvent', 'Downloads', 'Linux', 'home-menu']);" target="_blank">Linux (64-bit)</a></li>
-              <li><a href=downloads/express-0.9.4/express-0.9.4-win32_x86_64.zip onClick="_gaq.push(['_trackEvent', 'Downloads', 'Windows', 'home-menu']);" target="_blank">Windows (64-bit)</a></li>
-              <li><a href=downloads/express-0.9.4/express-0.9.4-src.tgz onClick="_gaq.push(['_trackEvent', 'Downloads', 'Source', 'home-menu']);" target="_blank">Source Code</a></li>
+              <li><a href=downloads/express-0.9.5/express-0.9.5-macosx_x86_64.tgz onClick="_gaq.push(['_trackEvent', 'Downloads', 'Mac', 'home-menu']);" target="_blank">Mac OS X (64-bit)</a></li>
+              <li><a href=downloads/express-0.9.5/express-0.9.5-linux_x86_64.tgz onClick="_gaq.push(['_trackEvent', 'Downloads', 'Linux', 'home-menu']);" target="_blank">Linux (64-bit)</a></li>
+              <li><a href=downloads/express-0.9.5/express-0.9.5-win32_x86_64.zip onClick="_gaq.push(['_trackEvent', 'Downloads', 'Windows', 'home-menu']);" target="_blank">Windows (64-bit)</a></li>
+              <li><a href=downloads/express-0.9.5/express-0.9.5-src.tgz onClick="_gaq.push(['_trackEvent', 'Downloads', 'Source', 'home-menu']);" target="_blank">Source Code</a></li>
               <li><a href="downloads" onClick="_gaq.push(['_trackEvent', 'Downloads', 'Previous','home-menu']);">Previous Versions</a></li>
             </ul>
           <!--[if lte IE 6]></td></tr></table></a><![endif]-->
@@ -161,6 +161,15 @@
         <div class="corner-content-1col-top"></div>                        
         <div class="content-1col-nobox">
           <h1>News</h1>
+          <h2>02.17.2012 &bull; eXpress 0.9.5 BETA released</h3>
+          <p><b>Release Notes:</b>
+   		  <ul>
+   		  <li>Numerous speed improvements.</li>
+   		  <li>Reduced memory requirements.</li>
+   		  <li>Improved bias model.</li>
+   		  <li>Re-added effective count fields to output.</li>
+   		  <li>Renamed "post_count_mean" field to "post_count_mode".</li>
+   		  </ul></p>
           <h2>01.05.2012 &bull; eXpress 0.9.4 BETA released</h3>
           <p><b>Release Notes:</b>
    		  <ul>
@@ -218,11 +227,11 @@
         <div class="subcontent-box">
           <h1>Download</h1>                    
           <h5>Current Release</h5>
-          <p>eXpress 0.9.4 BETA
-          <br />&rarr; <a href="downloads/express-0.9.4/express-0.9.4-macosx_x86_64.tgz" onClick="_gaq.push(['_trackEvent', 'Downloads', 'Mac', 'home-side']);" target="_blank">Mac OS X (64-bit) Binary</a>
-          <br />&rarr; <a href="downloads/express-0.9.4/express-0.9.4-linux_x86_64.tgz" onClick="_gaq.push(['_trackEvent', 'Downloads', 'Linux', 'home-side']);" target="_blank">Linux (64-bit) Binary</a>
-          <br />&rarr; <a href="downloads/express-0.9.4/express-0.9.4-win32_x86_64.zip" onClick="_gaq.push(['_trackEvent', 'Downloads', 'Windows', 'home-side']);" target="_blank">Windows (64-bit) Binary</a>
-          <br />&rarr; <a href="downloads/express-0.9.4/express-0.9.4-src.tgz" onClick="_gaq.push(['_trackEvent', 'Downloads', 'Source', 'home-side']); " target="_blank">Source</a>
+          <p>eXpress 0.9.5 BETA
+          <br />&rarr; <a href="downloads/express-0.9.5/express-0.9.5-macosx_x86_64.tgz" onClick="_gaq.push(['_trackEvent', 'Downloads', 'Mac', 'home-side']);" target="_blank">Mac OS X (64-bit) Binary</a>
+          <br />&rarr; <a href="downloads/express-0.9.5/express-0.9.5-linux_x86_64.tgz" onClick="_gaq.push(['_trackEvent', 'Downloads', 'Linux', 'home-side']);" target="_blank">Linux (64-bit) Binary</a>
+          <br />&rarr; <a href="downloads/express-0.9.5/express-0.9.5-win32_x86_64.zip" onClick="_gaq.push(['_trackEvent', 'Downloads', 'Windows', 'home-side']);" target="_blank">Windows (64-bit) Binary</a>
+          <br />&rarr; <a href="downloads/express-0.9.5/express-0.9.5-src.tgz" onClick="_gaq.push(['_trackEvent', 'Downloads', 'Source', 'home-side']); " target="_blank">Source</a>
           <h5>Previous Versions</h5>
           <p>&rarr; <a href="downloads" onClick="_gaq.push(['_trackEvent', 'Downloads', 'Previous','home-side']);">View All</a>
 

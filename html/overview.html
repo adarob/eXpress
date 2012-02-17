@@ -33,7 +33,7 @@
   <meta name="author" content="Designed by www.1234.info / Modified: Adam Roberts" />
   <meta name="distribution" content="global" />
   <meta name="image" content="http://bio.math.berkeley.edu/eXpress/img/logo.png" />
-  <meta name="description" content="eXpress is a general quantification tool for target DNA/RNA sequences. While its primary use currently is RNA-Seq it has the potential for applications in many other areas including as allele-specific expression and metgenomics. What makes eXpress different is that it is an online (or streaming) algorithm, meaning it only makes one pass through the data. This allows it to be very light-weight and efficient using a constant amount of memory and time linear in the number of sequenced fragments being processed. Furthermore, it accepts piped SAM/BAM input, allowing users to avoid storing extremely large alignment files. eXpress models fragment biases (sequence-specific and positional), fragment lengths, and errors, allowing it to also be one of the most accurate quantification methods available." />
+  <meta name="description" content="eXpress is a general quantification tool for target DNA/RNA sequences. While its primary use currently is RNA-Seq it has the potential for applications in many other areas including as allele-specific expression and metgenomics. What makes eXpress different is that it is an online (or streaming) algorithm, meaning it only makes one pass through the data. This allows it to be very light-weight and efficient using a constant amount of memory and time linear in the number of sequenced fragments being processed. Furthermore, it accepts piped SAM/BAM input, allowing users to avoid storing extremely large alignment files. eXpress models fragment biases, fragment lengths, and errors, allowing it to also be one of the most accurate quantification methods available." />
   <meta name="keywords" content="RNA-Seq, Genomics, transcript,quantification" />
   <link rel="stylesheet" type="text/css" media="screen,projection,print" href="./css/mf54_reset.css" />
   <link rel="stylesheet" type="text/css" media="screen,projection,print" href="./css/mf54_grid.css" />
@@ -125,11 +125,11 @@
         <li><a href="#">Download<!--[if IE 7]><!--></a><!--<![endif]-->
           <!--[if lte IE 6]><table><tr><td><![endif]-->
             <ul>
-              <li><a href=downloads/express-0.9.4/express-0.9.4-macosx_x86_64.tgz onClick="_gaq.push(['_trackEvent', 'Downloads', 'Mac', 'About']);" target="_blank">Mac OS X (64-bit)</a></li>
-              <li><a href=downloads/express-0.9.4/express-0.9.4-linux_x86_64.tgz onClick="_gaq.push(['_trackEvent', 'Downloads', 'Linux', 'About']);" target="_blank">Linux (64-bit)</a></li>
-              <li><a href=downloads/express-0.9.4/express-0.9.4-win32_x86_64.zip onClick="_gaq.push(['_trackEvent', 'Downloads', 'Windows', 'About']);" target="_blank">Windows (64-bit)</a></li>
+              <li><a href=downloads/express-0.9.5/express-0.9.5-macosx_x86_64.tgz onClick="_gaq.push(['_trackEvent', 'Downloads', 'Mac', 'About']);" target="_blank">Mac OS X (64-bit)</a></li>
+              <li><a href=downloads/express-0.9.5/express-0.9.5-linux_x86_64.tgz onClick="_gaq.push(['_trackEvent', 'Downloads', 'Linux', 'About']);" target="_blank">Linux (64-bit)</a></li>
+              <li><a href=downloads/express-0.9.5/express-0.9.5-win32_x86_64.zip onClick="_gaq.push(['_trackEvent', 'Downloads', 'Windows', 'About']);" target="_blank">Windows (64-bit)</a></li>
               <li><a href=downloads onClick="_gaq.push(['_trackEvent', 'Downloads', 'Previous','About']);">Previous Versions</a></li>
-              <li><a href=downloads/express-0.9.4/express-0.9.4-src.tgz onClick="_gaq.push(['_trackEvent', 'Downloads', 'Source', 'About']);" target="_blank">Source Code</a></li>
+              <li><a href=downloads/express-0.9.5/express-0.9.5-src.tgz onClick="_gaq.push(['_trackEvent', 'Downloads', 'Source', 'About']);" target="_blank">Source Code</a></li>
             </ul>
           <!--[if lte IE 6]></td></tr></table></a><![endif]-->
         </li>
@@ -217,7 +217,7 @@
 		  	<li>Supports alignments with unlimited multi-mappings and errors.</li>
 		  	<li>Transcript-level abundance estimation when used for RNA-Seq.</li>
 			<li>Can be used for allele-specific expression estimates in RNA-Seq.</li>
-		    <li>Corrects for both positional and sequence-specific fragment biases.</li>
+		    <li>Corrects for sequence-specific fragment biases.</li>
    		    <li>Learns first-order Markov model for sequencing errors for use in probablistic read assignment.</li>
    		    <li>Learns fragment length distribution for use in probablistic assignment of paired-end reads.</li>
    		    <li>Supports both directional and non-directional sequencing.</li>
