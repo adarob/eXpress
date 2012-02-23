@@ -110,7 +110,7 @@ double Transcript::log_likelihood(const FragHit& frag, bool with_pseudo) const
             if (ps != LEFT_ONLY)
                 ll += _end_bias->at(frag.right-1);  
         }
-        ll -= _cached_eff_len + _avg_bias;
+        ll -= (_cached_eff_len + _avg_bias);
     }
     
     if (ps == PAIRED)
@@ -451,32 +451,42 @@ void TranscriptTable::output_results(string output_dir, size_t tot_counts, bool 
                 if (trans.tot_counts() != trans.uniq_counts())
                 {
                     double binom_var = min(sexp(trans.binom_var() + l_var_renorm), 0.25*trans.tot_counts());
-                    count_var = binom_var;
-/*                    
-                    double m = sexp(trans.ambig_mass() - trans.tot_ambig_mass());
-                    double v = sexp(trans.tot_uncertainty() - trans.tot_ambig_mass());
+                    
+                    long double m = sexp(trans.ambig_mass() - trans.tot_ambig_mass());
+                    long double v = sexp(trans.tot_uncertainty() - trans.tot_ambig_mass());
                     //assert (p >=0 && p <= 1);
                     double n = trans.tot_counts()-trans.uniq_counts();
                     
-                    double k = m/v - m*m/v;
-                    double k2 = k*k;
-                    double k3 = k2*k;
-                    double l = m/v;
-                    double y = 0.419973683 * (pow((2*k3 - 42*k2 + sqrt(4*pow((-k2 + 14*k - 3*l -1),3) +
-                                pow((2*k3 - 42*k2 + 9*k*l + 150*k - 63*l - 2),2)) + 9*k*l +
-                                150*k - 63*l - 2),1.0/3)) - 
-                               (1.25992105*(-k2 + 14*k - 3*l - 1))/
-                                (3*pow((2*k3 - 42*k2 + sqrt(4*pow((-k2 + 14*k - 3*l -1),3) +
-                                pow((2*k3 - 42*k2 + 9*k*l + 150*k - 63*l - 2),2)) +
-                                        9*k*l + 150*k - 63*l - 2),1.0/3)) + (k-7)/3;
-                    double a = y*m + 1;
-                    double b = (a-1)/m + 2-a;
+                    long double m2 = m*m;
+                    long double m3 = m2*m;
+                    long double m4 = m3*m;
+                    long double m5 = m4*m;                    
+                    long double m6 = m5*m;
+                    long double m7 = m6*m;
+                    long double m8 = m7*m;
+                    long double m9 = m8*m;
+                    
+                    long double v2 = v*v;
+                    long double v3 = v2*v;
+                    
+                    long double c = -m3 + 2*m2 - 7*v*m - m + 4*v;
+                    long double d = 2*m9 - 12*m8 + 42*v*m7 + 30*m7 - 210*v*m6 - 40*m6 + 150*v2*m5 + 429*v*m5 + 30*m5 - 600*v2*m4 - 456*v*m4 - 12*m4 + 2*v3*m3 + 936*v2*m3 + 264*v*m3 + 2*m3 - 6*v3*m2 - 708*v2*m2 - 78*v*m2 + 6*v3*m + 258*v2*m + 9*v*m - 2*v3 - 36*v2;
+                    long double e = 2*m3 + 16*v*m2 - 5*m2 - 18*v*m + 4*m + 5*v - 1;
+                    long double f = 3*v*e - c*c;
+                    long double x = 4*pow(f,3)+d*d;
+                    long double y = 4*f*f*f + d*d;
+                    if (x < 0)
+                        x = 0;
+                    if (y < 0)
+                        y = 0;
+                    long double b = -c/(3*v) + pow(d + sqrt(x), (long double)1.0/3)/(3.77976315*v) - 1.25992105 * f / (3*v*pow(d + sqrt(y), (long double)1.0/3));
+                    long double a = (-b*m + 2*m - 1)/(m-1);
+                    
                     if (v == 0 || a < 0 || b < 0)
                         count_var = binom_var;
                     else
                         count_var = n*a*b*(a+b+n)/((a+b)*(a+b)*(a+b+1));
-                    //assert(!isnan(count_var) && !isinf(count_var));
- */
+                    assert(!isnan(count_var) && !isinf(count_var));
                 }
                 
                 double fpkm_std_dev = sqrt(trans_counts[i] + count_var);

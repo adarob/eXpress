@@ -27,7 +27,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
  <tr style="height: 56px;">
   <td id="projectlogo"><img alt="Logo" src="logo_small.png"></td>
   <td style="padding-left: 0.5em;">
-   <div id="projectname">eXpress&#160;<span id="projectnumber">0.9.4 BETA</span></div>
+   <div id="projectname">eXpress&#160;<span id="projectnumber">0.9.5 BETA</span></div>
    <div id="projectbrief"><a href=http://bio.math.berkeley.edu/eXpress>http://bio.math.berkeley.edu/eXpress</a></div>
   </td>
  </tr>
@@ -99,7 +99,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00016"></a>00016 <span class="preprocessor">#include &lt;api/BamReader.h&gt;</span>
 <a name="l00017"></a>00017 <span class="preprocessor">#include &lt;api/BamWriter.h&gt;</span>
 <a name="l00018"></a>00018 
-<a name="l00019"></a>00019 
+<a name="l00019"></a>00019 <span class="keyword">class </span><a class="code" href="struct_parse_thread_safety.html">ParseThreadSafety</a>;
 <a name="l00020"></a>00020 <span class="keyword">class </span><a class="code" href="class_fragment.html">Fragment</a>;
 <a name="l00021"></a>00021 <span class="keyword">class </span><a class="code" href="struct_frag_hit.html">FragHit</a>;
 <a name="l00022"></a>00022 <span class="keyword">class </span><a class="code" href="class_transcript_table.html">TranscriptTable</a>;
@@ -221,53 +221,41 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00334"></a>00334     <span class="keywordtype">void</span> <a class="code" href="class_s_a_m_writer.html#a9d8d5d912790ab0cdbf9750c7dd8c637">write_fragment</a>(<a class="code" href="class_fragment.html">Fragment</a>&amp; f);
 <a name="l00335"></a>00335 };
 <a name="l00336"></a>00336 
-<a name="l00344"></a><a class="code" href="struct_parse_thread_safety.html">00344</a> <span class="keyword">struct </span><a class="code" href="struct_parse_thread_safety.html">ParseThreadSafety</a>
-<a name="l00345"></a>00345 {
-<a name="l00349"></a><a class="code" href="struct_parse_thread_safety.html#a462012f8256c208cf8dde4d61546711c">00349</a>     <a class="code" href="class_fragment.html">Fragment</a>* <a class="code" href="struct_parse_thread_safety.html#a462012f8256c208cf8dde4d61546711c">next_frag</a>;
-<a name="l00350"></a>00350     
-<a name="l00354"></a><a class="code" href="struct_parse_thread_safety.html#a3eec0e7ef6466840df131350e4534271">00354</a>     boost::mutex <a class="code" href="struct_parse_thread_safety.html#a3eec0e7ef6466840df131350e4534271">mut</a>;
-<a name="l00355"></a>00355     
-<a name="l00360"></a><a class="code" href="struct_parse_thread_safety.html#a0c6cf6905d16c3dd3c70010c97ed26b1">00360</a>     boost::condition_variable <a class="code" href="struct_parse_thread_safety.html#a0c6cf6905d16c3dd3c70010c97ed26b1">cond</a>;
+<a name="l00337"></a>00337 
+<a name="l00348"></a><a class="code" href="class_threaded_map_parser.html">00348</a> <span class="keyword">class </span><a class="code" href="class_threaded_map_parser.html">ThreadedMapParser</a>
+<a name="l00349"></a>00349 {
+<a name="l00353"></a>00353     <a class="code" href="class_parser.html">Parser</a>* _parser;
+<a name="l00354"></a>00354     
+<a name="l00358"></a>00358     <a class="code" href="class_writer.html">Writer</a>* _writer;
+<a name="l00359"></a>00359     
+<a name="l00360"></a>00360     <span class="keywordtype">bool</span> _write_active;
 <a name="l00361"></a>00361     
-<a name="l00366"></a><a class="code" href="struct_parse_thread_safety.html#ae280cd98bd694c7f0f6bcb53b8d1471d">00366</a>     <span class="keywordtype">bool</span> <a class="code" href="struct_parse_thread_safety.html#ae280cd98bd694c7f0f6bcb53b8d1471d">frag_clean</a>;
-<a name="l00367"></a>00367     
-<a name="l00368"></a>00368     <a class="code" href="struct_parse_thread_safety.html">ParseThreadSafety</a>() : <a class="code" href="struct_parse_thread_safety.html#a462012f8256c208cf8dde4d61546711c">next_frag</a>(NULL), <a class="code" href="struct_parse_thread_safety.html#ae280cd98bd694c7f0f6bcb53b8d1471d">frag_clean</a>(false) {}
-<a name="l00369"></a>00369 };
-<a name="l00370"></a>00370 
-<a name="l00381"></a><a class="code" href="class_threaded_map_parser.html">00381</a> <span class="keyword">class </span><a class="code" href="class_threaded_map_parser.html">ThreadedMapParser</a>
-<a name="l00382"></a>00382 {
-<a name="l00386"></a>00386     <a class="code" href="class_parser.html">Parser</a>* _parser;
-<a name="l00387"></a>00387     
-<a name="l00391"></a>00391     <a class="code" href="class_writer.html">Writer</a>* _writer;
-<a name="l00392"></a>00392     
-<a name="l00393"></a>00393     <span class="keywordtype">bool</span> _write_active;
-<a name="l00394"></a>00394     
-<a name="l00395"></a>00395 <span class="keyword">public</span>:
-<a name="l00401"></a>00401     <a class="code" href="class_threaded_map_parser.html#a932bcde8510748310959b1d7cbed3ba5">ThreadedMapParser</a>(std::string input_file, std::string output_file, <span class="keywordtype">bool</span> <a class="code" href="class_threaded_map_parser.html#a0fd1dcdf0b8b665ff4f15850f20e5a84">write_active</a>);
+<a name="l00362"></a>00362 <span class="keyword">public</span>:
+<a name="l00368"></a>00368     <a class="code" href="class_threaded_map_parser.html#a932bcde8510748310959b1d7cbed3ba5">ThreadedMapParser</a>(std::string input_file, std::string output_file, <span class="keywordtype">bool</span> <a class="code" href="class_threaded_map_parser.html#a0fd1dcdf0b8b665ff4f15850f20e5a84">write_active</a>);
+<a name="l00369"></a>00369     
+<a name="l00373"></a>00373     <a class="code" href="class_threaded_map_parser.html#ac1722833023002b9dfc4e8245e05d473">~ThreadedMapParser</a>();
+<a name="l00374"></a>00374     
+<a name="l00382"></a>00382     <span class="keywordtype">void</span> <a class="code" href="class_threaded_map_parser.html#a4661c112c0109a6d9cf26d9a72c3f2d6">threaded_parse</a>(<a class="code" href="struct_parse_thread_safety.html">ParseThreadSafety</a>* thread_safety, <a class="code" href="class_transcript_table.html">TranscriptTable</a>* trans_table);
+<a name="l00383"></a>00383     
+<a name="l00388"></a><a class="code" href="class_threaded_map_parser.html#af4d55d77872b29e1ba0073dc18675123">00388</a>     <span class="keyword">const</span> TransIndex&amp; <a class="code" href="class_threaded_map_parser.html#af4d55d77872b29e1ba0073dc18675123">trans_index</a>() { <span class="keywordflow">return</span> _parser-&gt;<a class="code" href="class_parser.html#a53031c7eea91937e9f26b6853d186ded">trans_index</a>(); }
+<a name="l00389"></a>00389     
+<a name="l00394"></a><a class="code" href="class_threaded_map_parser.html#af3e8cee35d605c76c9a154b2bd36445c">00394</a>     <span class="keyword">const</span> TransIndex&amp; <a class="code" href="class_threaded_map_parser.html#af3e8cee35d605c76c9a154b2bd36445c">trans_lengths</a>() { <span class="keywordflow">return</span> _parser-&gt;<a class="code" href="class_parser.html#a0251836a0f88555a79cfe45b404b2085">trans_lengths</a>(); }
+<a name="l00395"></a>00395     
+<a name="l00401"></a><a class="code" href="class_threaded_map_parser.html#a0fd1dcdf0b8b665ff4f15850f20e5a84">00401</a>     <span class="keywordtype">void</span> <a class="code" href="class_threaded_map_parser.html#a0fd1dcdf0b8b665ff4f15850f20e5a84">write_active</a>(<span class="keywordtype">bool</span> b) { _write_active = b; }
 <a name="l00402"></a>00402     
-<a name="l00406"></a>00406     <a class="code" href="class_threaded_map_parser.html#ac1722833023002b9dfc4e8245e05d473">~ThreadedMapParser</a>();
+<a name="l00406"></a><a class="code" href="class_threaded_map_parser.html#ac6afab8a3e2e8975553e64c634a9f428">00406</a>     <span class="keywordtype">void</span> <a class="code" href="class_threaded_map_parser.html#ac6afab8a3e2e8975553e64c634a9f428">reset_reader</a>() { _parser-&gt;<a class="code" href="class_parser.html#aa251a9083f3f61c5ce55676e9e223cb3">reset</a>(); }
 <a name="l00407"></a>00407     
-<a name="l00415"></a>00415     <span class="keywordtype">void</span> <a class="code" href="class_threaded_map_parser.html#a4661c112c0109a6d9cf26d9a72c3f2d6">threaded_parse</a>(<a class="code" href="struct_parse_thread_safety.html">ParseThreadSafety</a>* thread_safety, <a class="code" href="class_transcript_table.html">TranscriptTable</a>* trans_table);
-<a name="l00416"></a>00416     
-<a name="l00421"></a><a class="code" href="class_threaded_map_parser.html#af4d55d77872b29e1ba0073dc18675123">00421</a>     <span class="keyword">const</span> TransIndex&amp; <a class="code" href="class_threaded_map_parser.html#af4d55d77872b29e1ba0073dc18675123">trans_index</a>() { <span class="keywordflow">return</span> _parser-&gt;<a class="code" href="class_parser.html#a53031c7eea91937e9f26b6853d186ded">trans_index</a>(); }
-<a name="l00422"></a>00422     
-<a name="l00427"></a><a class="code" href="class_threaded_map_parser.html#af3e8cee35d605c76c9a154b2bd36445c">00427</a>     <span class="keyword">const</span> TransIndex&amp; <a class="code" href="class_threaded_map_parser.html#af3e8cee35d605c76c9a154b2bd36445c">trans_lengths</a>() { <span class="keywordflow">return</span> _parser-&gt;<a class="code" href="class_parser.html#a0251836a0f88555a79cfe45b404b2085">trans_lengths</a>(); }
-<a name="l00428"></a>00428     
-<a name="l00434"></a><a class="code" href="class_threaded_map_parser.html#a0fd1dcdf0b8b665ff4f15850f20e5a84">00434</a>     <span class="keywordtype">void</span> <a class="code" href="class_threaded_map_parser.html#a0fd1dcdf0b8b665ff4f15850f20e5a84">write_active</a>(<span class="keywordtype">bool</span> b) { _write_active = b; }
-<a name="l00435"></a>00435     
-<a name="l00439"></a><a class="code" href="class_threaded_map_parser.html#ac6afab8a3e2e8975553e64c634a9f428">00439</a>     <span class="keywordtype">void</span> <a class="code" href="class_threaded_map_parser.html#ac6afab8a3e2e8975553e64c634a9f428">reset_reader</a>() { _parser-&gt;<a class="code" href="class_parser.html#aa251a9083f3f61c5ce55676e9e223cb3">reset</a>(); }
-<a name="l00440"></a>00440     
-<a name="l00441"></a>00441 };
-<a name="l00442"></a>00442 
-<a name="l00443"></a>00443 
-<a name="l00444"></a>00444 
-<a name="l00445"></a>00445 <span class="preprocessor">#endif</span>
+<a name="l00408"></a>00408 };
+<a name="l00409"></a>00409 
+<a name="l00410"></a>00410 
+<a name="l00411"></a>00411 
+<a name="l00412"></a>00412 <span class="preprocessor">#endif</span>
 </pre></div></div>
 </div>
   <div id="nav-path" class="navpath">
     <ul>
       <li class="navelem"><b>mapparser.h</b>      </li>
-      <li class="footer">Generated on Thu Jan 5 2012 14:34:16 for eXpress by&#160;
+      <li class="footer">Generated on Sat Feb 18 2012 07:21:49 for eXpress by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </li>
     </ul>

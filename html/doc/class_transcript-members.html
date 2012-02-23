@@ -27,7 +27,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
  <tr style="height: 56px;">
   <td id="projectlogo"><img alt="Logo" src="logo_small.png"></td>
   <td style="padding-left: 0.5em;">
-   <div id="projectname">eXpress&#160;<span id="projectnumber">0.9.4 BETA</span></div>
+   <div id="projectname">eXpress&#160;<span id="projectnumber">0.9.5 BETA</span></div>
    <div id="projectbrief"><a href=http://bio.math.berkeley.edu/eXpress>http://bio.math.berkeley.edu/eXpress</a></div>
   </td>
  </tr>
@@ -85,34 +85,35 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div>
 <div class="contents">
 This is the complete list of members for <a class="el" href="class_transcript.html">Transcript</a>, including all inherited members.<table>
-  <tr class="memlist"><td><a class="el" href="class_transcript.html#ac602834b5516cc43cca8152590d54107">add_mass</a>(double p, double mass)</td><td><a class="el" href="class_transcript.html">Transcript</a></td><td></td></tr>
-  <tr class="memlist"><td><a class="el" href="class_transcript.html#abe8efd17d5739deb26d0ed69348d1e01">add_prob_count</a>(double p)</td><td><a class="el" href="class_transcript.html">Transcript</a></td><td></td></tr>
+  <tr class="memlist"><td><a class="el" href="class_transcript.html#ac78eabc3a6eb38f66f4513d6877854fe">add_mass</a>(double p, double v, double mass)</td><td><a class="el" href="class_transcript.html">Transcript</a></td><td></td></tr>
+  <tr class="memlist"><td><a class="el" href="class_transcript.html#a7a8a3319acb2bb341a3c83d75e6a4eb8">ambig_mass</a>() const </td><td><a class="el" href="class_transcript.html">Transcript</a></td><td><code> [inline]</code></td></tr>
+  <tr class="memlist"><td><a class="el" href="class_transcript.html#a56ad13c21bdd1c60a2c0efb8461b73eb">binom_var</a>() const </td><td><a class="el" href="class_transcript.html">Transcript</a></td><td><code> [inline]</code></td></tr>
   <tr class="memlist"><td><a class="el" href="class_transcript.html#ab5316c6ffabd9639a4407cecd790d7c0">bundle</a>()</td><td><a class="el" href="class_transcript.html">Transcript</a></td><td><code> [inline]</code></td></tr>
   <tr class="memlist"><td><a class="el" href="class_transcript.html#a4ce5e2404d7d79564bbf3a333658e453">bundle</a>(Bundle *b)</td><td><a class="el" href="class_transcript.html">Transcript</a></td><td><code> [inline]</code></td></tr>
-  <tr class="memlist"><td><a class="el" href="class_transcript.html#a124c6320405dd10cd9ee6804ac6d50b7">cached_effective_length</a>() const </td><td><a class="el" href="class_transcript.html">Transcript</a></td><td></td></tr>
-  <tr class="memlist"><td><a class="el" href="class_transcript.html#a7ca04a466b3b259fb3ad288c7d863bdb">est_counts</a>() const </td><td><a class="el" href="class_transcript.html">Transcript</a></td><td><code> [inline]</code></td></tr>
-  <tr class="memlist"><td><a class="el" href="class_transcript.html#a608e456f57e99971266741493e25c48a">est_counts_var</a>() const </td><td><a class="el" href="class_transcript.html">Transcript</a></td><td><code> [inline]</code></td></tr>
-  <tr class="memlist"><td><a class="el" href="class_transcript.html#a6f62632781837d2e9e854367d5339002">est_effective_length</a>() const </td><td><a class="el" href="class_transcript.html">Transcript</a></td><td></td></tr>
+  <tr class="memlist"><td><a class="el" href="class_transcript.html#a955fa19658dd8cf16dec0e5b523154bc">cached_effective_length</a>(bool with_bias=true) const </td><td><a class="el" href="class_transcript.html">Transcript</a></td><td></td></tr>
+  <tr class="memlist"><td><a class="el" href="class_transcript.html#acc2877ec65b44e787d96c8e09eb5acb2">est_effective_length</a>(FLD *fld=NULL, bool with_bias=true) const </td><td><a class="el" href="class_transcript.html">Transcript</a></td><td></td></tr>
   <tr class="memlist"><td><a class="el" href="class_transcript.html#a6c2056b337c006b547044b40f5290f10">id</a>() const </td><td><a class="el" href="class_transcript.html">Transcript</a></td><td><code> [inline]</code></td></tr>
-  <tr class="memlist"><td><a class="el" href="class_transcript.html#a75fbbc00c2611c0dcd0bf0edc1a29015">incr_uniq_counts</a>(size_t incr_amt=1)</td><td><a class="el" href="class_transcript.html">Transcript</a></td><td><code> [inline]</code></td></tr>
+  <tr class="memlist"><td><a class="el" href="class_transcript.html#acb59e308d6867b338bbfd60b6b08e7b9">incr_counts</a>(bool uniq, size_t incr_amt=1)</td><td><a class="el" href="class_transcript.html">Transcript</a></td><td><code> [inline]</code></td></tr>
   <tr class="memlist"><td><a class="el" href="class_transcript.html#ae20e7dbb485307ba815584c45e54e4d5">length</a>() const </td><td><a class="el" href="class_transcript.html">Transcript</a></td><td><code> [inline]</code></td></tr>
   <tr class="memlist"><td><a class="el" href="class_transcript.html#ad36cad86938077a427c656d9e8725a44">log_likelihood</a>(const FragHit &amp;frag, bool with_pseudo) const </td><td><a class="el" href="class_transcript.html">Transcript</a></td><td></td></tr>
-  <tr class="memlist"><td><a class="el" href="class_transcript.html#a468c9bc39e15f7cdf76c5a46ea1ef70c">mass</a>() const </td><td><a class="el" href="class_transcript.html">Transcript</a></td><td><code> [inline]</code></td></tr>
-  <tr class="memlist"><td><a class="el" href="class_transcript.html#a808964e973fe80b46e9e033edefdb828">mass_var</a>() const </td><td><a class="el" href="class_transcript.html">Transcript</a></td><td><code> [inline]</code></td></tr>
+  <tr class="memlist"><td><a class="el" href="class_transcript.html#a4c5cded0dbf90669a38fda70bdf692c0">mass</a>(bool with_pseudo=true) const </td><td><a class="el" href="class_transcript.html">Transcript</a></td><td></td></tr>
   <tr class="memlist"><td><a class="el" href="class_transcript.html#adc5c3d067288ebc864ff9ace98a88944">name</a>() const </td><td><a class="el" href="class_transcript.html">Transcript</a></td><td><code> [inline]</code></td></tr>
+  <tr class="memlist"><td><a class="el" href="class_transcript.html#a457a54e54b2964452898214b3b20bb48">rho</a>() const </td><td><a class="el" href="class_transcript.html">Transcript</a></td><td></td></tr>
   <tr class="memlist"><td><a class="el" href="class_transcript.html#acd2794cfe2c2a1bdd70444b13f1ea296">round_reset</a>()</td><td><a class="el" href="class_transcript.html">Transcript</a></td><td></td></tr>
-  <tr class="memlist"><td><a class="el" href="class_transcript.html#abdf9e6054e345ed9f1a49f0be3a0ccc7">seq</a>() const </td><td><a class="el" href="class_transcript.html">Transcript</a></td><td><code> [inline]</code></td></tr>
+  <tr class="memlist"><td><a class="el" href="class_transcript.html#abf33ec44332e19ffc7b6791d4f8e03c8">samp_var</a>() const </td><td><a class="el" href="class_transcript.html">Transcript</a></td><td><code> [inline]</code></td></tr>
+  <tr class="memlist"><td><a class="el" href="class_transcript.html#aa8d0bdc121fa209300e6aab9cf2a3c2e">seq</a>(bool rev) const </td><td><a class="el" href="class_transcript.html">Transcript</a></td><td><code> [inline]</code></td></tr>
+  <tr class="memlist"><td><a class="el" href="class_transcript.html#a6ce2600ec329d1bb00d531fac458621d">tot_ambig_mass</a>() const </td><td><a class="el" href="class_transcript.html">Transcript</a></td><td><code> [inline]</code></td></tr>
   <tr class="memlist"><td><a class="el" href="class_transcript.html#a00162b4706b0e9b494b1de6033457243">tot_counts</a>() const </td><td><a class="el" href="class_transcript.html">Transcript</a></td><td><code> [inline]</code></td></tr>
-  <tr class="memlist"><td><a class="el" href="class_transcript.html#ae83c55fd9055fdacdf9ebbb45a995f50">tot_mass</a>() const </td><td><a class="el" href="class_transcript.html">Transcript</a></td><td><code> [inline]</code></td></tr>
+  <tr class="memlist"><td><a class="el" href="class_transcript.html#ac919a30a04ee7cf20e55bf82a2140b70">tot_uncertainty</a>() const </td><td><a class="el" href="class_transcript.html">Transcript</a></td><td><code> [inline]</code></td></tr>
   <tr class="memlist"><td><a class="el" href="class_transcript.html#ae5264673753068724e3885cdffe95eaa">Transcript</a>(const size_t id, const std::string &amp;name, const std::string &amp;seq, double alpha, const Globals *globs)</td><td><a class="el" href="class_transcript.html">Transcript</a></td><td></td></tr>
   <tr class="memlist"><td><a class="el" href="class_transcript.html#a23108362e439753a49f82bc5916bde9a">uniq_counts</a>() const </td><td><a class="el" href="class_transcript.html">Transcript</a></td><td><code> [inline]</code></td></tr>
-  <tr class="memlist"><td><a class="el" href="class_transcript.html#ac4b04bcf651566c7654eaac9499f5a28">update_transcript_bias</a>()</td><td><a class="el" href="class_transcript.html">Transcript</a></td><td></td></tr>
+  <tr class="memlist"><td><a class="el" href="class_transcript.html#ab4d209fd6fbfbc241a6c02a3a1be39e5">update_transcript_bias</a>(BiasBoss *bias_table=NULL, FLD *fld=NULL)</td><td><a class="el" href="class_transcript.html">Transcript</a></td><td></td></tr>
   <tr bgcolor="#f0f0f0"><td><b>~Transcript</b>() (defined in <a class="el" href="class_transcript.html">Transcript</a>)</td><td><a class="el" href="class_transcript.html">Transcript</a></td><td><code> [inline]</code></td></tr>
 </table></div>
 </div>
   <div id="nav-path" class="navpath">
     <ul>
-      <li class="footer">Generated on Thu Jan 5 2012 14:34:19 for eXpress by&#160;
+      <li class="footer">Generated on Sat Feb 18 2012 07:21:52 for eXpress by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </li>
     </ul>

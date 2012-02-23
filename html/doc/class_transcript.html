@@ -27,7 +27,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
  <tr style="height: 56px;">
   <td id="projectlogo"><img alt="Logo" src="logo_small.png"></td>
   <td style="padding-left: 0.5em;">
-   <div id="projectname">eXpress&#160;<span id="projectnumber">0.9.4 BETA</span></div>
+   <div id="projectname">eXpress&#160;<span id="projectnumber">0.9.5 BETA</span></div>
    <div id="projectbrief"><a href=http://bio.math.berkeley.edu/eXpress>http://bio.math.berkeley.edu/eXpress</a></div>
   </td>
  </tr>
@@ -96,32 +96,33 @@ Public Member Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_transcript.html#ae5264673753068724e3885cdffe95eaa">Transcript</a> (const size_t id, const std::string &amp;name, const std::string &amp;seq, double alpha, const <a class="el" href="struct_globals.html">Globals</a> *globs)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">const std::string &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_transcript.html#adc5c3d067288ebc864ff9ace98a88944">name</a> () const </td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">TransID&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_transcript.html#a6c2056b337c006b547044b40f5290f10">id</a> () const </td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">const std::string &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_transcript.html#abdf9e6054e345ed9f1a49f0be3a0ccc7">seq</a> () const </td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">const <a class="el" href="class_sequence.html">Sequence</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_transcript.html#aa8d0bdc121fa209300e6aab9cf2a3c2e">seq</a> (bool rev) const </td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_transcript.html#ae20e7dbb485307ba815584c45e54e4d5">length</a> () const </td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_transcript.html#a468c9bc39e15f7cdf76c5a46ea1ef70c">mass</a> () const </td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_transcript.html#ae83c55fd9055fdacdf9ebbb45a995f50">tot_mass</a> () const </td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_transcript.html#a808964e973fe80b46e9e033edefdb828">mass_var</a> () const </td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_transcript.html#a7ca04a466b3b259fb3ad288c7d863bdb">est_counts</a> () const </td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_transcript.html#a608e456f57e99971266741493e25c48a">est_counts_var</a> () const </td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_transcript.html#a457a54e54b2964452898214b3b20bb48">rho</a> () const </td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_transcript.html#a4c5cded0dbf90669a38fda70bdf692c0">mass</a> (bool with_pseudo=true) const </td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_transcript.html#a7a8a3319acb2bb341a3c83d75e6a4eb8">ambig_mass</a> () const </td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_transcript.html#a6ce2600ec329d1bb00d531fac458621d">tot_ambig_mass</a> () const </td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_transcript.html#a56ad13c21bdd1c60a2c0efb8461b73eb">binom_var</a> () const </td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_transcript.html#abf33ec44332e19ffc7b6791d4f8e03c8">samp_var</a> () const </td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_transcript.html#ac919a30a04ee7cf20e55bf82a2140b70">tot_uncertainty</a> () const </td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_transcript.html#acd2794cfe2c2a1bdd70444b13f1ea296">round_reset</a> ()</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_transcript.html#a00162b4706b0e9b494b1de6033457243">tot_counts</a> () const </td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_transcript.html#a23108362e439753a49f82bc5916bde9a">uniq_counts</a> () const </td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_bundle.html">Bundle</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_transcript.html#ab5316c6ffabd9639a4407cecd790d7c0">bundle</a> ()</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_transcript.html#a4ce5e2404d7d79564bbf3a333658e453">bundle</a> (<a class="el" href="class_bundle.html">Bundle</a> *b)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_transcript.html#ac602834b5516cc43cca8152590d54107">add_mass</a> (double p, double mass)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_transcript.html#abe8efd17d5739deb26d0ed69348d1e01">add_prob_count</a> (double p)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_transcript.html#a75fbbc00c2611c0dcd0bf0edc1a29015">incr_uniq_counts</a> (size_t incr_amt=1)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_transcript.html#ac78eabc3a6eb38f66f4513d6877854fe">add_mass</a> (double p, double v, double mass)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_transcript.html#acb59e308d6867b338bbfd60b6b08e7b9">incr_counts</a> (bool uniq, size_t incr_amt=1)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_transcript.html#ad36cad86938077a427c656d9e8725a44">log_likelihood</a> (const <a class="el" href="struct_frag_hit.html">FragHit</a> &amp;frag, bool with_pseudo) const </td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_transcript.html#a6f62632781837d2e9e854367d5339002">est_effective_length</a> () const </td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_transcript.html#a124c6320405dd10cd9ee6804ac6d50b7">cached_effective_length</a> () const </td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_transcript.html#ac4b04bcf651566c7654eaac9499f5a28">update_transcript_bias</a> ()</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_transcript.html#acc2877ec65b44e787d96c8e09eb5acb2">est_effective_length</a> (<a class="el" href="class_f_l_d.html">FLD</a> *fld=NULL, bool with_bias=true) const </td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_transcript.html#a955fa19658dd8cf16dec0e5b523154bc">cached_effective_length</a> (bool with_bias=true) const </td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_transcript.html#ab4d209fd6fbfbc241a6c02a3a1be39e5">update_transcript_bias</a> (<a class="el" href="class_bias_boss.html">BiasBoss</a> *bias_table=NULL, <a class="el" href="class_f_l_d.html">FLD</a> *fld=NULL)</td></tr>
 </table>
 <hr/><a name="_details"></a><h2>Detailed Description</h2>
 <div class="textblock"><p>The <a class="el" href="class_transcript.html">Transcript</a> class is used to store objects for the transcripts being mapped to. Besides storing basic information about the object (id, length), it also stores a mass based on the number of fragments mapping to the object. To help with updating this number, it returns the likelihood that a given fragment originated from it. These values are stored and returned in log space. </p>
 <dl class="author"><dt><b>Author:</b></dt><dd>Adam Roberts </dd></dl>
 <dl class="date"><dt><b>Date:</b></dt><dd>2011  Artistic License 2.0 </dd></dl>
 
-<p>Definition at line <a class="el" href="transcripts_8h_source.html#l00041">41</a> of file <a class="el" href="transcripts_8h_source.html">transcripts.h</a>.</p>
+<p>Definition at line <a class="el" href="transcripts_8h_source.html#l00086">86</a> of file <a class="el" href="transcripts_8h_source.html">transcripts.h</a>.</p>
 </div><hr/><h2>Constructor &amp; Destructor Documentation</h2>
 <a class="anchor" id="ae5264673753068724e3885cdffe95eaa"></a><!-- doxytag: member="Transcript::Transcript" ref="ae5264673753068724e3885cdffe95eaa" args="(const size_t id, const std::string &amp;name, const std::string &amp;seq, double alpha, const Globals *globs)" -->
 <div class="memitem">
@@ -176,12 +177,12 @@ Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="transcripts_8cpp_source.html#l00024">24</a> of file <a class="el" href="transcripts_8cpp_source.html">transcripts.cpp</a>.</p>
+<p>Definition at line <a class="el" href="transcripts_8cpp_source.html#l00023">23</a> of file <a class="el" href="transcripts_8cpp_source.html">transcripts.cpp</a>.</p>
 
 </div>
 </div>
 <hr/><h2>Member Function Documentation</h2>
-<a class="anchor" id="ac602834b5516cc43cca8152590d54107"></a><!-- doxytag: member="Transcript::add_mass" ref="ac602834b5516cc43cca8152590d54107" args="(double p, double mass)" -->
+<a class="anchor" id="ac78eabc3a6eb38f66f4513d6877854fe"></a><!-- doxytag: member="Transcript::add_mass" ref="ac78eabc3a6eb38f66f4513d6877854fe" args="(double p, double v, double mass)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -190,6 +191,12 @@ Public Member Functions</h2></td></tr>
           <td>(</td>
           <td class="paramtype">double&#160;</td>
           <td class="paramname"><em>p</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>v</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -209,58 +216,53 @@ Public Member Functions</h2></td></tr>
 <dl><dt><b>Parameters:</b></dt><dd>
   <table class="params">
     <tr><td class="paramname">p</td><td>a double for the (logged) probability that the fragment was generated by this transcript </td></tr>
+    <tr><td class="paramname">v</td><td>a double for the (logged) approximate variance (uncertainty) on the probability </td></tr>
     <tr><td class="paramname">mass</td><td>a double specifying the (logged) mass of the fragment being mapped </td></tr>
   </table>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="transcripts_8cpp_source.html#l00052">52</a> of file <a class="el" href="transcripts_8cpp_source.html">transcripts.cpp</a>.</p>
+<p>Definition at line <a class="el" href="transcripts_8cpp_source.html#l00048">48</a> of file <a class="el" href="transcripts_8cpp_source.html">transcripts.cpp</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="abe8efd17d5739deb26d0ed69348d1e01"></a><!-- doxytag: member="Transcript::add_prob_count" ref="abe8efd17d5739deb26d0ed69348d1e01" args="(double p)" -->
+<a class="anchor" id="a7a8a3319acb2bb341a3c83d75e6a4eb8"></a><!-- doxytag: member="Transcript::ambig_mass" ref="a7a8a3319acb2bb341a3c83d75e6a4eb8" args="() const " -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void Transcript::add_prob_count </td>
-          <td>(</td>
-          <td class="paramtype">double&#160;</td>
-          <td class="paramname"><em>p</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-<p>a member function that increases the estimated counts and estimated count variance based on the probabilistic assignment of a fragment </p>
-<dl><dt><b>Parameters:</b></dt><dd>
-  <table class="params">
-    <tr><td class="paramname">p</td><td>a double for the (logged) probability that the fragment was generated by this transcript </td></tr>
-  </table>
-  </dd>
-</dl>
-
-<p>Definition at line <a class="el" href="transcripts_8cpp_source.html#l00062">62</a> of file <a class="el" href="transcripts_8cpp_source.html">transcripts.cpp</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="ab5316c6ffabd9639a4407cecd790d7c0"></a><!-- doxytag: member="Transcript::bundle" ref="ab5316c6ffabd9639a4407cecd790d7c0" args="()" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="class_bundle.html">Bundle</a>* Transcript::bundle </td>
+          <td class="memname">double Transcript::ambig_mass </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
-          <td><code> [inline]</code></td>
+          <td> const<code> [inline]</code></td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
-<p>a member function that returns the <a class="el" href="class_bundle.html">Bundle</a> this <a class="el" href="class_transcript.html">Transcript</a> is a member of </p>
-<dl class="return"><dt><b>Returns:</b></dt><dd>a pointer to the <a class="el" href="class_bundle.html">Bundle</a> this transcript is a member of </dd></dl>
+<p>a member function that returns the (logged) total mass derived from ambiguous fragments mapping to the transcript </p>
+<dl class="return"><dt><b>Returns:</b></dt><dd>the (logged) total mass derived from ambiguous fragments mapping to the transcript </dd></dl>
 
-<p>Definition at line <a class="el" href="transcripts_8h_source.html#l00229">229</a> of file <a class="el" href="transcripts_8h_source.html">transcripts.h</a>.</p>
+<p>Definition at line <a class="el" href="transcripts_8h_source.html#l00233">233</a> of file <a class="el" href="transcripts_8h_source.html">transcripts.h</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a56ad13c21bdd1c60a2c0efb8461b73eb"></a><!-- doxytag: member="Transcript::binom_var" ref="a56ad13c21bdd1c60a2c0efb8461b73eb" args="() const " -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">double Transcript::binom_var </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const<code> [inline]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>a member function that returns the current (logged) binomial variance </p>
+<dl class="return"><dt><b>Returns:</b></dt><dd>logged binomial mass variance </dd></dl>
+
+<p>Definition at line <a class="el" href="transcripts_8h_source.html#l00245">245</a> of file <a class="el" href="transcripts_8h_source.html">transcripts.h</a>.</p>
 
 </div>
 </div>
@@ -286,18 +288,39 @@ Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="transcripts_8h_source.html#l00235">235</a> of file <a class="el" href="transcripts_8h_source.html">transcripts.h</a>.</p>
+<p>Definition at line <a class="el" href="transcripts_8h_source.html#l00287">287</a> of file <a class="el" href="transcripts_8h_source.html">transcripts.h</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a124c6320405dd10cd9ee6804ac6d50b7"></a><!-- doxytag: member="Transcript::cached_effective_length" ref="a124c6320405dd10cd9ee6804ac6d50b7" args="() const " -->
+<a class="anchor" id="ab5316c6ffabd9639a4407cecd790d7c0"></a><!-- doxytag: member="Transcript::bundle" ref="ab5316c6ffabd9639a4407cecd790d7c0" args="()" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="class_bundle.html">Bundle</a>* Transcript::bundle </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td><code> [inline]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>a member function that returns the <a class="el" href="class_bundle.html">Bundle</a> this <a class="el" href="class_transcript.html">Transcript</a> is a member of </p>
+<dl class="return"><dt><b>Returns:</b></dt><dd>a pointer to the <a class="el" href="class_bundle.html">Bundle</a> this transcript is a member of </dd></dl>
+
+<p>Definition at line <a class="el" href="transcripts_8h_source.html#l00281">281</a> of file <a class="el" href="transcripts_8h_source.html">transcripts.h</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a955fa19658dd8cf16dec0e5b523154bc"></a><!-- doxytag: member="Transcript::cached_effective_length" ref="a955fa19658dd8cf16dec0e5b523154bc" args="(bool with_bias=true) const " -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">double Transcript::cached_effective_length </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>with_bias</em> = <code>true</code></td><td>)</td>
           <td> const</td>
         </tr>
       </table>
@@ -306,69 +329,45 @@ Public Member Functions</h2></td></tr>
 <p>a member function that returns the most recently estimated effective length (logged) as calculated by the bias updater thread </p>
 <dl class="return"><dt><b>Returns:</b></dt><dd>the cached effective length of the transcript calculated </dd></dl>
 
-<p>Definition at line <a class="el" href="transcripts_8cpp_source.html#l00122">122</a> of file <a class="el" href="transcripts_8cpp_source.html">transcripts.cpp</a>.</p>
+<p>Definition at line <a class="el" href="transcripts_8cpp_source.html#l00146">146</a> of file <a class="el" href="transcripts_8cpp_source.html">transcripts.cpp</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a7ca04a466b3b259fb3ad288c7d863bdb"></a><!-- doxytag: member="Transcript::est_counts" ref="a7ca04a466b3b259fb3ad288c7d863bdb" args="() const " -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">double Transcript::est_counts </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td> const<code> [inline]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-<p>a member function that returns the current (logged) estimated counts not valid in the first online EM round </p>
-<dl class="return"><dt><b>Returns:</b></dt><dd>estimated counts </dd></dl>
-
-<p>Definition at line <a class="el" href="transcripts_8h_source.html#l00199">199</a> of file <a class="el" href="transcripts_8h_source.html">transcripts.h</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="a608e456f57e99971266741493e25c48a"></a><!-- doxytag: member="Transcript::est_counts_var" ref="a608e456f57e99971266741493e25c48a" args="() const " -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">double Transcript::est_counts_var </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td> const<code> [inline]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-<p>a member function that returns the current (logged) variance on estimated counts not valid in the first online EM round </p>
-<dl class="return"><dt><b>Returns:</b></dt><dd>variance estimated counts </dd></dl>
-
-<p>Definition at line <a class="el" href="transcripts_8h_source.html#l00206">206</a> of file <a class="el" href="transcripts_8h_source.html">transcripts.h</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="a6f62632781837d2e9e854367d5339002"></a><!-- doxytag: member="Transcript::est_effective_length" ref="a6f62632781837d2e9e854367d5339002" args="() const " -->
+<a class="anchor" id="acc2877ec65b44e787d96c8e09eb5acb2"></a><!-- doxytag: member="Transcript::est_effective_length" ref="acc2877ec65b44e787d96c8e09eb5acb2" args="(FLD *fld=NULL, bool with_bias=true) const " -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">double Transcript::est_effective_length </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td> const</td>
+          <td class="paramtype"><a class="el" href="class_f_l_d.html">FLD</a> *&#160;</td>
+          <td class="paramname"><em>fld</em> = <code>NULL</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>with_bias</em> = <code>true</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
-<p>a member function that calcualtes and returns the effective length of the transcript (logged) </p>
-<dl class="return"><dt><b>Returns:</b></dt><dd>the effective length of the transcript calculated as <img class="formulaInl" alt="$ \tilde{l} = \sum_{l=1}^{L(t)}\sum_{i=1}^{L(t)} D(l)b_5[i]*b_3[i+l] $" src="form_0.png"/> a member function that calcualtes and returns the estimated effective length of the transcript (logged) using the avg bias </dd>
-<dd>
-the estimated effective length of the transcript calculated as <img class="formulaInl" alt="$ \tilde{l} = \bar{bias}\sum_{l=1}^{L(t)} D(l)(L(t) - l + 1) $" src="form_1.png"/> </dd></dl>
+<p>a member function that calcualtes and returns the estimated effective length of the transcript (logged) using the avg bias </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramname">fld</td><td>an optional pointer to a different <a class="el" href="class_f_l_d.html">FLD</a> than the global one, for thread-safety </td></tr>
+    <tr><td class="paramname">with_bias</td><td>a boolean specifying whether or not the average bias should be used in the calculation </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="return"><dt><b>Returns:</b></dt><dd>the estimated effective length of the transcript calculated as <img class="formulaInl" alt="$ \tilde{l} = \bar{bias}\sum_{l=1}^{L(t)} D(l)(L(t) - l + 1) $" src="form_0.png"/> </dd></dl>
 
-<p>Definition at line <a class="el" href="transcripts_8cpp_source.html#l00108">108</a> of file <a class="el" href="transcripts_8cpp_source.html">transcripts.cpp</a>.</p>
+<p>Definition at line <a class="el" href="transcripts_8cpp_source.html#l00123">123</a> of file <a class="el" href="transcripts_8cpp_source.html">transcripts.cpp</a>.</p>
 
 </div>
 </div>
@@ -388,33 +387,44 @@ the estimated effective length of the transcript calculated as <img class="formu
 <p>a member function that returns the transcript id </p>
 <dl class="return"><dt><b>Returns:</b></dt><dd>TransID transcript ID </dd></dl>
 
-<p>Definition at line <a class="el" href="transcripts_8h_source.html#l00162">162</a> of file <a class="el" href="transcripts_8h_source.html">transcripts.h</a>.</p>
+<p>Definition at line <a class="el" href="transcripts_8h_source.html#l00203">203</a> of file <a class="el" href="transcripts_8h_source.html">transcripts.h</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a75fbbc00c2611c0dcd0bf0edc1a29015"></a><!-- doxytag: member="Transcript::incr_uniq_counts" ref="a75fbbc00c2611c0dcd0bf0edc1a29015" args="(size_t incr_amt=1)" -->
+<a class="anchor" id="acb59e308d6867b338bbfd60b6b08e7b9"></a><!-- doxytag: member="Transcript::incr_counts" ref="acb59e308d6867b338bbfd60b6b08e7b9" args="(bool uniq, size_t incr_amt=1)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void Transcript::incr_uniq_counts </td>
+          <td class="memname">void Transcript::incr_counts </td>
           <td>(</td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>uniq</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
           <td class="paramtype">size_t&#160;</td>
-          <td class="paramname"><em>incr_amt</em> = <code>1</code></td><td>)</td>
-          <td><code> [inline]</code></td>
+          <td class="paramname"><em>incr_amt</em> = <code>1</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td><code> [inline]</code></td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
-<p>a member function that increases the ccount of fragments uniquely mapped to this transcript </p>
+<p>a member function that increases the count of fragments mapped to this transcript </p>
 <dl><dt><b>Parameters:</b></dt><dd>
   <table class="params">
+    <tr><td class="paramname">uniq</td><td>a bool specifying whether or not the fragment uniquely maps to this transcript </td></tr>
     <tr><td class="paramname">incr_amt</td><td>a size_t to increase the counts by </td></tr>
   </table>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="transcripts_8h_source.html#l00255">255</a> of file <a class="el" href="transcripts_8h_source.html">transcripts.h</a>.</p>
+<p>Definition at line <a class="el" href="transcripts_8h_source.html#l00302">302</a> of file <a class="el" href="transcripts_8h_source.html">transcripts.h</a>.</p>
 
 </div>
 </div>
@@ -434,7 +444,7 @@ the estimated effective length of the transcript calculated as <img class="formu
 <p>a member function that returns the transcript length </p>
 <dl class="return"><dt><b>Returns:</b></dt><dd>transcript length </dd></dl>
 
-<p>Definition at line <a class="el" href="transcripts_8h_source.html#l00173">173</a> of file <a class="el" href="transcripts_8h_source.html">transcripts.h</a>.</p>
+<p>Definition at line <a class="el" href="transcripts_8h_source.html#l00214">214</a> of file <a class="el" href="transcripts_8h_source.html">transcripts.h</a>.</p>
 
 </div>
 </div>
@@ -472,47 +482,34 @@ the estimated effective length of the transcript calculated as <img class="formu
 </dl>
 <dl class="return"><dt><b>Returns:</b></dt><dd>(a value proportional to) the log likelihood the given fragment originated from this transcript </dd></dl>
 
-<p>Definition at line <a class="el" href="transcripts_8cpp_source.html#l00077">77</a> of file <a class="el" href="transcripts_8cpp_source.html">transcripts.cpp</a>.</p>
+<p>Definition at line <a class="el" href="transcripts_8cpp_source.html#l00090">90</a> of file <a class="el" href="transcripts_8cpp_source.html">transcripts.cpp</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a468c9bc39e15f7cdf76c5a46ea1ef70c"></a><!-- doxytag: member="Transcript::mass" ref="a468c9bc39e15f7cdf76c5a46ea1ef70c" args="() const " -->
+<a class="anchor" id="a4c5cded0dbf90669a38fda70bdf692c0"></a><!-- doxytag: member="Transcript::mass" ref="a4c5cded0dbf90669a38fda70bdf692c0" args="(bool with_pseudo=true) const " -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">double Transcript::mass </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td> const<code> [inline]</code></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>with_pseudo</em> = <code>true</code></td><td>)</td>
+          <td> const</td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
-<p>a member function that returns the current (logged) fragment mass </p>
+<p>a member function that returns the current (logged) probabilistically assigned fragment mass </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramname">with_pseudo</td><td>a boolean specifying whether pseudo-counts should be included in returned mass </td></tr>
+  </table>
+  </dd>
+</dl>
 <dl class="return"><dt><b>Returns:</b></dt><dd>logged mass </dd></dl>
 
-<p>Definition at line <a class="el" href="transcripts_8h_source.html#l00179">179</a> of file <a class="el" href="transcripts_8h_source.html">transcripts.h</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="a808964e973fe80b46e9e033edefdb828"></a><!-- doxytag: member="Transcript::mass_var" ref="a808964e973fe80b46e9e033edefdb828" args="() const " -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">double Transcript::mass_var </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td> const<code> [inline]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-<p>a member function that returns the current (logged) variance </p>
-<dl class="return"><dt><b>Returns:</b></dt><dd>logged mass variance </dd></dl>
-
-<p>Definition at line <a class="el" href="transcripts_8h_source.html#l00192">192</a> of file <a class="el" href="transcripts_8h_source.html">transcripts.h</a>.</p>
+<p>Definition at line <a class="el" href="transcripts_8cpp_source.html#l00082">82</a> of file <a class="el" href="transcripts_8cpp_source.html">transcripts.cpp</a>.</p>
 
 </div>
 </div>
@@ -532,7 +529,27 @@ the estimated effective length of the transcript calculated as <img class="formu
 <p>a member function that returns the transcript name </p>
 <dl class="return"><dt><b>Returns:</b></dt><dd>string containing transcript name </dd></dl>
 
-<p>Definition at line <a class="el" href="transcripts_8h_source.html#l00156">156</a> of file <a class="el" href="transcripts_8h_source.html">transcripts.h</a>.</p>
+<p>Definition at line <a class="el" href="transcripts_8h_source.html#l00197">197</a> of file <a class="el" href="transcripts_8h_source.html">transcripts.h</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a457a54e54b2964452898214b3b20bb48"></a><!-- doxytag: member="Transcript::rho" ref="a457a54e54b2964452898214b3b20bb48" args="() const " -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">double Transcript::rho </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>a member function that returns the current estimated rho (logged, w/ pseudo-counts) for the transcript </p>
+<dl class="return"><dt><b>Returns:</b></dt><dd>the current estimated rho </dd></dl>
+
+<p>Definition at line <a class="el" href="transcripts_8cpp_source.html#l00073">73</a> of file <a class="el" href="transcripts_8cpp_source.html">transcripts.cpp</a>.</p>
 
 </div>
 </div>
@@ -551,18 +568,39 @@ the estimated effective length of the transcript calculated as <img class="formu
 <div class="memdoc">
 <p>a member function that readies the transcript object for the next round of batch EM </p>
 
-<p>Definition at line <a class="el" href="transcripts_8cpp_source.html#l00069">69</a> of file <a class="el" href="transcripts_8cpp_source.html">transcripts.cpp</a>.</p>
+<p>Definition at line <a class="el" href="transcripts_8cpp_source.html#l00066">66</a> of file <a class="el" href="transcripts_8cpp_source.html">transcripts.cpp</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="abdf9e6054e345ed9f1a49f0be3a0ccc7"></a><!-- doxytag: member="Transcript::seq" ref="abdf9e6054e345ed9f1a49f0be3a0ccc7" args="() const " -->
+<a class="anchor" id="abf33ec44332e19ffc7b6791d4f8e03c8"></a><!-- doxytag: member="Transcript::samp_var" ref="abf33ec44332e19ffc7b6791d4f8e03c8" args="() const " -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">const std::string&amp; Transcript::seq </td>
+          <td class="memname">double Transcript::samp_var </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
+          <td> const<code> [inline]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>a member function that returns the (logged) sampling variance </p>
+<dl class="return"><dt><b>Returns:</b></dt><dd>the (logged) sampling variance </dd></dl>
+
+<p>Definition at line <a class="el" href="transcripts_8h_source.html#l00251">251</a> of file <a class="el" href="transcripts_8h_source.html">transcripts.h</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="aa8d0bdc121fa209300e6aab9cf2a3c2e"></a><!-- doxytag: member="Transcript::seq" ref="aa8d0bdc121fa209300e6aab9cf2a3c2e" args="(bool rev) const " -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="class_sequence.html">Sequence</a>&amp; Transcript::seq </td>
+          <td>(</td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>rev</em></td><td>)</td>
           <td> const<code> [inline]</code></td>
         </tr>
       </table>
@@ -571,7 +609,27 @@ the estimated effective length of the transcript calculated as <img class="formu
 <p>a member function that returns the transcript sequence </p>
 <dl class="return"><dt><b>Returns:</b></dt><dd>string containing transcript sequence </dd></dl>
 
-<p>Definition at line <a class="el" href="transcripts_8h_source.html#l00167">167</a> of file <a class="el" href="transcripts_8h_source.html">transcripts.h</a>.</p>
+<p>Definition at line <a class="el" href="transcripts_8h_source.html#l00208">208</a> of file <a class="el" href="transcripts_8h_source.html">transcripts.h</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a6ce2600ec329d1bb00d531fac458621d"></a><!-- doxytag: member="Transcript::tot_ambig_mass" ref="a6ce2600ec329d1bb00d531fac458621d" args="() const " -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">double Transcript::tot_ambig_mass </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const<code> [inline]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>a member function that returns the (logged) total mass of ambiguous fragments mapping to the transcript </p>
+<dl class="return"><dt><b>Returns:</b></dt><dd>the (logged) total mass of ambiguous fragments mapping to the transcript </dd></dl>
+
+<p>Definition at line <a class="el" href="transcripts_8h_source.html#l00239">239</a> of file <a class="el" href="transcripts_8h_source.html">transcripts.h</a>.</p>
 
 </div>
 </div>
@@ -591,16 +649,16 @@ the estimated effective length of the transcript calculated as <img class="formu
 <p>a member function that returns the current count of fragments mapped to this transcript (uniquely or ambiguously) </p>
 <dl class="return"><dt><b>Returns:</b></dt><dd>total fragment count </dd></dl>
 
-<p>Definition at line <a class="el" href="transcripts_8h_source.html#l00217">217</a> of file <a class="el" href="transcripts_8h_source.html">transcripts.h</a>.</p>
+<p>Definition at line <a class="el" href="transcripts_8h_source.html#l00269">269</a> of file <a class="el" href="transcripts_8h_source.html">transcripts.h</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="ae83c55fd9055fdacdf9ebbb45a995f50"></a><!-- doxytag: member="Transcript::tot_mass" ref="ae83c55fd9055fdacdf9ebbb45a995f50" args="() const " -->
+<a class="anchor" id="ac919a30a04ee7cf20e55bf82a2140b70"></a><!-- doxytag: member="Transcript::tot_uncertainty" ref="ac919a30a04ee7cf20e55bf82a2140b70" args="() const " -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">double Transcript::tot_mass </td>
+          <td class="memname">double Transcript::tot_uncertainty </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const<code> [inline]</code></td>
@@ -608,10 +666,10 @@ the estimated effective length of the transcript calculated as <img class="formu
       </table>
 </div>
 <div class="memdoc">
-<p>a member function that returns the total (logged) mass of all fragments mapped to the transcript </p>
-<dl class="return"><dt><b>Returns:</b></dt><dd>logged total mass </dd></dl>
+<p>a member function that returns the (logged) variance due to uncertainty on p </p>
+<dl class="return"><dt><b>Returns:</b></dt><dd>the (logged) variance due to uncertainty on p </dd></dl>
 
-<p>Definition at line <a class="el" href="transcripts_8h_source.html#l00185">185</a> of file <a class="el" href="transcripts_8h_source.html">transcripts.h</a>.</p>
+<p>Definition at line <a class="el" href="transcripts_8h_source.html#l00258">258</a> of file <a class="el" href="transcripts_8h_source.html">transcripts.h</a>.</p>
 
 </div>
 </div>
@@ -631,26 +689,44 @@ the estimated effective length of the transcript calculated as <img class="formu
 <p>a member function that returns the current count of fragments uniquely mapped to this transcript </p>
 <dl class="return"><dt><b>Returns:</b></dt><dd>unique fragment count </dd></dl>
 
-<p>Definition at line <a class="el" href="transcripts_8h_source.html#l00223">223</a> of file <a class="el" href="transcripts_8h_source.html">transcripts.h</a>.</p>
+<p>Definition at line <a class="el" href="transcripts_8h_source.html#l00275">275</a> of file <a class="el" href="transcripts_8h_source.html">transcripts.h</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="ac4b04bcf651566c7654eaac9499f5a28"></a><!-- doxytag: member="Transcript::update_transcript_bias" ref="ac4b04bcf651566c7654eaac9499f5a28" args="()" -->
+<a class="anchor" id="ab4d209fd6fbfbc241a6c02a3a1be39e5"></a><!-- doxytag: member="Transcript::update_transcript_bias" ref="ab4d209fd6fbfbc241a6c02a3a1be39e5" args="(BiasBoss *bias_table=NULL, FLD *fld=NULL)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">void Transcript::update_transcript_bias </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramtype"><a class="el" href="class_bias_boss.html">BiasBoss</a> *&#160;</td>
+          <td class="paramname"><em>bias_table</em> = <code>NULL</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype"><a class="el" href="class_f_l_d.html">FLD</a> *&#160;</td>
+          <td class="paramname"><em>fld</em> = <code>NULL</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 <p>a member function that causes the transcript bias to be re-calculated by the _bias_table based on curent parameters </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramname">bias_table</td><td>an optional pointer to a different <a class="el" href="class_bias_boss.html">BiasBoss</a> than the global one, for thread-safety </td></tr>
+    <tr><td class="paramname">fld</td><td>an optional pointer to a different <a class="el" href="class_f_l_d.html">FLD</a> than the global one, for thread-safety </td></tr>
+  </table>
+  </dd>
+</dl>
 
-<p>Definition at line <a class="el" href="transcripts_8cpp_source.html#l00146">146</a> of file <a class="el" href="transcripts_8cpp_source.html">transcripts.cpp</a>.</p>
+<p>Definition at line <a class="el" href="transcripts_8cpp_source.html#l00155">155</a> of file <a class="el" href="transcripts_8cpp_source.html">transcripts.cpp</a>.</p>
 
 </div>
 </div>
@@ -663,7 +739,7 @@ the estimated effective length of the transcript calculated as <img class="formu
   <div id="nav-path" class="navpath">
     <ul>
       <li class="navelem"><a class="el" href="class_transcript.html">Transcript</a>      </li>
-      <li class="footer">Generated on Thu Jan 5 2012 14:34:19 for eXpress by&#160;
+      <li class="footer">Generated on Sat Feb 18 2012 07:21:52 for eXpress by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </li>
     </ul>

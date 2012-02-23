@@ -437,18 +437,25 @@ bool SAMParser::map_end_from_line(char* line)
         switch(i++)
         {
             case 0:
+            {
                 f.name = p;
                 break;
+            }
             case 1:
+            {
                 sam_flag = atoi(p);
                 if (sam_flag & 0x4)
                     goto stop;
                 paired = sam_flag & 0x1;
                 if (paired && (sam_flag & 0x8))
                     goto stop;
-                f.left_first = ((sam_flag & 0x40) && !(sam_flag & 0x10)) || (!(sam_flag & 0x40) && (sam_flag & 0x10));
+                bool reversed = sam_flag & 0x10;
+                bool first = sam_flag & 0x40;
+                f.left_first = ((!paired && reversed) || (first && !reversed) || (!first && reversed));
                 break;
+            }
             case 2:
+            {
                 if(p[0] == '*')
                     goto stop;
                 if (!_trans_index.count(p))
@@ -458,12 +465,18 @@ bool SAMParser::map_end_from_line(char* line)
                 }
                 f.trans_id = _trans_index[p];
                 break;
+            }
             case 3:
+            {
                 f.left = (size_t)(atoi(p)-1);
                 break;
+            }
             case 4:
+            {
                 break;
+            }
             case 5:
+            {
                 if (sam_flag & 0x10)
                 {
                     f.right = f.left + cigar_length(p, f.inserts_r, f.deletes_r);
@@ -473,17 +486,25 @@ bool SAMParser::map_end_from_line(char* line)
                     f.right = f.left + cigar_length(p, f.inserts_l, f.deletes_l);
                 }
                 break;
+            }
             case 6:
+            {
                 // skip if only one end mapped of paired-end read
                 if(paired && p[0] != '=')
                     goto stop;
                 break;
+            }
             case 7:
+            {
                 f.mate_l = atoi(p)-1;
                 break;
+            }
             case 8:
+            {
                 break;
+            }
             case 9:
+            {
                 if (sam_flag & 0x10)
                 {
                     f.seq_r.set(p, 1);
@@ -495,6 +516,7 @@ bool SAMParser::map_end_from_line(char* line)
                     f.sam_l = sam_line;
                 }
                 goto stop;
+            }
         }
         
         p = strtok(NULL, "\t");
