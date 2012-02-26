@@ -158,8 +158,7 @@
         <div class="corner-content-1col-top"></div>                        
         <div class="content-1col-nobox">
         <h1 id="description">Description</h1>
-			<p>eXpress is a streaming tool for quantifying the abundances of a set of target sequences from sampled subsequences. An example of an application is transcript-level
-        RNA-Seq quantification. It is based on an online-EM
+			<p>eXpress is a streaming tool for quantifying the abundances of a set of target sequences from sampled subsequences. Example applications include transcript-level RNA-Seq quantification, allele-specific/haplotype expression analysis (from RNA-Seq), transcription factor binding quantification in ChIP-Seq, and analysis of metagenomic data. It is based on an online-EM
         algorithm [<a href="#ref1">1</a>] that results in space (memory) requirements
         proportional to the total size of the target sequences  and time
         requirements that are proportional to the number of sampled
@@ -168,9 +167,9 @@
         tools greatly reducing computing infrastructure requirements. eXpress can be used to build lightweight
 			high-throughput sequencing  processing pipelines when coupled with
 			a streaming aligner (such as Bowtie), as
-			output can be piped directly into eXpress, effectively eliminating the need to store read alignments in either memory or disk.</p>
+			output can be piped directly into eXpress, effectively eliminating the need to store read alignments in memory or on disk.</p>
 
-	  <p>In an analysis of the performance of eXpress for RNA-Seq analysis, we have observed that this efficiency does not come
+	  <p>In an analysis of the performance of eXpress for RNA-Seq data, we have observed that this efficiency does not come
 			at a cost of accuracy. eXpress is more accurate
 			than other available tools, even when limited
 			to smaller datasets that do not require such
@@ -186,19 +185,10 @@
         href=http://www.bcgsc.ca/platform/bioinfo/software/trans-abyss>Trans-ABySS</a>. The underlying model is based on previously described probabilistic
 			models developed for RNA-Seq [<a href="#ref4">4</a>] but is applicable to other settings where target sequences are sampled, and includes
 			parameters for fragment length distributions,
-			errors in reads, and fragment bias [<a href="#ref5">5</a>].
+			errors in reads, and sequence-specific fragment bias [<a href="#ref5">5</a>].
 	  </p>
 
-			<p>eXpress can be used to resolve ambiguous mappings in
-			other high-throughput sequencing based applications. The only required
-			inputs to eXpress are a set of target
-			sequences and a set of sequenced fragments
-			multiply-aligned to them.  While these
-			target sequences will often be gene
-			isoforms, they need not be.  Haplotypes could
-			be used as the reference for allele-specific
-			expression analysis or target genomes may be
-			used in a metagenomics experiments.  eXpress will be useful in any analysis where reads multi-map to sequences that differ in abundance.</p>
+			<p>eXpress can be used to resolve ambiguous mappings in other high-throughput sequencing based applications. The only required inputs to eXpress are a set of target sequences and a set of sequenced fragments multiply-aligned to them. While these target sequences will often be gene isoforms, they need not be. Haplotypes can be used as the reference for allele-specific expression analysis, binding regions for ChIP-Seq, or target genomes in metagenomics experiments. eXpress is useful in any analysis where reads multi-map to sequences that differ in abundance.</p>
       			<p>&rarr; <a href="#top">Back to top.</a></p>
       	</div>      
 

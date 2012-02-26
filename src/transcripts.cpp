@@ -486,6 +486,7 @@ void TranscriptTable::output_results(string output_dir, size_t tot_counts, bool 
                         count_var = binom_var;
                     else
                         count_var = n*a*b*(a+b+n)/((a+b)*(a+b)*(a+b+1));
+                    count_var = binom_var;
                     assert(!isnan(count_var) && !isinf(count_var));
                 }
                 

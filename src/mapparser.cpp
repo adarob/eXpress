@@ -451,7 +451,7 @@ bool SAMParser::map_end_from_line(char* line)
                     goto stop;
                 bool reversed = sam_flag & 0x10;
                 bool first = sam_flag & 0x40;
-                f.left_first = ((!paired && reversed) || (first && !reversed) || (!first && reversed));
+                f.left_first = ((!paired && !reversed) || (first && !reversed) || (!first && reversed));
                 break;
             }
             case 2:

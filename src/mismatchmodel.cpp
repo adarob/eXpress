@@ -71,7 +71,7 @@ double MismatchTable::log_likelihood(const FragHit& f) const
         }
         else
         {
-            if (!del_len)
+            if (del_len > 0)
                 ll += _delete_params(0);
             del_len = 0;
             ll += _insert_params(0);
@@ -79,7 +79,6 @@ double MismatchTable::log_likelihood(const FragHit& f) const
             cur = f.seq_l[i];
             prev = (i) ? f.seq_l[i-1] : 0;
             ref = t_seq_fwd[j];
-            
             if (prev != 4 && cur != 4 && ref != 4)
             {
                 index = (prev << 2) + ref;
@@ -98,14 +97,14 @@ double MismatchTable::log_likelihood(const FragHit& f) const
     
     while (i < r_len)
     { 
-        if (del != f.deletes_l.begin()-1 && del->pos == r_len-i-1)
+        if (del != f.deletes_r.begin()-1 && del->pos == r_len-i)
         {
             ll += _delete_params(del->len);
             j += del->len;
             del_len = del->len;
             del--;
         }
-        else if (ins != f.inserts_l.begin()-1 && ins->pos == r_len-i-1)
+        else if (ins != f.inserts_r.begin()-1 && ins->pos + ins->len == r_len-i)
         {
             ll += _insert_params(ins->len);
             if (ins->len > del_len)
@@ -117,7 +116,7 @@ double MismatchTable::log_likelihood(const FragHit& f) const
         }
         else
         {
-            if (!del_len)
+            if (del_len > 0)
                 ll += _delete_params(0);
             del_len = 0;
             ll += _insert_params(0);
@@ -182,7 +181,7 @@ void MismatchTable::update(const FragHit& f, double mass)
         }
         else
         {
-            if (!del_len)
+            if (del_len > 0)
                 _delete_params.increment(0, mass);
             del_len = 0;
             _insert_params.increment(0, mass);
@@ -208,14 +207,14 @@ void MismatchTable::update(const FragHit& f, double mass)
 
     while (i < r_len)
     { 
-        if (del != f.deletes_l.begin()-1 && del->pos == r_len-i-1)
+        if (del != f.deletes_r.begin()-1 && del->pos == r_len-i )
         {
             _delete_params.increment(del->len, mass);
             j += del->len;
             del_len = del->len;
             del--;
         }
-        else if (ins != f.inserts_l.begin()-1 && ins->pos == r_len-i-1)
+        else if (ins != f.inserts_r.begin()-1 && ins->pos + ins->len == r_len-i)
         {
             _insert_params.increment(ins->len, mass);
             if (ins->len > del_len)
@@ -227,7 +226,7 @@ void MismatchTable::update(const FragHit& f, double mass)
         }
         else
         {
-            if (!del_len)
+            if (del_len > 0)
                 _delete_params.increment(0, mass);
             del_len = 0;
             _insert_params.increment(0, mass);

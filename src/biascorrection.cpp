@@ -26,7 +26,7 @@ const int SURROUND = 10;
 const int CENTER = 11;
 const int WINDOW = 21;
 const size_t FG_ORDER = 3;
-const size_t BG_ORDER = 5;
+const size_t BG_ORDER = 3;
 
 SeqWeightTable::SeqWeightTable(size_t window_size, double alpha)
 :_observed(FG_ORDER, window_size, window_size, alpha),
