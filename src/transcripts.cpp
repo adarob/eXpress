@@ -43,6 +43,8 @@ Transcript::Transcript(const TransID id, const std::string& name, const std::str
         _end_bias = NULL;
     }
     _cached_eff_len = est_effective_length(NULL, false);
+    
+    _curr_params.binom_var = 2*(_alpha+_cached_eff_len)+log(0.25);
 }
 
 void Transcript::add_mass(double p, double v, double mass) 
@@ -447,13 +449,17 @@ void TranscriptTable::output_results(string output_dir, size_t tot_counts, bool 
                 // Calculate count variance
                 double count_var = 0;
                 
+                long double a;
+                long double b;
+                long double m;
+                long double v;
                 
                 if (trans.tot_counts() != trans.uniq_counts())
                 {
                     double binom_var = min(sexp(trans.binom_var() + l_var_renorm), 0.25*trans.tot_counts());
                     
-                    long double m = sexp(trans.ambig_mass() - trans.tot_ambig_mass());
-                    long double v = sexp(trans.tot_uncertainty() - trans.tot_ambig_mass());
+                    m = sexp(trans.ambig_mass() - trans.tot_ambig_mass());
+                    v = sexp(trans.tot_uncertainty() - trans.tot_ambig_mass());
                     //assert (p >=0 && p <= 1);
                     double n = trans.tot_counts()-trans.uniq_counts();
                     
@@ -475,18 +481,30 @@ void TranscriptTable::output_results(string output_dir, size_t tot_counts, bool 
                     long double f = 3*v*e - c*c;
                     long double x = 4*pow(f,3)+d*d;
                     long double y = 4*f*f*f + d*d;
+                    long double tmp;
                     if (x < 0)
                         x = 0;
                     if (y < 0)
                         y = 0;
-                    long double b = -c/(3*v) + pow(d + sqrt(x), (long double)1.0/3)/(3.77976315*v) - 1.25992105 * f / (3*v*pow(d + sqrt(y), (long double)1.0/3));
-                    long double a = (-b*m + 2*m - 1)/(m-1);
+                    b = -c/(3*v);
+                    assert(!isnan(b) && !isinf(b));
+                    tmp = pow(abs(d + sqrt(x)), (long double)1.0/3)/(3.77976315*v);
+                    if ((d+sqrt(x)) < 0)
+                        tmp *= -1;
+                    b += tmp;
+                    assert(!isnan(b) && !isinf(b));
+                    tmp = -1.25992105 * f / (3*v*pow(abs(d + sqrt(y)), (long double)1.0/3));
+                    if ((d+sqrt(y)) < 0)
+                        tmp *= -1;
+                    b += tmp;
+                    assert(!isnan(b) && !isinf(b));
+                    a = (-b*m + 2*m - 1)/(m-1);
                     
                     if (v == 0 || a < 0 || b < 0)
                         count_var = binom_var;
                     else
                         count_var = n*a*b*(a+b+n)/((a+b)*(a+b)*(a+b+1));
-                    count_var = binom_var;
+//                    count_var = binom_var;
                     assert(!isnan(count_var) && !isinf(count_var));
                 }
                 
@@ -500,7 +518,7 @@ void TranscriptTable::output_results(string output_dir, size_t tot_counts, bool 
                 double eff_count_mode = trans_counts[i] / eff_len * trans.length();
                 double eff_count_var = count_var * trans.length() * trans.length() / (eff_len*eff_len);
                 
-                fprintf(expr_file, "" SIZE_T_FMT "\t%s\t" SIZE_T_FMT "\t%f\t" SIZE_T_FMT "\t" SIZE_T_FMT "\t%f\t%f\t%f\t%f\t%f\t%f\t%f\n", bundle_id, trans.name().c_str(), trans.length(), eff_len, trans.tot_counts(), trans.uniq_counts(), trans_counts[i], count_var, eff_count_mode, eff_count_var, trans_fpkm, fpkm_lo, fpkm_hi);
+                fprintf(expr_file, "" SIZE_T_FMT "\t%s\t" SIZE_T_FMT "\t%f\t" SIZE_T_FMT "\t" SIZE_T_FMT "\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\n", bundle_id, trans.name().c_str(), trans.length(), eff_len, trans.tot_counts(), trans.uniq_counts(), trans_counts[i], count_var, eff_count_mode, eff_count_var, trans_fpkm, fpkm_lo, fpkm_hi, (double)a , (double)b, (double)m, (double)v);
             
                 if (output_varcov)
                 {
@@ -524,7 +542,7 @@ void TranscriptTable::output_results(string output_dir, size_t tot_counts, bool 
             for (size_t i = 0; i < bundle_trans.size(); ++i)
             {
                 Transcript& trans = *bundle_trans[i];
-                fprintf(expr_file, "" SIZE_T_FMT "\t%s\t" SIZE_T_FMT "\t%f\t%d\t%d\t%f\t%f\t%f\t%f\t%f\t%f\t%f\n", bundle_id, trans.name().c_str(), trans.length(), sexp(trans.est_effective_length()), 0, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+                fprintf(expr_file, "" SIZE_T_FMT "\t%s\t" SIZE_T_FMT "\t%f\t%d\t%d\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\n", bundle_id, trans.name().c_str(), trans.length(), sexp(trans.est_effective_length()), 0, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
                 
                 if (output_varcov)
                 {
