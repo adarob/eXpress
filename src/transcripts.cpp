@@ -43,20 +43,19 @@ Transcript::Transcript(const TransID id, const std::string& name, const std::str
         _end_bias = NULL;
     }
     _cached_eff_len = est_effective_length(NULL, false);
-    
-    _curr_params.binom_var = 2*(_alpha+_cached_eff_len)+log(0.25);
+    _curr_params.mass_var = _cached_eff_len + _alpha;
 }
 
 void Transcript::add_mass(double p, double v, double mass) 
 { 
     boost::mutex::scoped_lock lock(_bias_lock);
     _curr_params.mass = log_sum(_curr_params.mass, p+mass);
-    _curr_params.samp_var = log_sum(_curr_params.samp_var, 2*mass+p);
+    _curr_params.mass_var = log_sum(_curr_params.mass_var, p+mass*2);
     if (p != 0.0 || v != HUGE_VAL)
     {
-        _curr_params.binom_var = log_sum(_curr_params.binom_var, 2*mass + p + log(1-sexp(p)));
-        _curr_params.tot_unc = log_sum(_curr_params.tot_unc, v+mass);
-        _curr_params.ambig_mass = log_sum(_curr_params.ambig_mass, mass+p);
+        _curr_params.mass_var = log_sum(_curr_params.mass_var, v+2*mass);
+        _curr_params.var_sum = log_sum(_curr_params.var_sum, v+mass);
+        _curr_params.ambig_mass = log_sum(_curr_params.ambig_mass, p+mass);
         if (p!=HUGE_VAL)
             _curr_params.tot_ambig_mass = log_sum(_curr_params.tot_ambig_mass, mass);
     }
@@ -87,6 +86,14 @@ double Transcript::mass(bool with_pseudo) const
     if (!with_pseudo)
         return _ret_params->mass;
     return log_sum(_ret_params->mass, _alpha+_cached_eff_len);
+}
+
+double Transcript::mass_var(bool with_pseudo) const
+{
+    boost::mutex::scoped_lock lock(_bias_lock);
+    if (!with_pseudo)
+        return _ret_params->mass_var;
+    return log_sum(_ret_params->mass_var, 2*(_alpha+_cached_eff_len-2));
 }
 
 double Transcript::log_likelihood(const FragHit& frag, bool with_pseudo) const
@@ -385,7 +392,7 @@ void TranscriptTable::output_results(string output_dir, size_t tot_counts, bool 
     if (output_varcov)
         varcov_file.open((output_dir + "/varcov.xprs").c_str());    
     
-    fprintf(expr_file, "bundle_id\ttarget_id\tlength\teff_length\ttot_counts\tuniq_counts\tpost_count_mode\tpost_count_var\teff_count_mode\teff_count_var\tfpkm\tfpkm_conf_low\tfpkm_conf_high\n");
+    fprintf(expr_file, "bundle_id\ttarget_id\tlength\teff_length\ttot_counts\tuniq_counts\tpost_count_mean\tpost_count_var\teff_count_mean\teff_count_var\tfpkm\tfpkm_conf_low\tfpkm_conf_high\tcount_alpha\tcount_beta\n");
 
     double l_bil = log(1000000000.);
     double l_tot_counts = log((double)tot_counts);
@@ -447,17 +454,17 @@ void TranscriptTable::output_results(string output_dir, size_t tot_counts, bool 
                 double l_eff_len = trans.est_effective_length();
 
                 // Calculate count variance
+                double mass_var = trans.mass_var(false);
+                double count_alpha = 0;
+                double count_beta = 0;
                 double count_var = 0;
-                
                 if (trans.tot_counts() != trans.uniq_counts())
                 {
-                    double binom_var = min(sexp(trans.binom_var() + l_var_renorm), 0.25*trans.tot_counts());
                     
                     long double m = sexp(trans.ambig_mass() - trans.tot_ambig_mass());
-                    long double v = sexp(trans.tot_uncertainty() - trans.tot_ambig_mass());
-                    //assert (p >=0 && p <= 1);
+                    long double v = sexp(trans.var_sum() - trans.tot_ambig_mass());
                     double n = trans.tot_counts()-trans.uniq_counts();
-                    
+                    /*
                     long double m2 = m*m;
                     long double m3 = m2*m;
                     long double m4 = m3*m;
@@ -494,25 +501,31 @@ void TranscriptTable::output_results(string output_dir, size_t tot_counts, bool 
                     b += tmp;
                     assert(!isnan(b) && !isinf(b));
                     long double a = (-b*m + 2*m - 1)/(m-1);
+                    */
+                    
+                    double a = -m*(m*m - m + v)/v;
+                    double b = (m-1)*(m*m - m + v)/v;
+                    count_alpha = (double)a;
+                    count_beta = (double)b;
                     
                     if (v == 0 || a < 0 || b < 0)
-                        count_var = binom_var;
+                        count_var = mass_var;
                     else
                         count_var = n*a*b*(a+b+n)/((a+b)*(a+b)*(a+b+1));
                     assert(!isnan(count_var) && !isinf(count_var));
                 }
                 
-                double fpkm_std_dev = sqrt(trans_counts[i] + count_var);
+                double fpkm_std_dev = sexp(0.5*(mass_var + l_var_renorm));
                 double fpkm_constant = sexp(l_bil - l_eff_len - l_tot_counts);
                 double trans_fpkm = trans_counts[i] * fpkm_constant;
                 double fpkm_lo = max(0.0, (trans_counts[i] - 2*fpkm_std_dev) * fpkm_constant);
                 double fpkm_hi = (trans_counts[i] + 2*fpkm_std_dev) * fpkm_constant;
                 
                 double eff_len = sexp(l_eff_len);
-                double eff_count_mode = trans_counts[i] / eff_len * trans.length();
+                double eff_count_mean = trans_counts[i] / eff_len * trans.length();
                 double eff_count_var = count_var * trans.length() * trans.length() / (eff_len*eff_len);
                 
-                fprintf(expr_file, "" SIZE_T_FMT "\t%s\t" SIZE_T_FMT "\t%f\t" SIZE_T_FMT "\t" SIZE_T_FMT "\t%f\t%f\t%f\t%f\t%f\t%f\t%f\n", bundle_id, trans.name().c_str(), trans.length(), eff_len, trans.tot_counts(), trans.uniq_counts(), trans_counts[i], count_var, eff_count_mode, eff_count_var, trans_fpkm, fpkm_lo, fpkm_hi);
+                fprintf(expr_file, "" SIZE_T_FMT "\t%s\t" SIZE_T_FMT "\t%f\t" SIZE_T_FMT "\t" SIZE_T_FMT "\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\n", bundle_id, trans.name().c_str(), trans.length(), eff_len, trans.tot_counts(), trans.uniq_counts(), trans_counts[i], count_var, eff_count_mean, eff_count_var, trans_fpkm, fpkm_lo, fpkm_hi, count_alpha, count_beta);
             
                 if (output_varcov)
                 {
@@ -536,7 +549,7 @@ void TranscriptTable::output_results(string output_dir, size_t tot_counts, bool 
             for (size_t i = 0; i < bundle_trans.size(); ++i)
             {
                 Transcript& trans = *bundle_trans[i];
-                fprintf(expr_file, "" SIZE_T_FMT "\t%s\t" SIZE_T_FMT "\t%f\t%d\t%d\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\n", bundle_id, trans.name().c_str(), trans.length(), sexp(trans.est_effective_length()), 0, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+                fprintf(expr_file, "" SIZE_T_FMT "\t%s\t" SIZE_T_FMT "\t%f\t%d\t%d\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\n", bundle_id, trans.name().c_str(), trans.length(), sexp(trans.est_effective_length()), 0, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
                 
                 if (output_varcov)
                 {

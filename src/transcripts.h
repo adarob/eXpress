@@ -34,39 +34,34 @@ class MismatchTable;
 struct RoundParams
 {
     /**
-     * a private double that stores the (logged) assigned mass based on observed fragment mapping probabilities
+     * a public double that stores the (logged) assigned mass based on observed fragment mapping probabilities
      */
     double mass;
     
     /**
-     * a private double that stores the (logged) assigned mass derived from ambiguous fragments
+     * a public double that stores the (logged) assigned mass derived from ambiguous fragments
      */
     double ambig_mass;
     
     /**
-     * a private double that stores the (logged) total mass of ambiguous fragments mapping to the transcript
+     * a public double that stores the (logged) total mass of ambiguous fragments mapping to the transcript
      */
     double tot_ambig_mass;
-
+   
     /**
-     * a private double that stores the (logged) binomal variance of the mass
+     * a public double that stores the (logged) variance due to uncertainty on p
      */
-    double binom_var;
+    double mass_var;
     
     /**
-     * a private double that stores the (logged) sampling variance of the mass
+     * a public double that stores the (logged) weighted sum of the variance on the assignments
      */
-    double samp_var;    
-    
-    /**
-     * a private double that stores the (logged) variance due to uncertainty on p
-     */
-    double tot_unc;
+    double var_sum;
     
     /**
      * RoundParams constructor sets initial values for parameters
      */
-    RoundParams() : mass(HUGE_VAL), ambig_mass(HUGE_VAL), tot_ambig_mass(HUGE_VAL), binom_var(HUGE_VAL), samp_var(HUGE_VAL), tot_unc(HUGE_VAL){}
+    RoundParams() : mass(HUGE_VAL), ambig_mass(HUGE_VAL), tot_ambig_mass(HUGE_VAL), mass_var(HUGE_VAL), var_sum(HUGE_VAL) {}
 };
 
 typedef size_t TransID;
@@ -227,6 +222,18 @@ public:
     double mass(bool with_pseudo=true) const;
     
     /**
+     * a member function that returns the total (logged) variance on mass
+     * @return the total (logged) variance on mass
+     */
+    double mass_var(bool with_pseudo=true) const;
+    
+    /**
+     * a member function that returns the (logged) weighted sum of the variance on the assignments
+     * @return the (logged) weighted sum of the variance on the assignments
+     */
+    double var_sum() const { return _ret_params->var_sum; }
+    
+    /**
      * a member function that returns the (logged) total mass derived from ambiguous fragments mapping to the transcript
      * @return the (logged) total mass derived from ambiguous fragments mapping to the transcript
      */
@@ -237,25 +244,6 @@ public:
      * @return the (logged) total mass of ambiguous fragments mapping to the transcript
      */
     double tot_ambig_mass() const { return _ret_params->tot_ambig_mass; }
-    
-    /**
-     * a member function that returns the current (logged) binomial variance
-     * @return logged binomial mass variance
-     */
-    double binom_var() const { return _ret_params->binom_var; }
-    
-    /**
-     * a member function that returns the (logged) sampling variance
-     * @return the (logged) sampling variance
-     */
-    double samp_var() const { return _ret_params->samp_var; }
-    
-    
-    /**
-     * a member function that returns the (logged) variance due to uncertainty on p
-     * @return the (logged) variance due to uncertainty on p
-     */
-    double tot_uncertainty() const { return _ret_params->tot_unc; }
     
     /**
      * a member function that readies the transcript object for the next round of batch EM

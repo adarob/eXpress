@@ -282,7 +282,7 @@ void process_fragment(double mass_n, Fragment* frag_p, TranscriptTable* trans_ta
             Transcript* t = m.mapped_trans;
             likelihoods[i] = t->log_likelihood(m, first_round);
             masses[i] = t->mass();
-            variances[i] = log_sum(t->binom_var(), t->samp_var());
+            variances[i] = t->mass_var();
             total_likelihood = log_sum(total_likelihood, likelihoods[i]);
             total_mass = log_sum(total_mass, masses[i]);
             total_variance = log_sum(total_variance, variances[i]);
