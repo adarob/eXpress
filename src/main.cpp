@@ -273,6 +273,7 @@ void process_fragment(double mass_n, Fragment* frag_p, TranscriptTable* trans_ta
     double total_likelihood = HUGE_VAL;
     double total_mass = HUGE_VAL;
     double total_variance = HUGE_VAL;
+    size_t num_solveable = 0;
     
     if (frag.num_hits()>1)
     {
@@ -286,6 +287,7 @@ void process_fragment(double mass_n, Fragment* frag_p, TranscriptTable* trans_ta
             total_likelihood = log_sum(total_likelihood, likelihoods[i]);
             total_mass = log_sum(total_mass, masses[i]);
             total_variance = log_sum(total_variance, variances[i]);
+            num_solveable += t->solveable();
         }
     }
     else
@@ -330,7 +332,10 @@ void process_fragment(double mass_n, Fragment* frag_p, TranscriptTable* trans_ta
         if (first_round)
         {
             t->incr_counts(frag.num_hits()==1);
-            
+            if (!t->solveable() && num_solveable == frag.num_hits()-1)
+            {
+                t->solveable(true);
+            }
             if (!burned_out)
             {
                 if (m.pair_status() == PAIRED)

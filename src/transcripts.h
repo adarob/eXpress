@@ -167,6 +167,8 @@ class Transcript
      */
     double _cached_eff_len;
     
+    bool _solveable;
+    
 public:
     
     /**
@@ -289,6 +291,8 @@ public:
      */
     void incr_counts(bool uniq, size_t incr_amt = 1)
     {
+        if (uniq)
+            _solveable = true;
         _tot_counts += incr_amt;
         _uniq_counts += incr_amt*uniq;
     }
@@ -322,6 +326,9 @@ public:
      * @param fld an optional pointer to a different FLD than the global one, for thread-safety
      */
     void update_transcript_bias(BiasBoss* bias_table = NULL, FLD* fld = NULL);
+    
+    bool solveable() { return _solveable; }
+    void solveable(bool s) { _solveable = s; }
     
 };
 

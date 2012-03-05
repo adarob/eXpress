@@ -30,7 +30,8 @@ Transcript::Transcript(const TransID id, const std::string& name, const std::str
     _ret_params(&_curr_params),
     _uniq_counts(0),
     _tot_counts(0),
-    _avg_bias(0)
+    _avg_bias(0),
+    _solveable(false)
 { 
     if (globs->bias_table)
     {
@@ -392,7 +393,7 @@ void TranscriptTable::output_results(string output_dir, size_t tot_counts, bool 
     if (output_varcov)
         varcov_file.open((output_dir + "/varcov.xprs").c_str());    
     
-    fprintf(expr_file, "bundle_id\ttarget_id\tlength\teff_length\ttot_counts\tuniq_counts\tpost_count_mean\tpost_count_var\teff_count_mean\teff_count_var\tfpkm\tfpkm_conf_low\tfpkm_conf_high\tcount_alpha\tcount_beta\n");
+    fprintf(expr_file, "bundle_id\ttarget_id\tlength\teff_length\ttot_counts\tuniq_counts\tpost_count_mean\tpost_count_var\teff_count_mean\teff_count_var\tfpkm\tfpkm_conf_low\tfpkm_conf_high\tcount_alpha\tcount_beta\tsolveable\n");
 
     double l_bil = log(1000000000.);
     double l_tot_counts = log((double)tot_counts);
@@ -525,7 +526,7 @@ void TranscriptTable::output_results(string output_dir, size_t tot_counts, bool 
                 double eff_count_mean = trans_counts[i] / eff_len * trans.length();
                 double eff_count_var = count_var * trans.length() * trans.length() / (eff_len*eff_len);
                 
-                fprintf(expr_file, "" SIZE_T_FMT "\t%s\t" SIZE_T_FMT "\t%f\t" SIZE_T_FMT "\t" SIZE_T_FMT "\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\n", bundle_id, trans.name().c_str(), trans.length(), eff_len, trans.tot_counts(), trans.uniq_counts(), trans_counts[i], count_var, eff_count_mean, eff_count_var, trans_fpkm, fpkm_lo, fpkm_hi, count_alpha, count_beta);
+                fprintf(expr_file, "" SIZE_T_FMT "\t%s\t" SIZE_T_FMT "\t%f\t" SIZE_T_FMT "\t" SIZE_T_FMT "\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%c\n", bundle_id, trans.name().c_str(), trans.length(), eff_len, trans.tot_counts(), trans.uniq_counts(), trans_counts[i], count_var, eff_count_mean, eff_count_var, trans_fpkm, fpkm_lo, fpkm_hi, count_alpha, count_beta, (trans.solveable())?'T':'F');
             
                 if (output_varcov)
                 {
@@ -549,7 +550,7 @@ void TranscriptTable::output_results(string output_dir, size_t tot_counts, bool 
             for (size_t i = 0; i < bundle_trans.size(); ++i)
             {
                 Transcript& trans = *bundle_trans[i];
-                fprintf(expr_file, "" SIZE_T_FMT "\t%s\t" SIZE_T_FMT "\t%f\t%d\t%d\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\n", bundle_id, trans.name().c_str(), trans.length(), sexp(trans.est_effective_length()), 0, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+                fprintf(expr_file, "" SIZE_T_FMT "\t%s\t" SIZE_T_FMT "\t%f\t%d\t%d\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%c\n", bundle_id, trans.name().c_str(), trans.length(), sexp(trans.est_effective_length()), 0, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 'T');
                 
                 if (output_varcov)
                 {
