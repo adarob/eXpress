@@ -7,7 +7,6 @@
 //
 
 //TODO: Update params between rounds
-//TODO: Indels
 
 #include <boost/unordered_map.hpp>
 #include <boost/filesystem.hpp>
@@ -147,6 +146,7 @@ bool parse_options(int ac, char ** av)
     ("batch-mode","")
     ("online-N","")
     ("both","")
+    ("burn-out", po::value<double>(&burn_out)->default_value(burn_out), "")
     ("prior-params", po::value<string>(&prior_file)->default_value(""), "")
     ("forget-param,f", po::value<double>(&ff_param)->default_value(ff_param),"")
     ("expr-alpha", po::value<double>(&expr_alpha)->default_value(expr_alpha),"")
