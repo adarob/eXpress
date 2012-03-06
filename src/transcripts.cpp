@@ -459,11 +459,12 @@ void TranscriptTable::output_results(string output_dir, size_t tot_counts, bool 
                 double count_alpha = 0;
                 double count_beta = 0;
                 double count_var = 0;
+                
                 if (trans.tot_counts() != trans.uniq_counts())
                 {
                     
-                    long double m = sexp(trans.ambig_mass() - trans.tot_ambig_mass());
-                    long double v = sexp(trans.var_sum() - trans.tot_ambig_mass());
+                    double m = sexp(trans.ambig_mass() - trans.tot_ambig_mass());
+                    double v = sexp(trans.var_sum() - trans.tot_ambig_mass());
                     double n = trans.tot_counts()-trans.uniq_counts();
                     /*
                     long double m2 = m*m;
@@ -504,15 +505,22 @@ void TranscriptTable::output_results(string output_dir, size_t tot_counts, bool 
                     long double a = (-b*m + 2*m - 1)/(m-1);
                     */
                     
+                    
                     double a = -m*(m*m - m + v)/v;
                     double b = (m-1)*(m*m - m + v)/v;
-                    count_alpha = (double)a;
-                    count_beta = (double)b;
+                    if (!trans.solveable())
+                    {
+                        a = 1;
+                        b = 1;
+                    }
                     
-                    if (v == 0 || a < 0 || b < 0)
+                    if (trans.solveable() && (v == 0 || a < 0 || b < 0))
                         count_var = mass_var;
                     else
                         count_var = n*a*b*(a+b+n)/((a+b)*(a+b)*(a+b+1));
+                    
+                    count_alpha = a;
+                    count_beta = b;
                     assert(!isnan(count_var) && !isinf(count_var));
                 }
                 
