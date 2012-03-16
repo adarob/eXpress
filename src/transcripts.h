@@ -37,12 +37,7 @@ struct RoundParams
      * a public double that stores the (logged) assigned mass based on observed fragment mapping probabilities
      */
     double mass;
-    
-    /**
-     * a public double that stores the (logged) assigned mass derived from ambiguous fragments
-     */
-    double ambig_mass;
-    
+        
     /**
      * a public double that stores the (logged) total mass of ambiguous fragments mapping to the transcript
      */
@@ -61,7 +56,7 @@ struct RoundParams
     /**
      * RoundParams constructor sets initial values for parameters
      */
-    RoundParams() : mass(HUGE_VAL), ambig_mass(HUGE_VAL), tot_ambig_mass(HUGE_VAL), mass_var(HUGE_VAL), var_sum(HUGE_VAL) {}
+    RoundParams() : mass(HUGE_VAL), tot_ambig_mass(HUGE_VAL), mass_var(HUGE_VAL), var_sum(HUGE_VAL) {}
 };
 
 typedef size_t TransID;
@@ -234,13 +229,7 @@ public:
      * @return the (logged) weighted sum of the variance on the assignments
      */
     double var_sum() const { return _ret_params->var_sum; }
-    
-    /**
-     * a member function that returns the (logged) total mass derived from ambiguous fragments mapping to the transcript
-     * @return the (logged) total mass derived from ambiguous fragments mapping to the transcript
-     */
-    double ambig_mass() const { return _ret_params->ambig_mass; }
-        
+            
     /**
      * a member function that returns the (logged) total mass of ambiguous fragments mapping to the transcript
      * @return the (logged) total mass of ambiguous fragments mapping to the transcript

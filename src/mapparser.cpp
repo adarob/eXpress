@@ -282,7 +282,7 @@ bool BAMParser::map_end_from_alignment(BamTools::BamAlignment& a)
     if (!a.IsMapped())
         return false;
     
-    if (a.IsPaired() && (!a.IsMateMapped() || a.RefID != a.MateRefID))
+    if (a.IsPaired() && (!a.IsMateMapped() || a.RefID != a.MateRefID || a.IsReverseStrand() == a.IsMateReverseStrand()))
         return false;
     
     f.left_first = (!a.IsPaired() && !a.IsReverseStrand()) || (a.IsFirstMate() && !a.IsReverseStrand()) || (a.IsSecondMate() && a.IsReverseStrand());
@@ -450,6 +450,9 @@ bool SAMParser::map_end_from_line(char* line)
                 if (paired && (sam_flag & 0x8))
                     goto stop;
                 bool reversed = sam_flag & 0x10;
+                bool other_reversed = sam_flag & 0x20;
+                if (paired && reversed == other_reversed)
+                    goto stop;
                 bool first = sam_flag & 0x40;
                 f.left_first = ((!paired && !reversed) || (first && !reversed) || (!first && reversed));
                 break;
