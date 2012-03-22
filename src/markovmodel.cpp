@@ -53,7 +53,7 @@ void MarkovModel::update(const Sequence& seq, int left, double mass)
     }
 }
 
-void MarkovModel::fast_learn(const Sequence& seq, double mass)
+void MarkovModel::fast_learn(const Sequence& seq, double mass, const vector<double>& fl_cdf)
 {
     assert(_num_pos==_order+1);
     if (seq.length() < _order)
@@ -69,7 +69,13 @@ void MarkovModel::fast_learn(const Sequence& seq, double mass)
     {
         size_t curr = seq[i];
         
-        _params[_order].increment(cond, curr, mass);
+        double mass_i = mass;
+        if (seq.length()-i < fl_cdf.size())
+        {
+            mass_i += fl_cdf[seq.length()-1];
+        }
+        
+        _params[_order].increment(cond, curr, mass_i);
         cond = (cond << 2) + curr;
         cond -= seq[i-_order] << (_order*2);
     }

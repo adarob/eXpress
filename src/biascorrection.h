@@ -69,7 +69,7 @@ public:
      * @param seq the transcript sequence
      * @param mass the amount of used to weight the transcript's sequence in the parameter table
      */
-    void increment_expected(const Sequence& seq, double mass); 
+    void increment_expected(const Sequence& seq, double mass, const std::vector<double>& fl_cdf); 
     
     /**
      * a member function that normalizes the expected counts and converts them to the log scale
@@ -259,7 +259,7 @@ public:
      * assuming uniform expression of and accross the transcript's sequence
      * @param trans the transcript to measure expected counts from
      */
-    void update_expectations(const Transcript& trans, double mass=0);
+    void update_expectations(const Transcript& trans, double mass=0, const std::vector<double>& fl_cdf=std::vector<double>());
     
     /**
      * a member function that normalizes the expected counts and converts them to the log scale

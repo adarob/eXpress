@@ -9,6 +9,7 @@
 //TODO: Update params between rounds
 
 #include <boost/unordered_map.hpp>
+#include <boost/unordered_set.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/program_options.hpp>
 #include <boost/thread.hpp>
@@ -275,12 +276,20 @@ void process_fragment(double mass_n, Fragment* frag_p, TranscriptTable* trans_ta
     double total_variance = HUGE_VAL;
     size_t num_solveable = 0;
     
+    
+    boost::unordered_set<Transcript*> trans_set;
+
     if (frag.num_hits()>1)
     {
         for(size_t i = 0; i < frag.num_hits(); ++i)
         {
             const FragHit& m = *frag.hits()[i];
             Transcript* t = m.mapped_trans;
+            if (trans_set.count(t) == 0)
+            {
+                t->lock();
+                trans_set.insert(t);
+            }
             likelihoods[i] = t->log_likelihood(m, first_round);
             masses[i] = t->mass();
             variances[i] = t->mass_var();
@@ -292,6 +301,9 @@ void process_fragment(double mass_n, Fragment* frag_p, TranscriptTable* trans_ta
     }
     else
     {
+        Transcript* t = frag.hits()[0]->mapped_trans;
+        t->lock();
+        trans_set.insert(t);
         total_likelihood = likelihoods[0];
     }
     
@@ -363,6 +375,11 @@ void process_fragment(double mass_n, Fragment* frag_p, TranscriptTable* trans_ta
                 trans_table->update_covar(m.trans_id, m2.trans_id, covar); 
             }
         }
+    }
+    
+    foreach (Transcript* t, trans_set)
+    {
+        t->unlock();
     }
 }
 

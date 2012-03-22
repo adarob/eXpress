@@ -49,7 +49,6 @@ Transcript::Transcript(const TransID id, const std::string& name, const std::str
 
 void Transcript::add_mass(double p, double v, double mass) 
 { 
-    boost::mutex::scoped_lock lock(_bias_lock);
     _curr_params.mass = log_sum(_curr_params.mass, p+mass);
     _curr_params.mass_var = log_sum(_curr_params.mass_var, p+mass*2);
     if (p != 0.0 || v != HUGE_VAL)
@@ -82,7 +81,6 @@ double Transcript::rho() const
 
 double Transcript::mass(bool with_pseudo) const
 {
-    boost::mutex::scoped_lock lock(_bias_lock);
     if (!with_pseudo)
         return _ret_params->mass;
     return log_sum(_ret_params->mass, _alpha+_cached_eff_len);
@@ -90,7 +88,6 @@ double Transcript::mass(bool with_pseudo) const
 
 double Transcript::mass_var(bool with_pseudo) const
 {
-    boost::mutex::scoped_lock lock(_bias_lock);
     if (!with_pseudo)
         return _ret_params->mass_var;
     return log_sum(_ret_params->mass_var, 2*(_alpha+_cached_eff_len-2));
@@ -104,9 +101,7 @@ double Transcript::log_likelihood(const FragHit& frag, bool with_pseudo) const
         ll += (_globs->mismatch_table)->log_likelihood(frag);
     
     const PairStatus ps = frag.pair_status();
-    {
-        boost::mutex::scoped_lock lock(_bias_lock);
-        
+    {        
         if (with_pseudo)
             ll += log_sum(_ret_params->mass, _alpha+_cached_eff_len + _avg_bias);
         else
@@ -146,7 +141,6 @@ double Transcript::est_effective_length(FLD* fld, bool with_bias) const
     
     if (with_bias)
     {
-        boost::mutex::scoped_lock lock(_bias_lock);
         eff_len += _avg_bias;
     }
     return eff_len;
@@ -154,7 +148,6 @@ double Transcript::est_effective_length(FLD* fld, bool with_bias) const
 
 double Transcript::cached_effective_length(bool with_bias) const
 {
-    boost::mutex::scoped_lock lock(_bias_lock);
     if (with_bias)
         return _cached_eff_len + _avg_bias;
     return _cached_eff_len;
@@ -170,14 +163,12 @@ void Transcript::update_transcript_bias(BiasBoss* bias_table, FLD* fld)
     }
     else
     {
-        boost::mutex::scoped_lock lock(_bias_lock);
         _avg_bias = bias_table->get_transcript_bias(*_start_bias, *_end_bias, *this);
         assert(!isnan(_avg_bias) && !isinf(_avg_bias));
         
     }
     double eff_len = est_effective_length(fld, false);
     {
-        boost::mutex::scoped_lock lock(_bias_lock);
         _cached_eff_len = eff_len;
     }
 }
@@ -436,7 +427,7 @@ void TranscriptTable::output_results(string output_dir, size_t tot_counts, bool 
                 Transcript& trans = *bundle_trans[i];
                 double l_trans_frac = trans.mass() - l_bundle_mass;
                 trans_counts[i] = sexp(l_trans_frac + l_bundle_counts);
-                if (trans_counts[i] - (double)trans.tot_counts() > EPSILON ||  (double)trans.uniq_counts() - trans_counts[i] > EPSILON)
+                if (!approx_eq(trans_counts[i], (double)trans.tot_counts()))
                     requires_projection = true;
             }
             
@@ -594,13 +585,17 @@ void TranscriptTable::threaded_bias_update(boost::mutex* mut)
         
         burned_out_before = burned_out;
         
+        vector<double> fl_cdf = fld->cdf();
+        
         foreach(Transcript* trans, _trans_map)
         {  
+            trans->lock();
             trans->update_transcript_bias(bias_table, fld);
             if (bg_table)
             {
-                bg_table->update_expectations(*trans, trans->rho());
+                bg_table->update_expectations(*trans, trans->rho(), fl_cdf);
             }
+            trans->unlock();
             if (!running)
                 break;
         }

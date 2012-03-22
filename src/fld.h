@@ -77,6 +77,8 @@ public:
      * @return (logged) probability of observing the given FragHit length
      */ 
     double pdf(size_t len) const;
+  
+    std::vector<double> cdf() const;
     
     /**
      * a member function that returns the (logged) number of observed FragHits (including pseudo-counts)

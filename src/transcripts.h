@@ -140,7 +140,7 @@ class Transcript
     /**
      * a private mutex to provide thread-safety for bias variables with threaded update
      */
-    mutable boost::mutex _bias_lock;
+    mutable boost::mutex _lock;
     
     /**
      * a point to a private double vector storing the (logged) 5' bias at each position (accessed by multiple threads)
@@ -182,6 +182,10 @@ public:
         if (_end_bias)
             delete _end_bias;
     }
+    
+    void lock() { _lock.lock(); }
+    void unlock() { _lock.unlock(); }
+
     /**
      * a member function that returns the transcript name
      * @return string containing transcript name

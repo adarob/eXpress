@@ -14,8 +14,6 @@
 #include <algorithm>
 #include <boost/foreach.hpp>
 
-//#include <boost/random/mersenne_twister.hpp>
-
 #define foreach BOOST_FOREACH
 
 class TranscriptTable;
@@ -68,6 +66,11 @@ const size_t NUM_NUCS = 4;
 const char NUCS[] = {'A','C','G','T'};
 
 const double EPSILON = 0.0001;
+
+inline bool approx_eq(double a, double b, double eps=EPSILON)
+{
+    return abs(a-b) < eps;
+}
 
 /**
  * global function to calculate the log of the sum of 2 logged values efficiently

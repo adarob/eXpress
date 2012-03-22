@@ -76,6 +76,20 @@ double FLD::pdf(size_t len) const
     return _hist[len]-_tot_mass;
 }
 
+vector<double> FLD::cdf() const
+{
+    double cum = HUGE_VAL;
+    vector<double> cdf(_hist.size());
+    for (size_t i = 0; i < _hist.size(); ++i)
+    {
+        cum = log_sum(cum, _hist[i]);
+        cdf[i] = cum - _tot_mass;
+    }
+    assert(approx_eq(cum, _tot_mass));
+    
+    return cdf;
+}
+
 double FLD::tot_mass() const
 {
     return _tot_mass;
