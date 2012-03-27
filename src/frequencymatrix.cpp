@@ -50,7 +50,7 @@ void FrequencyMatrix::increment(size_t i, size_t j, double incr_amt)
         _array[k] += incr_amt;
         _rowsums[i] += incr_amt;
     }
-//    assert(!isnan(_rowsums[i]) && !isinf(_rowsums[i]));
+    assert(!isnan(_rowsums[i]) && !isinf(_rowsums[i]));
 }
 
 void FrequencyMatrix::increment(size_t k, double incr_amt)

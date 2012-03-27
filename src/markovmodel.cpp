@@ -72,7 +72,7 @@ void MarkovModel::fast_learn(const Sequence& seq, double mass, const vector<doub
         double mass_i = mass;
         if (seq.length()-i < fl_cdf.size())
         {
-            mass_i += fl_cdf[seq.length()-1];
+            mass_i += fl_cdf[seq.length()-i];
         }
         
         _params[_order].increment(cond, curr, mass_i);

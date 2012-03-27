@@ -308,6 +308,7 @@ double BiasBoss::get_transcript_bias(std::vector<float>& start_bias, std::vector
     }
     
     double avg_bias = (tot_start + tot_end) - (2*log((double)trans.length()));
+    assert(!isnan(avg_bias));
     return avg_bias;
 }
 
