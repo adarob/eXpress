@@ -30,7 +30,7 @@ const size_t BG_ORDER = 3;
 
 SeqWeightTable::SeqWeightTable(size_t window_size, double alpha)
 :_observed(FG_ORDER, window_size, window_size, alpha),
- _expected(BG_ORDER, window_size, window_size, HUGE_VAL) 
+ _expected(BG_ORDER, window_size, BG_ORDER+1, HUGE_VAL) 
 {}
 
 void SeqWeightTable::copy_observed(const SeqWeightTable& other)

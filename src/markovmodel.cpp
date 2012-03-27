@@ -55,36 +55,29 @@ void MarkovModel::update(const Sequence& seq, int left, double mass)
 
 void MarkovModel::fast_learn(const Sequence& seq, double mass, const vector<double>& fl_cdf)
 {
-    if (seq.length() < _window_size)
+    assert(_num_pos==_order+1);
+    if (seq.length() < _order)
         return;
     
-    assert(_window_size % 2 == 1);;
-    
-    for (size_t p = 0; p < _window_size; p++)
+    size_t cond = 0;
+    for (int i = 0; i < _order; ++i)
     {
-        size_t order = min((size_t)_order, p);
-        size_t cond = 0;
+        cond = (cond << 2) + seq[i];
+    }
+    
+    for(size_t i = _order; i < seq.length(); ++i)
+    {
+        size_t curr = seq[i];
         
-        for (size_t i = 0; i < order; ++i)
+        double mass_i = mass;
+        if (seq.length()-i < fl_cdf.size())
         {
-            cond = (cond << 2) + seq[i];
+            mass_i += fl_cdf[seq.length()-1];
         }
         
-        for(size_t i = order; i < seq.length()-_window_size + p; ++i)
-        {
-            size_t curr = seq[i];
-            
-            double mass_i = mass;
-            size_t max_frag_len = (seq.length()-_window_size + p) - i;
-            if (max_frag_len < fl_cdf.size())
-            {
-                mass_i += fl_cdf[max_frag_len];
-            }
-            
-            _params[p].increment(cond, curr, mass_i);
-            cond = (cond << 2) + curr;
-            cond -= seq[i-order] << (order*2);
-        }
+        _params[_order].increment(cond, curr, mass_i);
+        cond = (cond << 2) + curr;
+        cond -= seq[i-_order] << (_order*2);
     }
 }
 

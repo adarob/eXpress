@@ -235,6 +235,10 @@ TranscriptTable::TranscriptTable(const string& trans_fasta_file, const TransInde
             add_trans(name, seq, (alpha_map) ? alpha_renorm * alpha_map->find(name)->second : alpha, trans_index, trans_lengths);
         }
         infile.close();
+        if (globs->bias_table)
+        {
+            globs->bias_table->normalize_expectations();
+        }
     }
     else 
     {
@@ -548,6 +552,8 @@ void TranscriptTable::threaded_bias_update(boost::mutex* mut)
     while(running)
     {
         
+        if (bg_table)
+            bg_table->normalize_expectations();
         {
             boost::unique_lock<boost::mutex> lock(*mut);
             if(!fld)
