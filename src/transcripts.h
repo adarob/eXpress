@@ -138,7 +138,7 @@ class Transcript
     Bundle* _bundle;
     
     /**
-     * a private mutex to provide thread-safety for bias variables with threaded update
+     * a private mutex to provide thread-safety for variables with threaded update
      */
     mutable boost::mutex _lock;
     
@@ -162,6 +162,7 @@ class Transcript
      */
     double _cached_eff_len;
     
+    //DOC
     bool _solveable;
     
 public:
@@ -175,6 +176,9 @@ public:
      */
     Transcript(const size_t id, const std::string& name, const std::string& seq, double alpha, const Globals* globs);
     
+    /**
+     * Transcript Destructor deletes bias vectors
+     */    
     ~Transcript()
     {
         if (_start_bias)
@@ -183,7 +187,14 @@ public:
             delete _end_bias;
     }
     
+    /**
+     * a member function that locks the transcript mutex to provide thread safety
+     */
     void lock() { _lock.lock(); }
+    
+    /**
+     * a member function that unlocks the transcript mutex to provide thread safety
+     */
     void unlock() { _lock.unlock(); }
 
     /**
@@ -319,7 +330,8 @@ public:
      * @param fld an optional pointer to a different FLD than the global one, for thread-safety
      */
     void update_transcript_bias(BiasBoss* bias_table = NULL, FLD* fld = NULL);
-    
+
+    //DOC
     bool solveable() { return _solveable; }
     void solveable(bool s) { _solveable = s; }
     

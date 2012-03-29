@@ -56,6 +56,10 @@ public:
      */ 
     size_t max_val() const;
     
+    /**
+     * a member function that returns the minimum observed FragHit length (1 initially)
+     * @return minimum observed FragHit length
+     */ 
     size_t min_val() const;
     
     /**
@@ -78,6 +82,10 @@ public:
      */ 
     double pdf(size_t len) const;
   
+    /**
+     * a member function that returns a vector containing the cdf
+     * @return cdf
+     */ 
     std::vector<double> cdf() const;
     
     /**

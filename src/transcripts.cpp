@@ -352,25 +352,21 @@ void project_to_polytope(vector<Transcript*> bundle_trans, vector<double>& trans
             }
         }
         
-        if (unbound_counts + bound_counts == bundle_counts)
+        if (approx_eq(unbound_counts + bound_counts, bundle_counts))
             return;
         
         double normalizer = (bundle_counts - bound_counts)/unbound_counts;
+        
         bool unbound_exist = false;
-        unbound_counts = 0;
         for (size_t i = 0; i < bundle_trans.size(); ++i)
         {    
             if (!polytope_bound[i])
             {
                 trans_counts[i] *= normalizer;
-                unbound_counts += trans_counts[i];
                 unbound_exist = true;
             }
         }
-        
-        if (unbound_counts + bound_counts - bundle_counts < EPSILON)
-            return;
-        
+                
         if (!unbound_exist)
             polytope_bound = vector<bool>(bundle_trans.size(), false);
     }
@@ -427,16 +423,14 @@ void TranscriptTable::output_results(string output_dir, size_t tot_counts, bool 
                 Transcript& trans = *bundle_trans[i];
                 double l_trans_frac = trans.mass() - l_bundle_mass;
                 trans_counts[i] = sexp(l_trans_frac + l_bundle_counts);
-                if (!approx_eq(trans_counts[i], (double)trans.tot_counts()))
+                if (trans_counts[i] > (double)trans.tot_counts() || trans_counts[i] < (double)trans.uniq_counts())
                     requires_projection = true;
             }
-            
-            
+                        
             if (bundle_trans.size() > 1 && requires_projection)
             {
                 project_to_polytope(bundle_trans, trans_counts, bundle->counts());
             }
-            
             
             // Calculate individual counts and rhos
             for (size_t i = 0; i < bundle_trans.size(); ++i)

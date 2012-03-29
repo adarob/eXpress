@@ -56,7 +56,7 @@ void MarkovModel::update(const Sequence& seq, int left, double mass)
 void MarkovModel::fast_learn(const Sequence& seq, double mass, const vector<double>& fl_cdf)
 {
     assert(_num_pos==_order+1);
-    if (seq.length() < _order)
+    if (seq.length() < (size_t)_order)
         return;
     
     size_t cond = 0;

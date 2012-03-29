@@ -15,6 +15,7 @@
 class Sequence;
 class FrequencyMatrix;
 
+//DOC
 class MarkovModel
 {
     int _order;

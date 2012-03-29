@@ -357,6 +357,9 @@ class ThreadedMapParser
      */
     Writer* _writer;
     
+    /**
+     * a private boolean specifying whether to output the modified alignments
+     */
     bool _write_active;
     
 public:
