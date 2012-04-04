@@ -94,14 +94,14 @@ void SeqWeightTable::append_output(ofstream& outfile) const
     
     for(size_t j = 0; j < pow((double)NUM_NUCS, (double)FG_ORDER+1); j++)
     {
-        string trans = "";
+        string trans = "->";
+        trans += NUCS[j & 3];
         size_t cond = j >> 2;
         for(size_t k = 0; k < FG_ORDER; ++k)
         {
             trans = NUCS[cond & 3] + trans;
             cond = cond >> 2;
         }
-        trans = NUCS[j & 3] + "|" + trans;
         outfile << trans << '\t';
     }
     outfile << endl;
@@ -120,15 +120,14 @@ void SeqWeightTable::append_output(ofstream& outfile) const
     
     for(size_t j = 0; j < pow((double)NUM_NUCS, (double)BG_ORDER+1); j++)
     {
-        string trans = "";
+        string trans = "->";
+        trans += NUCS[j & 3];
         size_t cond = j >> 2;
         for(size_t k = 0; k < BG_ORDER; ++k)
         {
             trans = NUCS[cond & 3] + trans;
             cond = cond >> 2;
         }
-        trans = NUCS[j & 3] + "|" + trans;
-        
         outfile << trans << '\t';
     }
     outfile << endl;
