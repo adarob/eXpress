@@ -6,8 +6,6 @@
 //  Copyright 2011 Adam Roberts. All rights reserved.
 //
 
-//TODO: Update params between rounds
-
 #include <boost/unordered_map.hpp>
 #include <boost/unordered_set.hpp>
 #include <boost/filesystem.hpp>
@@ -125,7 +123,8 @@ bool parse_options(int ac, char ** av)
     ("output-dir,o", po::value<string>(&output_dir)->default_value("."), "write all output files to this directory")
     ("frag-len-mean,m", po::value<int>(&def_fl_mean)->default_value(def_fl_mean), "prior estimate for average fragment length")
     ("frag-len-stddev,s", po::value<int>(&def_fl_stddev)->default_value(def_fl_stddev), "prior estimate for fragment length std deviation")
-    ("additional-rounds,N", po::value<size_t>(&remaining_rounds)->default_value(remaining_rounds), "number of additional batch EM rounds after online round")
+    ("additional-batch,B", po::value<size_t>(&remaining_rounds)->default_value(remaining_rounds), "number of additional batch EM rounds after initial online round")
+    ("additional-online,O", po::value<size_t>(&remaining_rounds)->default_value(remaining_rounds), "number of additional online EM rounds after initial online round")
     ("output-align-prob", "output alignments (sam/bam) with probabilistic assignments")
     ("output-align-samp", "output alignments (sam/bam) with sampled assignments")
     ("fr-stranded", "accept only forward->reverse alignments (second-stranded protocols)")
@@ -145,7 +144,6 @@ bool parse_options(int ac, char ** av)
     ("output-running-rounds", "")    
     ("output-running-reads", "")
     ("batch-mode","")
-    ("online-N","")
     ("both","")
     ("burn-out", po::value<size_t>(&burn_out)->default_value(burn_out), "")
     ("prior-params", po::value<string>(&prior_file)->default_value(""), "")
@@ -224,7 +222,7 @@ bool parse_options(int ac, char ** av)
     output_running_rounds = vm.count("output-running-rounds");
     output_running_reads = vm.count("output-running-reads");
     batch_mode = vm.count("batch-mode");
-    online_additional = vm.count("online-N");
+    online_additional = vm.count("additional-online");
     both = vm.count("both");
     
     if (remaining_rounds > 0 && in_map_file_name != "")

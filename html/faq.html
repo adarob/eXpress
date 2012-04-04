@@ -44,7 +44,7 @@
         logo1=new Image
         logo1.src="img/logo.png"
         logo2=new Image
-        logo2.src="img/logo_white.png"
+        logo2.src="img/logo_yellow.png"
  </script>
   <title>eXpress &bull; FAQ</title>
 </head>
@@ -124,10 +124,10 @@
         <li><a href="#">Download<!--[if IE 7]><!--></a><!--<![endif]-->
           <!--[if lte IE 6]><table><tr><td><![endif]-->
             <ul>
-              <li><a href=downloads/express-0.9.6/express-0.9.6-macosx_x86_64.tgz onClick="_gaq.push(['_trackEvent', 'Downloads', 'Mac', 'FAQ']);" target="_blank">Mac OS X (64-bit)</a></li>
-              <li><a href=downloads/express-0.9.6/express-0.9.6-linux_x86_64.tgz onClick="_gaq.push(['_trackEvent', 'Downloads', 'Linux', 'FAQ']);" target="_blank">Linux (64-bit)</a></li>
-              <li><a href=downloads/express-0.9.6/express-0.9.6-win32_x86_64.zip onClick="_gaq.push(['_trackEvent', 'Downloads', 'Windows', 'FAQ']);" target="_blank">Windows (64-bit)</a></li>
-              <li><a href=downloads/express-0.9.6/express-0.9.6-src.tgz onClick="_gaq.push(['_trackEvent', 'Downloads', 'Source', 'FAQ']);" target="_blank">Source Code</a></li>
+              <li><a href=downloads/express-1.0.0/express-1.0.0-macosx_x86_64.tgz onClick="_gaq.push(['_trackEvent', 'Downloads', 'Mac', 'FAQ']);" target="_blank">Mac OS X (64-bit)</a></li>
+              <li><a href=downloads/express-1.0.0/express-1.0.0-linux_x86_64.tgz onClick="_gaq.push(['_trackEvent', 'Downloads', 'Linux', 'FAQ']);" target="_blank">Linux (64-bit)</a></li>
+              <li><a href=downloads/express-1.0.0/express-1.0.0-win32_x86_64.zip onClick="_gaq.push(['_trackEvent', 'Downloads', 'Windows', 'FAQ']);" target="_blank">Windows (64-bit)</a></li>
+              <li><a href=downloads/express-1.0.0/express-1.0.0-src.tgz onClick="_gaq.push(['_trackEvent', 'Downloads', 'Source', 'FAQ']);" target="_blank">Source Code</a></li>
               <li><a href="downloads" onClick="_gaq.push(['_trackEvent', 'Downloads', 'Previous','FAQ']);">Previous Versions</a></li>
            </ul>
           <!--[if lte IE 6]></td></tr></table></a><![endif]-->
@@ -156,7 +156,7 @@
         <div class="corner-content-1col-top"></div>                        
         <div class="content-1col-nobox">
           <h2 id="diff">Can eXpress be used for finding differentially expressed genes in RNA-Seq analysis?</h2>	
-		  <p>eXpress does not test for differential expression but the (rounded) "effective counts" in the results.xprs file can be used in downstream count-based analysis tools such as <a href="http://www.bioconductor.org/packages/2.6/bioc/html/DEGseq.html">DEGSeq</a>, <a href="http://www.bioconductor.org/packages/release/bioc/html/edgeR.html">edgeR</a>, <a href="http://www.bioconductor.org/packages/release/bioc/html/baySeq.html">baySeq</a>, or <a href="http://www.bioconductor.org/packages/release/bioc/html/DESeq.html">DESeq</a>. However, none of these tools are suitable for isoform level differential expression and we currently recommend <a href=http://cufflinks.cbcb.umd.edu>Cuffdiff</a> for that purpose.</p>
+		  <p>eXpress does not test for differential expression but the (rounded) "effective counts" in the results.xprs file can be used in downstream count-based analysis tools such as <a href="http://www.bioconductor.org/packages/2.6/bioc/html/DEGseq.html">DEGSeq</a>, <a href="http://www.bioconductor.org/packages/release/bioc/html/edgeR.html">edgeR</a>, <a href="http://www.bioconductor.org/packages/release/bioc/html/baySeq.html">baySeq</a>, or <a href="http://www.bioconductor.org/packages/release/bioc/html/DESeq.html">DESeq</a>. However, none of these tools are suitable for isoform level differential expression and until our own differential expression tool is completed, we currently recommend <a href=http://cufflinks.cbcb.umd.edu>Cuffdiff</a> for that purpose.</p>
 		  <p>&rarr; <a href="#top">Back to top.</a></p>
 	<h2 id="assmbl">Can eXpress be used to perform genome or transcriptome assembly?</h2>	
 	<p>No, eXpress is solely a <i>quantification</i> tool and cannot be used for assembly. However we believe the streaming algorithms underlying eXpress can be adapted for use in assembly as well and we are currently exploring ideas for low-memory streaming based assembly. For now we recommend <a href=http://cufflinks.cbcb.umd.edu>Cufflinks</a> for reference-based transcriptome assembly. <a href=http://trinityrnaseq.sourceforge.net/>Trinity</a>, <a href=http://www.ebi.ac.uk/~zerbino/oases/>Oases</a>, and <a href=http://www.bcgsc.ca/platform/bioinfo/software/trans-abyss>Trans-ABySS</a> can be used for <i>de novo</i> transcriptome assembly. There are numerous new short-read assembly tools that can be used for DNA assembly.</p>
@@ -168,7 +168,7 @@
 	<p>Yes, eXpress accepts both types of reads, even in the same alignment file.  However, to maximize accuracy of the bias correction and fragment length calculations, you should not mix reads generated in separate library preps.</p>
     <p>&rarr; <a href="#top">Back to top.</a></p>
     <h2 id="pub">When will the eXpress method be published?</h2>
-	<p>We are hard at work on the manuscript and expect it to be published by summer.</p>
+	<p>We have submitted a manuscript and expect it to be published in the coming months.</p>
 	<p>&rarr; <a href="#top">Back to top.</a></p>
     <h2 id="help">What do I do if I need help and my question isn't answered here?</h2>
 	<p>First, you should check to see if you question is answered in the <a href="manual.html">Manual</a> or <a href="tutorial.html">Tutorial</a>.  If not, you should see if it has been addressed at the <a href=http://seqanswers.com>SeqAnswers</a> forum.  If you still can't find your answer, feel free to contact us at <a mailto:ask.xprs@gmail.com>ask.xprs@gmail.com</a>.  We are busy but will do our best to respond as soon as possible!</p>

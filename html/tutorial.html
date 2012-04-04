@@ -43,7 +43,7 @@
         logo1=new Image
         logo1.src="img/logo.png"
         logo2=new Image
-        logo2.src="img/logo_white.png"
+        logo2.src="img/logo_yellow.png"
  </script>
   <title>eXpress &bull; Getting Started</title>
 </head>
@@ -123,10 +123,10 @@
         <li><a href="#">Download<!--[if IE 7]><!--></a><!--<![endif]-->
           <!--[if lte IE 6]><table><tr><td><![endif]-->
             <ul>
-              <li><a href=downloads/express-0.9.6/express-0.9.6-macosx_x86_64.tgz onClick="_gaq.push(['_trackEvent', 'Downloads', 'Mac', 'Tutorial']);" target="_blank">Mac OS X (64-bit)</a></li>
-              <li><a href=downloads/express-0.9.6/express-0.9.6-linux_x86_64.tgz onClick="_gaq.push(['_trackEvent', 'Downloads', 'Linux', 'Tutorial']);" target="_blank">Linux (64-bit)</a></li>
-              <li><a href=downloads/express-0.9.6/express-0.9.6-win32_x86_64.zip onClick="_gaq.push(['_trackEvent', 'Downloads', 'Windows', 'Tutorial']);" target="_blank">Windows (64-bit)</a></li>
-              <li><a href=downloads/express-0.9.6/express-0.9.6-src.tgz onClick="_gaq.push(['_trackEvent', 'Downloads', 'Source', 'Tutorial']);" target="_blank">Source</a></li>
+              <li><a href=downloads/express-1.0.0/express-1.0.0-macosx_x86_64.tgz onClick="_gaq.push(['_trackEvent', 'Downloads', 'Mac', 'Tutorial']);" target="_blank">Mac OS X (64-bit)</a></li>
+              <li><a href=downloads/express-1.0.0/express-1.0.0-linux_x86_64.tgz onClick="_gaq.push(['_trackEvent', 'Downloads', 'Linux', 'Tutorial']);" target="_blank">Linux (64-bit)</a></li>
+              <li><a href=downloads/express-1.0.0/express-1.0.0-win32_x86_64.zip onClick="_gaq.push(['_trackEvent', 'Downloads', 'Windows', 'Tutorial']);" target="_blank">Windows (64-bit)</a></li>
+              <li><a href=downloads/express-1.0.0/express-1.0.0-src.tgz onClick="_gaq.push(['_trackEvent', 'Downloads', 'Source', 'Tutorial']);" target="_blank">Source</a></li>
               <li><a href="downloads" onClick="_gaq.push(['_trackEvent', 'Downloads', 'Previous','Tutorial']);">Previous Versions</a></li>
              </ul>
           <!--[if lte IE 6]></td></tr></table></a><![endif]-->
@@ -160,12 +160,14 @@
 		  <p>In order to make it easy to install eXpress, we provide a few binary packages that save you the trouble of having to compile from source. To use the binary packages for OSX/Linux (Windows), simply download the appropriate one for your machine, untar (unzip) it, and make sure the <code>express(.exe)</code> binary is in a directory in your <tt>PATH</tt> environment variable.</p>
 		  <p>If using the Windows binary, you will also need to install the <a href="http://www.microsoft.com/download/en/details.aspx?id=5555">Visual C++ 2010 Runtime Library</a>.</p>
 		  <h2 id="src">Installing from source</h2>
-		  <p><b>Note:</b> Installing from source is often an unnecessary hassle.  If a binary is available for your system, it is highly recommended that you use it.  If one is not available, please sendd us a request to <a href="mailto:ask.xprs@gmail.com">ask.xprs@gmail.com</a>.</p>
+		  <p><b>Note:</b> Installing from source is often an unnecessary hassle.  If a binary is available for your system, it is highly recommended that you use it.  If one is not available, please send us a request to <a href="mailto:ask.xprs@gmail.com">ask.xprs@gmail.com</a>.</p>
 		  <p>The instructions below include commands that are compatible with Unix/Linux/Mac. If compiling on a Windows machine, use the appropriate DOS commands instead.  Assuming you are using the Visual C++ compiler, you must type your commands from the Visual Studio Command Prompt.
 		  <h4>&bull; Install C++ Compiler (if not already available)</h4>
 		  <p>While most Linux systems will already have GCC installed, Mac OS X and Windows do not have a C++ compiler installed by default.  Free options include <a href=http://developer.apple.com/tools/xcode>XCode</a> for Mac OS X and <a href=http://www.microsoft.com/visualstudio/en-us/products/2010-editions/visual-cpp-express>Visual C++ Express</a> for Windows.</p>
 		  <h4>&bull; Download and extract the source</h4>
-		  <p>First you must download source code using the link on the right side of this page.  Untar the file.  From now on we refer to the path to the directory that is created as <code>&lt;YOUR_EXPRESS_DIR&gt;</code>.
+		  <p>First you must download source code from the Download menu at the top of this page.  Untar the file using:</p>
+		  <ol><li><pre class="sc"><code>$ tar -xf express-&lt;EXPRESS_VERSION&gt;-src.tgz</code></pre></li></ol>
+		  <p>From now on we refer to the path to the directory that is created as <code>&lt;YOUR_EXPRESS_DIR&gt;</code>.</p>
           <h4>&bull; Install CMake</h4>
           <p>Fortunately, the developers of CMake provide simple installation packages for most architectures. Find the right package for your system at their <a href=http://www.cmake.org/cmake/resources/software.html>website</a>.</p>
           <h4>&bull; Install BamTools</h4>
@@ -182,11 +184,11 @@
           	<pre class="sc"><code>$ make</code></pre></li>
           </ol>
           <h4>&bull; Install BOOST</h4>
-          <p>If you have Ports or MacPorts installed, these will probably be the easiest way to install BOOST.  If you are using Windows, you can use the installer found <a href=http://www.boostpro.com/download/>here</a>.  Otherwise, follow the instructions below.</p>
+          <p>If you have a package manager such as yum (Linux) or MacPorts (OS X) installed, these will probably be the easiest way to install BOOST. Be sure to install <code>boost-devel</code> so that the headers are included. If you are using Windows, you can use the installer found <a href=http://www.boostpro.com/download/>here</a>.  Otherwise, follow the instructions below.</p>
           			<ol>
                     <li><a href="http://www.boost.org/users/download/">Download</a>
                       Boost and the <code>bjam</code> build engine.</li>
-                    <li>Unpack bjam and add it to your <tt>PATH</tt>.</li>
+                    <li>Unpack <code>bjam</code> and add it to your <tt>PATH</tt>.</li>
                     <li>Unpack the Boost tarball and <code>cd</code> to the
                       Boost source directory. This directory is called
                       the <code>BOOST_ROOT</code> in some Boost installation
@@ -250,7 +252,7 @@
         many mismatches during mapping since eXpress builds an error model to probabalistically assign the reads, although this will increase mapping time.</li>
 		  </ol>
 		  <h2 id="example">An example</h2>
-		  <p>In the following two sub-sections, you will run eXpress on a sample RNA-Seq dataset with simulated reads from UGT3A2 and the HOXC cluster using the human genome build hg18.  Both the transcript sequences (transcripts.fasta) and raw reads (reads_1fastq, reads_2.fastq) can be found in the <tt>&lt;YOUR_EXPRESS_DIR&gt;/sample_data</tt> directory.  For this example to work, you will need to have both <a href=http://bowtie-bio.sourceforge.net>Bowtie</a> and <a href=http://samtools.sf.net>SAMtools</a> installed, but in general any aligner will work and the conversion to BAM is not necessary unless you have insufficient disk space to store the uncompressed SAM.</p>
+		  <p>In the following two sub-sections, you will run eXpress on a sample RNA-Seq dataset with simulated reads from UGT3A2 and the HOXC cluster using the human genome build hg18.  Both the transcript sequences (transcripts.fasta) and raw reads (reads_1.fastq, reads_2.fastq) can be found in the <tt>&lt;YOUR_EXPRESS_DIR&gt;/sample_data</tt> directory.  For this example to work, you will need to have both <a href=http://bowtie-bio.sourceforge.net>Bowtie</a> and <a href=http://samtools.sf.net>SAMtools</a> installed, but in general any aligner will work and the conversion to BAM is not necessary unless you have insufficient disk space to store the uncompressed SAM.</p>
 		  <p>Before you begin, you must prepare your Bowtie index. Since you wish to allow many multi-mappings, it is useful to build the index with a small offrate (in this case 1).  The smaller the offrate, the larger the index and the faster the mapping.  If you have disk space to spare, always use an offrate of 1. Build the index with the following commands.</p>
 		  <ol><li><pre class="sc"><code>$ cd &lt;YOUR_EXPRESS_DIR&gt;/sample_data <br />$ bowtie-build --offrate 1 transcripts.fasta transcripts</code></pre></li></ol>
 		  <p>This command will populate your directory with several index files that allow Bowtie to more easily align reads to the transcripts.</p>
@@ -270,29 +272,29 @@
    		  <p>The output for eXpress is saved in a file called <tt>results.xprs</tt> in an easy-to-parse tab-delimited format.  Since an output directory was not specified, it is simply placed in the working directory (<tt>&lt;YOUR_EXPRESS_DIR&gt;/sample_data</tt>). You can view the output for the run using the command:
    		  <ol><li><pre class="sc"><code>$ more results.xprs</code></pre></li></ol></p>
    		  <p>Your results should look identical to this:</p>
-   		  <ol><li><pre class="output"><code>bundle_id	target_id	length	eff_length	tot_counts	uniq_counts	post_count_mode	post_count_var	eff_count_mode	eff_count_var	fpkm	fpkm_conf_low	fpkm_conf_high
-1	NM_022658	2288	2111.031696	4881	4881	4881.000000	0.000000	5290.175426	0.000000	231213.960930	224595.002623	237832.919238
-2	NM_014212	2037	1860.067174	55	55	55.000000	0.000000	60.231696	0.000000	2956.882460	2159.470561	3754.294359
-3	NM_006897	1541	1364.137281	664	664	664.000000	0.000000	750.088729	0.000000	48675.452910	44897.505073	52453.400746
-4	NM_001168316	2283	2106.032402	1552	12	516.598635	388.000000	560.007853	455.946043	24529.472300	21673.244046	27385.700554
-4	NM_174914	2385	2208.017985	1745	38	930.845799	436.250000	1005.457041	508.987356	42157.527944	38808.437597	45506.618292
-4	NR_031764	1853	1676.093181	1243	7	316.555566	310.750000	349.967096	379.809355	18886.513572	15897.888697	21875.138448
-5	NM_017410	2396	2219.016430	42	42	42.000000	0.000000	45.349822	0.000000	1892.730465	1308.621162	2476.839768
-6	NM_017409	1959	1782.078199	47	47	47.000000	0.000000	51.666083	0.000000	2637.370236	1867.970262	3406.770211
-7	NM_173860	849	672.235093	962	962	962.000000	0.000000	1214.958886	0.000000	143104.698051	133876.936763	152332.459340
-8	NM_014620	2300	2123.029999	958	77	553.868775	239.500000	600.037768	281.092286	26088.598628	23435.145523	28742.051732
-8	NM_153693	2072	1895.062226	481	5	77.654759	95.416638	84.905212	114.066119	4097.741888	2709.327293	5486.156482
-8	NR_003084	1640	1463.123288	266	0	21.854792	29.846520	24.496814	37.498989	1493.708156	510.829610	2476.586702
-8	NM_153633	1666	1489.119613	762	10	390.173574	190.500000	436.519114	238.443675	26201.627498	22965.195823	29438.059174
-8	NM_018953	1612	1435.127246	228	91	210.455804	20.501608	236.393502	25.866471	14664.609325	12546.708897	16782.509753
-8	NM_004503	1681	1504.117493	384	37	330.992296	73.025659	369.916614	91.211035	22005.747410	19333.057547	24678.437273
+   		  <ol><li><pre class="output"><code>bundle_id	target_id	length	eff_length	tot_counts	uniq_counts	est_counts	eff_counts	ambig_distr_alpha	ambig_distr_beta	fpkm	fpkm_conf_low	fpkm_conf_high	solveable
+1	NM_014620	2300	2123.247776	958	77	520.554767	563.888952	39.404036	38.861284	24516.910965	21256.860893	27776.961037	T
+1	NM_153693	2072	1895.275039	481	5	119.916333	131.097934	19.284056	60.593282	6327.120373	4587.418700	8066.822046	T
+1	NR_003084	1640	1463.326696	266	0	17.689103	19.824779	6.175215	86.684623	1208.828007	348.657645	2068.998369	T
+1	NM_153633	1666	1489.323587	762	10	416.151511	465.518994	64.183691	54.654069	27942.316563	23818.690311	32065.942816	T
+1	NM_018953	1612	1435.330044	228	91	212.893398	239.097731	3.148257	0.390173	14832.365459	11791.549012	17873.181907	T
+1	NM_004503	1681	1504.321793	384	37	297.794888	332.770029	16.332212	5.398573	19795.956525	16293.650427	23298.262622	T
+2	NM_014212	2037	1860.279224	55	55	55.000000	60.224830	0.000000	0.000000	2956.545409	1737.816128	4175.274690	T
+3	NM_173860	849	672.421281	962	962	962.000000	1214.622475	0.000000	0.000000	143065.073604	129374.738511	156755.408697	T
+4	NM_022658	2288	2111.249211	4881	4881	4881.000000	5289.630397	0.000000	0.000000	231190.139724	221343.835827	241036.443620	T
+5	NM_017410	2396	2219.236296	42	42	42.000000	45.345329	0.000000	0.000000	1892.542947	953.138236	2831.947658	T
+6	NM_006897	1541	1364.338534	664	664	664.000000	749.978084	0.000000	0.000000	48668.272828	42912.224535	54424.321120	T
+7	NM_017409	1959	1782.288551	47	47	47.000000	51.659985	0.000000	0.000000	2637.058964	1581.064918	3693.053009	T
+8	NM_001168316	2283	2106.249809	1552	12	443.212928	480.406032	86.571551	222.603290	21042.752189	18083.116378	24002.388000	T
+8	NM_174914	2385	2208.237612	1745	38	1049.949880	1133.995024	74.786096	51.366264	47546.961175	43110.530924	51983.391426	T
+8	NR_031764	1853	1676.301226	1243	7	270.837192	299.386118	100.878291	371.706966	16156.833161	13233.910476	19079.755847	T
 </code></pre></li></ol>
    		  <p>While it may be difficult to read in your
         terminal, opening the file with R or Excel should help you to
         visualize the columns.  An important column is FPKM,
         which reports the estimated abundance in expected
         <b>F</b>ragments <b>P</b>er <b>K</b>ilobase per <b>M</b>illion
-        mapped fragments.  Other fields include the mode (post_count_mode) and variance (post_count_var) of the posterior count distribution, as well as the "effective" mode (eff_count_mode) and variance (eff_count_var) after correction for bias.  Transcripts are sorted by their bundle_id, which denotes which multi-mapping group the transcript belongs to and can help determine isoforms and gene families.  More details on the output including full descriptions of all columns can be found in the <a href=manual.html#expr>Manual</a>.</p> 
+        mapped fragments.  Other fields include the estimated counts (est_counts) and parameters for the the posterior count distribution (ambig_distr_alpha/beta), as well as the "effective" estimated counts (eff_counts) after correction for bias.  Transcripts are sorted by their bundle_id, denoting which multi-mapping group the transcript belongs to and can help determine isoforms and gene families.  More details on the output including full descriptions of all columns can be found in the <a href=manual.html#expr>Manual</a>.</p> 
           		<p>&rarr; <a href="#top">Back to top.</a></p>
          
         <h2 id="diff">Calculating differential expression</h2>
