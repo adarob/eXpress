@@ -16,7 +16,7 @@
 #include "frequencymatrix.h"
 #include "fld.h"
 
-class Transcript;
+class Target;
 class FragHit;
 
 /**
@@ -37,7 +37,7 @@ class SeqWeightTable
     
     /**
      * a private MarkovModel that stores the expected condtional nucleotide frequencies (logged) based on an assumption
-     * of equal expression of all transcripts
+     * of equal expression of all targets
      */
     MarkovModel _expected;
     
@@ -65,9 +65,9 @@ public:
     
     /**
      * a member function that increments the expected counts for a sliding window through
-     * the given transcript sequence by some mass
-     * @param seq the transcript sequence
-     * @param mass the amount of used to weight the transcript's sequence in the parameter table
+     * the given target sequence by some mass
+     * @param seq the target sequence
+     * @param mass the amount of used to weight the target's sequence in the parameter table
      */
     void increment_expected(const Sequence& seq, double mass, const std::vector<double>& fl_cdf); 
     
@@ -78,7 +78,7 @@ public:
     
     /**
      * a member function that increments the observed counts for the given fragment sequence by some mass (logged)
-     * @param seq the transcript sequence (possibly reverse complemented) to which the fragment end maps
+     * @param seq the target sequence (possibly reverse complemented) to which the fragment end maps
      * @param i the index into the sequence at which to center the bias window (where the fragment starts/ends)
      * @param mass the fragment's mass
      */
@@ -86,7 +86,7 @@ public:
     
     /**
      * a member function that calculates the bias weight (logged) of a bias window
-     * @param seq the transcript sequence the fragment hits to
+     * @param seq the target sequence the fragment hits to
      * @param i the fragment end point (the central point of the bias window)
      * @return the bias weight for the bias window which is the product of the individual nucleotide bias weights
      */
@@ -124,12 +124,12 @@ class PosWeightTable
     
     /**
      * a private FrequencyMatrix that stores the expected fragment frequencies (logged) in different positional
-     * bins based on an assumption of equal expression of all transcripts
+     * bins based on an assumption of equal expression of all targets
      */
     FrequencyMatrix _expected;
     
     /**
-     * a private vector of unsigned integers specifying the bin ranges for transcript lengths
+     * a private vector of unsigned integers specifying the bin ranges for target lengths
      */
     std::vector<size_t> _len_bins;
     
@@ -142,7 +142,7 @@ public:
     
     /**
      * PosWeightTable Constructor
-     * @param len_bins a vector of unsigned integers specifying the bin ranges for transcript lengths
+     * @param len_bins a vector of unsigned integers specifying the bin ranges for target lengths
      * @param pos_bins a vector of doubles specifying the bin ranges for fractional positions
      * @param alpha a double specifying the strength of the uniform prior (logged pseudo-counts for each parameter)
      */
@@ -153,15 +153,15 @@ public:
 
     /**
      * a member function that increments the expected counts for the given fractional position by 1 (logged)
-     * @param len the transcript length
-     * @param pos the fractional transcript position
+     * @param len the target length
+     * @param pos the fractional target position
      */
     void increment_expected(size_t len, double pos); 
     
     /**
      * a member function that increments the expected counts for the given fractional position bin by 1 (logged)
-     * @param l the transcript length bin
-     * @param p the fractional transcript position bin
+     * @param l the target length bin
+     * @param p the fractional target position bin
      */
     void increment_expected(size_t l, size_t p); 
 
@@ -172,33 +172,33 @@ public:
     
     /**
      * a member function that increments the observed counts for the given fragment position by some mass (logged)
-     * @param len the transcript length
-     * @param pos the fractional transcript position
+     * @param len the target length
+     * @param pos the fractional target position
      * @param normalized_mass the mass (logged probabilistic assignment) of the fragment normalized by its estimated expression
      */
     void increment_observed(size_t len, double pos, double normalized_mass);
     
     /**
      * a member function that increments the observed counts for the given fragment position bin by some mass (logged)
-     * @param l the transcript length bin
-     * @param p the fractional transcript position bin
+     * @param l the target length bin
+     * @param p the fractional target position bin
      * @param normalized_mass the mass (logged probabilistic assignment) of the fragment normalized by its estimated expression
      */
     void increment_observed(size_t l, size_t p, double normalized_mass);
 
     /**
-     * a member function that return the bias weight (logged) of a fractional transcript position
-     * @param len the transcript length
-     * @param pos the fractional transcript position
-     * @return the logged bias weight for the fractional transcript position
+     * a member function that return the bias weight (logged) of a fractional target position
+     * @param len the target length
+     * @param pos the fractional target position
+     * @return the logged bias weight for the fractional target position
      */
     double get_weight(size_t len, double pos) const;
     
     /**
-     * a member function that return the bias weight (logged) of a fractional transcript position bin
-     * @param l the transcript length bin
-     * @param p the fractional transcript position bin
-     * @return the logged bias weight for the fractional transcript position
+     * a member function that return the bias weight (logged) of a fractional target position bin
+     * @param l the target length bin
+     * @param p the fractional target position bin
+     * @return the logged bias weight for the fractional target position
      */
     double get_weight(size_t l, size_t p) const;
 
@@ -256,10 +256,10 @@ public:
     
     /**
      * a member function that updates the expectation parameters (sequence-specific and positional)
-     * assuming uniform expression of and accross the transcript's sequence
-     * @param trans the transcript to measure expected counts from
+     * assuming uniform expression of and accross the target's sequence
+     * @param targ the target to measure expected counts from
      */
-    void update_expectations(const Transcript& trans, double mass=0, const std::vector<double>& fl_cdf=std::vector<double>());
+    void update_expectations(const Target& targ, double mass=0, const std::vector<double>& fl_cdf=std::vector<double>());
     
     /**
      * a member function that normalizes the expected counts and converts them to the log scale
@@ -268,21 +268,21 @@ public:
     
     /**
      * a member function that updates the observed parameters (sequence-specific and positional) 
-     * given a fragment mapping to a transcript and its logged probabilistic assignment
+     * given a fragment mapping to a target and its logged probabilistic assignment
      * @param hit the fragment hit (alignment)
      * @param mass the logged probabality of the mapping, which is the amount to update the observed counts by
      */
     void update_observed(const FragHit& hit, double mass);
     
     /**
-     * a member function that returns the 5' and 3' bias values at each position in a given transcript
+     * a member function that returns the 5' and 3' bias values at each position in a given target
      * based on the current bias parameters
-     * @param start_bias a vector containing the logged bias for each 5' start site in the transcript
-     * @param end_bias a vector containing the logged bias for each 3' end site in the transcript
-     * @param trans the transcript for which to calculate the logged bias
+     * @param start_bias a vector containing the logged bias for each 5' start site in the target
+     * @param end_bias a vector containing the logged bias for each 3' end site in the target
+     * @param targ the target for which to calculate the logged bias
      * @return the product of the average 5' and 3' bias (logged)
      */
-    double get_transcript_bias(std::vector<float>& start_bias, std::vector<float>& end_bias, const Transcript& trans) const;
+    double get_target_bias(std::vector<float>& start_bias, std::vector<float>& end_bias, const Target& targ) const;
     
     /**
      * a member function that returns a string containing the observed positional nucleotide probabilities (non-logged) in column-major order (A,C,G,T)

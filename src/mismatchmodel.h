@@ -11,7 +11,7 @@
 #include "frequencymatrix.h"
 
 class FragHit;
-class Transcript;
+class Target;
 
 /** 
  * The MismatchTable class is used to store and update mismatch (error) parameters using a first-order

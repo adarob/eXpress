@@ -18,8 +18,8 @@
 #include "sequence.h"
 
 typedef size_t TransID;
-class Transcript;
-class TranscriptTable;
+class Target;
+class TargetTable;
 
 /**
  * PairStatus enum
@@ -67,14 +67,14 @@ struct FragHit
     std::string name;
     
     /**
-     * a public TransID for the transcript mapped to
+     * a public TransID for the target mapped to
      */
-    TransID trans_id;
+    TransID targ_id;
     
     /**
-     * a public pointer to the transcript mapped to
+     * a public pointer to the target mapped to
      */
-    Transcript* mapped_trans;
+    Target* mapped_targ;
     
     /**
      * a public string containing the "left" read sequence (first according to SAM flag)
@@ -87,13 +87,13 @@ struct FragHit
     Sequence seq_r;
     
     /**
-     * a public size_t containing the 0-based leftmost coordinate mapped to in the transcript
+     * a public size_t containing the 0-based leftmost coordinate mapped to in the target
      * valid only if PairStatus is PAIRED or LEFT_ONLY
      */
     size_t left;
     
     /**
-     * a public size_t containing the position following the 0-based rightmost coordinate mapped to in the transcript
+     * a public size_t containing the position following the 0-based rightmost coordinate mapped to in the target
      * valid only if PairStatus is PAIRED or RIGHT_ONLY
      */
     size_t right;
@@ -108,7 +108,7 @@ struct FragHit
     /**
      * a public bool specifying that the "right" (second according to SAM flag) is reverse complemented when true
      * and the "left" (first according to SAM flag) is reverse complemented when false
-     * in other words, the "left" read is truly left of the "right" read in transcript coordinate space when true
+     * in other words, the "left" read is truly left of the "right" read in target coordinate space when true
      */
     bool left_first;
     

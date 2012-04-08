@@ -18,7 +18,7 @@
 #include <time.h>
 #include "main.h"
 #include "bundles.h"
-#include "transcripts.h"
+#include "targets.h"
 #include "fld.h"
 #include "fragments.h"
 #include "biascorrection.h"
@@ -256,10 +256,10 @@ bool parse_options(int ac, char ** av)
  * and the mass of the fragment is divided based on the normalized marginals to update the model parameters.
  * @param mass_n double specifying the logged fragment mass
  * @param frag_p pointer to the fragment to probabilistically assign
- * @param trans_table pointer to the transcript table
+ * @param targ_table pointer to the target table
  * @param globs a pointer to the struct containing pointers to the global parameter tables (bias_table, mismatch_table, fld)
  */
-void process_fragment(double mass_n, Fragment* frag_p, TranscriptTable* trans_table, Globals& globs)
+void process_fragment(double mass_n, Fragment* frag_p, TargetTable* targ_table, Globals& globs)
 {
     Fragment& frag = *frag_p;
     
@@ -275,18 +275,18 @@ void process_fragment(double mass_n, Fragment* frag_p, TranscriptTable* trans_ta
     size_t num_solveable = 0;
     
     
-    boost::unordered_set<Transcript*> trans_set;
+    boost::unordered_set<Target*> targ_set;
 
     if (frag.num_hits()>1)
     {
         for(size_t i = 0; i < frag.num_hits(); ++i)
         {
             const FragHit& m = *frag.hits()[i];
-            Transcript* t = m.mapped_trans;
-            if (trans_set.count(t) == 0)
+            Target* t = m.mapped_targ;
+            if (targ_set.count(t) == 0)
             {
                 t->lock();
-                trans_set.insert(t);
+                targ_set.insert(t);
             }
             likelihoods[i] = t->log_likelihood(m, first_round);
             masses[i] = t->mass();
@@ -299,16 +299,16 @@ void process_fragment(double mass_n, Fragment* frag_p, TranscriptTable* trans_ta
     }
     else
     {
-        Transcript* t = frag.hits()[0]->mapped_trans;
+        Target* t = frag.hits()[0]->mapped_targ;
         t->lock();
-        trans_set.insert(t);
+        targ_set.insert(t);
         total_likelihood = likelihoods[0];
     }
     
     assert(!islzero(total_likelihood));
     
     // merge bundles
-    Bundle* bundle = frag.hits()[0]->mapped_trans->bundle();
+    Bundle* bundle = frag.hits()[0]->mapped_targ->bundle();
     if (first_round)
     {
         bundle->incr_counts();
@@ -318,9 +318,9 @@ void process_fragment(double mass_n, Fragment* frag_p, TranscriptTable* trans_ta
     for(size_t i = 0; i < frag.num_hits(); ++i)
     {
         FragHit& m = *frag.hits()[i];
-        Transcript* t  = m.mapped_trans;
+        Target* t  = m.mapped_targ;
  
-        bundle = trans_table->merge_bundles(bundle, t->bundle());
+        bundle = targ_table->merge_bundles(bundle, t->bundle());
         
         double p = likelihoods[i]-total_likelihood;
         double mass_t = mass_n + p;
@@ -370,12 +370,12 @@ void process_fragment(double mass_n, Fragment* frag_p, TranscriptTable* trans_ta
                 if ((first_round && last_round) || online_additional)
                     covar += 2*mass_n;
                 
-                trans_table->update_covar(m.trans_id, m2.trans_id, covar); 
+                targ_table->update_covar(m.targ_id, m2.targ_id, covar); 
             }
         }
     }
     
-    foreach (Transcript* t, trans_set)
+    foreach (Target* t, targ_set)
     {
         t->unlock();
     }
@@ -385,11 +385,11 @@ void process_fragment(double mass_n, Fragment* frag_p, TranscriptTable* trans_ta
  * This is the driver function for the main processing thread.  This function keeps track of the current fragment mass and sends fragments to be
  * processed once they are passed by the parsing thread.
  * @param map_parser the parsing object
- * @param trans_table pointer to the transcript table
+ * @param targ_table pointer to the target table
  * @param globs a struct containing pointers to the global parameter tables (bias_table, mismatch_table, fld)
  * @return the total number of fragments processed
  */
-size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TranscriptTable* trans_table, Globals& globs)
+size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TargetTable* targ_table, Globals& globs)
 {
     cout << "Processing input fragment alignments...\n";
     
@@ -409,7 +409,7 @@ size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TranscriptTable* 
         ParseThreadSafety pts;
         boost::mutex bu_mut;
         running = true;
-        boost::thread parse(&ThreadedMapParser::threaded_parse, &map_parser, &pts, trans_table);
+        boost::thread parse(&ThreadedMapParser::threaded_parse, &map_parser, &pts, targ_table);
         
         while(!stop_at || num_frags < stop_at)
         {
@@ -433,7 +433,7 @@ size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TranscriptTable* 
                     
             if (n == burn_in)
             {
-                bias_update = new boost::thread(&TranscriptTable::threaded_bias_update, trans_table, &bu_mut);
+                bias_update = new boost::thread(&TargetTable::threaded_bias_update, targ_table, &bu_mut);
                 if (globs.mismatch_table)
                     (globs.mismatch_table)->activate();
             }
@@ -444,7 +444,7 @@ size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TranscriptTable* 
             
             {
                 boost::unique_lock<boost::mutex> lock(bu_mut);
-                process_fragment(mass_n, frag, trans_table, globs);
+                process_fragment(mass_n, frag, targ_table, globs);
             }
             
             num_frags++;
@@ -461,7 +461,7 @@ size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TranscriptTable* 
                 }
                 else
                 {
-                    cout << "Fragments Processed: " << setw(9) << num_frags << "\t Number of Bundles: "<< trans_table->num_bundles() << endl;
+                    cout << "Fragments Processed: " << setw(9) << num_frags << "\t Number of Bundles: "<< targ_table->num_bundles() << endl;
                 }
             }
 
@@ -478,7 +478,7 @@ size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TranscriptTable* 
                     cerr << e.what() << endl;
                     exit(1);
                 }
-                trans_table->output_results(dir, n, false);
+                targ_table->output_results(dir, n, false);
                 
                 ofstream paramfile((dir + "/params.xprs").c_str());
                 (globs.fld)->append_output(paramfile);
@@ -529,7 +529,7 @@ size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TranscriptTable* 
                     cerr << e.what() << endl;
                     exit(1);
                 }
-                trans_table->output_results(dir, num_frags, false);
+                targ_table->output_results(dir, num_frags, false);
             }
             cout << remaining_rounds << " remaining rounds." << endl;
             first_round = false;
@@ -547,7 +547,7 @@ size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TranscriptTable* 
     if (vis)
         cout << "99\n";
     else
-        cout << "COMPLETED: Processed " << num_frags << " mapped fragments, targets are in " << trans_table->num_bundles() << " bundles\n";
+        cout << "COMPLETED: Processed " << num_frags << " mapped fragments, targets are in " << targ_table->num_bundles() << " bundles\n";
     
     return num_frags;
 }
@@ -580,18 +580,18 @@ int main (int argc, char ** argv)
     
     ThreadedMapParser map_parser(in_map_file_name, out_map_file_name, last_round);
     globs.bias_table = (bias_correct) ? new BiasBoss(bias_alpha):NULL;
-    TranscriptTable trans_table(fasta_file_name, map_parser.trans_index(), map_parser.trans_lengths(), expr_alpha, expr_alpha_map, &globs);
-    globs.trans_table = &trans_table;
+    TargetTable targ_table(fasta_file_name, map_parser.targ_index(), map_parser.targ_lengths(), expr_alpha, expr_alpha_map, &globs);
+    globs.targ_table = &targ_table;
     
-    double num_trans = (double)map_parser.trans_index().size();
+    double num_targ = (double)map_parser.targ_index().size();
     
-    if (calc_covar && (double)SSIZE_MAX < num_trans*(num_trans+1))
+    if (calc_covar && (double)SSIZE_MAX < num_targ*(num_targ+1))
     {
-        cerr << "Warning: Your system is unable to represent large enough values for efficiently hashing transcript pairs.  Covariance calculation will be disabled.\n";
+        cerr << "Warning: Your system is unable to represent large enough values for efficiently hashing target pairs.  Covariance calculation will be disabled.\n";
         calc_covar = false;
     }
     
-    size_t tot_counts = threaded_calc_abundances(map_parser, &trans_table, globs);
+    size_t tot_counts = threaded_calc_abundances(map_parser, &targ_table, globs);
     
     if (both)
     {
@@ -599,7 +599,7 @@ int main (int argc, char ** argv)
         online_additional = false;
     }
     
-    trans_table.round_reset();
+    targ_table.round_reset();
     ff_param = 1.0;
     first_round = false;
     while (!last_round)
@@ -615,20 +615,20 @@ int main (int argc, char ** argv)
                 cerr << e.what() << endl;
                 exit(1);
             }
-            trans_table.output_results(dir, tot_counts, false);
+            targ_table.output_results(dir, tot_counts, false);
         }
         remaining_rounds--;
         cout << "\nRe-estimating counts with additional round of EM (" << remaining_rounds << " remaining)...\n";
         last_round = (remaining_rounds == 0);
         map_parser.write_active(last_round);
         map_parser.reset_reader();
-        tot_counts = threaded_calc_abundances(map_parser, &trans_table, globs);
-        trans_table.round_reset();
+        tot_counts = threaded_calc_abundances(map_parser, &targ_table, globs);
+        targ_table.round_reset();
     }
     
 	cout << "Writing results to file...\n";
     
-    trans_table.output_results(output_dir, tot_counts, calc_covar);
+    targ_table.output_results(output_dir, tot_counts, calc_covar);
     ofstream paramfile((output_dir + "/params.xprs").c_str());
     (globs.fld)->append_output(paramfile);
     if (globs.mismatch_table)

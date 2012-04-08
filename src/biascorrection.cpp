@@ -12,7 +12,7 @@
 #include <boost/assign.hpp>
 #include "main.h"
 #include "biascorrection.h"
-#include "transcripts.h"
+#include "targets.h"
 #include "fragments.h"
 #include "frequencymatrix.h"
 #include "sequence.h"
@@ -94,15 +94,15 @@ void SeqWeightTable::append_output(ofstream& outfile) const
     
     for(size_t j = 0; j < pow((double)NUM_NUCS, (double)FG_ORDER+1); j++)
     {
-        string trans = "->";
-        trans += NUCS[j & 3];
+        string s = "->";
+        s += NUCS[j & 3];
         size_t cond = j >> 2;
         for(size_t k = 0; k < FG_ORDER; ++k)
         {
-            trans = NUCS[cond & 3] + trans;
+            s = NUCS[cond & 3] + s;
             cond = cond >> 2;
         }
-        outfile << trans << '\t';
+        outfile << s << '\t';
     }
     outfile << endl;
     
@@ -120,15 +120,15 @@ void SeqWeightTable::append_output(ofstream& outfile) const
     
     for(size_t j = 0; j < pow((double)NUM_NUCS, (double)BG_ORDER+1); j++)
     {
-        string trans = "->";
-        trans += NUCS[j & 3];
+        string s = "->";
+        s += NUCS[j & 3];
         size_t cond = j >> 2;
         for(size_t k = 0; k < BG_ORDER; ++k)
         {
-            trans = NUCS[cond & 3] + trans;
+            s = NUCS[cond & 3] + s;
             cond = cond >> 2;
         }
-        outfile << trans << '\t';
+        outfile << s << '\t';
     }
     outfile << endl;
     
@@ -255,13 +255,13 @@ void BiasBoss::copy_expectations(const BiasBoss& other)
     _3_seq_bias.copy_expected(other._3_seq_bias);
 }
 
-void BiasBoss::update_expectations(const Transcript& trans, double mass, const vector<double>& fl_cdf)
+void BiasBoss::update_expectations(const Target& targ, double mass, const vector<double>& fl_cdf)
 {
     if (mass == HUGE_VAL)
         return;
 
-    const Sequence& seq_fwd = trans.seq(0);
-    const Sequence& seq_rev = trans.seq(1);
+    const Sequence& seq_fwd = targ.seq(0);
+    const Sequence& seq_rev = targ.seq(1);
 
     _5_seq_bias.increment_expected(seq_fwd, mass, fl_cdf);
     _3_seq_bias.increment_expected(seq_rev, mass, fl_cdf);
@@ -277,8 +277,8 @@ void BiasBoss::update_observed(const FragHit& hit, double normalized_mass)
 {
     assert (hit.pair_status() != PAIRED || hit.length() > WINDOW);
     
-    const Sequence& t_seq_fwd = hit.mapped_trans->seq(0);
-    const Sequence& t_seq_rev = hit.mapped_trans->seq(1);
+    const Sequence& t_seq_fwd = hit.mapped_targ->seq(0);
+    const Sequence& t_seq_rev = hit.mapped_targ->seq(1);
 
     if (hit.pair_status() != RIGHT_ONLY)
     {
@@ -291,23 +291,23 @@ void BiasBoss::update_observed(const FragHit& hit, double normalized_mass)
     }
 }
 
-double BiasBoss::get_transcript_bias(std::vector<float>& start_bias, std::vector<float>& end_bias, const Transcript& trans) const
+double BiasBoss::get_target_bias(std::vector<float>& start_bias, std::vector<float>& end_bias, const Target& targ) const
 {
     double tot_start = HUGE_VAL;
     double tot_end = HUGE_VAL;
     
-    const Sequence& t_seq_fwd = trans.seq(0);
-    const Sequence& t_seq_rev = trans.seq(1);
+    const Sequence& t_seq_fwd = targ.seq(0);
+    const Sequence& t_seq_rev = targ.seq(1);
 
-    for (size_t i = 0; i < trans.length(); ++i)
+    for (size_t i = 0; i < targ.length(); ++i)
     {
         start_bias[i] = _5_seq_bias.get_weight(t_seq_fwd, i);// + curr_5_pos_bias;
-        end_bias[trans.length()-i-1] = _3_seq_bias.get_weight(t_seq_rev, i);// + curr_3_pos_bias;
+        end_bias[targ.length()-i-1] = _3_seq_bias.get_weight(t_seq_rev, i);// + curr_3_pos_bias;
         tot_start = log_sum(tot_start, start_bias[i]);
         tot_end = log_sum(tot_start, end_bias[i]);
     }
     
-    double avg_bias = (tot_start + tot_end) - (2*log((double)trans.length()));
+    double avg_bias = (tot_start + tot_end) - (2*log((double)targ.length()));
     assert(!isnan(avg_bias));
     return avg_bias;
 }

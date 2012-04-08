@@ -1,5 +1,5 @@
 //
-//  transcripts.h
+//  targets.h
 //  express
 //
 //  Created by Adam Roberts on 3/20/11.
@@ -26,7 +26,7 @@ class BiasBoss;
 class MismatchTable;
 
 /**
- *  The RoundParams struct stores the transcript parameters unique to a given round (iteration) of EM
+ *  The RoundParams struct stores the target parameters unique to a given round (iteration) of EM
  *  @author    Adam Roberts
  *  @date      2012
  *  @copyright Artistic License 2.0
@@ -39,7 +39,7 @@ struct RoundParams
     double mass;
         
     /**
-     * a public double that stores the (logged) total mass of ambiguous fragments mapping to the transcript
+     * a public double that stores the (logged) total mass of ambiguous fragments mapping to the target
      */
     double tot_ambig_mass;
    
@@ -63,7 +63,7 @@ typedef size_t TransID;
 
 
 /**
- * The Transcript class is used to store objects for the transcripts
+ * The Target class is used to store objects for the targets
  * being mapped to.  Besides storing basic information about the object
  * (id, length), it also stores a mass based on the number of 
  * fragments mapping to the object.  To help with updating this number,
@@ -73,7 +73,7 @@ typedef size_t TransID;
  *  @date      2011
  *  @copyright Artistic License 2.0
  **/
-class Transcript
+class Target
 {
     /**
      * a private pointer to the struct containing pointers to the global parameter tables (bias_table, mismatch_table, fld)
@@ -81,22 +81,22 @@ class Transcript
     const Globals* _globs;
     
     /**
-     * a private TransID that stores the hashed transcript name
+     * a private TransID that stores the hashed target name
      */
     TransID _id;
     
     /**
-     * a private string that stores the transcript name
+     * a private string that stores the target name
      */
     std::string _name;
     
     /**
-     * a private Sequence object that stores the forward transcript sequence
+     * a private Sequence object that stores the forward target sequence
      */
     Sequence _seq_f;
 
     /**
-     * a private Sequence object that stores the reverse transcript sequence
+     * a private Sequence object that stores the reverse target sequence
      */
     Sequence _seq_r;
     
@@ -122,18 +122,18 @@ class Transcript
     
     /**
      * a private size_t that stores the number of fragments (non-logged) uniquely mapping
-     * to this transcript
+     * to this target
      */
     size_t _uniq_counts;
     
     /**
      * a private size_t that stores the fragment counts (non-logged) for the bundle
-     * the total bundle counts is the sum of this value for all transcripts in the bundle
+     * the total bundle counts is the sum of this value for all targets in the bundle
      */
     size_t _tot_counts;
     
     /**
-     * a private pointer to the Bundle this Transcript is a member of
+     * a private pointer to the Bundle this Target is a member of
      */
     Bundle* _bundle;
     
@@ -153,7 +153,7 @@ class Transcript
     std::vector<float>* _end_bias;
     
     /**
-     * a private double storing the (logged) product of the average 3' and 5' biases for the transcript (accessed by multiple threads)
+     * a private double storing the (logged) product of the average 3' and 5' biases for the target (accessed by multiple threads)
      */
     double _avg_bias;
     
@@ -162,24 +162,27 @@ class Transcript
      */
     double _cached_eff_len;
     
-    //DOC
+    /**
+     * a private boolean specifying whether a unique solution exists, always false unless a unique read is mapped to the target
+     * or all other targets in a mapping are solveable
+     */
     bool _solveable;
     
 public:
     
     /**
-     * Transcript Constructor
-     * @param name a string that stores the transcript name
-     * @param seq a string that stores the transcript sequence
+     * Target Constructor
+     * @param name a string that stores the target name
+     * @param seq a string that stores the target sequence
      * @param alpha a double that specifies the intial pseudo-counts (non-logged)
      * @param globs a pointer to the struct containing pointers to the global parameter tables (bias_table, mismatch_table, fld)
      */
-    Transcript(const size_t id, const std::string& name, const std::string& seq, double alpha, const Globals* globs);
+    Target(const size_t id, const std::string& name, const std::string& seq, double alpha, const Globals* globs);
     
     /**
-     * Transcript Destructor deletes bias vectors
+     * Target Destructor deletes bias vectors
      */    
-    ~Transcript()
+    ~Target()
     {
         if (_start_bias)
             delete _start_bias;
@@ -188,40 +191,40 @@ public:
     }
     
     /**
-     * a member function that locks the transcript mutex to provide thread safety
+     * a member function that locks the target mutex to provide thread safety
      */
     void lock() { _lock.lock(); }
     
     /**
-     * a member function that unlocks the transcript mutex to provide thread safety
+     * a member function that unlocks the target mutex to provide thread safety
      */
     void unlock() { _lock.unlock(); }
 
     /**
-     * a member function that returns the transcript name
-     * @return string containing transcript name
+     * a member function that returns the target name
+     * @return string containing target name
      */
     const std::string& name() const { return _name; }
     
     /**
-     * a member function that returns the transcript id
-     * @return TransID transcript ID
+     * a member function that returns the target id
+     * @return TransID target ID
      */
     TransID id() const { return _id; }
     /**
-     * a member function that returns the transcript sequence
-     * @return string containing transcript sequence
+     * a member function that returns the target sequence
+     * @return string containing target sequence
      */
     const Sequence& seq(bool rev) const { if (rev) return _seq_r; return _seq_f; }
     
     /**
-     * a member function that returns the transcript length
-     * @return transcript length
+     * a member function that returns the target length
+     * @return target length
      */
     size_t length() const { return _seq_f.length(); }
     
     /**
-     * a member function that returns the current estimated rho (logged, w/ pseudo-counts) for the transcript
+     * a member function that returns the current estimated rho (logged, w/ pseudo-counts) for the target
      * @return the current estimated rho
      */
     double rho() const;
@@ -246,51 +249,51 @@ public:
     double var_sum() const { return _ret_params->var_sum; }
             
     /**
-     * a member function that returns the (logged) total mass of ambiguous fragments mapping to the transcript
-     * @return the (logged) total mass of ambiguous fragments mapping to the transcript
+     * a member function that returns the (logged) total mass of ambiguous fragments mapping to the target
+     * @return the (logged) total mass of ambiguous fragments mapping to the target
      */
     double tot_ambig_mass() const { return _ret_params->tot_ambig_mass; }
     
     /**
-     * a member function that readies the transcript object for the next round of batch EM
+     * a member function that readies the target object for the next round of batch EM
      */
     void round_reset();
     
     /**
-     * a member function that returns the current count of fragments mapped to this transcript (uniquely or ambiguously)
+     * a member function that returns the current count of fragments mapped to this target (uniquely or ambiguously)
      * @return total fragment count
      */
     size_t tot_counts() const { return _tot_counts; }
     
     /**
-     * a member function that returns the current count of fragments uniquely mapped to this transcript
+     * a member function that returns the current count of fragments uniquely mapped to this target
      * @return unique fragment count
      */
     size_t uniq_counts() const { return _uniq_counts; }
     
     /**
-     * a member function that returns the Bundle this Transcript is a member of
-     * @return a pointer to the Bundle this transcript is a member of
+     * a member function that returns the Bundle this Target is a member of
+     * @return a pointer to the Bundle this target is a member of
      */
     Bundle* bundle() { return _bundle; }
 
     /**
-     * a member function that set the Bundle this Transcript is a member of
-     * @param b a pointer to the Bundle to set this Transcript as a member of
+     * a member function that set the Bundle this Target is a member of
+     * @param b a pointer to the Bundle to set this Target as a member of
      */
     void bundle(Bundle* b) { _bundle = b; }
     
     /**
      * a member function that increases the expected fragment counts and variance by a given (logged) fragment mass
-     * @param p a double for the (logged) probability that the fragment was generated by this transcript
+     * @param p a double for the (logged) probability that the fragment was generated by this target
      * @param v a double for the (logged) approximate variance (uncertainty) on the probability
      * @param mass a double specifying the (logged) mass of the fragment being mapped
      */
     void add_mass(double p, double v, double mass);
     
     /**
-     * a member function that increases the count of fragments mapped to this transcript
-     * @param uniq a bool specifying whether or not the fragment uniquely maps to this transcript
+     * a member function that increases the count of fragments mapped to this target
+     * @param uniq a bool specifying whether or not the fragment uniquely maps to this target
      * @param incr_amt a size_t to increase the counts by
      */
     void incr_counts(bool uniq, size_t incr_amt = 1)
@@ -303,54 +306,62 @@ public:
     
     /**
      * a member function that returns (a value proportional to) the log likelihood the given fragment
-     * originated from this transcript
-     * @param frag a FragHit to return the likelihood of being originated from this transcript
+     * originated from this target
+     * @param frag a FragHit to return the likelihood of being originated from this target
      * @param with_pseudo a FragHit specifying whether or not pseudo-counts should be included in the calculation
-     * @return (a value proportional to) the log likelihood the given fragment originated from this transcript
+     * @return (a value proportional to) the log likelihood the given fragment originated from this target
      */
     double log_likelihood(const FragHit& frag, bool with_pseudo) const;
         
     /**
-     * a member function that calcualtes and returns the estimated effective length of the transcript (logged) using the avg bias
+     * a member function that calcualtes and returns the estimated effective length of the target (logged) using the avg bias
      * @param fld an optional pointer to a different FLD than the global one, for thread-safety
      * @param with_bias a boolean specifying whether or not the average bias should be used in the calculation
-     * @return the estimated effective length of the transcript calculated as \f$ \tilde{l} = \bar{bias}\sum_{l=1}^{L(t)} D(l)(L(t) - l + 1) \f$
+     * @return the estimated effective length of the target calculated as \f$ \tilde{l} = \bar{bias}\sum_{l=1}^{L(t)} D(l)(L(t) - l + 1) \f$
      */
     double est_effective_length(FLD* fld = NULL, bool with_bias=true) const;
     
     /**
      * a member function that returns the most recently estimated effective length (logged) as calculated by the bias updater thread 
-     * @return the cached effective length of the transcript calculated
+     * @return the cached effective length of the target calculated
      */
     double cached_effective_length(bool with_bias=true) const;
 
     /**
-     * a member function that causes the transcript bias to be re-calculated by the _bias_table based on curent parameters
+     * a member function that causes the target bias to be re-calculated by the _bias_table based on curent parameters
      * @param bias_table an optional pointer to a different BiasBoss than the global one, for thread-safety
      * @param fld an optional pointer to a different FLD than the global one, for thread-safety
      */
-    void update_transcript_bias(BiasBoss* bias_table = NULL, FLD* fld = NULL);
+    void update_target_bias(BiasBoss* bias_table = NULL, FLD* fld = NULL);
 
-    //DOC
+    /**
+     * a member function that returns the _solveable flag
+     * @return a boolean specifying whether or not the target has a unique solution
+     */    
     bool solveable() { return _solveable; }
+    
+    /**
+     * a member function that sets the _solveable flag
+     * @param a boolean specifying whether or not the target has a unique solution
+     */   
     void solveable(bool s) { _solveable = s; }
     
 };
 
-typedef std::vector<Transcript*> TransMap;
+typedef std::vector<Target*> TransMap;
 typedef boost::unordered_map<std::string, size_t> TransIndex;
 typedef boost::unordered_map<size_t, float> CovarMap;
 typedef boost::unordered_map<std::string, double> AlphaMap;
 
 /**
- * The TranscriptTable class is used to keep track of the Transcript objects for a run.
- * The constructor parses a fasta file to generate the Transcript objects and store them in a map
+ * The TargetTable class is used to keep track of the Target objects for a run.
+ * The constructor parses a fasta file to generate the Target objects and store them in a map
  * that allows them to be looked up based on their string id.
  *  @author    Adam Roberts
  *  @date      2011
  *  @copyright Artistic License 2.0
  **/
-class TranscriptTable
+class TargetTable
 {
     /**
      * a private pointer to the struct containing pointers to the global parameter tables (bias_table, mismatch_table, fld)
@@ -358,9 +369,9 @@ class TranscriptTable
     Globals* _globs;
         
     /**
-     * a private map to look up pointers to Transcript objects by their TransID id
+     * a private map to look up pointers to Target objects by their TransID id
      */
-    TransMap _trans_map;
+    TransMap _targ_map;
     
     /**
      * the private table to keep track of Bundles
@@ -368,7 +379,7 @@ class TranscriptTable
     BundleTable _bundle_table;
     
     /**
-     * a private CovarTable to look up the covariance for pairs of Transcripts by their combined hashed TransIDs
+     * a private CovarTable to look up the covariance for pairs of Targets by their combined hashed TransIDs
      * these values are stored positive, even though they are negative
      */
     CovarTable _covar_table;
@@ -384,50 +395,50 @@ class TranscriptTable
     mutable boost::mutex _fpb_mut;
     
     /**
-     * a private function that validates and adds a transcript pointer to the table
+     * a private function that validates and adds a target pointer to the table
      * @param name the name of the trancript
-     * @param seq the sequence of the transcript
-     * @param alpha a double that specifies the initial pseudo-counts for each bp of the transcript (non-logged)
-     * @param trans_index the transcript-to-index map from the alignment file
-     * @param trans_lengths the transcript-to-length map from the alignment file (for validation)
+     * @param seq the sequence of the target
+     * @param alpha a double that specifies the initial pseudo-counts for each bp of the target (non-logged)
+     * @param targ_index the target-to-index map from the alignment file
+     * @param targ_lengths the target-to-length map from the alignment file (for validation)
      */
-    void add_trans(const std::string& name, const std::string& seq, double alpha, const TransIndex& trans_index, const TransIndex& trans_lengths);  
+    void add_targ(const std::string& name, const std::string& seq, double alpha, const TransIndex& targ_index, const TransIndex& targ_lengths);  
     
 public:
     /**
-     * TranscriptTable Constructor
-     * @param trans_fasta_file a string storing the path to the fasta file from which to load transcripts
-     * @param trans_index the transcript-to-index map from the alignment file
-     * @param trans_lengths the transcript-to-length map from the alignment file
-     * @param alpha a double that specifies the intial pseudo-counts for each bp of the transcripts (non-logged)
-     * @param alpha_map an optional pointer to a map object that specifies proportional weights of pseudo-counts for each transcript
+     * TargetTable Constructor
+     * @param targ_fasta_file a string storing the path to the fasta file from which to load targets
+     * @param targ_index the target-to-index map from the alignment file
+     * @param targ_lengths the target-to-length map from the alignment file
+     * @param alpha a double that specifies the intial pseudo-counts for each bp of the targets (non-logged)
+     * @param alpha_map an optional pointer to a map object that specifies proportional weights of pseudo-counts for each target
      * @param globs a pointer to the struct containing pointers to the global parameter tables (bias_table, mismatch_table, fld)
      */
-    TranscriptTable(const std::string& trans_fasta_file, const TransIndex& trans_index, const TransIndex& trans_lengths, double alpha, const AlphaMap* alpha_map, Globals* globs);
+    TargetTable(const std::string& targ_fasta_file, const TransIndex& targ_index, const TransIndex& targ_lengths, double alpha, const AlphaMap* alpha_map, Globals* globs);
     
     /**
-     * TranscriptTable Destructor
-     * deletes all of the transcript objects in the table
+     * TargetTable Destructor
+     * deletes all of the target objects in the table
      */
-    ~TranscriptTable();
+    ~TargetTable();
         
     /**
-     * a member function that returns a pointer to the transcript with the given id 
-     * @param id of the transcript queried
-     * @return pointer to the transcript wit the given id
+     * a member function that returns a pointer to the target with the given id 
+     * @param id of the target queried
+     * @return pointer to the target wit the given id
      */
-    Transcript* get_trans(TransID id);
+    Target* get_targ(TransID id);
     
     /**
-     * a member function that readies all Transcript objects in the table for the next round of batch EM
+     * a member function that readies all Target objects in the table for the next round of batch EM
      */
     void round_reset();
     
     /**
-     * a member function that returns the number of transcripts in the table
-     * @return number of transcripts in the table
+     * a member function that returns the number of targets in the table
+     * @return number of targets in the table
      */
-    size_t size() const { return _trans_map.size(); }
+    size_t size() const { return _targ_map.size(); }
     
     /**
      * a member function that returns the (logged) total mass per base (including pseudo-counts)
@@ -442,26 +453,26 @@ public:
     void update_total_fpb(double incr_amt);
     
     /**
-     * a member function that increases the covariance between two transcripts by the specified amount
+     * a member function that increases the covariance between two targets by the specified amount
      * these values are stored positive even though they are negative (logged)
-     * @param trans1 one of the transcripts in the pair
-     * @param trans2 the other transcript in the pair
+     * @param targ1 one of the targets in the pair
+     * @param targ2 the other target in the pair
      * @param covar a double specifying the amount to increase the pair's covariance by (logged)
      */
-    void update_covar(TransID trans1, TransID trans2, double covar) { _covar_table.increment(trans1, trans2, covar); }
+    void update_covar(TransID targ1, TransID targ2, double covar) { _covar_table.increment(targ1, targ2, covar); }
     
     /**
-     * a member function that returns the covariance between two transcripts
+     * a member function that returns the covariance between two targets
      * these returned value will be the log of the negative of the true value
-     * @param trans1 one of the transcripts in the pair
-     * @param trans2 the other transcript in the pair
+     * @param targ1 one of the targets in the pair
+     * @param targ2 the other target in the pair
      * @return the negative of the pair's covariance (logged)
      */
-    double get_covar(TransID trans1, TransID trans2) { return _covar_table.get(trans1, trans2); }
+    double get_covar(TransID targ1, TransID targ2) { return _covar_table.get(targ1, targ2); }
     
     /**
-     * a member function that returns the number of pairs of transcripts with non-zero covariance
-     * @return the number of transcript pairs with non-zero covariance
+     * a member function that returns the number of pairs of targets with non-zero covariance
+     * @return the number of target pairs with non-zero covariance
      */
     size_t covar_size() const { return _covar_table.size(); }
        
@@ -489,7 +500,7 @@ public:
     void output_results(std::string output_dir, size_t tot_counts, bool output_varcov);
     
     /**
-     * a member function for driving a thread that continuously updates the transcript bias values
+     * a member function for driving a thread that continuously updates the target bias values
      */
     void threaded_bias_update(boost::mutex* mut);
 };

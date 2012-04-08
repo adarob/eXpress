@@ -9,7 +9,7 @@
 #include "mapparser.h"
 #include "main.h"
 #include "fragments.h"
-#include "transcripts.h"
+#include "targets.h"
 #include "threadsafety.h"
 
 using namespace std;
@@ -165,7 +165,7 @@ ThreadedMapParser::~ThreadedMapParser()
         delete _writer;
 }
 
-void ThreadedMapParser::threaded_parse(ParseThreadSafety* thread_safety, TranscriptTable* trans_table)
+void ThreadedMapParser::threaded_parse(ParseThreadSafety* thread_safety, TargetTable* targ_table)
 {
     ParseThreadSafety& ts = *thread_safety;
     bool fragments_remain = true;
@@ -185,14 +185,14 @@ void ThreadedMapParser::threaded_parse(ParseThreadSafety* thread_safety, Transcr
         for (size_t i = 0; frag && i < frag->hits().size(); ++i)
         {
             FragHit& m = *(frag->hits()[i]);
-            Transcript* t = trans_table->get_trans(m.trans_id);
+            Target* t = targ_table->get_targ(m.targ_id);
             if (!t)
             {
-                cerr << "ERROR: Target sequence at index '" << m.trans_id << "' not found. Verify that it is in the SAM/BAM header and FASTA file.\n";
+                cerr << "ERROR: Target sequence at index '" << m.targ_id << "' not found. Verify that it is in the SAM/BAM header and FASTA file.\n";
                 exit(1);
             }
-            m.mapped_trans = t;
-            assert(t->id() == m.trans_id);
+            m.mapped_targ = t;
+            assert(t->id() == m.targ_id);
         }
 
         last_frag = ts.next_frag;
@@ -235,8 +235,8 @@ BAMParser::BAMParser(BamTools::BamReader* reader)
     size_t index = 0;
     foreach(const BamTools::RefData& ref, _reader->GetReferenceData())
     {
-        _trans_index[ref.RefName] = index++;
-        _trans_lengths[ref.RefName] = ref.RefLength;
+        _targ_index[ref.RefName] = index++;
+        _targ_lengths[ref.RefName] = ref.RefLength;
     }
     
     // Get first valid FragHit
@@ -287,7 +287,7 @@ bool BAMParser::map_end_from_alignment(BamTools::BamAlignment& a)
     
     f.left_first = (!a.IsPaired() && !a.IsReverseStrand()) || (a.IsFirstMate() && !a.IsReverseStrand()) || (a.IsSecondMate() && a.IsReverseStrand());
     f.name = a.Name;
-    f.trans_id = a.RefID;
+    f.targ_id = a.RefID;
     f.left = a.Position;
     f.mate_l = a.MatePosition;
     
@@ -372,9 +372,9 @@ SAMParser::SAMParser(istream* in)
         {
             string name = str.substr(idx+3);
             name = name.substr(0,name.find_first_of("\n\t "));
-            if (_trans_index.find(name) == _trans_index.end())
+            if (_targ_index.find(name) == _targ_index.end())
             {
-                _trans_index[name] = index++;
+                _targ_index[name] = index++;
             }
             else
             {
@@ -386,7 +386,7 @@ SAMParser::SAMParser(istream* in)
             {
                 string len = str.substr(idx+3);
                 len = len.substr(0,len.find_first_of("\n\t "));
-                _trans_lengths[name] = atoi(len.c_str());
+                _targ_lengths[name] = atoi(len.c_str());
             }
         }
     }
@@ -461,12 +461,12 @@ bool SAMParser::map_end_from_line(char* line)
             {
                 if(p[0] == '*')
                     goto stop;
-                if (!_trans_index.count(p))
+                if (!_targ_index.count(p))
                 {
                     cerr << "ERROR: Target sequence '" << p << "' not found. Verify that it is in the SAM/BAM header and FASTA file.\n";
                     exit(1);
                 }
-                f.trans_id = _trans_index[p];
+                f.targ_id = _targ_index[p];
                 break;
             }
             case 3:

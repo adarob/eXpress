@@ -6,15 +6,15 @@
 //  Copyright 2011 Adam Roberts. All rights reserved.
 //
 
-#include "transcripts.h"
+#include "targets.h"
 #include "bundles.h"
 #include "main.h"
 
 using namespace std;
 
-void CovarTable::increment(TransID trans1, TransID trans2, double incr_amt)
+void CovarTable::increment(TransID targ1, TransID targ2, double incr_amt)
 {
-    size_t pair_id = size()*min(trans1, trans2)+max(trans1, trans2);
+    size_t pair_id = size()*min(targ1, targ2)+max(targ1, targ2);
     if (_covar_map.count(pair_id))
     {
             _covar_map[pair_id] = log_sum(_covar_map[pair_id], incr_amt);
@@ -26,9 +26,9 @@ void CovarTable::increment(TransID trans1, TransID trans2, double incr_amt)
 }
 
 
-double CovarTable::get(TransID trans1, TransID trans2)
+double CovarTable::get(TransID targ1, TransID targ2)
 {
-    size_t pair_id = size()*min(trans1, trans2)+max(trans1, trans2);
+    size_t pair_id = size()*min(targ1, targ2)+max(targ1, targ2);
     if (_covar_map.count(pair_id))
     {
         return _covar_map[pair_id];
@@ -39,9 +39,9 @@ double CovarTable::get(TransID trans1, TransID trans2)
     }
 }
 
-Bundle::Bundle(Transcript* trans)
-: _counts(trans->tot_counts())
-{ _transcripts.push_back(trans); }
+Bundle::Bundle(Target* targ)
+: _counts(targ->tot_counts())
+{ _targets.push_back(targ); }
 
 void Bundle::incr_counts(size_t incr_amt)
 {
@@ -56,9 +56,9 @@ BundleTable::~BundleTable()
     }
 }
 
-Bundle* BundleTable::create_bundle(Transcript* trans)
+Bundle* BundleTable::create_bundle(Target* targ)
 {
-    Bundle* b = new Bundle(trans);
+    Bundle* b = new Bundle(targ);
     _bundles.insert(b);
     return b;
 }
@@ -72,10 +72,10 @@ Bundle* BundleTable::merge(Bundle* b1, Bundle* b2)
         swap(b1, b2);
 
   
-    foreach(Transcript* trans, b2->transcripts())
+    foreach(Target* targ, b2->targets())
     {
-        trans->bundle(b1);
-        b1->transcripts().push_back(trans);
+        targ->bundle(b1);
+        b1->targets().push_back(targ);
     }
     
     b1->incr_counts(b2->counts());

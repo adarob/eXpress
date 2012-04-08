@@ -1,5 +1,5 @@
 //
-//  transcripts.cpp
+//  targets.cpp
 //  express
 //
 //  Created by Adam Roberts on 3/20/11.
@@ -7,7 +7,7 @@
 //
 
 #include "main.h"
-#include "transcripts.h"
+#include "targets.h"
 #include "fld.h"
 #include "fragments.h"
 #include "biascorrection.h"
@@ -20,7 +20,7 @@
 
 using namespace std;
 
-Transcript::Transcript(const TransID id, const std::string& name, const std::string& seq, double alpha, const Globals* globs)
+Target::Target(const TransID id, const std::string& name, const std::string& seq, double alpha, const Globals* globs)
 :   _globs(globs),
     _id(id),
     _name(name),
@@ -47,7 +47,7 @@ Transcript::Transcript(const TransID id, const std::string& name, const std::str
     _curr_params.mass_var = _cached_eff_len + _alpha;
 }
 
-void Transcript::add_mass(double p, double v, double mass) 
+void Target::add_mass(double p, double v, double mass) 
 { 
     _curr_params.mass = log_sum(_curr_params.mass, p+mass);
     _curr_params.mass_var = log_sum(_curr_params.mass_var, p+mass*2);
@@ -59,41 +59,41 @@ void Transcript::add_mass(double p, double v, double mass)
             _curr_params.tot_ambig_mass = log_sum(_curr_params.tot_ambig_mass, mass);
     }
     
-    (_globs->trans_table)->update_total_fpb(mass - _cached_eff_len);
+    (_globs->targ_table)->update_total_fpb(mass - _cached_eff_len);
     
 }  
 
-void Transcript::round_reset()
+void Target::round_reset()
 {
     _last_params = _curr_params;
     _curr_params = RoundParams();
     _ret_params = &_last_params;
 }
 
-double Transcript::rho() const
+double Target::rho() const
 {
     double eff_len = cached_effective_length(false);
     if (eff_len == HUGE_VAL)
         return HUGE_VAL;
     
-    return mass(true) - eff_len - (_globs->trans_table)->total_fpb();
+    return mass(true) - eff_len - (_globs->targ_table)->total_fpb();
 }
 
-double Transcript::mass(bool with_pseudo) const
+double Target::mass(bool with_pseudo) const
 {
     if (!with_pseudo)
         return _ret_params->mass;
     return log_sum(_ret_params->mass, _alpha+_cached_eff_len);
 }
 
-double Transcript::mass_var(bool with_pseudo) const
+double Target::mass_var(bool with_pseudo) const
 {
     if (!with_pseudo)
         return _ret_params->mass_var;
     return log_sum(_ret_params->mass_var, 2*(_alpha+_cached_eff_len-2));
 }
 
-double Transcript::log_likelihood(const FragHit& frag, bool with_pseudo) const
+double Target::log_likelihood(const FragHit& frag, bool with_pseudo) const
 {
     double ll = 0;
     
@@ -124,7 +124,7 @@ double Transcript::log_likelihood(const FragHit& frag, bool with_pseudo) const
     return ll;
 }
 
-double Transcript::est_effective_length(FLD* fld, bool with_bias) const
+double Target::est_effective_length(FLD* fld, bool with_bias) const
 {
     if (!fld)
     {
@@ -146,7 +146,7 @@ double Transcript::est_effective_length(FLD* fld, bool with_bias) const
     return eff_len;
 }
 
-double Transcript::cached_effective_length(bool with_bias) const
+double Target::cached_effective_length(bool with_bias) const
 {
     if (with_bias)
         return _cached_eff_len + _avg_bias;
@@ -154,7 +154,7 @@ double Transcript::cached_effective_length(bool with_bias) const
 }
 
 
-void Transcript::update_transcript_bias(BiasBoss* bias_table, FLD* fld)
+void Target::update_target_bias(BiasBoss* bias_table, FLD* fld)
 {
     if (!bias_table)
     {
@@ -163,7 +163,7 @@ void Transcript::update_transcript_bias(BiasBoss* bias_table, FLD* fld)
     }
     else
     {
-        _avg_bias = bias_table->get_transcript_bias(*_start_bias, *_end_bias, *this);
+        _avg_bias = bias_table->get_target_bias(*_start_bias, *_end_bias, *this);
         assert(!isnan(_avg_bias) && !isinf(_avg_bias));
         
     }
@@ -173,10 +173,10 @@ void Transcript::update_transcript_bias(BiasBoss* bias_table, FLD* fld)
     }
 }
 
-TranscriptTable::TranscriptTable(const string& trans_fasta_file, const TransIndex& trans_index, const TransIndex& trans_lengths, double alpha, const AlphaMap* alpha_map, Globals* globs)
+TargetTable::TargetTable(const string& targ_fasta_file, const TransIndex& targ_index, const TransIndex& targ_lengths, double alpha, const AlphaMap* alpha_map, Globals* globs)
 : _globs(globs),
-  _trans_map(trans_index.size(), NULL),
-  _total_fpb(log(alpha*trans_index.size()))
+  _targ_map(targ_index.size(), NULL),
+  _total_fpb(log(alpha*targ_index.size()))
 {
     cout << "Loading target sequences";
     if (globs->bias_table)
@@ -194,7 +194,7 @@ TranscriptTable::TranscriptTable(const string& trans_fasta_file, const TransInde
         alpha_renorm = (alpha * alpha_map->size())/alpha_total;
     }
     
-    ifstream infile (trans_fasta_file.c_str());
+    ifstream infile (targ_fasta_file.c_str());
     string line;
     string seq = "";
     string name = "";
@@ -207,7 +207,7 @@ TranscriptTable::TranscriptTable(const string& trans_fasta_file, const TransInde
             {
                 if (!name.empty())
                 {
-                    add_trans(name, seq, (alpha_map) ? alpha_renorm * alpha_map->find(name)->second : alpha, trans_index, trans_lengths);
+                    add_targ(name, seq, (alpha_map) ? alpha_renorm * alpha_map->find(name)->second : alpha, targ_index, targ_lengths);
                 }
                 name = line.substr(1,line.find(' ')-1);
                 if (target_names.count(name))
@@ -232,7 +232,7 @@ TranscriptTable::TranscriptTable(const string& trans_fasta_file, const TransInde
         }
         if (!name.empty())
         {
-            add_trans(name, seq, (alpha_map) ? alpha_renorm * alpha_map->find(name)->second : alpha, trans_index, trans_lengths);
+            add_targ(name, seq, (alpha_map) ? alpha_renorm * alpha_map->find(name)->second : alpha, targ_index, targ_lengths);
         }
         infile.close();
         if (globs->bias_table)
@@ -242,62 +242,62 @@ TranscriptTable::TranscriptTable(const string& trans_fasta_file, const TransInde
     }
     else 
     {
-        cerr << "ERROR: Unable to open MultiFASTA file '" << trans_fasta_file << "'.\n" ; 
+        cerr << "ERROR: Unable to open MultiFASTA file '" << targ_fasta_file << "'.\n" ; 
         exit(1);
     }
     
     if (size() == 0)
     {
-        cerr << "ERROR: No targets found in MultiFASTA file '" << trans_fasta_file << "'.\n" ; 
+        cerr << "ERROR: No targets found in MultiFASTA file '" << targ_fasta_file << "'.\n" ; 
         exit(1);        
     }
     
-    for(TransIndex::const_iterator it = trans_index.begin(); it != trans_index.end(); ++it)
+    for(TransIndex::const_iterator it = targ_index.begin(); it != targ_index.end(); ++it)
     {
-        if (!_trans_map[it->second])
+        if (!_targ_map[it->second])
         {
-            cerr << "ERROR: Sequence for target '" << it->first << "' not found in MultiFasta file '" << trans_fasta_file << "'.\n";
+            cerr << "ERROR: Sequence for target '" << it->first << "' not found in MultiFasta file '" << targ_fasta_file << "'.\n";
             exit(1);
         }
     }
 }
 
-TranscriptTable::~TranscriptTable()
+TargetTable::~TargetTable()
 {
-    foreach( Transcript* trans, _trans_map)
+    foreach( Target* targ, _targ_map)
     {
-        delete trans;
+        delete targ;
     }
 }
 
-void TranscriptTable::add_trans(const string& name, const string& seq, double alpha, const TransIndex& trans_index, const TransIndex& trans_lengths)
+void TargetTable::add_targ(const string& name, const string& seq, double alpha, const TransIndex& targ_index, const TransIndex& targ_lengths)
 {
-    TransIndex::const_iterator it = trans_index.find(name);
-    if(it == trans_index.end())
+    TransIndex::const_iterator it = targ_index.find(name);
+    if(it == targ_index.end())
     {
         cerr << "Warning: Target '" << name << "' exists in MultiFASTA but not alignment (SAM/BAM) file.\n";
         return;
     }
     
-    if (trans_lengths.find(name)->second != seq.length())
+    if (targ_lengths.find(name)->second != seq.length())
     {
-        cerr << "ERROR: Target '" << name << "' differs in length between MultiFASTA and alignment (SAM/BAM) files ("<< seq.length() << " vs. " << trans_lengths.find(name)->second << ").\n";
+        cerr << "ERROR: Target '" << name << "' differs in length between MultiFASTA and alignment (SAM/BAM) files ("<< seq.length() << " vs. " << targ_lengths.find(name)->second << ").\n";
         exit(1);
     }
 
-    Transcript* trans = new Transcript(it->second, name, seq, alpha, _globs);
+    Target* targ = new Target(it->second, name, seq, alpha, _globs);
     if (_globs->bias_table)
-        (_globs->bias_table)->update_expectations(*trans);
-    _trans_map[trans->id()] = trans;
-    trans->bundle(_bundle_table.create_bundle(trans));
+        (_globs->bias_table)->update_expectations(*targ);
+    _targ_map[targ->id()] = targ;
+    targ->bundle(_bundle_table.create_bundle(targ));
 }
 
-Transcript* TranscriptTable::get_trans(TransID id)
+Target* TargetTable::get_targ(TransID id)
 {
-    return _trans_map[id];
+    return _targ_map[id];
 }
 
-Bundle* TranscriptTable::merge_bundles(Bundle* b1, Bundle* b2)
+Bundle* TargetTable::merge_bundles(Bundle* b1, Bundle* b2)
 {
     if (b1 != b2)
     {
@@ -306,49 +306,49 @@ Bundle* TranscriptTable::merge_bundles(Bundle* b1, Bundle* b2)
     return b1;
 }
 
-size_t TranscriptTable::num_bundles()
+size_t TargetTable::num_bundles()
 {
     return _bundle_table.size();
 }
 
-void TranscriptTable::round_reset()
+void TargetTable::round_reset()
 {
-    foreach(Transcript* trans, _trans_map)
+    foreach(Target* targ, _targ_map)
     {
-        trans->round_reset();
+        targ->round_reset();
     }
 }
 
-void project_to_polytope(vector<Transcript*> bundle_trans, vector<double>& trans_counts, double bundle_counts)
+void project_to_polytope(vector<Target*> bundle_targ, vector<double>& targ_counts, double bundle_counts)
 {
-    vector<bool> polytope_bound(bundle_trans.size(), false);
+    vector<bool> polytope_bound(bundle_targ.size(), false);
     
     while (true)
     {
         double unbound_counts = 0;
         double bound_counts = 0;
-        for (size_t i = 0; i < bundle_trans.size(); ++i)
+        for (size_t i = 0; i < bundle_targ.size(); ++i)
         {
-            Transcript& trans = *bundle_trans[i];
+            Target& targ = *bundle_targ[i];
             
-            if (trans_counts[i] > trans.tot_counts())
+            if (targ_counts[i] > targ.tot_counts())
             {
-                trans_counts[i] = trans.tot_counts();
+                targ_counts[i] = targ.tot_counts();
                 polytope_bound[i] = true;
             }
-            else if (trans_counts[i] < trans.uniq_counts())
+            else if (targ_counts[i] < targ.uniq_counts())
             {
-                trans_counts[i] = trans.uniq_counts();
+                targ_counts[i] = targ.uniq_counts();
                 polytope_bound[i] = true;
             }
             
             if (polytope_bound[i])
             {
-                bound_counts += trans_counts[i];
+                bound_counts += targ_counts[i];
             }
             else
             {
-                unbound_counts += trans_counts[i];
+                unbound_counts += targ_counts[i];
             }
         }
         
@@ -358,21 +358,21 @@ void project_to_polytope(vector<Transcript*> bundle_trans, vector<double>& trans
         double normalizer = (bundle_counts - bound_counts)/unbound_counts;
         
         bool unbound_exist = false;
-        for (size_t i = 0; i < bundle_trans.size(); ++i)
+        for (size_t i = 0; i < bundle_targ.size(); ++i)
         {    
             if (!polytope_bound[i])
             {
-                trans_counts[i] *= normalizer;
+                targ_counts[i] *= normalizer;
                 unbound_exist = true;
             }
         }
                 
         if (!unbound_exist)
-            polytope_bound = vector<bool>(bundle_trans.size(), false);
+            polytope_bound = vector<bool>(bundle_targ.size(), false);
     }
 }
 
-void TranscriptTable::output_results(string output_dir, size_t tot_counts, bool output_varcov)
+void TargetTable::output_results(string output_dir, size_t tot_counts, bool output_varcov)
 { 
     FILE * expr_file = fopen((output_dir + "/results.xprs").c_str(), "w");
     ofstream varcov_file;
@@ -389,25 +389,25 @@ void TranscriptTable::output_results(string output_dir, size_t tot_counts, bool 
     {
         ++bundle_id;
         
-        const vector<Transcript*>& bundle_trans = bundle->transcripts();
+        const vector<Target*>& bundle_targ = bundle->targets();
         
         if (output_varcov)
         {
             varcov_file << ">" << bundle_id << ": ";
-            for (size_t i = 0; i < bundle_trans.size(); ++i)
+            for (size_t i = 0; i < bundle_targ.size(); ++i)
             {
                 if (i)
                     varcov_file << ", ";
-                varcov_file << bundle_trans[i]->name();
+                varcov_file << bundle_targ[i]->name();
             }
             varcov_file << endl;
         }        
         
         // Calculate total counts for bundle and bundle-level rho
         double l_bundle_mass = HUGE_VAL;
-        for (size_t i = 0; i < bundle_trans.size(); ++i)
+        for (size_t i = 0; i < bundle_targ.size(); ++i)
         {
-            l_bundle_mass = log_sum(l_bundle_mass, bundle_trans[i]->mass()); 
+            l_bundle_mass = log_sum(l_bundle_mass, bundle_targ[i]->mass()); 
         }
         
         if (bundle->counts())
@@ -415,51 +415,51 @@ void TranscriptTable::output_results(string output_dir, size_t tot_counts, bool 
             double l_bundle_counts = log((double)bundle->counts());
             double l_var_renorm = 2*(l_bundle_counts - l_bundle_mass);
             
-            vector<double> trans_counts(bundle_trans.size(),0);
+            vector<double> targ_counts(bundle_targ.size(),0);
             bool requires_projection = false;
 
-            for (size_t i = 0; i < bundle_trans.size(); ++i)
+            for (size_t i = 0; i < bundle_targ.size(); ++i)
             {
-                Transcript& trans = *bundle_trans[i];
-                double l_trans_frac = trans.mass() - l_bundle_mass;
-                trans_counts[i] = sexp(l_trans_frac + l_bundle_counts);
-                if (trans_counts[i] > (double)trans.tot_counts() || trans_counts[i] < (double)trans.uniq_counts())
+                Target& targ = *bundle_targ[i];
+                double l_targ_frac = targ.mass() - l_bundle_mass;
+                targ_counts[i] = sexp(l_targ_frac + l_bundle_counts);
+                if (targ_counts[i] > (double)targ.tot_counts() || targ_counts[i] < (double)targ.uniq_counts())
                     requires_projection = true;
             }
                         
-            if (bundle_trans.size() > 1 && requires_projection)
+            if (bundle_targ.size() > 1 && requires_projection)
             {
-                project_to_polytope(bundle_trans, trans_counts, bundle->counts());
+                project_to_polytope(bundle_targ, targ_counts, bundle->counts());
             }
             
             // Calculate individual counts and rhos
-            for (size_t i = 0; i < bundle_trans.size(); ++i)
+            for (size_t i = 0; i < bundle_targ.size(); ++i)
             {
-                Transcript& trans = *bundle_trans[i];
-                double l_eff_len = trans.est_effective_length();
+                Target& targ = *bundle_targ[i];
+                double l_eff_len = targ.est_effective_length();
 
                 // Calculate count variance
-                double mass_var = trans.mass_var(false);
+                double mass_var = targ.mass_var(false);
                 double count_alpha = 0;
                 double count_beta = 0;
                 double count_var = 0;
                 
-                if (trans.tot_counts() != trans.uniq_counts())
+                if (targ.tot_counts() != targ.uniq_counts())
                 {
                     
-                    double n = trans.tot_counts()-trans.uniq_counts();
-                    double m = (trans_counts[i] - trans.uniq_counts())/n;
-                    double v = sexp(trans.var_sum() - trans.tot_ambig_mass());                    
+                    double n = targ.tot_counts()-targ.uniq_counts();
+                    double m = (targ_counts[i] - targ.uniq_counts())/n;
+                    double v = sexp(targ.var_sum() - targ.tot_ambig_mass());                    
                     
                     double a = -m*(m*m - m + v)/v;
                     double b = (m-1)*(m*m - m + v)/v;
-                    if (!trans.solveable())
+                    if (!targ.solveable())
                     {
                         a = 1;
                         b = 1;
                     }
                     
-                    if (trans.solveable() && (v == 0 || a < 0 || b < 0))
+                    if (targ.solveable() && (v == 0 || a < 0 || b < 0))
                         count_var = mass_var;
                     else
                         count_var = n*a*b*(a+b+n)/((a+b)*(a+b)*(a+b+1));
@@ -471,18 +471,18 @@ void TranscriptTable::output_results(string output_dir, size_t tot_counts, bool 
                 
                 double fpkm_std_dev = sexp(0.5*(mass_var + l_var_renorm));
                 double fpkm_constant = sexp(l_bil - l_eff_len - l_tot_counts);
-                double trans_fpkm = trans_counts[i] * fpkm_constant;
-                double fpkm_lo = max(0.0, (trans_counts[i] - 2*fpkm_std_dev) * fpkm_constant);
-                double fpkm_hi = (trans_counts[i] + 2*fpkm_std_dev) * fpkm_constant;
+                double targ_fpkm = targ_counts[i] * fpkm_constant;
+                double fpkm_lo = max(0.0, (targ_counts[i] - 2*fpkm_std_dev) * fpkm_constant);
+                double fpkm_hi = (targ_counts[i] + 2*fpkm_std_dev) * fpkm_constant;
                 
                 double eff_len = sexp(l_eff_len);
-                double eff_counts = trans_counts[i] / eff_len * trans.length();
+                double eff_counts = targ_counts[i] / eff_len * targ.length();
                 
-                fprintf(expr_file, "" SIZE_T_FMT "\t%s\t" SIZE_T_FMT "\t%f\t" SIZE_T_FMT "\t" SIZE_T_FMT "\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%c\n", bundle_id, trans.name().c_str(), trans.length(), eff_len, trans.tot_counts(), trans.uniq_counts(), trans_counts[i], eff_counts, count_alpha, count_beta, trans_fpkm, fpkm_lo, fpkm_hi, (trans.solveable())?'T':'F');
+                fprintf(expr_file, "" SIZE_T_FMT "\t%s\t" SIZE_T_FMT "\t%f\t" SIZE_T_FMT "\t" SIZE_T_FMT "\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%c\n", bundle_id, targ.name().c_str(), targ.length(), eff_len, targ.tot_counts(), targ.uniq_counts(), targ_counts[i], eff_counts, count_alpha, count_beta, targ_fpkm, fpkm_lo, fpkm_hi, (targ.solveable())?'T':'F');
             
                 if (output_varcov)
                 {
-                    for (size_t j = 0; j < bundle_trans.size(); ++j)
+                    for (size_t j = 0; j < bundle_targ.size(); ++j)
                     {
                         if (j)
                             varcov_file << "\t";
@@ -490,7 +490,7 @@ void TranscriptTable::output_results(string output_dir, size_t tot_counts, bool 
                         if (i==j)
                             varcov_file << scientific << count_var;
                         else
-                            varcov_file << scientific << -sexp(get_covar(trans.id(), bundle_trans[j]->id()) + l_var_renorm);
+                            varcov_file << scientific << -sexp(get_covar(targ.id(), bundle_targ[j]->id()) + l_var_renorm);
                            
                     }
                     varcov_file << endl;
@@ -499,14 +499,14 @@ void TranscriptTable::output_results(string output_dir, size_t tot_counts, bool 
         }
         else
         {
-            for (size_t i = 0; i < bundle_trans.size(); ++i)
+            for (size_t i = 0; i < bundle_targ.size(); ++i)
             {
-                Transcript& trans = *bundle_trans[i];
-                fprintf(expr_file, "" SIZE_T_FMT "\t%s\t" SIZE_T_FMT "\t%f\t%d\t%d\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%c\n", bundle_id, trans.name().c_str(), trans.length(), sexp(trans.est_effective_length()), 0, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 'T');
+                Target& targ = *bundle_targ[i];
+                fprintf(expr_file, "" SIZE_T_FMT "\t%s\t" SIZE_T_FMT "\t%f\t%d\t%d\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%c\n", bundle_id, targ.name().c_str(), targ.length(), sexp(targ.est_effective_length()), 0, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 'T');
                 
                 if (output_varcov)
                 {
-                    for (size_t j = 0; j < bundle_trans.size(); ++j)
+                    for (size_t j = 0; j < bundle_targ.size(); ++j)
                     {
                         if (j)
                             varcov_file << "\t";
@@ -523,19 +523,19 @@ void TranscriptTable::output_results(string output_dir, size_t tot_counts, bool 
         varcov_file.close();
 }
 
-double TranscriptTable::total_fpb() const
+double TargetTable::total_fpb() const
 {
     boost::unique_lock<boost::mutex>(_fpb_mut);
     return _total_fpb;
 }
 
-void TranscriptTable::update_total_fpb(double incr_amt)
+void TargetTable::update_total_fpb(double incr_amt)
 {
     boost::unique_lock<boost::mutex>(_fpb_mut);
     _total_fpb = log_sum(_total_fpb, incr_amt);
 }
 
-void TranscriptTable::threaded_bias_update(boost::mutex* mut)
+void TargetTable::threaded_bias_update(boost::mutex* mut)
 {
     BiasBoss* bias_table = NULL;
     BiasBoss* bg_table = NULL;
@@ -581,15 +581,15 @@ void TranscriptTable::threaded_bias_update(boost::mutex* mut)
         
         vector<double> fl_cdf = fld->cdf();
         
-        foreach(Transcript* trans, _trans_map)
+        foreach(Target* targ, _targ_map)
         {  
-            trans->lock();
-            trans->update_transcript_bias(bias_table, fld);
+            targ->lock();
+            targ->update_target_bias(bias_table, fld);
             if (bg_table)
             {
-                bg_table->update_expectations(*trans, trans->rho(), fl_cdf);
+                bg_table->update_expectations(*targ, targ->rho(), fl_cdf);
             }
-            trans->unlock();
+            targ->unlock();
             if (!running)
                 break;
         }

@@ -8,7 +8,7 @@
 
 #include "main.h"
 #include "mismatchmodel.h"
-#include "transcripts.h"
+#include "targets.h"
 #include "fragments.h"
 #include "sequence.h"
 #include <iostream>
@@ -30,9 +30,9 @@ double MismatchTable::log_likelihood(const FragHit& f) const
     if (!_active)
         return 0;
     
-    const Transcript& trans = *f.mapped_trans;
-    const Sequence& t_seq_fwd = trans.seq(0);
-    const Sequence& t_seq_rev = trans.seq(1);
+    const Target& targ = *f.mapped_targ;
+    const Sequence& t_seq_fwd = targ.seq(0);
+    const Sequence& t_seq_rev = targ.seq(1);
 
     double ll = 0;
     
@@ -91,7 +91,7 @@ double MismatchTable::log_likelihood(const FragHit& f) const
     
     size_t r_len = f.seq_r.length();
     i = 0;
-    j = trans.length()-f.right;
+    j = targ.length()-f.right;
     ins = f.inserts_r.end()-1;
     del = f.deletes_r.end()-1;
     
@@ -142,9 +142,9 @@ double MismatchTable::log_likelihood(const FragHit& f) const
 
 void MismatchTable::update(const FragHit& f, double mass)
 {
-    const Transcript& trans = *f.mapped_trans;
-    const Sequence& t_seq_fwd = trans.seq(0);
-    const Sequence& t_seq_rev = trans.seq(1);
+    const Target& targ = *f.mapped_targ;
+    const Sequence& t_seq_fwd = targ.seq(0);
+    const Sequence& t_seq_rev = targ.seq(1);
     
     vector<FrequencyMatrix>& left_mm = (f.left_first) ? _first_read_mm : _second_read_mm;
     vector<FrequencyMatrix>& right_mm = (!f.left_first) ? _first_read_mm : _second_read_mm;
@@ -201,7 +201,7 @@ void MismatchTable::update(const FragHit& f, double mass)
 
     size_t r_len = f.seq_r.length();
     i = 0;
-    j = trans.length()-f.right;
+    j = targ.length()-f.right;
     ins = f.inserts_r.end()-1;
     del = f.deletes_r.end()-1;
 

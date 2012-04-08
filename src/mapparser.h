@@ -19,7 +19,7 @@
 class ParseThreadSafety;
 class Fragment;
 class FragHit;
-class TranscriptTable;
+class TargetTable;
 
 typedef boost::unordered_map<std::string, size_t> TransIndex;
 
@@ -42,16 +42,16 @@ public:
     virtual const std::string header() const=0;
     
     /**
-     * a member function that returns the transcript-to-index map
-     * @return the transcript-to-index map
+     * a member function that returns the target-to-index map
+     * @return the target-to-index map
      */
-    virtual const TransIndex& trans_index() const=0;
+    virtual const TransIndex& targ_index() const=0;
     
     /**
-     * a member function that returns the transcript-to-length map
-     * @return the transcript-to-length map
+     * a member function that returns the target-to-length map
+     * @return the target-to-length map
      */
-    virtual const TransIndex& trans_lengths() const=0;
+    virtual const TransIndex& targ_lengths() const=0;
     
     /**
      * a member function that loads all mappings of the next fragment
@@ -107,14 +107,14 @@ class BAMParser : public Parser
     BamTools::BamReader* _reader;
     
     /**
-     * the private transcript-to-index map
+     * the private target-to-index map
      */
-    TransIndex _trans_index; 
+    TransIndex _targ_index; 
     
     /**
-     * the private transcript-to-length map 
+     * the private target-to-length map 
      */
-    TransIndex _trans_lengths;
+    TransIndex _targ_lengths;
     
     /**
      * a private pointer to the current fragment mapping being parsed
@@ -146,16 +146,16 @@ public:
     const std::string header() const { return _reader->GetHeaderText(); }
     
     /**
-     * a member function that returns the transcript-to-index map
-     * @return the transcript-to-index map
+     * a member function that returns the target-to-index map
+     * @return the target-to-index map
      */
-    const TransIndex& trans_index() const { return _trans_index; }
+    const TransIndex& targ_index() const { return _targ_index; }
     
     /**
-     * a member function that returns the transcript-to-length map
-     * @return the transcript-to-length map
+     * a member function that returns the target-to-length map
+     * @return the target-to-length map
      */
-    const TransIndex& trans_lengths() const { return _trans_lengths; }
+    const TransIndex& targ_lengths() const { return _targ_lengths; }
     
     /**
      * a member function that loads all mappings of the next fragment
@@ -228,14 +228,14 @@ class SAMParser : public Parser
     std::istream* _in;
     
     /**
-     * the private transcript-to-index map
+     * the private target-to-index map
      */
-    TransIndex _trans_index; 
+    TransIndex _targ_index; 
     
     /**
-     * the private transcript-to-length map
+     * the private target-to-length map
      */
-    TransIndex _trans_lengths;
+    TransIndex _targ_lengths;
     
     /**
      * a private pointer to the current fragment mapping being parsed
@@ -271,16 +271,16 @@ public:
     const std::string header() const { return _header; }
     
     /**
-     * a member function that returns the transcript-to-index map
-     * @return the transcript-to-index map
+     * a member function that returns the target-to-index map
+     * @return the target-to-index map
      */
-    const TransIndex& trans_index() const { return _trans_index; }
+    const TransIndex& targ_index() const { return _targ_index; }
     
     /**
-     * a member function that returns the transcript-to-length map
-     * @return the transcript-to-length map
+     * a member function that returns the target-to-length map
+     * @return the target-to-length map
      */
-    const TransIndex& trans_lengths() const { return _trans_lengths; }
+    const TransIndex& targ_lengths() const { return _targ_lengths; }
     
     /**
      * a member function that loads all mappings of the next fragment
@@ -377,24 +377,24 @@ public:
     
     /**
      * a member function that drives the parse thread
-     * when all valid mappings of a fragment have been parsed, its mapped transcripts are found and the information
+     * when all valid mappings of a fragment have been parsed, its mapped targets are found and the information
      * is passed in a Fragment object to the processing thread through the ParseThreadSafety struct
      * @param thread_safety a pointer to the struct containing shared locks and data with the processing thread
-     * @param trans_table a pointer to the table of Transcript objects to lookup the mapped transcripts
+     * @param targ_table a pointer to the table of Target objects to lookup the mapped targets
      */
-    void threaded_parse(ParseThreadSafety* thread_safety, TranscriptTable* trans_table);
+    void threaded_parse(ParseThreadSafety* thread_safety, TargetTable* targ_table);
     
     /**
-     * a member function that returns the transcript-to-index map
-     * @return the transcript-to-index map
+     * a member function that returns the target-to-index map
+     * @return the target-to-index map
      */
-    const TransIndex& trans_index() { return _parser->trans_index(); }
+    const TransIndex& targ_index() { return _parser->targ_index(); }
     
     /**
-     * a member function that returns the transcript-to-length map
-     * @return the transcript-to-length map
+     * a member function that returns the target-to-length map
+     * @return the target-to-length map
      */
-    const TransIndex& trans_lengths() { return _parser->trans_lengths(); }
+    const TransIndex& targ_lengths() { return _parser->targ_lengths(); }
     
     /**
      * a member function that sets the write-active status of the parser

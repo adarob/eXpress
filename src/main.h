@@ -16,7 +16,7 @@
 
 #define foreach BOOST_FOREACH
 
-class TranscriptTable;
+class TargetTable;
 class BiasBoss;
 class MismatchTable;
 class FLD;
@@ -29,7 +29,7 @@ struct Globals
     FLD* fld;
     MismatchTable* mismatch_table;
     BiasBoss* bias_table;
-    TranscriptTable* trans_table;
+    TargetTable* targ_table;
 };
 
 /**
