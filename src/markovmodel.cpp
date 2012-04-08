@@ -19,7 +19,7 @@ MarkovModel::MarkovModel(size_t order, size_t window_size, size_t num_pos, doubl
 : _order((int)order),
   _window_size((int)window_size),
   _num_pos((int)num_pos),
-  _params(num_pos, FrequencyMatrix(pow((double)NUM_NUCS, (double)order), NUM_NUCS, alpha, logged)),
+  _params(num_pos, FrequencyMatrix<double>(pow((double)NUM_NUCS, (double)order), NUM_NUCS, alpha, logged)),
   _logged(logged)
 {}
 

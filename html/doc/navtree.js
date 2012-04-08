@@ -24,9 +24,9 @@ var NAVTREE =
       [ "SAMWriter", "class_s_a_m_writer.html", null ],
       [ "Sequence", "class_sequence.html", null ],
       [ "SeqWeightTable", "class_seq_weight_table.html", null ],
+      [ "Target", "class_target.html", null ],
+      [ "TargetTable", "class_target_table.html", null ],
       [ "ThreadedMapParser", "class_threaded_map_parser.html", null ],
-      [ "Transcript", "class_transcript.html", null ],
-      [ "TranscriptTable", "class_transcript_table.html", null ],
       [ "Writer", "class_writer.html", null ]
     ] ],
     [ "Class Index", "classes.html", null ],
@@ -52,9 +52,9 @@ var NAVTREE =
       [ "RoundParams", "struct_round_params.html", null ],
       [ "Sequence", "class_sequence.html", null ],
       [ "SeqWeightTable", "class_seq_weight_table.html", null ],
+      [ "Target", "class_target.html", null ],
+      [ "TargetTable", "class_target_table.html", null ],
       [ "ThreadedMapParser", "class_threaded_map_parser.html", null ],
-      [ "Transcript", "class_transcript.html", null ],
-      [ "TranscriptTable", "class_transcript_table.html", null ],
       [ "Writer", "class_writer.html", [
         [ "BAMWriter", "class_b_a_m_writer.html", null ],
         [ "SAMWriter", "class_s_a_m_writer.html", null ]
@@ -83,9 +83,9 @@ var NAVTREE =
       [ "src/mismatchmodel.h", null, null ],
       [ "src/sequence.cpp", null, null ],
       [ "src/sequence.h", null, null ],
+      [ "src/targets.cpp", null, null ],
+      [ "src/targets.h", null, null ],
       [ "src/threadsafety.h", null, null ],
-      [ "src/transcripts.cpp", null, null ],
-      [ "src/transcripts.h", null, null ],
       [ "src/update_check.h", null, null ]
     ] ]
   ] ]

@@ -108,111 +108,6 @@ public:
 };
 
 /**
- * The PosWeightTable class keeps track of fractional position bias parameters in log space.
- * It allows for the bias associated with a given fractional position to be calculated, and for the bias
- * parameters to be updated based on additional fragment observations.
- *  @author    Adam Roberts
- *  @date      2011
- *  @copyright Artistic License 2.0
- **/
-class PosWeightTable
-{
-    /**
-     * a private FrequencyMatrix that stores the fragment frequencies (logged) in different positional bins
-     */
-    FrequencyMatrix _observed;
-    
-    /**
-     * a private FrequencyMatrix that stores the expected fragment frequencies (logged) in different positional
-     * bins based on an assumption of equal expression of all targets
-     */
-    FrequencyMatrix _expected;
-    
-    /**
-     * a private vector of unsigned integers specifying the bin ranges for target lengths
-     */
-    std::vector<size_t> _len_bins;
-    
-    /**
-     * a private vector of doubles specifying the bin ranges for fractional positions
-     */
-    std::vector<double> _pos_bins;
-    
-public:
-    
-    /**
-     * PosWeightTable Constructor
-     * @param len_bins a vector of unsigned integers specifying the bin ranges for target lengths
-     * @param pos_bins a vector of doubles specifying the bin ranges for fractional positions
-     * @param alpha a double specifying the strength of the uniform prior (logged pseudo-counts for each parameter)
-     */
-    PosWeightTable(const std::vector<size_t>& len_bins, const std::vector<double>& pos_bins, double alpha);
-    
-    const std::vector<size_t>& len_bins() const { return _len_bins; }
-    const std::vector<double>& pos_bins() const { return _pos_bins; }
-
-    /**
-     * a member function that increments the expected counts for the given fractional position by 1 (logged)
-     * @param len the target length
-     * @param pos the fractional target position
-     */
-    void increment_expected(size_t len, double pos); 
-    
-    /**
-     * a member function that increments the expected counts for the given fractional position bin by 1 (logged)
-     * @param l the target length bin
-     * @param p the fractional target position bin
-     */
-    void increment_expected(size_t l, size_t p); 
-
-    /**
-     * a member function that normalizes the expected counts and converts them to the log scale
-     */
-    void normalize_expected();
-    
-    /**
-     * a member function that increments the observed counts for the given fragment position by some mass (logged)
-     * @param len the target length
-     * @param pos the fractional target position
-     * @param normalized_mass the mass (logged probabilistic assignment) of the fragment normalized by its estimated expression
-     */
-    void increment_observed(size_t len, double pos, double normalized_mass);
-    
-    /**
-     * a member function that increments the observed counts for the given fragment position bin by some mass (logged)
-     * @param l the target length bin
-     * @param p the fractional target position bin
-     * @param normalized_mass the mass (logged probabilistic assignment) of the fragment normalized by its estimated expression
-     */
-    void increment_observed(size_t l, size_t p, double normalized_mass);
-
-    /**
-     * a member function that return the bias weight (logged) of a fractional target position
-     * @param len the target length
-     * @param pos the fractional target position
-     * @return the logged bias weight for the fractional target position
-     */
-    double get_weight(size_t len, double pos) const;
-    
-    /**
-     * a member function that return the bias weight (logged) of a fractional target position bin
-     * @param l the target length bin
-     * @param p the fractional target position bin
-     * @return the logged bias weight for the fractional target position
-     */
-    double get_weight(size_t l, size_t p) const;
-
-    
-    /**
-     * a member function that outputs the fractional position probabilities in matrix format with length bins
-     * as rows and fractional position bins as columns
-     * @param outfile the file to append to
-     */
-    void append_output(std::ofstream& outfile) const;
-    
-};
-
-/**
  * The BiasBoss class keeps track of sequence-specific and positional bias.
  * It allows for the bias associated with a given fragment end to be calculated, and 
  * for the bias parameters to be updated based on additional observations.  All stored
@@ -233,17 +128,7 @@ class BiasBoss
      */
     SeqWeightTable _3_seq_bias;
     
-    /**
-     * a private SeqWeightTable that stores the 5' sequence-specific bias parameters (logged)
-     */
-//    PosWeightTable _5_pos_bias;
-    
-    /**
-     * a private SeqWeightTable that stores the 3' sequence-specific bias parameters (logged)
-     */
-//    PosWeightTable _3_pos_bias;
-    
-public:
+  public:
     
     /**
      * BiasBoss Constructor

@@ -11,9 +11,9 @@
 
 #include <vector>
 #include <string>
+#include "frequencymatrix.h"
 
 class Sequence;
-class FrequencyMatrix;
 
 //DOC
 class MarkovModel
@@ -21,7 +21,7 @@ class MarkovModel
     int _order;
     int _window_size;
     int _num_pos;
-    std::vector<FrequencyMatrix> _params;
+    std::vector<FrequencyMatrix<double> > _params;
     bool _logged;
     
 public:

@@ -8,8 +8,9 @@
 //  Created by Adam Roberts on 4/23/11.
 //  Copyright 2011 Adam Roberts. All rights reserved.
 //
-#include "boost/multi_array.hpp"
 #include <vector>
+#include <cassert>
+#include "main.h"
 
 /**
  * The FrequencyMatrix class keeps track of the frequency parameters
@@ -21,17 +22,18 @@
  *  @date      2011
  *  @copyright Artistic License 2.0
  **/
+template <class T>
 class FrequencyMatrix
 {
    /**
     * a private vector of doubles to store the matrix frequencies (logged) in row-major format
     */
-    std::vector<double> _array;
+    std::vector<T> _array;
     
    /**
     * a private vector of doubles to store the (logged) row sums for the matrix
     */
-    std::vector<double> _rowsums;
+    std::vector<T> _rowsums;
     
     /**
      * a private size_t for the number of rows
@@ -62,7 +64,7 @@ public:
      * @param alpha a double specifying the intial psuedo-counts (un-logged)
      * @param logged bool that specifies if the table is in log space
      */   
-    FrequencyMatrix(size_t m, size_t n, double alpha, bool logged = true);
+    FrequencyMatrix(size_t m, size_t n, T alpha, bool logged = true);
    
     /**
      * a member function to extract the probability of a given position in the matrix (logged if table is logged)
@@ -70,14 +72,14 @@ public:
      * @param j the value (column)
      * @return a double specifying the probability of the given value in the given distribution (logged if table is logged)
      */  
-    double operator()(size_t i, size_t j) const;
+    T operator()(size_t i, size_t j) const;
     
     /**
      * a member function to extract the probability of a given position in the flattened matrix (logged if table is logged)
      * @param k the array position
      * @return a double specifying the probability of the given position in the flattened matrix (logged if table is logged)
      */  
-    double operator()(size_t k) const;
+    T operator()(size_t k) const;
     
     /**
      * a member function to increase the mass of a given position in the matrix
@@ -85,14 +87,14 @@ public:
      * @param j the value (column)
      * @param incr_amt the amount to increase the mass by (logged if table is logged)
      */ 
-    void increment(size_t i, size_t j, double incr_amt);
+    void increment(size_t i, size_t j, T incr_amt);
     
     /**
      * a member function to increase the mass of a given position in the flattened matrix (logged if table is logged)
      * @param k the array position
      * @param incr_amt the amount to increase the mass by (logged if table is logged)
      */ 
-    void increment(size_t k, double incr_amt);
+    void increment(size_t k, T incr_amt);
     
     /**
      * a member function that returns the raw value stored at a given position of the flattened matrix
@@ -114,5 +116,87 @@ public:
      */ 
     void set_logged(bool logged);
 };
+
+
+template <class T>
+FrequencyMatrix<T>::FrequencyMatrix(size_t m, size_t n, T alpha, bool logged)
+: _array(m*n, logged ? log(alpha):alpha),
+_rowsums(m, logged ? log(n*alpha):n*alpha),
+_M(m),
+_N(n),
+_logged(logged)
+{}
+
+template <class T>
+T FrequencyMatrix<T>::operator()(size_t i, size_t j) const
+{
+    assert(i*_N+j < _M*_N);
+    if (_logged)
+        return _array[i*_N+j]-_rowsums[i];
+    else
+        return _array[i*_N+j]/_rowsums[i];
+}
+
+template <class T>
+T FrequencyMatrix<T>::operator()(size_t k) const
+{
+    return operator()(0, k);
+}
+
+template <class T>
+void FrequencyMatrix<T>::increment(size_t i, size_t j, T incr_amt)
+{
+    size_t k = i*_N+j;
+    assert(k < _M*_N);
+    if (_logged)
+    {
+        _array[k] = log_sum(_array[k], incr_amt);
+        _rowsums[i] = log_sum(_rowsums[i], incr_amt);
+    }
+    else
+    {
+        _array[k] += incr_amt;
+        _rowsums[i] += incr_amt;
+    }
+//    assert(!isnan(_rowsums[i]) && !isinf(_rowsums[i]));
+}
+
+template <class T>
+void FrequencyMatrix<T>::increment(size_t k, T incr_amt)
+{
+    increment(0, k, incr_amt);
+}
+
+template <class T>
+void FrequencyMatrix<T>::set_logged(bool logged)
+{
+    if (logged == _logged)
+        return;
+    
+    if (logged)
+    {
+        for(size_t i = 0; i < _M*_N; ++i)
+        {
+            _array[i] = log(_array[i]);
+        }
+        for(size_t i = 0; i < _M; ++i)
+        {
+            _rowsums[i] = log(_rowsums[i]);
+        }
+    }
+    else
+    {
+        for(size_t i = 0; i < _M*_N; ++i)
+        {
+            _array[i] = sexp(_array[i]);
+        }
+        for(size_t i = 0; i < _M; ++i)
+        {
+            _rowsums[i] = sexp(_rowsums[i]);
+        }
+    }
+    
+    _logged = logged;    
+}
 
 #endif

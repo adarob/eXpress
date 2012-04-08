@@ -105,8 +105,8 @@ Public Member Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_b_a_m_parser.html#a62f2f36949e43f9f0f6ba0b7b144ec90">BAMParser</a> (BamTools::BamReader *reader)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_b_a_m_parser.html#aacb639a5b0cadfc369129a9ffc70a042">~BAMParser</a> ()</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">const std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_b_a_m_parser.html#a1df815c2f4785a08caeb36610bf9793f">header</a> () const </td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">const TransIndex &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_b_a_m_parser.html#abb19e83d54fa5f4bd0b1a506fdbdafce">trans_index</a> () const </td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">const TransIndex &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_b_a_m_parser.html#aa667b13849421179814adf07c7456992">trans_lengths</a> () const </td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">const TransIndex &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_b_a_m_parser.html#a59926063d63d404e0f63d15fc903c3db">targ_index</a> () const </td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">const TransIndex &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_b_a_m_parser.html#a56f959263f969a2a5a3e4127baf1b2d4">targ_lengths</a> () const </td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_b_a_m_parser.html#a7cf9959e9c3f4abb14e6e46c4e2a4041">next_fragment</a> (<a class="el" href="class_fragment.html">Fragment</a> &amp;f)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_b_a_m_parser.html#af2a5ee51bb5e7c1c561db727910e8bf4">reset</a> ()</td></tr>
 </table>
@@ -229,12 +229,12 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="abb19e83d54fa5f4bd0b1a506fdbdafce"></a><!-- doxytag: member="BAMParser::trans_index" ref="abb19e83d54fa5f4bd0b1a506fdbdafce" args="() const " -->
+<a class="anchor" id="a59926063d63d404e0f63d15fc903c3db"></a><!-- doxytag: member="BAMParser::targ_index" ref="a59926063d63d404e0f63d15fc903c3db" args="() const " -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">const TransIndex&amp; BAMParser::trans_index </td>
+          <td class="memname">const TransIndex&amp; BAMParser::targ_index </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const<code> [inline, virtual]</code></td>
@@ -242,21 +242,21 @@ Public Member Functions</h2></td></tr>
       </table>
 </div>
 <div class="memdoc">
-<p>a member function that returns the transcript-to-index map </p>
-<dl class="return"><dt><b>Returns:</b></dt><dd>the transcript-to-index map </dd></dl>
+<p>a member function that returns the target-to-index map </p>
+<dl class="return"><dt><b>Returns:</b></dt><dd>the target-to-index map </dd></dl>
 
-<p>Implements <a class="el" href="class_parser.html#a53031c7eea91937e9f26b6853d186ded">Parser</a>.</p>
+<p>Implements <a class="el" href="class_parser.html#ac790d5de4daa8c0ca2a016dad12c4ef0">Parser</a>.</p>
 
 <p>Definition at line <a class="el" href="mapparser_8h_source.html#l00152">152</a> of file <a class="el" href="mapparser_8h_source.html">mapparser.h</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="aa667b13849421179814adf07c7456992"></a><!-- doxytag: member="BAMParser::trans_lengths" ref="aa667b13849421179814adf07c7456992" args="() const " -->
+<a class="anchor" id="a56f959263f969a2a5a3e4127baf1b2d4"></a><!-- doxytag: member="BAMParser::targ_lengths" ref="a56f959263f969a2a5a3e4127baf1b2d4" args="() const " -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">const TransIndex&amp; BAMParser::trans_lengths </td>
+          <td class="memname">const TransIndex&amp; BAMParser::targ_lengths </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const<code> [inline, virtual]</code></td>
@@ -264,10 +264,10 @@ Public Member Functions</h2></td></tr>
       </table>
 </div>
 <div class="memdoc">
-<p>a member function that returns the transcript-to-length map </p>
-<dl class="return"><dt><b>Returns:</b></dt><dd>the transcript-to-length map </dd></dl>
+<p>a member function that returns the target-to-length map </p>
+<dl class="return"><dt><b>Returns:</b></dt><dd>the target-to-length map </dd></dl>
 
-<p>Implements <a class="el" href="class_parser.html#a0251836a0f88555a79cfe45b404b2085">Parser</a>.</p>
+<p>Implements <a class="el" href="class_parser.html#adf179e89e620ae5a1eae857eda255ab7">Parser</a>.</p>
 
 <p>Definition at line <a class="el" href="mapparser_8h_source.html#l00158">158</a> of file <a class="el" href="mapparser_8h_source.html">mapparser.h</a>.</p>
 
@@ -282,7 +282,7 @@ Public Member Functions</h2></td></tr>
   <div id="nav-path" class="navpath">
     <ul>
       <li class="navelem"><a class="el" href="class_b_a_m_parser.html">BAMParser</a>      </li>
-      <li class="footer">Generated on Sat Feb 18 2012 07:21:51 for eXpress by&#160;
+      <li class="footer">Generated on Sun Apr 8 2012 11:49:01 for eXpress by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </li>
     </ul>

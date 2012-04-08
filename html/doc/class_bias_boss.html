@@ -98,10 +98,10 @@ Public Member Functions</h2></td></tr>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>copy_observations</b> (const <a class="el" href="class_bias_boss.html">BiasBoss</a> &amp;other)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a191cf6370fe1a2c9d72dd3cf14ff461d"></a><!-- doxytag: member="BiasBoss::copy_expectations" ref="a191cf6370fe1a2c9d72dd3cf14ff461d" args="(const BiasBoss &amp;other)" -->
 void&#160;</td><td class="memItemRight" valign="bottom"><b>copy_expectations</b> (const <a class="el" href="class_bias_boss.html">BiasBoss</a> &amp;other)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_bias_boss.html#a85eefeaa4fc8d9c10db4cf99906f34ab">update_expectations</a> (const <a class="el" href="class_transcript.html">Transcript</a> &amp;trans, double mass=0)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_bias_boss.html#a3e081d8d3dc9ef8612db716a14ca9f00">update_expectations</a> (const <a class="el" href="class_target.html">Target</a> &amp;targ, double mass=0, const std::vector&lt; double &gt; &amp;fl_cdf=std::vector&lt; double &gt;())</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_bias_boss.html#a59aa886bbdf042aba90348b5fc89020c">normalize_expectations</a> ()</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_bias_boss.html#a4a3d5e083c77d567db176d45339de79c">update_observed</a> (const <a class="el" href="struct_frag_hit.html">FragHit</a> &amp;hit, double mass)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_bias_boss.html#a84827b7389687fa2591c8bacf5e7e3a7">get_transcript_bias</a> (std::vector&lt; float &gt; &amp;start_bias, std::vector&lt; float &gt; &amp;end_bias, const <a class="el" href="class_transcript.html">Transcript</a> &amp;trans) const </td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_bias_boss.html#a7222cc7c94fb0843bb69130830ba6cbb">get_target_bias</a> (std::vector&lt; float &gt; &amp;start_bias, std::vector&lt; float &gt; &amp;end_bias, const <a class="el" href="class_target.html">Target</a> &amp;targ) const </td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_bias_boss.html#a849af7bee4868e29367aa4a3e47262a0">to_string</a> () const </td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_bias_boss.html#a33a06af813884a0aa4b98b51a72bc1eb">append_output</a> (std::ofstream &amp;outfile) const </td></tr>
 </table>
@@ -163,12 +163,12 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>copy_expectations</b>
 
 </div>
 </div>
-<a class="anchor" id="a84827b7389687fa2591c8bacf5e7e3a7"></a><!-- doxytag: member="BiasBoss::get_transcript_bias" ref="a84827b7389687fa2591c8bacf5e7e3a7" args="(std::vector&lt; float &gt; &amp;start_bias, std::vector&lt; float &gt; &amp;end_bias, const Transcript &amp;trans) const " -->
+<a class="anchor" id="a7222cc7c94fb0843bb69130830ba6cbb"></a><!-- doxytag: member="BiasBoss::get_target_bias" ref="a7222cc7c94fb0843bb69130830ba6cbb" args="(std::vector&lt; float &gt; &amp;start_bias, std::vector&lt; float &gt; &amp;end_bias, const Target &amp;targ) const " -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">double BiasBoss::get_transcript_bias </td>
+          <td class="memname">double BiasBoss::get_target_bias </td>
           <td>(</td>
           <td class="paramtype">std::vector&lt; float &gt; &amp;&#160;</td>
           <td class="paramname"><em>start_bias</em>, </td>
@@ -182,8 +182,8 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>copy_expectations</b>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="class_transcript.html">Transcript</a> &amp;&#160;</td>
-          <td class="paramname"><em>trans</em>&#160;</td>
+          <td class="paramtype">const <a class="el" href="class_target.html">Target</a> &amp;&#160;</td>
+          <td class="paramname"><em>targ</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -193,18 +193,18 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>copy_expectations</b>
       </table>
 </div>
 <div class="memdoc">
-<p>a member function that returns the 5' and 3' bias values at each position in a given transcript based on the current bias parameters </p>
+<p>a member function that returns the 5' and 3' bias values at each position in a given target based on the current bias parameters </p>
 <dl><dt><b>Parameters:</b></dt><dd>
   <table class="params">
-    <tr><td class="paramname">start_bias</td><td>a vector containing the logged bias for each 5' start site in the transcript </td></tr>
-    <tr><td class="paramname">end_bias</td><td>a vector containing the logged bias for each 3' end site in the transcript </td></tr>
-    <tr><td class="paramname">trans</td><td>the transcript for which to calculate the logged bias </td></tr>
+    <tr><td class="paramname">start_bias</td><td>a vector containing the logged bias for each 5' start site in the target </td></tr>
+    <tr><td class="paramname">end_bias</td><td>a vector containing the logged bias for each 3' end site in the target </td></tr>
+    <tr><td class="paramname">targ</td><td>the target for which to calculate the logged bias </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="return"><dt><b>Returns:</b></dt><dd>the product of the average 5' and 3' bias (logged) </dd></dl>
 
-<p>Definition at line <a class="el" href="biascorrection_8cpp_source.html#l00312">312</a> of file <a class="el" href="biascorrection_8cpp_source.html">biascorrection.cpp</a>.</p>
+<p>Definition at line <a class="el" href="biascorrection_8cpp_source.html#l00294">294</a> of file <a class="el" href="biascorrection_8cpp_source.html">biascorrection.cpp</a>.</p>
 
 </div>
 </div>
@@ -223,7 +223,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>copy_expectations</b>
 <div class="memdoc">
 <p>a member function that normalizes the expected counts and converts them to the log scale </p>
 
-<p>Definition at line <a class="el" href="biascorrection_8cpp_source.html#l00284">284</a> of file <a class="el" href="biascorrection_8cpp_source.html">biascorrection.cpp</a>.</p>
+<p>Definition at line <a class="el" href="biascorrection_8cpp_source.html#l00270">270</a> of file <a class="el" href="biascorrection_8cpp_source.html">biascorrection.cpp</a>.</p>
 
 </div>
 </div>
@@ -243,25 +243,31 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>copy_expectations</b>
 <p>a member function that returns a string containing the observed positional nucleotide probabilities (non-logged) in column-major order (A,C,G,T) </p>
 <dl class="return"><dt><b>Returns:</b></dt><dd>the string representation of the observed probabilities </dd></dl>
 
-<p>Definition at line <a class="el" href="biascorrection_8cpp_source.html#l00344">344</a> of file <a class="el" href="biascorrection_8cpp_source.html">biascorrection.cpp</a>.</p>
+<p>Definition at line <a class="el" href="biascorrection_8cpp_source.html#l00315">315</a> of file <a class="el" href="biascorrection_8cpp_source.html">biascorrection.cpp</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a85eefeaa4fc8d9c10db4cf99906f34ab"></a><!-- doxytag: member="BiasBoss::update_expectations" ref="a85eefeaa4fc8d9c10db4cf99906f34ab" args="(const Transcript &amp;trans, double mass=0)" -->
+<a class="anchor" id="a3e081d8d3dc9ef8612db716a14ca9f00"></a><!-- doxytag: member="BiasBoss::update_expectations" ref="a3e081d8d3dc9ef8612db716a14ca9f00" args="(const Target &amp;targ, double mass=0, const std::vector&lt; double &gt; &amp;fl_cdf=std::vector&lt; double &gt;())" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">void BiasBoss::update_expectations </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="class_transcript.html">Transcript</a> &amp;&#160;</td>
-          <td class="paramname"><em>trans</em>, </td>
+          <td class="paramtype">const <a class="el" href="class_target.html">Target</a> &amp;&#160;</td>
+          <td class="paramname"><em>targ</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">double&#160;</td>
-          <td class="paramname"><em>mass</em> = <code>0</code>&#160;</td>
+          <td class="paramname"><em>mass</em> = <code>0</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::vector&lt; double &gt; &amp;&#160;</td>
+          <td class="paramname"><em>fl_cdf</em> = <code>std::vector&lt;double&gt;()</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -271,15 +277,15 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>copy_expectations</b>
       </table>
 </div>
 <div class="memdoc">
-<p>a member function that updates the expectation parameters (sequence-specific and positional) assuming uniform expression of and accross the transcript's sequence </p>
+<p>a member function that updates the expectation parameters (sequence-specific and positional) assuming uniform expression of and accross the target's sequence </p>
 <dl><dt><b>Parameters:</b></dt><dd>
   <table class="params">
-    <tr><td class="paramname">trans</td><td>the transcript to measure expected counts from </td></tr>
+    <tr><td class="paramname">targ</td><td>the target to measure expected counts from </td></tr>
   </table>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="biascorrection_8cpp_source.html#l00260">260</a> of file <a class="el" href="biascorrection_8cpp_source.html">biascorrection.cpp</a>.</p>
+<p>Definition at line <a class="el" href="biascorrection_8cpp_source.html#l00258">258</a> of file <a class="el" href="biascorrection_8cpp_source.html">biascorrection.cpp</a>.</p>
 
 </div>
 </div>
@@ -307,7 +313,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>copy_expectations</b>
       </table>
 </div>
 <div class="memdoc">
-<p>a member function that updates the observed parameters (sequence-specific and positional) given a fragment mapping to a transcript and its logged probabilistic assignment </p>
+<p>a member function that updates the observed parameters (sequence-specific and positional) given a fragment mapping to a target and its logged probabilistic assignment </p>
 <dl><dt><b>Parameters:</b></dt><dd>
   <table class="params">
     <tr><td class="paramname">hit</td><td>the fragment hit (alignment) </td></tr>
@@ -316,7 +322,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>copy_expectations</b>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="biascorrection_8cpp_source.html#l00292">292</a> of file <a class="el" href="biascorrection_8cpp_source.html">biascorrection.cpp</a>.</p>
+<p>Definition at line <a class="el" href="biascorrection_8cpp_source.html#l00276">276</a> of file <a class="el" href="biascorrection_8cpp_source.html">biascorrection.cpp</a>.</p>
 
 </div>
 </div>
@@ -329,7 +335,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>copy_expectations</b>
   <div id="nav-path" class="navpath">
     <ul>
       <li class="navelem"><a class="el" href="class_bias_boss.html">BiasBoss</a>      </li>
-      <li class="footer">Generated on Sat Feb 18 2012 07:21:51 for eXpress by&#160;
+      <li class="footer">Generated on Sun Apr 8 2012 11:49:01 for eXpress by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </li>
     </ul>

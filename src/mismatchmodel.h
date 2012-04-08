@@ -26,22 +26,22 @@ class MismatchTable
     /**
      * a vector of FrequencyMatrix objects to store the Markov model parameters for each position in the first ("left") read 
      */
-    std::vector<FrequencyMatrix> _first_read_mm;
+    std::vector<FrequencyMatrix<double> > _first_read_mm;
     
     /**
      * a vector of FrequencyMatrix objects to store the Markov model parameters for each position in the second ("right") read 
      */
-    std::vector<FrequencyMatrix> _second_read_mm;
+    std::vector<FrequencyMatrix<double> > _second_read_mm;
     
     /**
      * a FrequencyMatrix storing the observations of insertions of given lengths 
      */
-    FrequencyMatrix _insert_params;
+    FrequencyMatrix<double> _insert_params;
 
     /**
      * a FrequencyMatrix storing the observations of deletions of given lengths 
      */
-    FrequencyMatrix _delete_params;
+    FrequencyMatrix<double> _delete_params;
     
     /**
      * a size_t storing the maximum observed read length

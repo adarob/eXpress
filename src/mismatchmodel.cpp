@@ -17,8 +17,8 @@
 using namespace std;
 
 MismatchTable::MismatchTable(double alpha)
-: _first_read_mm(MAX_READ_LEN, FrequencyMatrix(16, 4, alpha)),
-  _second_read_mm(MAX_READ_LEN, FrequencyMatrix(16, 4, alpha)),
+: _first_read_mm(MAX_READ_LEN, FrequencyMatrix<double>(16, 4, alpha)),
+  _second_read_mm(MAX_READ_LEN, FrequencyMatrix<double>(16, 4, alpha)),
   _insert_params(1, MAX_READ_LEN, alpha),  
   _delete_params(1, MAX_READ_LEN, alpha),
   _max_len(0),
@@ -36,8 +36,8 @@ double MismatchTable::log_likelihood(const FragHit& f) const
 
     double ll = 0;
     
-    const vector<FrequencyMatrix>& left_mm = (f.left_first) ? _first_read_mm : _second_read_mm;
-    const vector<FrequencyMatrix>& right_mm = (!f.left_first) ? _first_read_mm : _second_read_mm;
+    const vector<FrequencyMatrix<double> >& left_mm = (f.left_first) ? _first_read_mm : _second_read_mm;
+    const vector<FrequencyMatrix<double> >& right_mm = (!f.left_first) ? _first_read_mm : _second_read_mm;
     
     size_t cur;
     size_t ref;
@@ -146,8 +146,8 @@ void MismatchTable::update(const FragHit& f, double mass)
     const Sequence& t_seq_fwd = targ.seq(0);
     const Sequence& t_seq_rev = targ.seq(1);
     
-    vector<FrequencyMatrix>& left_mm = (f.left_first) ? _first_read_mm : _second_read_mm;
-    vector<FrequencyMatrix>& right_mm = (!f.left_first) ? _first_read_mm : _second_read_mm;
+    vector<FrequencyMatrix<double> >& left_mm = (f.left_first) ? _first_read_mm : _second_read_mm;
+    vector<FrequencyMatrix<double> >& right_mm = (!f.left_first) ? _first_read_mm : _second_read_mm;
     
     size_t cur;
     size_t ref;

@@ -96,7 +96,7 @@ Public Member Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_seq_weight_table.html#a9c086928447f2c5af25355d1ac37f236">SeqWeightTable</a> (size_t window_size, double alpha)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_seq_weight_table.html#a11980714ae7e2864ff37398c8bf19d50">copy_observed</a> (const <a class="el" href="class_seq_weight_table.html">SeqWeightTable</a> &amp;other)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_seq_weight_table.html#ab0af75b4f00090bec0d49a81d79df608">copy_expected</a> (const <a class="el" href="class_seq_weight_table.html">SeqWeightTable</a> &amp;other)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_seq_weight_table.html#a4c0eb78535d6e75bebf3ed7b7645998e">increment_expected</a> (const <a class="el" href="class_sequence.html">Sequence</a> &amp;seq, double mass)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_seq_weight_table.html#a78b30a85079d8bec4171c780964900cf">increment_expected</a> (const <a class="el" href="class_sequence.html">Sequence</a> &amp;seq, double mass, const std::vector&lt; double &gt; &amp;fl_cdf)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_seq_weight_table.html#a683d5829e92c085c6c05a8209aab47e7">normalize_expected</a> ()</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_seq_weight_table.html#aef95729e3fef2384ca8a48ed424d315a">increment_observed</a> (const <a class="el" href="class_sequence.html">Sequence</a> &amp;seq, size_t i, double mass)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_seq_weight_table.html#adfdee1cb194728dc89bdbf76e6976122">get_weight</a> (const <a class="el" href="class_sequence.html">Sequence</a> &amp;seq, size_t i) const </td></tr>
@@ -251,7 +251,7 @@ Public Member Functions</h2></td></tr>
 <p>a member function that calculates the bias weight (logged) of a bias window </p>
 <dl><dt><b>Parameters:</b></dt><dd>
   <table class="params">
-    <tr><td class="paramname">seq</td><td>the transcript sequence the fragment hits to </td></tr>
+    <tr><td class="paramname">seq</td><td>the target sequence the fragment hits to </td></tr>
     <tr><td class="paramname">i</td><td>the fragment end point (the central point of the bias window) </td></tr>
   </table>
   </dd>
@@ -262,7 +262,7 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="a4c0eb78535d6e75bebf3ed7b7645998e"></a><!-- doxytag: member="SeqWeightTable::increment_expected" ref="a4c0eb78535d6e75bebf3ed7b7645998e" args="(const Sequence &amp;seq, double mass)" -->
+<a class="anchor" id="a78b30a85079d8bec4171c780964900cf"></a><!-- doxytag: member="SeqWeightTable::increment_expected" ref="a78b30a85079d8bec4171c780964900cf" args="(const Sequence &amp;seq, double mass, const std::vector&lt; double &gt; &amp;fl_cdf)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -276,7 +276,13 @@ Public Member Functions</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">double&#160;</td>
-          <td class="paramname"><em>mass</em>&#160;</td>
+          <td class="paramname"><em>mass</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::vector&lt; double &gt; &amp;&#160;</td>
+          <td class="paramname"><em>fl_cdf</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -286,16 +292,14 @@ Public Member Functions</h2></td></tr>
       </table>
 </div>
 <div class="memdoc">
-<p>a member function that increments the expected counts for a sliding window through the given transcript sequence by some mass </p>
+<p>a member function that increments the expected counts for a sliding window through the given target sequence by some mass </p>
 <dl><dt><b>Parameters:</b></dt><dd>
   <table class="params">
-    <tr><td class="paramname">seq</td><td>the transcript sequence </td></tr>
-    <tr><td class="paramname">mass</td><td>the amount of used to weight the transcript's sequence in the parameter table </td></tr>
+    <tr><td class="paramname">seq</td><td>the target sequence </td></tr>
+    <tr><td class="paramname">mass</td><td>the amount of used to weight the target's sequence in the parameter table </td></tr>
   </table>
   </dd>
 </dl>
-
-<p>Definition at line <a class="el" href="biascorrection_8cpp_source.html#l00046">46</a> of file <a class="el" href="biascorrection_8cpp_source.html">biascorrection.cpp</a>.</p>
 
 </div>
 </div>
@@ -332,7 +336,7 @@ Public Member Functions</h2></td></tr>
 <p>a member function that increments the observed counts for the given fragment sequence by some mass (logged) </p>
 <dl><dt><b>Parameters:</b></dt><dd>
   <table class="params">
-    <tr><td class="paramname">seq</td><td>the transcript sequence (possibly reverse complemented) to which the fragment end maps </td></tr>
+    <tr><td class="paramname">seq</td><td>the target sequence (possibly reverse complemented) to which the fragment end maps </td></tr>
     <tr><td class="paramname">i</td><td>the index into the sequence at which to center the bias window (where the fragment starts/ends) </td></tr>
     <tr><td class="paramname">mass</td><td>the fragment's mass </td></tr>
   </table>
@@ -389,7 +393,7 @@ Public Member Functions</h2></td></tr>
   <div id="nav-path" class="navpath">
     <ul>
       <li class="navelem"><a class="el" href="class_seq_weight_table.html">SeqWeightTable</a>      </li>
-      <li class="footer">Generated on Sat Feb 18 2012 07:21:52 for eXpress by&#160;
+      <li class="footer">Generated on Sun Apr 8 2012 11:49:02 for eXpress by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </li>
     </ul>
