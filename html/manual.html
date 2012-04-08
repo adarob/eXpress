@@ -73,7 +73,7 @@
         <div class="sitename">
           <h1><a href="#">eXpress</a></h1> 
           &nbsp;
-          <h2><i>Streaming</i> RNA-Seq Analysis</h2>
+          <h2><i>Streaming</i> quantification for high-throughput sequencing</h2>
         </div>
     
         <!-- A.2 BUTTON NAVIGATION -->
@@ -123,10 +123,10 @@
         <li><a href="#">Download<!--[if IE 7]><!--></a><!--<![endif]-->
           <!--[if lte IE 6]><table><tr><td><![endif]-->
             <ul>
-              <li><a href=downloads/express-0.9.6/express-0.9.6-macosx_x86_64.tgz onClick="_gaq.push(['_trackEvent', 'Downloads', 'Mac', 'Manual']);" target="_blank">Mac OS X (64-bit)</a></li>
-              <li><a href=downloads/express-0.9.6/express-0.9.6-linux_x86_64.tgz onClick="_gaq.push(['_trackEvent', 'Downloads', 'Linux', 'Manual']);" target="_blank">Linux (64-bit)</a></li>
-              <li><a href=downloads/express-0.9.6/express-0.9.6-win32_x86_64.zip onClick="_gaq.push(['_trackEvent', 'Downloads', 'Windows', 'Manual']);" target="_blank">Windows (64-bit)</a></li>
-              <li><a href=downloads/express-0.9.6/express-0.9.6-src.tgz onClick="_gaq.push(['_trackEvent', 'Downloads', 'Source', 'Manual']);" target="_blank">Source Code</a></li>
+              <li><a href=downloads/express-1.0.0/express-1.0.0-macosx_x86_64.tgz onClick="_gaq.push(['_trackEvent', 'Downloads', 'Mac', 'Manual']);" target="_blank">Mac OS X (64-bit)</a></li>
+              <li><a href=downloads/express-1.0.0/express-1.0.0-linux_x86_64.tgz onClick="_gaq.push(['_trackEvent', 'Downloads', 'Linux', 'Manual']);" target="_blank">Linux (64-bit)</a></li>
+              <li><a href=downloads/express-1.0.0/express-1.0.0-win32_x86_64.zip onClick="_gaq.push(['_trackEvent', 'Downloads', 'Windows', 'Manual']);" target="_blank">Windows (64-bit)</a></li>
+              <li><a href=downloads/express-1.0.0/express-1.0.0-src.tgz onClick="_gaq.push(['_trackEvent', 'Downloads', 'Source', 'Manual']);" target="_blank">Source Code</a></li>
               <li><a href="downloads" onClick="_gaq.push(['_trackEvent', 'Downloads', 'Previous','Manual']);">Previous Versions</a></li>
             </ul>
           <!--[if lte IE 6]></td></tr></table></a><![endif]-->
@@ -311,12 +311,12 @@
    	  <tr><th scope="row">6</th><td>uniq_counts</td><td><tt>7</tt></td><td>The number of fragments uniquely mapping to this target.</td></tr> 
 	  <tr><th scope="row">7</th><td>est_counts</td><td><tt>26.702456</tt></td><td>The estimated number of fragments generated from this target in the sequencing experiment.</td></tr> 
   	  <tr><th scope="row">8</th><td>eff_counts</td><td><tt>74.399258</tt></td><td>The estimated number of fragments generated from this target in the sequencing experiment, adjusted for fragment and length biases.  In other words, his is the expected number of reads from the experiment if these biases did not exist.  This is the value recommended for input to count-biased differential expression tools.</td></tr> 
-  	  <tr><th scope="row">8</th><td>ambig_distr_alpha</td><td><tt>3.154652</tt></td><td>The alpha parameter for the posterior beta-binomial distribution fit to the N=tot_counts-uniq_counts ambiguous reads mapped to this target.</td></tr> 
-  	  <tr><th scope="row">10</th><td>ambig_distr_beta</td><td><tt>2.293653</tt></td><td>The beta parameter for the posterior beta-binomial distribution fit to the N=tot_counts-uniq_counts ambiguous reads mapped to this target.</td></tr> 
-   	  <tr><th scope="row">9</th><td>fpkm</td><td><tt>3.514176</tt></td><td>The estimated relative abundance of this target in the sample in units of <b>f</b>ragments <b>p</b>er <b>k</b>ilobase per <b>m</b>illion sequenced. This value is proportional to est_counts divided by eff_length.</td></tr> 
+  	  <tr><th scope="row">8</th><td>ambig_distr_alpha</td><td><tt>3.154652</tt></td><td>The alpha parameter for the posterior beta-binomial distribution fit to the ambiguous reads.</td></tr> 
+  	  <tr><th scope="row">10</th><td>ambig_distr_beta</td><td><tt>2.293653</tt></td><td>The beta parameter for the posterior beta-binomial distribution fit to the ambiguous reads.</td></tr> 
+   	  <tr><th scope="row">9</th><td>fpkm</td><td><tt>3.514176</tt></td><td>The estimated relative abundance of this target in the sample in units of <b>f</b>ragments <b>p</b>er <b>k</b>ilobase per <b>m</b>illion mapped. This value is proportional to est_counts divided by eff_length.</td></tr> 
    	  <tr><th scope="row">10</th><td>fpkm_conf_low</td><td><tt>2.119151</tt></td><td>The lower bound of the 95% confidence interval for the FPKM.</td></tr> 
    	  <tr><th scope="row">11</th><td>fpkm_conf_high</td><td><tt>4.909200</tt></td><td>The upper bound of the 95% confidence interval for the FPKM.</td></tr> 
-   	  <tr><th scope="row">12</th><td>solveable</td><td><tt>T</tt></td><td>A binary (T/F) value specifying whether eXpress believes a maximum likelihood estimated exists for the target's counts.  If false (F), the estimated counts still take all available evidence into account, but the posterior distribution is uniform.</td></tr> 
+   	  <tr><th scope="row">12</th><td>solveable</td><td><tt>T</tt></td><td>A binary (T/F) value indicating whether the likelihood function has a unique maximum.  If false (F), the reported posterior distribution is uniform.</td></tr> 
 	  </table></p>
 	  <p>See the <a href="overview.html#methods">Methods</a> for more details on how these values are calculated.</p>
 	  

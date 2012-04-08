@@ -73,7 +73,7 @@
         <div class="sitename">
           <h1><a href="#">eXpress</a></h1> 
           &nbsp;
-          <h2><i>Streaming</i> RNA-Seq Analysis</h2>
+          <h2><i>Streaming</i> quantification for high-throughput sequencing</h2>
         </div>
     
         <!-- A.2 BUTTON NAVIGATION -->
@@ -164,6 +164,9 @@
 	<h2 id="restr">Is eXpress restricted to RNA-Seq analysis?</h2>
 	<p>The methods in eXpress are general and can be used in any application where it is necessary to quantify the relative abundances of sequences that have been sampled using short reads. RNA-Seq is the application that we have focused on in initial testing because of the large amount of available data, however eXpress can be easily applied to allele-specific expression, metagenomics, and many other active areas of research.</p>
     <p>&rarr; <a href="#top">Back to top.</a></p>
+	<h2 id="stream">Does eXpress only work in streaming mode?</h2>	
+	<p>No, eXpress is also able to accept a SAM or BAM file as input (see <a href=manual.html#input>Manual</a> and <a href=tutorial.html#reqin>Getting Started</a> for more information on how to use different inputs. If given an alignment file, eXpress is also able to do multiple passes over the data to improve accuracy.  See the <a href=manual.html#running>Manual</a> for more details on different iterative modes.</p>
+	<p>&rarr; <a href="#top">Back to top.</a></p>
    	<h2 id="single">Does eXpress accept both single-end and paired-end read alignments?</h2>
 	<p>Yes, eXpress accepts both types of reads, even in the same alignment file.  However, to maximize accuracy of the bias correction and fragment length calculations, you should not mix reads generated in separate library preps.</p>
     <p>&rarr; <a href="#top">Back to top.</a></p>
@@ -190,6 +193,7 @@
    		  	<li><a href="#diff">Can eXpress be used for finding differentially expressed genes in RNA-Seq analysis?</a></li>
  		  	<li><a href="#assmbl">Can eXpress be used to perform genome or transcriptome assembly?</a></li>
 			 <li><a href="#restr">Is eXpress restricted to RNA-Seq analysis?</a></li>
+			 <li><a href="#stream">Does eXpress only work in streaming mode?</a></li>
 			 <li><a href="#single">Does eXpress accept both single-end and paired-end read alignments?</a></li>
 			  <li><a href="#pub">When will the eXpress method be published?</a></li>
 
