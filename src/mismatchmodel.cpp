@@ -81,11 +81,13 @@ double MismatchTable::log_likelihood(const FragHit& f) const
             
             if (t_seq_fwd.prob())
             {
+                double trans_prob = HUGE_VAL;
                 for(size_t nuc = 0; nuc < NUM_NUCS; nuc++)
                 {
                     index = (prev << 2) + nuc;
-                    ll += t_seq_fwd.get_prob(j, nuc) + left_mm[i](index, cur);
+                    trans_prob = log_sum(trans_prob, t_seq_fwd.get_prob(j, nuc) + left_mm[i](index, cur));
                 }
+                ll += trans_prob;
             }
             else
             {
@@ -136,11 +138,13 @@ double MismatchTable::log_likelihood(const FragHit& f) const
             
             if (t_seq_rev.prob())
             {
+                double trans_prob = HUGE_VAL;
                 for(size_t nuc = 0; nuc < NUM_NUCS; nuc++)
                 {
                     index = (prev << 2) + nuc;
-                    ll += t_seq_rev.get_prob(j, nuc) + right_mm[i](index, cur);
+                    trans_prob = log_sum(trans_prob, t_seq_rev.get_prob(j, nuc) + right_mm[i](index, cur));
                 }
+                ll += trans_prob;
             }
             else
             {
