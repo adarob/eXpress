@@ -17,8 +17,8 @@ SequenceFwd::SequenceFwd(const std::string& seq, bool rev, bool prob) : _encoded
 {
     if (prob)
     {
-        _obs_seq = FrequencyMatrix<float>(seq.length(), NUM_NUCS, log(0.1));
-        _exp_seq = FrequencyMatrix<float>(seq.length(), NUM_NUCS, log(0.1));
+        _obs_seq = FrequencyMatrix<float>(seq.length(), NUM_NUCS, 0.1);
+        _exp_seq = FrequencyMatrix<float>(seq.length(), NUM_NUCS, 0.1);
     }
     set(seq, rev);
 }
