@@ -70,9 +70,10 @@ public:
      * a member function to extract the probability of a given position in the matrix (logged if table is logged)
      * @param i the distribution (row)
      * @param j the value (column)
+     * @param normalized a bool specifying whether or not the frequency should be normalized
      * @return a double specifying the probability of the given value in the given distribution (logged if table is logged)
      */  
-    T operator()(size_t i, size_t j) const;
+    T operator()(size_t i, size_t j, bool normalized=true) const;
     
     /**
      * a member function to extract the probability of a given position in the flattened matrix (logged if table is logged)
@@ -128,9 +129,11 @@ _logged(logged)
 {}
 
 template <class T>
-T FrequencyMatrix<T>::operator()(size_t i, size_t j) const
+T FrequencyMatrix<T>::operator()(size_t i, size_t j, bool normalized) const
 {
     assert(i*_N+j < _M*_N);
+    if (!normalized)
+        return _array[i*_N+j];
     if (_logged)
         return _array[i*_N+j]-_rowsums[i];
     else

@@ -59,7 +59,7 @@ struct RoundParams
     RoundParams() : mass(HUGE_VAL), tot_ambig_mass(HUGE_VAL), mass_var(HUGE_VAL), var_sum(HUGE_VAL) {}
 };
 
-typedef size_t TransID;
+typedef size_t TargID;
 
 
 /**
@@ -81,9 +81,9 @@ class Target
     const Globals* _globs;
     
     /**
-     * a private TransID that stores the hashed target name
+     * a private TargID that stores the hashed target name
      */
-    TransID _id;
+    TargID _id;
     
     /**
      * a private string that stores the target name
@@ -93,12 +93,12 @@ class Target
     /**
      * a private Sequence object that stores the forward target sequence
      */
-    Sequence _seq_f;
+    SequenceFwd _seq_f;
 
     /**
      * a private Sequence object that stores the reverse target sequence
      */
-    Sequence _seq_r;
+    SequenceRev _seq_r;
     
     /**
      * a private double object that stores the pseudo-mass-per-base
@@ -174,10 +174,11 @@ public:
      * Target Constructor
      * @param name a string that stores the target name
      * @param seq a string that stores the target sequence
+     * @param DOC
      * @param alpha a double that specifies the intial pseudo-counts (non-logged)
      * @param globs a pointer to the struct containing pointers to the global parameter tables (bias_table, mismatch_table, fld)
      */
-    Target(const size_t id, const std::string& name, const std::string& seq, double alpha, const Globals* globs);
+    Target(const size_t id, const std::string& name, const std::string& seq, bool prob_seq, double alpha, const Globals* globs);
     
     /**
      * Target Destructor deletes bias vectors
@@ -208,14 +209,21 @@ public:
     
     /**
      * a member function that returns the target id
-     * @return TransID target ID
+     * @return TargID target ID
      */
-    TransID id() const { return _id; }
+    TargID id() const { return _id; }
+    
     /**
-     * a member function that returns the target sequence
+     * a member function that returns the target sequence (const)
      * @return string containing target sequence
      */
     const Sequence& seq(bool rev) const { if (rev) return _seq_r; return _seq_f; }
+    
+    /**
+     * a member function that returns the target sequence (non-const)
+     * @return string containing target sequence
+     */
+    Sequence& seq(bool rev) { if (rev) return _seq_r; return _seq_f; }
     
     /**
      * a member function that returns the target length
@@ -369,7 +377,7 @@ class TargetTable
     Globals* _globs;
         
     /**
-     * a private map to look up pointers to Target objects by their TransID id
+     * a private map to look up pointers to Target objects by their TargID id
      */
     TransMap _targ_map;
     
@@ -379,7 +387,7 @@ class TargetTable
     BundleTable _bundle_table;
     
     /**
-     * a private CovarTable to look up the covariance for pairs of Targets by their combined hashed TransIDs
+     * a private CovarTable to look up the covariance for pairs of Targets by their combined hashed TargIDs
      * these values are stored positive, even though they are negative
      */
     CovarTable _covar_table;
@@ -398,11 +406,12 @@ class TargetTable
      * a private function that validates and adds a target pointer to the table
      * @param name the name of the trancript
      * @param seq the sequence of the target
+     * @param DOC
      * @param alpha a double that specifies the initial pseudo-counts for each bp of the target (non-logged)
      * @param targ_index the target-to-index map from the alignment file
      * @param targ_lengths the target-to-length map from the alignment file (for validation)
      */
-    void add_targ(const std::string& name, const std::string& seq, double alpha, const TransIndex& targ_index, const TransIndex& targ_lengths);  
+    void add_targ(const std::string& name, const std::string& seq, bool prob_seqs, double alpha, const TransIndex& targ_index, const TransIndex& targ_lengths);  
     
 public:
     /**
@@ -410,11 +419,12 @@ public:
      * @param targ_fasta_file a string storing the path to the fasta file from which to load targets
      * @param targ_index the target-to-index map from the alignment file
      * @param targ_lengths the target-to-length map from the alignment file
+     * @param DOC
      * @param alpha a double that specifies the intial pseudo-counts for each bp of the targets (non-logged)
      * @param alpha_map an optional pointer to a map object that specifies proportional weights of pseudo-counts for each target
      * @param globs a pointer to the struct containing pointers to the global parameter tables (bias_table, mismatch_table, fld)
      */
-    TargetTable(const std::string& targ_fasta_file, const TransIndex& targ_index, const TransIndex& targ_lengths, double alpha, const AlphaMap* alpha_map, Globals* globs);
+    TargetTable(const std::string& targ_fasta_file, const TransIndex& targ_index, const TransIndex& targ_lengths, bool prob_seqs, double alpha, const AlphaMap* alpha_map, Globals* globs);
     
     /**
      * TargetTable Destructor
@@ -427,7 +437,7 @@ public:
      * @param id of the target queried
      * @return pointer to the target wit the given id
      */
-    Target* get_targ(TransID id);
+    Target* get_targ(TargID id);
     
     /**
      * a member function that readies all Target objects in the table for the next round of batch EM
@@ -459,7 +469,7 @@ public:
      * @param targ2 the other target in the pair
      * @param covar a double specifying the amount to increase the pair's covariance by (logged)
      */
-    void update_covar(TransID targ1, TransID targ2, double covar) { _covar_table.increment(targ1, targ2, covar); }
+    void update_covar(TargID targ1, TargID targ2, double covar) { _covar_table.increment(targ1, targ2, covar); }
     
     /**
      * a member function that returns the covariance between two targets
@@ -468,7 +478,7 @@ public:
      * @param targ2 the other target in the pair
      * @return the negative of the pair's covariance (logged)
      */
-    double get_covar(TransID targ1, TransID targ2) { return _covar_table.get(targ1, targ2); }
+    double get_covar(TargID targ1, TargID targ2) { return _covar_table.get(targ1, targ2); }
     
     /**
      * a member function that returns the number of pairs of targets with non-zero covariance

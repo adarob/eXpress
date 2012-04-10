@@ -78,12 +78,22 @@ double MismatchTable::log_likelihood(const FragHit& f) const
             
             cur = f.seq_l[i];
             prev = (i) ? f.seq_l[i-1] : 0;
-            ref = t_seq_fwd[j];
-            if (prev != 4 && cur != 4 && ref != 4)
+            
+            if (t_seq_fwd.prob())
             {
+                for(size_t nuc = 0; nuc < NUM_NUCS; nuc++)
+                {
+                    index = (prev << 2) + nuc;
+                    ll += t_seq_fwd.get_prob(j, nuc) + left_mm[i](index, cur);
+                }
+            }
+            else
+            {
+                ref = t_seq_fwd[j];
                 index = (prev << 2) + ref;
                 ll += left_mm[i](index, cur);
             }
+                
             i++;
             j++;
         }
@@ -123,9 +133,18 @@ double MismatchTable::log_likelihood(const FragHit& f) const
             
             cur = f.seq_r[i];
             prev = (i) ? f.seq_r[i-1] : 0;
-            ref = t_seq_rev[j];
-            if (prev != 4 && cur != 4 && ref != 4)
+            
+            if (t_seq_rev.prob())
             {
+                for(size_t nuc = 0; nuc < NUM_NUCS; nuc++)
+                {
+                    index = (prev << 2) + nuc;
+                    ll += t_seq_rev.get_prob(j, nuc) + right_mm[i](index, cur);
+                }
+            }
+            else
+            {
+                ref = t_seq_rev[j];
                 index = (prev << 2) + ref;
                 ll += right_mm[i](index, cur);
             }
@@ -140,11 +159,11 @@ double MismatchTable::log_likelihood(const FragHit& f) const
 }
 
 
-void MismatchTable::update(const FragHit& f, double mass)
+void MismatchTable::update(const FragHit& f, double p, double mass)
 {
-    const Target& targ = *f.mapped_targ;
-    const Sequence& t_seq_fwd = targ.seq(0);
-    const Sequence& t_seq_rev = targ.seq(1);
+    Target& targ = *f.mapped_targ;
+    Sequence& t_seq_fwd = targ.seq(0);
+    Sequence& t_seq_rev = targ.seq(1);
     
     vector<FrequencyMatrix<double> >& left_mm = (f.left_first) ? _first_read_mm : _second_read_mm;
     vector<FrequencyMatrix<double> >& right_mm = (!f.left_first) ? _first_read_mm : _second_read_mm;
@@ -189,11 +208,25 @@ void MismatchTable::update(const FragHit& f, double mass)
             cur = f.seq_l[i];
             prev = (i) ? f.seq_l[i-1] : 0;
             ref = t_seq_fwd[j];
-            if (prev != 4 && cur != 4 && ref != 4)
+
+            if (t_seq_fwd.prob())
+            {
+                size_t ref_index = (prev << 2) + ref;
+                for(size_t nuc = 0; nuc < NUM_NUCS; nuc++)
+                {
+                    index = (prev << 2) + nuc;
+                    left_mm[i].increment(index, cur, mass+p+t_seq_fwd.get_prob(j, nuc));
+                    
+                    t_seq_rev.update_exp(j, nuc, p+right_mm[i](ref_index, nuc));
+                }
+                t_seq_fwd.update_obs(j, cur, p);
+            }
+            else
             {
                 index = (prev << 2) + ref;
-                left_mm[i].increment(index, cur, mass);
+                left_mm[i].increment(index, cur, mass+p);
             }
+            
             i++;
             j++;
         }
@@ -234,10 +267,23 @@ void MismatchTable::update(const FragHit& f, double mass)
             cur = f.seq_r[i];
             prev = (i) ? f.seq_r[i-1] : 0;
             ref = t_seq_rev[j];
-            if (prev != 4 && cur != 4 && ref != 4)
+
+            if (t_seq_rev.prob())
+            {
+                size_t ref_index = (prev << 2) + ref;
+                for(size_t nuc = 0; nuc < NUM_NUCS; nuc++)
+                {
+                    index = (prev << 2) + nuc;
+                    right_mm[i].increment(index, cur, mass+p+t_seq_rev.get_prob(j, nuc));
+                    
+                    t_seq_rev.update_exp(j, nuc, p+right_mm[i](ref_index, nuc));
+                }
+                t_seq_rev.update_obs(j, cur, p);
+            }
+            else
             {
                 index = (prev << 2) + ref;
-                right_mm[i].increment(index, cur, mass);
+                right_mm[i].increment(index, cur, mass+p);
             }
             i++;
             j++;

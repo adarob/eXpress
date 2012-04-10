@@ -17,7 +17,7 @@
 #include <api/BamAlignment.h>
 #include "sequence.h"
 
-typedef size_t TransID;
+typedef size_t TargID;
 class Target;
 class TargetTable;
 
@@ -67,9 +67,9 @@ struct FragHit
     std::string name;
     
     /**
-     * a public TransID for the target mapped to
+     * a public TargID for the target mapped to
      */
-    TransID targ_id;
+    TargID targ_id;
     
     /**
      * a public pointer to the target mapped to
@@ -79,12 +79,12 @@ struct FragHit
     /**
      * a public string containing the "left" read sequence (first according to SAM flag)
      */
-    Sequence seq_l;
+    SequenceFwd seq_l;
     
     /**
      * a public string containing the "right" read sequence (second according to SAM flag)
      */
-    Sequence seq_r;
+    SequenceFwd seq_r;
     
     /**
      * a public size_t containing the 0-based leftmost coordinate mapped to in the target

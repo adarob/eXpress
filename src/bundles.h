@@ -14,7 +14,7 @@
 #include <boost/unordered_map.hpp>
 
 class Target;
-typedef size_t TransID;
+typedef size_t TargID;
 typedef boost::unordered_map<size_t, float> CovarMap;
 
 /** 
@@ -26,7 +26,7 @@ typedef boost::unordered_map<size_t, float> CovarMap;
 class CovarTable
 {
     /**
-     * a private map to look up the covariance for pairs of Targets by their combined hashed TransIDs
+     * a private map to look up the covariance for pairs of Targets by their combined hashed TargIDs
      * these values are stored positive and logged, even though they are negative
      */
     CovarMap _covar_map;
@@ -42,7 +42,7 @@ public:
      * @param targ2 the other target in the pair
      * @param covar a double specifying the amount to increase the pair's covariance by (logged)
      */
-    void increment(TransID targ1, TransID targ2, double covar);
+    void increment(TargID targ1, TargID targ2, double covar);
     
     /**
      * a member function that returns the covariance between two targets
@@ -51,7 +51,7 @@ public:
      * @param targ2 the other target in the pair
      * @return the negative of the pair's covariance (logged)
      */
-    double get(TransID targ1, TransID targ2);
+    double get(TargID targ1, TargID targ2);
     
     /**
      * a member function that returns the number of pairs of targets with non-zero covariance

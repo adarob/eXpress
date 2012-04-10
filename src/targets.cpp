@@ -20,12 +20,12 @@
 
 using namespace std;
 
-Target::Target(const TransID id, const std::string& name, const std::string& seq, double alpha, const Globals* globs)
+Target::Target(const TargID id, const std::string& name, const std::string& seq, bool prob_seq, double alpha, const Globals* globs)
 :   _globs(globs),
     _id(id),
     _name(name),
-    _seq_f(seq, 0),
-    _seq_r(seq, 1),
+    _seq_f(seq, 0, prob_seq),
+    _seq_r(_seq_f),
     _alpha(log(alpha)),
     _ret_params(&_curr_params),
     _uniq_counts(0),
@@ -173,7 +173,7 @@ void Target::update_target_bias(BiasBoss* bias_table, FLD* fld)
     }
 }
 
-TargetTable::TargetTable(const string& targ_fasta_file, const TransIndex& targ_index, const TransIndex& targ_lengths, double alpha, const AlphaMap* alpha_map, Globals* globs)
+TargetTable::TargetTable(const string& targ_fasta_file, const TransIndex& targ_index, const TransIndex& targ_lengths, bool prob_seqs, double alpha, const AlphaMap* alpha_map, Globals* globs)
 : _globs(globs),
   _targ_map(targ_index.size(), NULL),
   _total_fpb(log(alpha*targ_index.size()))
@@ -207,7 +207,7 @@ TargetTable::TargetTable(const string& targ_fasta_file, const TransIndex& targ_i
             {
                 if (!name.empty())
                 {
-                    add_targ(name, seq, (alpha_map) ? alpha_renorm * alpha_map->find(name)->second : alpha, targ_index, targ_lengths);
+                    add_targ(name, seq, prob_seqs, (alpha_map) ? alpha_renorm * alpha_map->find(name)->second : alpha, targ_index, targ_lengths);
                 }
                 name = line.substr(1,line.find(' ')-1);
                 if (target_names.count(name))
@@ -232,7 +232,7 @@ TargetTable::TargetTable(const string& targ_fasta_file, const TransIndex& targ_i
         }
         if (!name.empty())
         {
-            add_targ(name, seq, (alpha_map) ? alpha_renorm * alpha_map->find(name)->second : alpha, targ_index, targ_lengths);
+            add_targ(name, seq, prob_seqs, (alpha_map) ? alpha_renorm * alpha_map->find(name)->second : alpha, targ_index, targ_lengths);
         }
         infile.close();
         if (globs->bias_table)
@@ -270,7 +270,7 @@ TargetTable::~TargetTable()
     }
 }
 
-void TargetTable::add_targ(const string& name, const string& seq, double alpha, const TransIndex& targ_index, const TransIndex& targ_lengths)
+void TargetTable::add_targ(const string& name, const string& seq, bool prob_seq, double alpha, const TransIndex& targ_index, const TransIndex& targ_lengths)
 {
     TransIndex::const_iterator it = targ_index.find(name);
     if(it == targ_index.end())
@@ -285,14 +285,14 @@ void TargetTable::add_targ(const string& name, const string& seq, double alpha, 
         exit(1);
     }
 
-    Target* targ = new Target(it->second, name, seq, alpha, _globs);
+    Target* targ = new Target(it->second, name, seq, prob_seq, alpha, _globs);
     if (_globs->bias_table)
         (_globs->bias_table)->update_expectations(*targ);
     _targ_map[targ->id()] = targ;
     targ->bundle(_bundle_table.create_bundle(targ));
 }
 
-Target* TargetTable::get_targ(TransID id)
+Target* TargetTable::get_targ(TargID id)
 {
     return _targ_map[id];
 }

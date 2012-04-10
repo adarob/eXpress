@@ -78,9 +78,10 @@ public:
     /**
      * member function that updates the error model parameters based on a mapping and its (logged) mass
      * @param f the fragment mapping 
-     * @param mass the logged mass to increase the parameters by
+     * @param p the logged posterior probablity of the alignment
+     * @param mass the logged mass of the fragment
      */
-    void update(const FragHit&, double mass);
+    void update(const FragHit&, double p, double mass);
     
     /**
      * member function that returns a string containing a collapsed confusion matrix based on the model parameters for the first read

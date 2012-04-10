@@ -11,58 +11,19 @@
 
 using namespace std;
 
-/**
- * function to encode a nucleotide character to a size_t value
- * @param c the nucleotide character to be encoded
- * @return a size_t value encoding the nucleotide
- */
-inline char ctoi(const char c)
+SequenceFwd::SequenceFwd():  _encoded_seq(NULL), _len(0) {}
+
+SequenceFwd::SequenceFwd(const std::string& seq, bool rev, bool prob) : _encoded_seq(NULL), _len(seq.length()), _prob(prob)
 {
-    switch(c)
+    if (prob)
     {
-        case 'A':
-        case 'a':
-            return 0;
-        case 'C':
-        case 'c':
-            return 1;
-        case 'G':
-        case 'g':
-            return 2;
-        case 'T':
-        case 't':
-            return 3;
-        default:
-            return 0;
+        _obs_seq = FrequencyMatrix<float>(seq.length(), NUM_NUCS, log(0.1));
+        _exp_seq = FrequencyMatrix<float>(seq.length(), NUM_NUCS, log(0.1));
     }
-}
-
-inline char complement(const char c)
-{
-    switch(c)
-    {
-        case 0:
-            return 3;
-        case 1:
-            return 2;
-        case 2:
-            return 1;
-        case 3:
-            return 0;
-        default:
-            assert(false);
-            return 4;
-    }    
-}
-
-Sequence::Sequence():  _encoded_seq(NULL), _len(0) {}
-
-Sequence::Sequence(const std::string& seq, bool rev) : _encoded_seq(NULL), _len(seq.length())
-{
     set(seq, rev);
 }
 
-Sequence::Sequence(const Sequence& other) : _encoded_seq(NULL), _len(other.length())
+SequenceFwd::SequenceFwd(const SequenceFwd& other) : _encoded_seq(NULL), _obs_seq(other._obs_seq), _exp_seq(other._exp_seq), _len(other.length()), _prob(other._prob)
 {
     if (other._encoded_seq)
     {
@@ -72,7 +33,7 @@ Sequence::Sequence(const Sequence& other) : _encoded_seq(NULL), _len(other.lengt
     }
 }
 
-Sequence& Sequence::operator=(const Sequence& other)
+SequenceFwd& SequenceFwd::operator=(const SequenceFwd& other)
 {
     if (other._encoded_seq)
     {
@@ -80,19 +41,22 @@ Sequence& Sequence::operator=(const Sequence& other)
         char* encoded_seq = new char[_len];
         std::copy(other._encoded_seq, other._encoded_seq + _len, encoded_seq);
         _encoded_seq = encoded_seq;
+        _obs_seq = other._obs_seq;
+        _exp_seq = other._exp_seq;
+        _prob = other._prob;
     }
     return *this;
 }
 
 
-Sequence::~Sequence()
+SequenceFwd::~SequenceFwd()
 {
     if (_encoded_seq)
         delete _encoded_seq;
 }
 
 
-void Sequence::set(const std::string& seq, bool rev)
+void SequenceFwd::set(const std::string& seq, bool rev)
 {
     if (_encoded_seq)
         delete _encoded_seq;
@@ -103,21 +67,50 @@ void Sequence::set(const std::string& seq, bool rev)
         for(size_t i = 0; i < seq.length(); i++)
         {
             encoded_seq[i] = ctoi(seq[i]);
+            if (_prob)
+            {
+                _obs_seq.increment(i, encoded_seq[i], 0);
+                _exp_seq.increment(i, encoded_seq[i], 0);
+            }
         }
     }
     else
     {
         for(size_t i = 0; i < seq.length(); i++)
         {
-            encoded_seq[seq.length()-1-i] = complement(ctoi(seq[i]));
+            size_t j = seq.length()-1-i;
+            encoded_seq[j] = complement(ctoi(seq[i]));
+            if (_prob)
+            {
+                _obs_seq.increment(j, encoded_seq[j], 0);
+                _exp_seq.increment(i, encoded_seq[i], 0);
+            }
         }
     }
     _encoded_seq = encoded_seq;
     _len = seq.length();
 }
 
-size_t Sequence::operator[](const size_t index) const
+size_t SequenceFwd::operator[](const size_t index) const
 {
-    assert(index < _len); 
+    assert(index < _len);
     return _encoded_seq[index]; 
+}
+
+float SequenceFwd::get_prob(const size_t index, const size_t nuc) const
+{
+    assert(_prob);
+    return _obs_seq(index, nuc);
+}
+
+void SequenceFwd::update_obs(const size_t index, const size_t nuc, float mass)
+{
+    assert(_prob);
+    _obs_seq.increment(index, nuc, mass);
+}
+
+void SequenceFwd::update_exp(const size_t index, const size_t nuc, float mass)
+{
+    assert(_prob);
+    _exp_seq.increment(index, nuc, mass);
 }

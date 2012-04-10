@@ -63,6 +63,7 @@ int def_fl_mean = 200;
 int def_fl_stddev = 80;
 
 // option parameters
+bool edit_detect = false;
 bool error_model = true;
 bool bias_correct = true;
 bool calc_covar = false;
@@ -137,6 +138,7 @@ bool parse_options(int ac, char ** av)
     
     po::options_description hidden("Hidden options");
     hidden.add_options()
+    ("edit-detect","")
     ("no-bias-correct","")
     ("no-error-model","")
     ("single-round", "")
@@ -214,7 +216,8 @@ bool parse_options(int ac, char ** av)
         }
         direction = RF;
     }
-    
+
+    edit_detect = vm.count("edit-detect");
     calc_covar = vm.count("calc-covar");
     bias_correct = !(vm.count("no-bias-correct"));
     error_model = !(vm.count("no-error-model"));
@@ -353,7 +356,7 @@ void process_fragment(double mass_n, Fragment* frag_p, TargetTable* targ_table, 
                 if (globs.bias_table)
                     (globs.bias_table)->update_observed(m, mass_t);
                 if (globs.mismatch_table)
-                    (globs.mismatch_table)->update(m, mass_t);
+                    (globs.mismatch_table)->update(m, p, mass_n);
             }
         }
         
@@ -580,7 +583,7 @@ int main (int argc, char ** argv)
     
     ThreadedMapParser map_parser(in_map_file_name, out_map_file_name, last_round);
     globs.bias_table = (bias_correct) ? new BiasBoss(bias_alpha):NULL;
-    TargetTable targ_table(fasta_file_name, map_parser.targ_index(), map_parser.targ_lengths(), expr_alpha, expr_alpha_map, &globs);
+    TargetTable targ_table(fasta_file_name, map_parser.targ_index(), map_parser.targ_lengths(), edit_detect, expr_alpha, expr_alpha_map, &globs);
     globs.targ_table = &targ_table;
     
     double num_targ = (double)map_parser.targ_index().size();
