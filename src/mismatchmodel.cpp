@@ -221,7 +221,7 @@ void MismatchTable::update(const FragHit& f, double p, double mass)
                     index = (prev << 2) + nuc;
                     left_mm[i].increment(index, cur, mass+p+t_seq_fwd.get_prob(j, nuc));
                     
-                    t_seq_rev.update_exp(j, nuc, p+right_mm[i](ref_index, nuc));
+                    t_seq_fwd.update_exp(j, nuc, p+left_mm[i](ref_index, nuc));
                 }
                 t_seq_fwd.update_obs(j, cur, p);
             }
