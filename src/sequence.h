@@ -40,21 +40,9 @@ inline char ctoi(const char c)
 
 inline char complement(const char c)
 {
-    switch(c)
-    {
-        case 0:
-            return 3;
-        case 1:
-            return 2;
-        case 2:
-            return 1;
-        case 3:
-            return 0;
-        default:
-            assert(false);
-            return 4;
-    }    
+    return c^3;
 }
+
 /**
  * The Sequence class is used to store and access encoded nucleotide sequences.
  *  @author    Adam Roberts
