@@ -19,7 +19,8 @@ MarkovModel::MarkovModel(size_t order, size_t window_size, size_t num_pos, doubl
 : _order((int)order),
   _window_size((int)window_size),
   _num_pos((int)num_pos),
-  _params(num_pos, FrequencyMatrix<double>(pow((double)NUM_NUCS, (double)order), NUM_NUCS, alpha, true))
+  _params(num_pos, FrequencyMatrix<double>(pow((double)NUM_NUCS, (double)order), NUM_NUCS, alpha)),
+  _bitclear((1<<(2*order))-1)
 {}
 
 
@@ -56,8 +57,7 @@ void MarkovModel::update(const Sequence& seq, int left, double mass)
             _params[index].increment(cond, curr, mass);
         }
         cond = (cond << 2) + curr;
-        if (i >= _order)
-            cond -= seq[j-_order] << (_order*2);
+        cond &= _bitclear;
         i++;
         j++;
     }
@@ -97,7 +97,7 @@ void MarkovModel::fast_learn(const Sequence& seq, double mass, const vector<doub
             _params[_order].increment(cond, curr, mass_i);
         }
         cond = (cond << 2) + curr;
-        cond -= seq[i-_order] << (_order*2);
+        cond &= _bitclear;
     }
 }
 
@@ -151,21 +151,24 @@ double MarkovModel::seq_prob(const Sequence& seq, int left) const
             double prob = HUGE_VAL;
             for (size_t nuc = 0; nuc < NUM_NUCS; nuc++)
             {
+                assert(!isnan(seq.get_prob(j, nuc)));
+                assert(!isnan(_params[index](cond, nuc)));
                 prob = log_sum(prob, seq.get_prob(j, nuc) + _params[index](cond, nuc));
             }
             v += prob;
         }
         else
         {
+            assert(!isnan(_params[index](cond, curr)));
             v += _params[index](cond, curr);
         }
         cond = (cond << 2) + curr;
-        if (i >= _order)
-            cond -= seq[j-_order] << (_order*2);
+        cond &= _bitclear;
+
         i++;
         j++;
     }
-    
+    assert(!isnan(v));
     return v;
 }
 

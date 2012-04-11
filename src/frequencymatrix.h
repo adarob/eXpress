@@ -134,6 +134,8 @@ template <class T>
 T FrequencyMatrix<T>::operator()(size_t i, size_t j, bool normalized) const
 {
     assert(i*_N+j < _M*_N);
+//    assert(!std::isnan(_array[i*_N+j]));
+//    assert(!std::isnan(_rowsums[i]));
     if (!normalized)
         return _array[i*_N+j];
     if (_logged)
@@ -163,7 +165,7 @@ void FrequencyMatrix<T>::increment(size_t i, size_t j, T incr_amt)
         _array[k] += incr_amt;
         _rowsums[i] += incr_amt;
     }
-//    assert(!isnan(_rowsums[i]) && !isinf(_rowsums[i]));
+//    assert(!std::isnan(_rowsums[i]) && !std::isinf(_rowsums[i]));
 }
 
 template <class T>
@@ -210,7 +212,7 @@ size_t FrequencyMatrix<T>::mode(size_t i) const
     size_t k = i*_N;
     size_t arg = 0;
     T val = _array[k]; 
-    for (size_t j = 0; j < _N; j++)
+    for (size_t j = 1; j < _N; j++)
     {
         if (_array[k+j] > val)
         {

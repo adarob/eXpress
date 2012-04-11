@@ -17,8 +17,8 @@ SequenceFwd::SequenceFwd(const std::string& seq, bool rev, bool prob) : _encoded
 {
     if (prob)
     {
-        _obs_seq = FrequencyMatrix<float>(seq.length(), NUM_NUCS, 0.1);
-        _exp_seq = FrequencyMatrix<float>(seq.length(), NUM_NUCS, 0.1);
+        _obs_seq = FrequencyMatrix<float>(seq.length(), NUM_NUCS, 0.01);
+        _exp_seq = FrequencyMatrix<float>(seq.length(), NUM_NUCS, 0.01);
     }
     set(seq, rev);
 }
@@ -62,29 +62,13 @@ void SequenceFwd::set(const std::string& seq, bool rev)
         delete _encoded_seq;
     
     char* encoded_seq = new char[seq.length()]; 
-    if (!rev)
+    for(size_t i = 0; i < seq.length(); i++)
     {
-        for(size_t i = 0; i < seq.length(); i++)
+        encoded_seq[i] = (rev) ? complement(ctoi(seq[seq.length()-1-i])) : ctoi(seq[i]);
+        if (_prob)
         {
-            encoded_seq[i] = ctoi(seq[i]);
-            if (_prob)
-            {
-                _obs_seq.increment(i, encoded_seq[i], 0);
-                _exp_seq.increment(i, encoded_seq[i], 0);
-            }
-        }
-    }
-    else
-    {
-        for(size_t i = 0; i < seq.length(); i++)
-        {
-            size_t j = seq.length()-1-i;
-            encoded_seq[j] = complement(ctoi(seq[i]));
-            if (_prob)
-            {
-                _obs_seq.increment(j, encoded_seq[j], 0);
-                _exp_seq.increment(i, encoded_seq[i], 0);
-            }
+            _obs_seq.increment(i, encoded_seq[i], 0);
+            _exp_seq.increment(i, encoded_seq[i], 0);
         }
     }
     _encoded_seq = encoded_seq;

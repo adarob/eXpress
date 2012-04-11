@@ -22,6 +22,7 @@ class MarkovModel
     int _window_size;
     int _num_pos;
     std::vector<FrequencyMatrix<double> > _params;
+    size_t _bitclear;
     
 public:
     MarkovModel(size_t order, size_t window_size, size_t num_pos, double alpha);
