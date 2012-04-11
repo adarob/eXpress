@@ -51,7 +51,6 @@ void SeqWeightTable::increment_expected(const Sequence& seq, double mass, const 
 void SeqWeightTable::normalize_expected()
 {
     _expected.calc_marginals();
-//    _expected.set_logged(true);
 }
 
 void SeqWeightTable::increment_observed(const Sequence& seq, size_t i, double mass)
@@ -206,8 +205,8 @@ double BiasBoss::get_target_bias(std::vector<float>& start_bias, std::vector<flo
 
     for (size_t i = 0; i < targ.length(); ++i)
     {
-        start_bias[i] = _5_seq_bias.get_weight(t_seq_fwd, i);// + curr_5_pos_bias;
-        end_bias[targ.length()-i-1] = _3_seq_bias.get_weight(t_seq_rev, i);// + curr_3_pos_bias;
+        start_bias[i] = _5_seq_bias.get_weight(t_seq_fwd, i);
+        end_bias[targ.length()-i-1] = _3_seq_bias.get_weight(t_seq_rev, i);
         tot_start = log_sum(tot_start, start_bias[i]);
         tot_end = log_sum(tot_start, end_bias[i]);
     }

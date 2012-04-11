@@ -15,12 +15,11 @@ using namespace std;
 
 const double LOG_QUARTER = log(0.25);
 
-MarkovModel::MarkovModel(size_t order, size_t window_size, size_t num_pos, double alpha, bool logged)
+MarkovModel::MarkovModel(size_t order, size_t window_size, size_t num_pos, double alpha)
 : _order((int)order),
   _window_size((int)window_size),
   _num_pos((int)num_pos),
-  _params(num_pos, FrequencyMatrix<double>(pow((double)NUM_NUCS, (double)order), NUM_NUCS, alpha, logged)),
-  _logged(logged)
+  _params(num_pos, FrequencyMatrix<double>(pow((double)NUM_NUCS, (double)order), NUM_NUCS, alpha, true))
 {}
 
 
@@ -43,8 +42,19 @@ void MarkovModel::update(const Sequence& seq, int left, double mass)
     
     while(i < _window_size && j < seq_len)
     {
+        size_t index = min(i, _num_pos-1);
         size_t curr = seq[j];
-        _params[min(i,_num_pos-1)].increment(cond, curr, mass);
+        if (seq.prob())
+        {
+            for(size_t nuc = 0; nuc < NUM_NUCS; nuc++)
+            {
+                _params[index].increment(cond, nuc, seq.get_prob(j, nuc) + mass);
+            }
+        }
+        else
+        {
+            _params[index].increment(cond, curr, mass);
+        }
         cond = (cond << 2) + curr;
         if (i >= _order)
             cond -= seq[j-_order] << (_order*2);
@@ -75,7 +85,17 @@ void MarkovModel::fast_learn(const Sequence& seq, double mass, const vector<doub
             mass_i += fl_cdf[seq.length()-i];
         }
         
-        _params[_order].increment(cond, curr, mass_i);
+        if (seq.prob())
+        {
+            for(size_t nuc = 0; nuc < NUM_NUCS; nuc++)
+            {
+                _params[_order].increment(cond, nuc, seq.get_prob(i, nuc) + mass_i);
+            }
+        }
+        else
+        {
+            _params[_order].increment(cond, curr, mass_i);
+        }
         cond = (cond << 2) + curr;
         cond -= seq[i-_order] << (_order*2);
     }
@@ -110,7 +130,7 @@ double MarkovModel::seq_prob(const Sequence& seq, int left) const
     int seq_len = (int)seq.length();
     
     size_t cond = 0;
-    double v = (_logged) ? 0:1;
+    double v = 0;
 
     if (left < _order)
     {
@@ -119,19 +139,26 @@ double MarkovModel::seq_prob(const Sequence& seq, int left) const
         {
             cond = (cond << 2) + seq[j];
         }
-        if (_logged)
-            v = i*LOG_QUARTER;
-        else
-            v = pow(0.25, (double)i);
+        v = i*LOG_QUARTER;
     }
         
     while(i < _window_size && j < seq_len)
     {
+        size_t index = min(i, _num_pos -1);
         size_t curr = seq[j];
-        if (_logged)
-            v += _params[min(i,_num_pos-1)](cond, curr);
+        if (seq.prob())
+        {
+            double prob = HUGE_VAL;
+            for (size_t nuc = 0; nuc < NUM_NUCS; nuc++)
+            {
+                prob = log_sum(prob, seq.get_prob(j, nuc) + _params[index](cond, nuc));
+            }
+            v += prob;
+        }
         else
-            v *= _params[min(i,_num_pos-1)](cond, curr);
+        {
+            v += _params[index](cond, curr);
+        }
         cond = (cond << 2) + curr;
         if (i >= _order)
             cond -= seq[j-_order] << (_order*2);
@@ -142,20 +169,8 @@ double MarkovModel::seq_prob(const Sequence& seq, int left) const
     return v;
 }
 
-void MarkovModel::set_logged(bool logged)
-{
-    if (logged == _logged)
-        return;
-    _logged = logged;
-    for (size_t i = 0; i < _params.size(); ++i)
-    {
-        _params[i].set_logged(logged);
-    }
-}
-
 double MarkovModel::marginal_prob(size_t w, size_t nuc) const
 {
-    assert(_logged);
     assert(w < _params.size());
     double marg = HUGE_VAL;
     double tot = HUGE_VAL;

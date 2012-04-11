@@ -22,10 +22,9 @@ class MarkovModel
     int _window_size;
     int _num_pos;
     std::vector<FrequencyMatrix<double> > _params;
-    bool _logged;
     
 public:
-    MarkovModel(size_t order, size_t window_size, size_t num_pos, double alpha, bool logged=true);
+    MarkovModel(size_t order, size_t window_size, size_t num_pos, double alpha);
     
     double transition_prob(size_t p, size_t cond, size_t curr) const;
 
@@ -37,8 +36,6 @@ public:
     
     void fast_learn(const Sequence& seq, double mass, const std::vector<double>& fl_cdf);
     void calc_marginals();
-    
-    void set_logged(bool logged);
 };
 
 

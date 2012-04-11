@@ -94,6 +94,10 @@ void SequenceFwd::set(const std::string& seq, bool rev)
 size_t SequenceFwd::operator[](const size_t index) const
 {
     assert(index < _len);
+    if (_prob)
+    {
+        return _obs_seq.mode(index);
+    }
     return _encoded_seq[index]; 
 }
 

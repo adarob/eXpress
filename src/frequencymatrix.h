@@ -116,6 +116,8 @@ public:
      * @param logged bool specifying if the table should be converted to logged or non-logged space
      */ 
     void set_logged(bool logged);
+    
+    size_t mode(size_t i) const;
 };
 
 
@@ -201,5 +203,23 @@ void FrequencyMatrix<T>::set_logged(bool logged)
     
     _logged = logged;    
 }
+
+template <class T>
+size_t FrequencyMatrix<T>::mode(size_t i) const
+{
+    size_t k = i*_N;
+    size_t arg = 0;
+    T val = _array[k]; 
+    for (size_t j = 0; j < _N; j++)
+    {
+        if (_array[k+j] > val)
+        {
+            val = _array[k+j];
+            arg = j;
+        }
+    }
+    return arg;
+}
+
 
 #endif
