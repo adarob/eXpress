@@ -60,7 +60,8 @@ public:
      * @return the encoded character at the given index
      */
     virtual size_t operator[](const size_t index) const = 0;
-    
+    virtual size_t get_ref(const size_t index) const = 0;
+    virtual void update_est(const size_t index, const size_t nuc, float mass) = 0;
     virtual void update_obs(const size_t index, const size_t nuc, float mass) = 0;
     virtual void update_exp(const size_t index, const size_t nuc, float mass) = 0;
     virtual float get_prob(const size_t index, const size_t nuc) const = 0;
@@ -85,8 +86,9 @@ class SequenceFwd: public Sequence
     /**
      * a char array that stores the encoded sequence (not null terminated)
      */
-    const char* _encoded_seq;
+    const char* _ref_seq;
     
+    FrequencyMatrix<float> _est_seq;
     FrequencyMatrix<float> _obs_seq;
     FrequencyMatrix<float> _exp_seq;
     
@@ -139,7 +141,8 @@ public:
      * @return the encoded character at the given index
      */
     size_t operator[](const size_t index) const;
-
+    size_t get_ref(const size_t index) const;
+    void update_est(const size_t index, const size_t nuc, float mass);
     void update_obs(const size_t index, const size_t nuc, float mass);
     void update_exp(const size_t index, const size_t nuc, float mass);
     float get_prob(const size_t index, const size_t nuc) const;
@@ -159,7 +162,9 @@ public:
     size_t length() const { return _seq->length(); }
     bool empty() const { return _seq->empty(); }
     void set(const std::string& seq, bool rev) { assert(false); }
-    size_t operator[](const size_t index) const { return complement(_seq->operator[](length()-index-1)); }
+    size_t operator[](const size_t index) const { return complement(_seq->operator[](length()-index-1)); }    
+    size_t get_ref(const size_t index) const { return complement(_seq->get_ref(length()-index-1)); }
+    void update_est(const size_t index, const size_t nuc, float mass) { _seq->update_est(length()-index-1, complement(nuc), mass); }
     void update_obs(const size_t index, const size_t nuc, float mass) { _seq->update_obs(length()-index-1, complement(nuc), mass); }
     void update_exp(const size_t index, const size_t nuc, float mass) { _seq->update_exp(length()-index-1, complement(nuc), mass); }
     float get_prob(const size_t index, const size_t nuc) const { return _seq->get_prob(length()-index-1, complement(nuc)); }

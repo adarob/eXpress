@@ -173,7 +173,6 @@ void MismatchTable::update(const FragHit& f, double p, double mass)
     vector<FrequencyMatrix<double> >& right_mm = (!f.left_first) ? _first_read_mm : _second_read_mm;
     
     size_t cur;
-    size_t ref;
     size_t prev;
     size_t index;
     
@@ -183,6 +182,8 @@ void MismatchTable::update(const FragHit& f, double p, double mass)
     size_t del_len = 0;
     vector<Indel>::const_iterator ins = f.inserts_l.begin();
     vector<Indel>::const_iterator del = f.deletes_l.begin();
+    
+    vector<double> joint_probs(NUM_NUCS);
     
     while (i < f.seq_l.length())
     {
@@ -211,23 +212,43 @@ void MismatchTable::update(const FragHit& f, double p, double mass)
             
             cur = f.seq_l[i];
             prev = (i) ? f.seq_l[i-1] : 0;
-            ref = t_seq_fwd[j];
-
-            if (t_seq_fwd.prob())
+     
+            if (t_seq_fwd.prob() && _active)
             {
-                size_t ref_index = (prev << 2) + ref;
+                
+                t_seq_fwd.update_obs(j, cur, p);
+
                 for(size_t nuc = 0; nuc < NUM_NUCS; nuc++)
                 {
                     index = (prev << 2) + nuc;
                     left_mm[i].increment(index, cur, mass+p+t_seq_fwd.get_prob(j, nuc));
-                    
+                }
+                
+                for(size_t nuc = 0; nuc < NUM_NUCS; nuc++)
+                {
+                    size_t ref_index = (prev << 2) + t_seq_fwd.get_ref(j);
                     t_seq_fwd.update_exp(j, nuc, p+left_mm[i](ref_index, nuc));
                 }
-                t_seq_fwd.update_obs(j, cur, p);
+                
+                for (size_t read_nuc=0; read_nuc < NUM_NUCS; read_nuc++)
+                {
+                    double Z = HUGE_VAL;
+                    for (size_t ref_nuc=0; ref_nuc < NUM_NUCS; ref_nuc++)
+                    {
+                        index = (prev << 2) + ref_nuc;
+                        joint_probs[ref_nuc] = t_seq_fwd.get_prob(j, ref_nuc) + left_mm[i](index, read_nuc);
+                        Z = log_sum(Z, joint_probs[ref_nuc]);
+                    }
+                    
+                    for (size_t ref_nuc=0; ref_nuc < NUM_NUCS; ref_nuc++)
+                    {
+                        t_seq_fwd.update_est(j, ref_nuc, p + joint_probs[ref_nuc] - Z);
+                    }
+                }
             }
             else
             {
-                index = (prev << 2) + ref;
+                index = (prev << 2) + t_seq_fwd[j];
                 left_mm[i].increment(index, cur, mass+p);
             }
             
@@ -270,25 +291,45 @@ void MismatchTable::update(const FragHit& f, double p, double mass)
             
             cur = f.seq_r[i];
             prev = (i) ? f.seq_r[i-1] : 0;
-            ref = t_seq_rev[j];
-
-            if (t_seq_rev.prob())
+            
+            if (t_seq_rev.prob() && _active)
             {
-                size_t ref_index = (prev << 2) + ref;
+                t_seq_rev.update_obs(j, cur, p);
+                
                 for(size_t nuc = 0; nuc < NUM_NUCS; nuc++)
                 {
                     index = (prev << 2) + nuc;
                     right_mm[i].increment(index, cur, mass+p+t_seq_rev.get_prob(j, nuc));
-                    
+                }
+                
+                for(size_t nuc = 0; nuc < NUM_NUCS; nuc++)
+                {
+                    size_t ref_index = (prev << 2) + t_seq_rev.get_ref(j);
                     t_seq_rev.update_exp(j, nuc, p+right_mm[i](ref_index, nuc));
                 }
-                t_seq_rev.update_obs(j, cur, p);
+                
+                for (size_t read_nuc=0; read_nuc < NUM_NUCS; read_nuc++)
+                {
+                    double Z = HUGE_VAL;
+                    for (size_t ref_nuc=0; ref_nuc < NUM_NUCS; ref_nuc++)
+                    {
+                        index = (prev << 2) + ref_nuc;
+                        joint_probs[ref_nuc] = t_seq_rev.get_prob(j, ref_nuc) + right_mm[i](index, read_nuc);
+                        Z = log_sum(Z, joint_probs[ref_nuc]);
+                    }
+                    
+                    for (size_t ref_nuc=0; ref_nuc < NUM_NUCS; ref_nuc++)
+                    {
+                        t_seq_rev.update_est(j, ref_nuc, p + joint_probs[ref_nuc] - Z);
+                    }
+                }
             }
             else
             {
-                index = (prev << 2) + ref;
+                index = (prev << 2) + t_seq_rev[j];
                 right_mm[i].increment(index, cur, mass+p);
             }
+            
             i++;
             j++;
         }
