@@ -39,8 +39,8 @@ double ff_param = 0.85;
 
 // the burn-in parameter determines how many reads are required before the 
 // error and bias models are applied to probabilistic assignment 
-size_t burn_in = 10000;
-//size_t burn_in = 100;
+//size_t burn_in = 10000;
+size_t burn_in = 100;
 
 size_t burn_out = 5000000;
 bool burned_out = false;

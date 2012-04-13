@@ -50,6 +50,8 @@ class FrequencyMatrix
      */
     bool _logged;
     
+    bool _fixed;
+    
 public:
     
     /**
@@ -117,6 +119,9 @@ public:
      */ 
     void set_logged(bool logged);
     
+    void fix();
+    bool is_fixed() const { return _fixed; }
+    
     size_t mode(size_t i) const;
 };
 
@@ -127,7 +132,8 @@ FrequencyMatrix<T>::FrequencyMatrix(size_t m, size_t n, T alpha, bool logged)
 _rowsums(m, logged ? log(n*alpha):n*alpha),
 _M(m),
 _N(n),
-_logged(logged)
+_logged(logged),
+_fixed(false)
 {}
 
 template <class T>
@@ -136,7 +142,7 @@ T FrequencyMatrix<T>::operator()(size_t i, size_t j, bool normalized) const
     assert(i*_N+j < _M*_N);
 //    assert(!std::isnan(_array[i*_N+j]));
 //    assert(!std::isnan(_rowsums[i]));
-    if (!normalized)
+    if (_fixed || !normalized)
         return _array[i*_N+j];
     if (_logged)
         return _array[i*_N+j]-_rowsums[i];
@@ -153,6 +159,9 @@ T FrequencyMatrix<T>::operator()(size_t k) const
 template <class T>
 void FrequencyMatrix<T>::increment(size_t i, size_t j, T incr_amt)
 {
+    if (_fixed)
+        return;
+    
     size_t k = i*_N+j;
     assert(k < _M*_N);
     if (_logged)
@@ -177,7 +186,7 @@ void FrequencyMatrix<T>::increment(size_t k, T incr_amt)
 template <class T>
 void FrequencyMatrix<T>::set_logged(bool logged)
 {
-    if (logged == _logged)
+    if (logged == _logged || _fixed)
         return;
     
     if (logged)
@@ -202,8 +211,7 @@ void FrequencyMatrix<T>::set_logged(bool logged)
             _rowsums[i] = sexp(_rowsums[i]);
         }
     }
-    
-    _logged = logged;    
+    _logged = logged;
 }
 
 template <class T>
@@ -223,5 +231,19 @@ size_t FrequencyMatrix<T>::mode(size_t i) const
     return arg;
 }
 
+template <class T>
+void FrequencyMatrix<T>::fix()
+{
+    if (_fixed)
+        return;
+    for (size_t i = 0; i < _M; ++i)
+    {
+        for (size_t j = 0; j < _N; ++j)
+        {
+            _array[i*_N+j] = operator()(i,j);
+        }
+    }
+    _fixed = true;
+}
 
 #endif

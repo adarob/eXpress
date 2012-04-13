@@ -77,14 +77,14 @@ double MismatchTable::log_likelihood(const FragHit& f) const
             ll += _insert_params(0);
             
             cur = f.seq_l[i];
-            prev = (i) ? f.seq_l[i-1] : 0;
+            prev = (i) ? (f.seq_l[i-1] << 2) : 0;
             
             if (t_seq_fwd.prob())
             {
                 double trans_prob = HUGE_VAL;
                 for(size_t nuc = 0; nuc < NUM_NUCS; nuc++)
                 {
-                    index = (prev << 2) + nuc;
+                    index = prev + nuc;
                     trans_prob = log_sum(trans_prob, t_seq_fwd.get_prob(j, nuc) + left_mm[i](index, cur));
                 }
                 ll += trans_prob;
@@ -92,7 +92,7 @@ double MismatchTable::log_likelihood(const FragHit& f) const
             else
             {
                 ref = t_seq_fwd[j];
-                index = (prev << 2) + ref;
+                index = prev + ref;
                 ll += left_mm[i](index, cur);
             }
                 
@@ -134,14 +134,14 @@ double MismatchTable::log_likelihood(const FragHit& f) const
             ll += _insert_params(0);
             
             cur = f.seq_r[i];
-            prev = (i) ? f.seq_r[i-1] : 0;
+            prev = (i) ? (f.seq_r[i-1] << 2) : 0;
             
             if (t_seq_rev.prob())
             {
                 double trans_prob = HUGE_VAL;
                 for(size_t nuc = 0; nuc < NUM_NUCS; nuc++)
                 {
-                    index = (prev << 2) + nuc;
+                    index = prev + nuc;
                     trans_prob = log_sum(trans_prob, t_seq_rev.get_prob(j, nuc) + right_mm[i](index, cur));
                 }
                 ll += trans_prob;
@@ -149,7 +149,7 @@ double MismatchTable::log_likelihood(const FragHit& f) const
             else
             {
                 ref = t_seq_rev[j];
-                index = (prev << 2) + ref;
+                index = prev + ref;
                 ll += right_mm[i](index, cur);
             }
 
@@ -211,44 +211,40 @@ void MismatchTable::update(const FragHit& f, double p, double mass)
             _insert_params.increment(0, mass);
             
             cur = f.seq_l[i];
-            prev = (i) ? f.seq_l[i-1] : 0;
+            prev = (i) ? (f.seq_l[i-1] << 2) : 0;
      
             if (t_seq_fwd.prob() && _active)
             {
-                
                 t_seq_fwd.update_obs(j, cur, p);
-
-                for(size_t nuc = 0; nuc < NUM_NUCS; nuc++)
+                
+                for(size_t nuc = 0; !left_mm[i].is_fixed() && nuc < NUM_NUCS; nuc++)
                 {
-                    index = (prev << 2) + nuc;
+                    index = prev + nuc;
                     left_mm[i].increment(index, cur, mass+p+t_seq_fwd.get_prob(j, nuc));
                 }
                 
+                double Z = HUGE_VAL;
+                
+                size_t ref_index = (j) ? (t_seq_fwd.get_ref(j-1)<<2) + t_seq_fwd.get_ref(j) : t_seq_fwd.get_ref(j);
                 for(size_t nuc = 0; nuc < NUM_NUCS; nuc++)
                 {
-                    size_t ref_index = (prev << 2) + t_seq_fwd.get_ref(j);
+                    // Update expected
                     t_seq_fwd.update_exp(j, nuc, p+left_mm[i](ref_index, nuc));
+                    
+                    // Update posterior
+                    index = prev + nuc;
+                    joint_probs[nuc] = t_seq_fwd.get_prob(j, nuc) + left_mm[i](index, cur);
+                    Z = log_sum(Z, joint_probs[nuc]);
                 }
                 
-                for (size_t read_nuc=0; read_nuc < NUM_NUCS; read_nuc++)
+                for (size_t nuc=0; nuc < NUM_NUCS; nuc++)
                 {
-                    double Z = HUGE_VAL;
-                    for (size_t ref_nuc=0; ref_nuc < NUM_NUCS; ref_nuc++)
-                    {
-                        index = (prev << 2) + ref_nuc;
-                        joint_probs[ref_nuc] = t_seq_fwd.get_prob(j, ref_nuc) + left_mm[i](index, read_nuc);
-                        Z = log_sum(Z, joint_probs[ref_nuc]);
-                    }
-                    
-                    for (size_t ref_nuc=0; ref_nuc < NUM_NUCS; ref_nuc++)
-                    {
-                        t_seq_fwd.update_est(j, ref_nuc, p + joint_probs[ref_nuc] - Z);
-                    }
+                    t_seq_fwd.update_est(j, nuc, p + joint_probs[nuc] - Z);
                 }
             }
             else
             {
-                index = (prev << 2) + t_seq_fwd[j];
+                index = prev + t_seq_fwd[j];
                 left_mm[i].increment(index, cur, mass+p);
             }
             
@@ -290,43 +286,40 @@ void MismatchTable::update(const FragHit& f, double p, double mass)
             _insert_params.increment(0, mass);
             
             cur = f.seq_r[i];
-            prev = (i) ? f.seq_r[i-1] : 0;
+            prev = (i) ? (f.seq_r[i-1] << 2) : 0;
             
             if (t_seq_rev.prob() && _active)
             {
                 t_seq_rev.update_obs(j, cur, p);
                 
-                for(size_t nuc = 0; nuc < NUM_NUCS; nuc++)
+                for(size_t nuc = 0; !right_mm[i].is_fixed() && nuc < NUM_NUCS; nuc++)
                 {
-                    index = (prev << 2) + nuc;
+                    index = prev + nuc;
                     right_mm[i].increment(index, cur, mass+p+t_seq_rev.get_prob(j, nuc));
                 }
                 
+                double Z = HUGE_VAL;
+                
+                size_t ref_index = (j) ? (t_seq_rev.get_ref(j-1)<<2) + t_seq_rev.get_ref(j) : t_seq_rev.get_ref(j);
                 for(size_t nuc = 0; nuc < NUM_NUCS; nuc++)
                 {
-                    size_t ref_index = (prev << 2) + t_seq_rev.get_ref(j);
+                    // Update expected
                     t_seq_rev.update_exp(j, nuc, p+right_mm[i](ref_index, nuc));
+                    
+                    // Update posterior
+                    index = prev + nuc;
+                    joint_probs[nuc] = t_seq_rev.get_prob(j, nuc) + right_mm[i](index, cur);
+                    Z = log_sum(Z, joint_probs[nuc]);
                 }
                 
-                for (size_t read_nuc=0; read_nuc < NUM_NUCS; read_nuc++)
+                for (size_t nuc=0; nuc < NUM_NUCS; nuc++)
                 {
-                    double Z = HUGE_VAL;
-                    for (size_t ref_nuc=0; ref_nuc < NUM_NUCS; ref_nuc++)
-                    {
-                        index = (prev << 2) + ref_nuc;
-                        joint_probs[ref_nuc] = t_seq_rev.get_prob(j, ref_nuc) + right_mm[i](index, read_nuc);
-                        Z = log_sum(Z, joint_probs[ref_nuc]);
-                    }
-                    
-                    for (size_t ref_nuc=0; ref_nuc < NUM_NUCS; ref_nuc++)
-                    {
-                        t_seq_rev.update_est(j, ref_nuc, p + joint_probs[ref_nuc] - Z);
-                    }
+                    t_seq_rev.update_est(j, nuc, p + joint_probs[nuc] - Z);
                 }
             }
             else
             {
-                index = (prev << 2) + t_seq_rev[j];
+                index = prev + t_seq_rev[j];
                 right_mm[i].increment(index, cur, mass+p);
             }
             
