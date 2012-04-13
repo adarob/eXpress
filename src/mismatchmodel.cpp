@@ -225,7 +225,7 @@ void MismatchTable::update(const FragHit& f, double p, double mass)
                 
                 double Z = HUGE_VAL;
                 
-                size_t ref_index = (j) ? (t_seq_fwd.get_ref(j-1)<<2) + t_seq_fwd.get_ref(j) : t_seq_fwd.get_ref(j);
+                size_t ref_index = (i) ? (t_seq_fwd.get_ref(j-1)<<2) + t_seq_fwd.get_ref(j) : t_seq_fwd.get_ref(j);
                 for(size_t nuc = 0; nuc < NUM_NUCS; nuc++)
                 {
                     // Update expected
@@ -300,7 +300,7 @@ void MismatchTable::update(const FragHit& f, double p, double mass)
                 
                 double Z = HUGE_VAL;
                 
-                size_t ref_index = (j) ? (t_seq_rev.get_ref(j-1)<<2) + t_seq_rev.get_ref(j) : t_seq_rev.get_ref(j);
+                size_t ref_index = (i) ? (t_seq_rev.get_ref(j-1)<<2) + t_seq_rev.get_ref(j) : t_seq_rev.get_ref(j);
                 for(size_t nuc = 0; nuc < NUM_NUCS; nuc++)
                 {
                     // Update expected

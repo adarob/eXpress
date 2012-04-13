@@ -80,7 +80,7 @@ size_t SequenceFwd::operator[](const size_t index) const
     assert(index < _len);
     if (_prob)
     {
-        return _obs_seq.mode(index);
+        return _est_seq.mode(index);
     }
     return _ref_seq[index]; 
 }

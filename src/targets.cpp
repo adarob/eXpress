@@ -14,7 +14,6 @@
 #include "mismatchmodel.h"
 #include <iostream>
 #include <fstream>
-#include <math.h>
 #include <cassert>
 #include <stdio.h>
 
