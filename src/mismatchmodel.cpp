@@ -217,12 +217,6 @@ void MismatchTable::update(const FragHit& f, double p, double mass)
             {
                 t_seq_fwd.update_obs(j, cur, p);
                 
-                for(size_t nuc = 0; !left_mm[i].is_fixed() && nuc < NUM_NUCS; nuc++)
-                {
-                    index = prev + nuc;
-                    left_mm[i].increment(index, cur, mass+p+t_seq_fwd.get_prob(j, nuc));
-                }
-                
                 double Z = HUGE_VAL;
                 
                 size_t ref_index = (i) ? (t_seq_fwd.get_ref(j-1)<<2) + t_seq_fwd.get_ref(j) : t_seq_fwd.get_ref(j);
@@ -235,6 +229,12 @@ void MismatchTable::update(const FragHit& f, double p, double mass)
                     index = prev + nuc;
                     joint_probs[nuc] = t_seq_fwd.get_prob(j, nuc) + left_mm[i](index, cur);
                     Z = log_sum(Z, joint_probs[nuc]);
+                }
+                
+                for(size_t nuc = 0; !left_mm[i].is_fixed() && nuc < NUM_NUCS; nuc++)
+                {
+                    index = prev + nuc;
+                    left_mm[i].increment(index, cur, mass+p+t_seq_fwd.get_prob(j, nuc));
                 }
                 
                 for (size_t nuc=0; nuc < NUM_NUCS; nuc++)
@@ -291,13 +291,7 @@ void MismatchTable::update(const FragHit& f, double p, double mass)
             if (t_seq_rev.prob() && _active)
             {
                 t_seq_rev.update_obs(j, cur, p);
-                
-                for(size_t nuc = 0; !right_mm[i].is_fixed() && nuc < NUM_NUCS; nuc++)
-                {
-                    index = prev + nuc;
-                    right_mm[i].increment(index, cur, mass+p+t_seq_rev.get_prob(j, nuc));
-                }
-                
+               
                 double Z = HUGE_VAL;
                 
                 size_t ref_index = (i) ? (t_seq_rev.get_ref(j-1)<<2) + t_seq_rev.get_ref(j) : t_seq_rev.get_ref(j);
@@ -310,6 +304,12 @@ void MismatchTable::update(const FragHit& f, double p, double mass)
                     index = prev + nuc;
                     joint_probs[nuc] = t_seq_rev.get_prob(j, nuc) + right_mm[i](index, cur);
                     Z = log_sum(Z, joint_probs[nuc]);
+                }
+                
+                for(size_t nuc = 0; !right_mm[i].is_fixed() && nuc < NUM_NUCS; nuc++)
+                {
+                    index = prev + nuc;
+                    right_mm[i].increment(index, cur, mass+p+t_seq_rev.get_prob(j, nuc));
                 }
                 
                 for (size_t nuc=0; nuc < NUM_NUCS; nuc++)
@@ -329,6 +329,17 @@ void MismatchTable::update(const FragHit& f, double p, double mass)
     }
     
     _max_len = max(_max_len, max(f.seq_l.length(), f.seq_r.length())); 
+}
+
+void MismatchTable::fix()
+{
+    for (size_t i = 0; i < MAX_READ_LEN; i++)
+    {
+        _first_read_mm[i].fix();
+        _second_read_mm[i].fix();
+    }
+    _insert_params.fix();
+    _delete_params.fix();
 }
 
 string MismatchTable::to_string() const

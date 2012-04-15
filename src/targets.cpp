@@ -494,6 +494,21 @@ void TargetTable::output_results(string output_dir, size_t tot_counts, bool outp
                     }
                     varcov_file << endl;
                 }
+/*                
+                if (targ.seq().prob())
+                {
+                    const Sequence& targ_seq = targ.seq();
+                    vector<double> p_vals;
+                    targ_seq.calc_p_vals(p_vals);
+                    for (size_t i = 0; i < p_vals.size(); ++i)
+                    {
+                    //    if (p_vals[i] < 0.05)
+                        {
+                            cout << targ.name() << "\t" << i << "\t" << targ_seq.get_ref(i) << "\t" << targ_seq[i] << "\t" << p_vals[i] << endl; 
+                        }
+                    }
+                }
+ */
             }
         }
         else

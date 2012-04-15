@@ -8,8 +8,10 @@
 
 #include "sequence.h"
 #include <cassert>
+#include <boost/math/distributions/chi_squared.hpp>
 
 using namespace std;
+
 
 SequenceFwd::SequenceFwd():  _ref_seq(NULL), _len(0) {}
 
@@ -88,6 +90,7 @@ size_t SequenceFwd::operator[](const size_t index) const
 size_t SequenceFwd::get_ref(const size_t index) const
 {
     assert(index < _len);
+    assert(_ref_seq[index] == operator[](index));
     return _ref_seq[index]; 
 }
 
@@ -113,4 +116,37 @@ void SequenceFwd::update_exp(const size_t index, const size_t nuc, float mass)
 {
     assert(_prob);
     _exp_seq.increment(index, nuc, mass);
+}
+
+void SequenceFwd::calc_p_vals(vector<double>& p_vals) const
+{
+    p_vals = vector<double>(_len, 1.0);
+    boost::math::chi_squared_distribution<double> chisq(3);
+    double obs_n,exp_n;
+    for (size_t i = 0; i < _len; ++i)
+    {
+        if (_obs_seq.total(i)==HUGE_VAL)
+            continue;
+        
+        double S = 0;
+        for (size_t nuc = 0; nuc < NUM_NUCS; ++nuc)
+        {
+            obs_n = sexp(_obs_seq(i,nuc,false));
+            exp_n = sexp(_exp_seq(i,nuc,false));
+            S += (obs_n-exp_n)*(obs_n-exp_n)/exp_n;
+        }
+        
+        p_vals[i] -= boost::math::cdf(chisq,S);
+    }
+}
+
+void SequenceRev::calc_p_vals(vector<double>& p_vals) const
+{
+    vector<double> temp;
+    _seq->calc_p_vals(temp);
+    p_vals = vector<double>(length());
+    for(size_t i = 0; i < length(); i++)
+    {
+        p_vals[i] = temp[length()-i-1];
+    }
 }

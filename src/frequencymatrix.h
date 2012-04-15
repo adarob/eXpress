@@ -111,7 +111,7 @@ public:
      * @param i the distribution (row)
      * @return a double specifying the raw row sum for the given distribution
      */ 
-    double row(size_t i) const { return _rowsums[i]; } 
+    double total(size_t i) const { return _rowsums[i]; } 
     
     /**
      * a member function that converts the table between log-space and non-log space

@@ -66,7 +66,8 @@ public:
     virtual void update_exp(const size_t index, const size_t nuc, float mass) = 0;
     virtual float get_prob(const size_t index, const size_t nuc) const = 0;
     virtual bool prob() const = 0;
-    
+    virtual void calc_p_vals(std::vector<double>& p_vals) const = 0;
+
     /**
      * a member function that returns the length of the encoded sequence
      * @return the length of the encoded sequence
@@ -149,6 +150,7 @@ public:
     bool prob() const { return _prob; }
     bool empty() const { return _len==0; }
     size_t length() const { return _len; }
+    void calc_p_vals(std::vector<double>& p_vals) const;
 };
 
 class SequenceRev: public Sequence
@@ -168,7 +170,8 @@ public:
     void update_obs(const size_t index, const size_t nuc, float mass) { _seq->update_obs(length()-index-1, complement(nuc), mass); }
     void update_exp(const size_t index, const size_t nuc, float mass) { _seq->update_exp(length()-index-1, complement(nuc), mass); }
     float get_prob(const size_t index, const size_t nuc) const { return _seq->get_prob(length()-index-1, complement(nuc)); }
-    bool prob() const { return _seq->prob(); }
+    bool prob() const { return _seq->prob(); }    
+    void calc_p_vals(std::vector<double>& p_vals) const;
 };
 
 #endif

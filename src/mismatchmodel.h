@@ -83,6 +83,8 @@ public:
      */
     void update(const FragHit&, double p, double mass);
     
+    void fix();
+    
     /**
      * member function that returns a string containing a collapsed confusion matrix based on the model parameters for the first read
      * @return a space-separated string for the flattened, collapsed confusion matrix in row-major format (observed value as rows)

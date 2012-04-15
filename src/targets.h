@@ -217,7 +217,7 @@ public:
      * a member function that returns the target sequence (const)
      * @return string containing target sequence
      */
-    const Sequence& seq(bool rev) const { if (rev) return _seq_r; return _seq_f; }
+    const Sequence& seq(bool rev=false) const { if (rev) return _seq_r; return _seq_f; }
     
     /**
      * a member function that returns the target sequence (non-const)
