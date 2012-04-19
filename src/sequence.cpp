@@ -19,7 +19,7 @@ SequenceFwd::SequenceFwd(const std::string& seq, bool rev, bool prob) : _ref_seq
 {
     if (prob)
     {
-        _est_seq = FrequencyMatrix<float>(seq.length(), NUM_NUCS, 0.01);
+        _est_seq = FrequencyMatrix<float>(seq.length(), NUM_NUCS, 0.001);
         _obs_seq = FrequencyMatrix<float>(seq.length(), NUM_NUCS, HUGE_VAL);
         _exp_seq = FrequencyMatrix<float>(seq.length(), NUM_NUCS, HUGE_VAL);
     }

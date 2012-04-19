@@ -588,7 +588,7 @@ void TargetTable::threaded_bias_update(boost::mutex* mut)
             cout << "Synchronized parameter tables.\n";
         }
 
-        if (burned_out && burned_out_before)
+        if (!edit_detect && burned_out && burned_out_before)
             break;
         
         burned_out_before = burned_out;

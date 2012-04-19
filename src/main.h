@@ -49,6 +49,7 @@ extern bool running;
  * certain parameters
  */
 extern bool burned_out;
+extern bool edit_detect;
 
 /**
  * a global size_t specifying the maximum read length supported
