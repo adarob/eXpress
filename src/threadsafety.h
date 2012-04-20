@@ -10,8 +10,23 @@
 #define express_thread_safety_h
 
 #include <boost/thread.hpp>
+#include <queue.h>
 
 class Fragment;
+
+class ThreadSafeFragQueue
+{
+    std::queue<Fragment*> _queue;
+    size_t _max_size;
+    boost::mutex _mut;
+    boost::condition_variable _cond;
+    
+public:
+    ThreadSafeFragQueue(size_t max_size);
+    Fragment* pop(bool block=true);
+    void push(Fragment* frag);
+    bool empty(bool block=false);
+};
 
 /**
  * The ParseThreadSafety struct stores objects to allow for parsing to safely occur
@@ -22,29 +37,10 @@ class Fragment;
  **/
 struct ParseThreadSafety
 {
-    /**
-     * a pointer to the next Fragment to be processed by the main thread
-     */
-    Fragment* next_frag;
-    
-    /**
-     * a mutex for the conditional variable
-     */
-    boost::mutex mut;
-    
-    /**
-     * a conditional variable where the processor waits for a new Fragment and the parser waits
-     * for the Fragment pointer to be copied by the processor
-     */
-    boost::condition_variable cond;
-    
-    /**
-     * a bool specifying the condition that the current next_frag pointer is clean, meaning that it
-     * hasn't been copied by the processor
-     */
-    bool frag_clean;
-    
-    ParseThreadSafety() : next_frag(NULL), frag_clean(false) {}
+    ThreadSafeFragQueue proc_in;
+    ThreadSafeFragQueue proc_on;
+    ThreadSafeFragQueue proc_out;
+    ParseThreadSafety(size_t q_size) : proc_in(q_size), proc_on(q_size), proc_out(q_size) {}
 };
 
 #endif

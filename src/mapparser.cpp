@@ -165,15 +165,17 @@ ThreadedMapParser::~ThreadedMapParser()
         delete _writer;
 }
 
-void ThreadedMapParser::threaded_parse(ParseThreadSafety* thread_safety, TargetTable* targ_table)
+void ThreadedMapParser::threaded_parse(ParseThreadSafety* thread_safety_p, TargetTable* targ_table, size_t stop_at)
 {
-    ParseThreadSafety& ts = *thread_safety;
+    ParseThreadSafety& pts = *thread_safety_p;
     bool fragments_remain = true;
     Fragment * last_frag = NULL;
-    while (true)
+    size_t n = 0;
+    size_t still_out = 0;
+    while (!stop_at || n < stop_at)
     {
         Fragment* frag = NULL;
-        while (running && fragments_remain)
+        while (fragments_remain)
         {
             frag = new Fragment(); 
             fragments_remain = _parser->next_fragment(*frag);
@@ -194,36 +196,34 @@ void ThreadedMapParser::threaded_parse(ParseThreadSafety* thread_safety, TargetT
             m.mapped_targ = t;
             assert(t->id() == m.targ_id);
         }
-
-        last_frag = ts.next_frag;
-        
+        Fragment* done_frag = pts.proc_out.pop(false);
+        while (done_frag)
         {
-            boost::unique_lock<boost::mutex> lock(ts.mut);
-            if (running)
-            {
-                ts.next_frag = frag;
-                ts.frag_clean = true;
-                
-                ts.cond.notify_one();
-
-                while(ts.frag_clean)
-                {
-                    ts.cond.wait(lock);
-                }
-            }
+            if (last_frag && _writer && _write_active)
+                _writer->write_fragment(*done_frag);
+            delete done_frag;
+            still_out--;
+            done_frag = pts.proc_out.pop(false);
         }
 
-        if (last_frag && _writer && _write_active)
-            _writer->write_fragment(*last_frag);
-        if (last_frag)
-            delete last_frag;
+        
         if (!frag)
             break;
-        if (!running)
-        {
-            delete frag;
-            break;
-        }
+        
+        pts.proc_in.push(frag);
+        n++;
+        still_out++;
+    }
+    
+    pts.proc_in.push(NULL);
+    
+    while (still_out)
+    {
+        Fragment* done_frag = pts.proc_out.pop(true);
+        if (last_frag && _writer && _write_active)
+            _writer->write_fragment(*done_frag);
+        delete done_frag;
+        still_out--;
     }
 }
 
@@ -261,6 +261,7 @@ bool BAMParser::next_fragment(Fragment& nf)
     {   
         if (!_reader->GetNextAlignment(a))
         {
+            nf.sort_hits();
             return false;
         }
         else if (!map_end_from_alignment(a))
@@ -269,6 +270,7 @@ bool BAMParser::next_fragment(Fragment& nf)
         }
         else if (!nf.add_map_end(_frag_buff))
         {
+            nf.sort_hits();
             return true;
         }
         _frag_buff = new FragHit();
@@ -337,13 +339,16 @@ void BAMWriter::write_fragment(Fragment& f)
     }
     else
     {
+        double total = 0;
         foreach(FragHit* hit, f.hits())
         {
+            total += hit->probability;
             hit->bam_l.AddTag("XP","f",(float)hit->probability);
             hit->bam_r.AddTag("XP","f",(float)hit->probability);
             _writer->SaveAlignment(hit->bam_l);
             _writer->SaveAlignment(hit->bam_r);
         }
+        assert(approx_eq(total, 1.0));
     }
 }
 
@@ -420,6 +425,7 @@ bool SAMParser::next_fragment(Fragment& nf)
         _frag_buff = new FragHit();
     }
     
+    nf.sort_hits();
     return _in->good();
 }
 
@@ -573,10 +579,13 @@ void SAMWriter::write_fragment(Fragment& f)
     }
     else
     {
+        double total = 0;
         foreach(FragHit* hit, f.hits())
         {
+            total += hit->probability;
             *_out << hit->sam_l << " XP:f:" << (float)hit->probability << endl;
             *_out << hit->sam_r << " XP:f:" << (float)hit->probability << endl;
         }
+        assert(approx_eq(total, 1.0));
     }
 }

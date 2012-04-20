@@ -21,6 +21,7 @@ class Fragment;
 class FragHit;
 class TargetTable;
 
+
 typedef boost::unordered_map<std::string, size_t> TransIndex;
 
 /**
@@ -381,8 +382,9 @@ public:
      * is passed in a Fragment object to the processing thread through the ParseThreadSafety struct
      * @param thread_safety a pointer to the struct containing shared locks and data with the processing thread
      * @param targ_table a pointer to the table of Target objects to lookup the mapped targets
+     DOC
      */
-    void threaded_parse(ParseThreadSafety* thread_safety, TargetTable* targ_table);
+    void threaded_parse(ParseThreadSafety* thread_safety, TargetTable* targ_table, size_t stop_at=0);
     
     /**
      * a member function that returns the target-to-index map

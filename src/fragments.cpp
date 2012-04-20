@@ -14,6 +14,8 @@
 
 using namespace std;
 
+Fragment::Fragment(double mass) : _mass(mass) {}
+
 Fragment::~Fragment()
 {
     for (size_t i = 0; i < num_hits(); i++)
@@ -109,3 +111,12 @@ const FragHit* Fragment::sample_hit() const
     return _frag_hits[i];
 }
 
+bool fraghit_compare(FragHit* h1, FragHit* h2)
+{
+    return h1->targ_id < h2->targ_id;
+}
+
+void Fragment::sort_hits()
+{
+    sort(_frag_hits.begin(), _frag_hits.end(), fraghit_compare);
+}

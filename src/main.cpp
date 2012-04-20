@@ -68,10 +68,10 @@ bool edit_detect = false;
 bool error_model = true;
 bool bias_correct = true;
 bool calc_covar = false;
-bool vis = false;
 bool output_alignments = false;
 bool output_running_rounds = false;
 bool output_running_reads = false;
+size_t num_threads = 2;
 
 // directional parameters
 enum Direction{ BOTH, FR, RF };
@@ -123,6 +123,7 @@ bool parse_options(int ac, char ** av)
     generic.add_options()
     ("help,h", "produce help message")
     ("output-dir,o", po::value<string>(&output_dir)->default_value("."), "write all output files to this directory")
+    ("num-threads,p", po::value<size_t>(&num_threads)->default_value(2), "number of threads (>= 2)")
     ("frag-len-mean,m", po::value<int>(&def_fl_mean)->default_value(def_fl_mean), "prior estimate for average fragment length")
     ("frag-len-stddev,s", po::value<int>(&def_fl_stddev)->default_value(def_fl_stddev), "prior estimate for fragment length std deviation")
     ("additional-batch,B", po::value<size_t>(&remaining_rounds)->default_value(remaining_rounds), "number of additional batch EM rounds after initial online round")
@@ -143,7 +144,6 @@ bool parse_options(int ac, char ** av)
     ("no-bias-correct","")
     ("no-error-model","")
     ("single-round", "")
-    ("visualizer-output,v","")
     ("output-running-rounds", "")    
     ("output-running-reads", "")
     ("batch-mode","")
@@ -222,12 +222,17 @@ bool parse_options(int ac, char ** av)
     calc_covar = vm.count("calc-covar");
     bias_correct = !(vm.count("no-bias-correct"));
     error_model = !(vm.count("no-error-model"));
-    vis = vm.count("visualizer-output");
     output_running_rounds = vm.count("output-running-rounds");
     output_running_reads = vm.count("output-running-reads");
     batch_mode = vm.count("batch-mode");
     online_additional = vm.count("additional-online");
     both = vm.count("both");
+    
+    if (num_threads < 2)
+        num_threads = 0;
+    num_threads -= 2;
+    if (num_threads > 0)
+        num_threads -= edit_detect;
     
     if (remaining_rounds > 0 && in_map_file_name != "")
         last_round = false;
@@ -258,14 +263,13 @@ bool parse_options(int ac, char ** av)
 /**
  * This function handles the probabilistic assignment of multi-mapped reads.  The marginal likelihoods are calculated for each mapping,
  * and the mass of the fragment is divided based on the normalized marginals to update the model parameters.
- * @param mass_n double specifying the logged fragment mass
  * @param frag_p pointer to the fragment to probabilistically assign
- * @param targ_table pointer to the target table
  * @param globs a pointer to the struct containing pointers to the global parameter tables (bias_table, mismatch_table, fld)
  */
-void process_fragment(double mass_n, Fragment* frag_p, TargetTable* targ_table, Globals& globs)
+void process_fragment(Fragment* frag_p, Globals& globs)
 {
     Fragment& frag = *frag_p;
+    double mass_n = frag.mass();
     
     assert(frag.num_hits());
         
@@ -324,7 +328,7 @@ void process_fragment(double mass_n, Fragment* frag_p, TargetTable* targ_table, 
         FragHit& m = *frag.hits()[i];
         Target* t  = m.mapped_targ;
  
-        bundle = targ_table->merge_bundles(bundle, t->bundle());
+        bundle = globs.targ_table->merge_bundles(bundle, t->bundle());
         
         double p = likelihoods[i]-total_likelihood;
         double mass_t = mass_n + p;
@@ -374,7 +378,7 @@ void process_fragment(double mass_n, Fragment* frag_p, TargetTable* targ_table, 
                 if ((first_round && last_round) || online_additional)
                     covar += 2*mass_n;
                 
-                targ_table->update_covar(m.targ_id, m2.targ_id, covar); 
+                globs.targ_table->update_covar(m.targ_id, m2.targ_id, covar); 
             }
         }
     }
@@ -382,6 +386,18 @@ void process_fragment(double mass_n, Fragment* frag_p, TargetTable* targ_table, 
     foreach (Target* t, targ_set)
     {
         t->unlock();
+    }
+}
+
+void proc_thread(ParseThreadSafety* pts, Globals* globs)
+{
+    while (true)
+    {
+        Fragment* frag = pts->proc_on.pop();
+        if (!frag)
+            break;
+        process_fragment(frag, *globs);
+        pts->proc_out.push(frag);
     }
 }
 
@@ -397,43 +413,65 @@ size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TargetTable* targ
 {
     cout << "Processing input fragment alignments...\n";
     
+    vector<boost::thread*> thread_pool;
     boost::thread* bias_update = NULL;
     
     size_t n = 1;
     size_t num_frags = 0;
     double mass_n = 0;
-    Fragment* frag;
     cout << setiosflags(ios::left);
     
     // For log-scale output
     size_t i = 1;
     size_t j = 6;
+    
+    
+    Fragment* frag;
+    
     while (true)
     {
-        ParseThreadSafety pts;
         boost::mutex bu_mut;
         running = true;
-        boost::thread parse(&ThreadedMapParser::threaded_parse, &map_parser, &pts, targ_table);
+        ParseThreadSafety pts(max((int)num_threads,10));
+        boost::thread parse(&ThreadedMapParser::threaded_parse, &map_parser, &pts, targ_table, stop_at);
         
-        while(!stop_at || num_frags < stop_at)
+        if (burned_out)
         {
+            for(size_t i=0; i < thread_pool.size(); i++)
             {
-                boost::unique_lock<boost::mutex> lock(pts.mut);
-                while(!pts.frag_clean)
-                {
-                    pts.cond.wait(lock);
-                }
-                
-                frag = pts.next_frag;
-                
-                pts.frag_clean = false;
-                pts.cond.notify_one();
+                thread_pool[i] = new boost::thread(proc_thread, &pts, &globs);
             }
-
-            if (!frag)
+        }
+        
+        while(true)
+        {
+            frag = pts.proc_in.pop();
+            if (num_threads && burned_out)
             {
-                break;
-            }                
+                if (!frag)
+                {
+                    for(size_t i = 0; i < thread_pool.size(); ++i)
+                    {
+                        pts.proc_on.push(NULL);
+                    }
+                    break;
+                }
+                frag->mass(mass_n);
+                pts.proc_on.push(frag);
+            }
+            else
+            {
+                if (!frag)
+                {
+                    break;
+                }
+                {
+                    frag->mass(mass_n);
+                    boost::unique_lock<boost::mutex> lock(bu_mut);
+                    process_fragment(frag, globs);
+                    pts.proc_out.push(frag);
+                }
+            }
                     
             if (n == burn_in)
             {
@@ -445,32 +483,14 @@ size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TargetTable* targ
             {
                 (globs.mismatch_table)->fix();
                 burned_out = true;
-            }
-            
-            {
-                boost::unique_lock<boost::mutex> lock(bu_mut);
-                process_fragment(mass_n, frag, targ_table, globs);
-            }
-            
-            num_frags++;
-            
-            // Output progress
-            if (num_frags % 1000000 == 0)
-            {
-                if (vis)
+                thread_pool = vector<boost::thread*>(num_threads);
+                for(size_t i=0; i < thread_pool.size(); i++)
                 {
-                    cout << "0 " << (globs.fld)->to_string() << '\n';
-                    cout << "1 " << (globs.mismatch_table)->to_string() << '\n';
-                    cout << "2 " << (globs.bias_table)->to_string() << '\n';
-                    cout << "3 " << num_frags << '\n';
-                }
-                else
-                {
-                    cout << "Fragments Processed: " << setw(9) << num_frags << "\t Number of Bundles: "<< targ_table->num_bundles() << endl;
+                    thread_pool[i] = new boost::thread(proc_thread, &pts, &globs);
                 }
             }
-
-            if (output_running_reads && n == i*pow(10.,(double)j))
+            
+            if (output_running_reads && n >= i*pow(10.,(double)j))
             {
                 boost::unique_lock<boost::mutex> lock(bu_mut);
                 char buff[500];
@@ -493,7 +513,6 @@ size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TargetTable* targ
                     (globs.bias_table)->append_output(paramfile);
                 paramfile.close();
 
-                
                 if (i++ == 9)
                 {
                     i = 1;
@@ -501,19 +520,19 @@ size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TargetTable* targ
                 }
             }
             
+            num_frags++;
             n++;
             mass_n += ff_param*log((double)n-1) - log(pow(n,ff_param) - 1);
         }
     
-        {
-            boost::unique_lock<boost::mutex> lock1(pts.mut);
-            boost::unique_lock<boost::mutex> lock2(bu_mut);
-            running = false;
-            pts.frag_clean = false;
-            pts.cond.notify_one();
-        }
+        running = false;
 
         parse.join();
+        foreach(boost::thread* t, thread_pool)
+        {
+            t->join();
+        }
+        
         if (bias_update)
         {
             bias_update->join();
@@ -549,10 +568,8 @@ size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TargetTable* targ
         }
     }
         
-    if (vis)
-        cout << "99\n";
-    else
-        cout << "COMPLETED: Processed " << num_frags << " mapped fragments, targets are in " << targ_table->num_bundles() << " bundles\n";
+ 
+    cout << "COMPLETED: Processed " << num_frags << " mapped fragments, targets are in " << targ_table->num_bundles() << " bundles\n";
     
     return num_frags;
 }

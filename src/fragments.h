@@ -192,14 +192,19 @@ class Fragment
      */
     std::string _name;
     
+    double _mass;
+    
     /**
      * a private function that searches for the mate of the given read mapping
      * if found, the mates are combined into a single fragment and added to _frag_hits
      * if not found, the read mapping is added to open_mates
      */
     void add_open_mate(FragHit* om);
+    
 
 public:
+    
+    Fragment(double mass=0);
     
     /**
      * Fragment destructor deletes all FragHit objects pointed to by the Fragment
@@ -239,8 +244,11 @@ public:
      * @return a randomly sampled FragHit
      */
     const FragHit* sample_hit() const;
-
     
+    void mass(double m) { _mass = m; }
+    double mass() const { return _mass; }
+
+    void sort_hits();
 };
 
 
