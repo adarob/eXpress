@@ -490,7 +490,7 @@ size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TargetTable* targ
                 }
             }
             
-            if (output_running_reads && n >= i*pow(10.,(double)j))
+            if (output_running_reads && n == i*pow(10.,(double)j))
             {
                 boost::unique_lock<boost::mutex> lock(bu_mut);
                 char buff[500];
@@ -521,6 +521,12 @@ size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TargetTable* targ
             }
             
             num_frags++;
+            
+            // Output progress
+            if (num_frags % 1000000 == 0)
+            {
+                cout << "Fragments Processed: " << setw(9) << num_frags << "\t Number of Bundles: "<< targ_table->num_bundles() << endl;
+            }
             n++;
             mass_n += ff_param*log((double)n-1) - log(pow(n,ff_param) - 1);
         }
