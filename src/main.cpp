@@ -269,6 +269,7 @@ bool parse_options(int ac, char ** av)
 void process_fragment(Fragment* frag_p, Globals& globs)
 {
     Fragment& frag = *frag_p;
+    frag.sort_hits();
     double mass_n = frag.mass();
     
     assert(frag.num_hits());
@@ -289,6 +290,7 @@ void process_fragment(Fragment* frag_p, Globals& globs)
     {
         for(size_t i = 0; i < frag.num_hits(); ++i)
         {
+            
             const FragHit& m = *frag.hits()[i];
             Target* t = m.mapped_targ;
             if (targ_set.count(t) == 0)

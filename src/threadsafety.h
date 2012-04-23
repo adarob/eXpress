@@ -10,7 +10,7 @@
 #define express_thread_safety_h
 
 #include <boost/thread.hpp>
-#include <queue.h>
+#include <queue>
 
 class Fragment;
 

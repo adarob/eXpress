@@ -19,9 +19,6 @@
 
 using namespace std;
 
-const vector<size_t> LEN_BINS = boost::assign::list_of(791)(1265)(1707)(2433)(999999999); 
-const vector<double> POS_BINS = boost::assign::list_of(0.1)(0.2)(0.3)(0.4)(0.5)(0.6)(0.7)(0.8)(0.9)(1.0);
-
 const int SURROUND = 10;
 const int CENTER = 11;
 const int WINDOW = 21;

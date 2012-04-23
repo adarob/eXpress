@@ -261,7 +261,6 @@ bool BAMParser::next_fragment(Fragment& nf)
     {   
         if (!_reader->GetNextAlignment(a))
         {
-            nf.sort_hits();
             return false;
         }
         else if (!map_end_from_alignment(a))
@@ -270,7 +269,6 @@ bool BAMParser::next_fragment(Fragment& nf)
         }
         else if (!nf.add_map_end(_frag_buff))
         {
-            nf.sort_hits();
             return true;
         }
         _frag_buff = new FragHit();
@@ -425,7 +423,6 @@ bool SAMParser::next_fragment(Fragment& nf)
         _frag_buff = new FragHit();
     }
     
-    nf.sort_hits();
     return _in->good();
 }
 
