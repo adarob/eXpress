@@ -169,7 +169,6 @@ void ThreadedMapParser::threaded_parse(ParseThreadSafety* thread_safety_p, Targe
 {
     ParseThreadSafety& pts = *thread_safety_p;
     bool fragments_remain = true;
-    Fragment * last_frag = NULL;
     size_t n = 0;
     size_t still_out = 0;
     while (!stop_at || n < stop_at)
@@ -199,7 +198,7 @@ void ThreadedMapParser::threaded_parse(ParseThreadSafety* thread_safety_p, Targe
         Fragment* done_frag = pts.proc_out.pop(false);
         while (done_frag)
         {
-            if (last_frag && _writer && _write_active)
+            if (_writer && _write_active)
                 _writer->write_fragment(*done_frag);
             delete done_frag;
             still_out--;
@@ -220,7 +219,7 @@ void ThreadedMapParser::threaded_parse(ParseThreadSafety* thread_safety_p, Targe
     while (still_out)
     {
         Fragment* done_frag = pts.proc_out.pop(true);
-        if (last_frag && _writer && _write_active)
+        if (_writer && _write_active)
             _writer->write_fragment(*done_frag);
         delete done_frag;
         still_out--;
@@ -332,8 +331,11 @@ void BAMWriter::write_fragment(Fragment& f)
     if (_sample)
     {
         const FragHit* hit = f.sample_hit();
-        _writer->SaveAlignment(hit->bam_l);
-        _writer->SaveAlignment(hit->bam_r);
+        PairStatus ps = hit->pair_status();
+        if (ps != RIGHT_ONLY)
+            _writer->SaveAlignment(hit->bam_l);
+        if (ps != LEFT_ONLY)
+            _writer->SaveAlignment(hit->bam_r);
     }
     else
     {
@@ -341,10 +343,17 @@ void BAMWriter::write_fragment(Fragment& f)
         foreach(FragHit* hit, f.hits())
         {
             total += hit->probability;
-            hit->bam_l.AddTag("XP","f",(float)hit->probability);
-            hit->bam_r.AddTag("XP","f",(float)hit->probability);
-            _writer->SaveAlignment(hit->bam_l);
-            _writer->SaveAlignment(hit->bam_r);
+            PairStatus ps = hit->pair_status();
+            if (ps != RIGHT_ONLY)
+            {
+                hit->bam_l.AddTag("XP","f",(float)hit->probability);
+                _writer->SaveAlignment(hit->bam_l);
+            }
+            if (ps != LEFT_ONLY)
+            {
+                hit->bam_r.AddTag("XP","f",(float)hit->probability);
+                _writer->SaveAlignment(hit->bam_r);      
+            }
         }
         assert(approx_eq(total, 1.0));
     }
@@ -580,8 +589,11 @@ void SAMWriter::write_fragment(Fragment& f)
         foreach(FragHit* hit, f.hits())
         {
             total += hit->probability;
-            *_out << hit->sam_l << " XP:f:" << (float)hit->probability << endl;
-            *_out << hit->sam_r << " XP:f:" << (float)hit->probability << endl;
+            PairStatus ps = hit->pair_status();
+            if (ps != RIGHT_ONLY)
+                *_out << hit->sam_l << " XP:f:" << (float)hit->probability << endl;
+            if (ps != LEFT_ONLY)
+                *_out << hit->sam_r << " XP:f:" << (float)hit->probability << endl;
         }
         assert(approx_eq(total, 1.0));
     }
