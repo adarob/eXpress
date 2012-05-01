@@ -161,7 +161,20 @@
         <div class="corner-content-1col-top"></div>                        
         <div class="content-1col-nobox">
           <h1>News</h1>
-          <h2>04.08.2012 &bull; eXpress 1.0.0 released</h3>
+          <h2>05.01.2012 &bull; Follow-up for Bowtie2 users</h2>
+          <p>Some users have asked questions about the Bowtie2 bug we reported yesterday.  We have developed a way to test if this bug will affect your results and by how much.  You should run one of the pairs of commands below (depending on if you file is in SAM or BAM format).  The first command prints how many reads (+ header lines) eXpress will see due to the bug and the second command prints how many reads (+ header lines) eXpress would see without the bug (the correct number).  The difference between the two will tell you how many reads are being "double counted" by eXpress.  If this number is relatively small, there is no cause for alarm.  If it is large, you should sort your file and rerun eXpress.  The commands to do this sorting can be found in the <a href=http://bio.math.berkeley.edu/eXpress/manual.html#sam>Manual</a>.  Please let us know if you have any further questions about this by emailing us at <a mailto:ask.xprs@gmail.com>ask.xprs@gmail.com</a>.  
+          <h4>Test commands:</h4>
+		  <p>(w/ SAM files)
+		  <ol><li><pre class="sc"><code>cut -f1 hits.sam | uniq | sort | wc -l
+          <br>cut -f1 hits.sam | uniq | sort | uniq | wc -l</code></pre></li></ol>
+ 		  </p>
+ 		  <p>(w/ BAM files)
+		  <ol><li><pre class="sc"><code>samtools view hits.bam | cut -f1 | uniq | sort | wc -l
+		  <br>samtools view hits.bam | cut -f1 | uniq | sort | uniq | wc -l</code></pre></li></ol>
+          <h2>04.30.2012 &bull; Warning for Bowtie2 users</h2>
+		  <p>Due to a bug in Bowtie2, the alignments for a given read aren't guaranteed to be in a consecutive block in the SAM output.  Therefore, you must use the --reorder option until the bug is fixed or sort your alignment file using the commands in the <a href=http://bio.math.berkeley.edu/eXpress/manual.html#sam>Manual</a>.</p>
+		  <p>This bug will cause eXpress to produce incorrect results with no errors or notifications.</p>
+          <h2>04.08.2012 &bull; eXpress 1.0.0 released</h2>
           <p>We are happy to announce the release of eXpress 1.0.0 following numerous tests on simulated and real data, and improvements based on feedback from early users.</p>
           <p><b>Release Notes:</b>
    		  <ul>
@@ -170,7 +183,7 @@
 		  <li>Bias model improved</li>
 		  <li>Minor bug fixes and speed increases</li>
    		  </ul></p>
-          <h2>02.16.2012 &bull; eXpress 0.9.5 BETA released</h3>
+          <h2>02.16.2012 &bull; eXpress 0.9.5 BETA released</h2>
           <p><b>Release Notes:</b>
    		  <ul>
    		  <li>Numerous speed improvements.</li>
@@ -179,7 +192,7 @@
    		  <li>Re-added effective count fields to output.</li>
    		  <li>Renamed "post_count_mean" field to "post_count_mode".</li>
    		  </ul></p>
-          <h2>01.05.2012 &bull; eXpress 0.9.4 BETA released</h3>
+          <h2>01.05.2012 &bull; eXpress 0.9.4 BETA released</h2>
           <p><b>Release Notes:</b>
    		  <ul>
    		  <li>Greatly increased speed of BAM parsing (thanks to improvements in BamTools)</li>

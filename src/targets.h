@@ -164,9 +164,9 @@ class Target
     
     /**
      * a private boolean specifying whether a unique solution exists, always false unless a unique read is mapped to the target
-     * or all other targets in a mapping are solveable
+     * or all other targets in a mapping are solvable
      */
-    bool _solveable;
+    bool _solvable;
     
 public:
     
@@ -307,7 +307,7 @@ public:
     void incr_counts(bool uniq, size_t incr_amt = 1)
     {
         if (uniq)
-            _solveable = true;
+            _solvable = true;
         _tot_counts += incr_amt;
         _uniq_counts += incr_amt*uniq;
     }
@@ -343,16 +343,16 @@ public:
     void update_target_bias(BiasBoss* bias_table = NULL, FLD* fld = NULL);
 
     /**
-     * a member function that returns the _solveable flag
+     * a member function that returns the _solvable flag
      * @return a boolean specifying whether or not the target has a unique solution
      */    
-    bool solveable() { return _solveable; }
+    bool solvable() { return _solvable; }
     
     /**
-     * a member function that sets the _solveable flag
+     * a member function that sets the _solvable flag
      * @param a boolean specifying whether or not the target has a unique solution
      */   
-    void solveable(bool s) { _solveable = s; }
+    void solvable(bool s) { _solvable = s; }
     
 };
 

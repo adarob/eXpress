@@ -25,6 +25,7 @@
 #include "mismatchmodel.h"
 #include "mapparser.h"
 #include "threadsafety.h"
+#include "robertsfilter.h"
 
 #ifndef WIN32
     #include "update_check.h"
@@ -281,7 +282,7 @@ void process_fragment(Fragment* frag_p, Globals& globs)
     double total_likelihood = HUGE_VAL;
     double total_mass = HUGE_VAL;
     double total_variance = HUGE_VAL;
-    size_t num_solveable = 0;
+    size_t num_solvable = 0;
     
     
     boost::unordered_set<Target*> targ_set;
@@ -304,7 +305,7 @@ void process_fragment(Fragment* frag_p, Globals& globs)
             total_likelihood = log_sum(total_likelihood, likelihoods[i]);
             total_mass = log_sum(total_mass, masses[i]);
             total_variance = log_sum(total_variance, variances[i]);
-            num_solveable += t->solveable();
+            num_solvable += t->solvable();
         }
     }
     else
@@ -352,9 +353,9 @@ void process_fragment(Fragment* frag_p, Globals& globs)
         if (first_round)
         {
             t->incr_counts(frag.num_hits()==1);
-            if (!t->solveable() && num_solveable == frag.num_hits()-1)
+            if (!t->solvable() && num_solvable == frag.num_hits()-1)
             {
-                t->solveable(true);
+                t->solvable(true);
             }
             if ((!burned_out || edit_detect) && globs.mismatch_table)
                     (globs.mismatch_table)->update(m, p, mass_n);
@@ -418,6 +419,8 @@ size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TargetTable* targ
     vector<boost::thread*> thread_pool;
     boost::thread* bias_update = NULL;
     
+    RobertsFilter frags_seen;
+    
     size_t n = 1;
     size_t num_frags = 0;
     double mass_n = 0;
@@ -448,6 +451,11 @@ size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TargetTable* targ
         while(true)
         {
             frag = pts.proc_in.pop();
+            if (frag && frags_seen.test_and_push(frag->name()))
+            {
+                cerr << "ERROR: Alignments are not properly sorted. Read '" << frag->name() << "' has alignments which are non-consecutive.\n" ; 
+                exit(1);  
+            }
             if (num_threads && burned_out)
             {
                 if (!frag)

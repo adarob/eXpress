@@ -13,7 +13,7 @@
 using namespace std;
 
 
-SequenceFwd::SequenceFwd():  _ref_seq(NULL), _len(0) {}
+SequenceFwd::SequenceFwd():  _ref_seq(NULL), _len(0), _prob(0){}
 
 SequenceFwd::SequenceFwd(const std::string& seq, bool rev, bool prob) : _ref_seq(NULL), _len(seq.length()), _prob(prob)
 {

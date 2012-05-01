@@ -30,7 +30,7 @@ Target::Target(const TargID id, const std::string& name, const std::string& seq,
     _uniq_counts(0),
     _tot_counts(0),
     _avg_bias(0),
-    _solveable(false)
+    _solvable(false)
 { 
     if (globs->bias_table)
     {
@@ -378,7 +378,7 @@ void TargetTable::output_results(string output_dir, size_t tot_counts, bool outp
     if (output_varcov)
         varcov_file.open((output_dir + "/varcov.xprs").c_str());    
     
-    fprintf(expr_file, "bundle_id\ttarget_id\tlength\teff_length\ttot_counts\tuniq_counts\test_counts\teff_counts\tambig_distr_alpha\tambig_distr_beta\tfpkm\tfpkm_conf_low\tfpkm_conf_high\tsolveable\n");
+    fprintf(expr_file, "bundle_id\ttarget_id\tlength\teff_length\ttot_counts\tuniq_counts\test_counts\teff_counts\tambig_distr_alpha\tambig_distr_beta\tfpkm\tfpkm_conf_low\tfpkm_conf_high\tsolvable\n");
 
     double l_bil = log(1000000000.);
     double l_tot_counts = log((double)tot_counts);
@@ -452,13 +452,13 @@ void TargetTable::output_results(string output_dir, size_t tot_counts, bool outp
                     
                     double a = -m*(m*m - m + v)/v;
                     double b = (m-1)*(m*m - m + v)/v;
-                    if (!targ.solveable())
+                    if (!targ.solvable())
                     {
                         a = 1;
                         b = 1;
                     }
                     
-                    if (targ.solveable() && (v == 0 || a < 0 || b < 0))
+                    if (targ.solvable() && (v == 0 || a < 0 || b < 0))
                         count_var = mass_var;
                     else
                         count_var = n*a*b*(a+b+n)/((a+b)*(a+b)*(a+b+1));
@@ -477,7 +477,7 @@ void TargetTable::output_results(string output_dir, size_t tot_counts, bool outp
                 double eff_len = sexp(l_eff_len);
                 double eff_counts = targ_counts[i] / eff_len * targ.length();
                 
-                fprintf(expr_file, "" SIZE_T_FMT "\t%s\t" SIZE_T_FMT "\t%f\t" SIZE_T_FMT "\t" SIZE_T_FMT "\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%c\n", bundle_id, targ.name().c_str(), targ.length(), eff_len, targ.tot_counts(), targ.uniq_counts(), targ_counts[i], eff_counts, count_alpha, count_beta, targ_fpkm, fpkm_lo, fpkm_hi, (targ.solveable())?'T':'F');
+                fprintf(expr_file, "" SIZE_T_FMT "\t%s\t" SIZE_T_FMT "\t%f\t" SIZE_T_FMT "\t" SIZE_T_FMT "\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%c\n", bundle_id, targ.name().c_str(), targ.length(), eff_len, targ.tot_counts(), targ.uniq_counts(), targ_counts[i], eff_counts, count_alpha, count_beta, targ_fpkm, fpkm_lo, fpkm_hi, (targ.solvable())?'T':'F');
             
                 if (output_varcov)
                 {
