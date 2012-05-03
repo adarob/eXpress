@@ -510,7 +510,7 @@ void TargetTable::output_results(string output_dir, size_t tot_counts, bool outp
                     {
                         if (p_vals[i] < 0.05)
                         {
-                            edits_file << targ.name() << "\t" << i << "\t" << p_vals[i] << "\t" << targ_seq.get_ref(i);
+                            edits_file << targ.name() << "\t" << i << "\t" << p_vals[i] << "\t" << NUCS[targ_seq.get_ref(i)];
                             for (size_t nuc=0; nuc < NUM_NUCS; nuc++)
                                 edits_file << "\t" << sexp(targ_seq.get_prob(i,nuc));
                             edits_file << endl; 
