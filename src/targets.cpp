@@ -381,8 +381,8 @@ void TargetTable::output_results(string output_dir, size_t tot_counts, bool outp
     
     if (output_edits)
     {
-        varcov_file.open((output_dir + "/edits.xprs").c_str());
-        edits_file << "target_id\tposition\tp_value\tP(A)\tP(C)\tP(G)\tP(T)\n";
+        edits_file.open((output_dir + "/edits.xprs").c_str());
+        edits_file << "target_id\tposition\tp_value\tref_nuc\tP(A)\tP(C)\tP(G)\tP(T)\n";
     }
     
     fprintf(expr_file, "bundle_id\ttarget_id\tlength\teff_length\ttot_counts\tuniq_counts\test_counts\teff_counts\tambig_distr_alpha\tambig_distr_beta\tfpkm\tfpkm_conf_low\tfpkm_conf_high\tsolvable\n");
@@ -510,9 +510,9 @@ void TargetTable::output_results(string output_dir, size_t tot_counts, bool outp
                     {
                         if (p_vals[i] < 0.05)
                         {
-                            edits_file << targ.name() << "\t" << i << "\t" << p_vals[i];
+                            edits_file << targ.name() << "\t" << i << "\t" << p_vals[i] << "\t" << targ_seq.get_ref(i);
                             for (size_t nuc=0; nuc < NUM_NUCS; nuc++)
-                                edits_file << "\t" << targ_seq.get_prob(i,nuc);
+                                edits_file << "\t" << sexp(targ_seq.get_prob(i,nuc));
                             edits_file << endl; 
                         }
                     }
