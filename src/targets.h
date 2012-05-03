@@ -506,8 +506,9 @@ public:
      * @param output_dir the directory to output the expression file to
      * @param tot_counts the total number of observed mapped fragments
      * @param output_varcov boolean specifying whether to also output the variance-covariance matrix
+     * @param output_varcov boolean specifying whether to also output the editing p-values
      */
-    void output_results(std::string output_dir, size_t tot_counts, bool output_varcov);
+    void output_results(std::string output_dir, size_t tot_counts, bool output_varcov=false, bool output_edits=false);
     
     /**
      * a member function for driving a thread that continuously updates the target bias values

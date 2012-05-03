@@ -513,7 +513,7 @@ size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TargetTable* targ
                     cerr << e.what() << endl;
                     exit(1);
                 }
-                targ_table->output_results(dir, n, false);
+                targ_table->output_results(dir, n);
                 
                 ofstream paramfile((dir + "/params.xprs").c_str());
                 (globs.fld)->append_output(paramfile);
@@ -569,7 +569,7 @@ size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TargetTable* targ
                     cerr << e.what() << endl;
                     exit(1);
                 }
-                targ_table->output_results(dir, num_frags, false);
+                targ_table->output_results(dir, num_frags);
             }
             cout << remaining_rounds << " remaining rounds." << endl;
             first_round = false;
@@ -653,7 +653,7 @@ int main (int argc, char ** argv)
                 cerr << e.what() << endl;
                 exit(1);
             }
-            targ_table.output_results(dir, tot_counts, false);
+            targ_table.output_results(dir, tot_counts);
         }
         remaining_rounds--;
         cout << "\nRe-estimating counts with additional round of EM (" << remaining_rounds << " remaining)...\n";
@@ -666,7 +666,7 @@ int main (int argc, char ** argv)
     
 	cout << "Writing results to file...\n";
     
-    targ_table.output_results(output_dir, tot_counts, calc_covar);
+    targ_table.output_results(output_dir, tot_counts, calc_covar, edit_detect);
     ofstream paramfile((output_dir + "/params.xprs").c_str());
     (globs.fld)->append_output(paramfile);
     if (globs.mismatch_table)

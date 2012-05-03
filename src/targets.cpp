@@ -371,12 +371,19 @@ void project_to_polytope(vector<Target*> bundle_targ, vector<double>& targ_count
     }
 }
 
-void TargetTable::output_results(string output_dir, size_t tot_counts, bool output_varcov)
+void TargetTable::output_results(string output_dir, size_t tot_counts, bool output_varcov, bool output_edits)
 { 
     FILE * expr_file = fopen((output_dir + "/results.xprs").c_str(), "w");
     ofstream varcov_file;
+    ofstream edits_file;
     if (output_varcov)
         varcov_file.open((output_dir + "/varcov.xprs").c_str());    
+    
+    if (output_edits)
+    {
+        varcov_file.open((output_dir + "/edits.xprs").c_str());
+        edits_file << "target_id\tposition\tp_value\tP(A)\tP(C)\tP(G)\tP(T)\n";
+    }
     
     fprintf(expr_file, "bundle_id\ttarget_id\tlength\teff_length\ttot_counts\tuniq_counts\test_counts\teff_counts\tambig_distr_alpha\tambig_distr_beta\tfpkm\tfpkm_conf_low\tfpkm_conf_high\tsolvable\n");
 
@@ -494,21 +501,22 @@ void TargetTable::output_results(string output_dir, size_t tot_counts, bool outp
                     }
                     varcov_file << endl;
                 }
-/*                
-                if (targ.seq().prob())
+                if (output_edits)
                 {
                     const Sequence& targ_seq = targ.seq();
                     vector<double> p_vals;
                     targ_seq.calc_p_vals(p_vals);
                     for (size_t i = 0; i < p_vals.size(); ++i)
                     {
-                    //    if (p_vals[i] < 0.05)
+                        if (p_vals[i] < 0.05)
                         {
-                            cout << targ.name() << "\t" << i << "\t" << targ_seq.get_ref(i) << "\t" << targ_seq[i] << "\t" << p_vals[i] << endl; 
+                            edits_file << targ.name() << "\t" << i << "\t" << p_vals[i];
+                            for (size_t nuc=0; nuc < NUM_NUCS; nuc++)
+                                edits_file << "\t" << targ_seq.get_prob(i,nuc);
+                            edits_file << endl; 
                         }
                     }
                 }
- */
             }
         }
         else
@@ -535,6 +543,8 @@ void TargetTable::output_results(string output_dir, size_t tot_counts, bool outp
     fclose(expr_file);
     if (output_varcov)
         varcov_file.close();
+    if (output_edits)
+        edits_file.close();
 }
 
 double TargetTable::total_fpb() const
