@@ -90,14 +90,28 @@ size_t SequenceFwd::operator[](const size_t index) const
 size_t SequenceFwd::get_ref(const size_t index) const
 {
     assert(index < _len);
-    assert(_ref_seq[index] == operator[](index));
+    //assert(_ref_seq[index] == operator[](index));
     return _ref_seq[index]; 
 }
+
+
 
 float SequenceFwd::get_prob(const size_t index, const size_t nuc) const
 {
     assert(_prob);
     return _est_seq(index, nuc);
+}
+
+float SequenceFwd::get_obs(const size_t index, const size_t nuc) const
+{
+    assert(index < _len);
+    return _obs_seq(index,nuc,false);
+}
+
+float SequenceFwd::get_exp(const size_t index, const size_t nuc) const
+{
+    assert(index < _len);
+    return _exp_seq(index,nuc,false);
 }
 
 void SequenceFwd::update_est(const size_t index, const size_t nuc, float mass)
