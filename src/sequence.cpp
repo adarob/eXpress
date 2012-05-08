@@ -8,10 +8,10 @@
 
 #include "sequence.h"
 #include <cassert>
-#include <boost/math/distributions/chi_squared.hpp>
+#include <boost/math/distributions/normal.hpp>
 
 using namespace std;
-
+using namespace boost::math;
 
 SequenceFwd::SequenceFwd():  _ref_seq(NULL), _len(0), _prob(0){}
 
@@ -134,6 +134,52 @@ void SequenceFwd::update_exp(const size_t index, const size_t nuc, float mass)
 
 void SequenceFwd::calc_p_vals(vector<double>& p_vals) const
 {
+    p_vals = vector<double>(_len, 1);
+    for (size_t i = 0; i < _len; ++i)
+    {
+        double N = sexp(_obs_seq.total(i));        
+
+        if (N==0)
+            continue;
+
+        size_t ref_nuc = get_ref(i);
+        double p_val = HUGE_VAL;
+        
+        vector<double> cdfs(4);
+        for (size_t nuc = 0; nuc < NUM_NUCS; ++nuc)
+        {
+            if (nuc == ref_nuc)
+                continue;
+            
+            double p = sexp(_exp_seq(i,nuc));
+            double obs_n = sexp(_obs_seq(i,nuc,false));
+            normal norm (N*p, sqrt(N*p*(1-p)));
+            cdfs[nuc] = cdf(norm, obs_n);
+        }
+        
+        for (size_t nuc1 = 0; nuc1 < NUM_NUCS; ++nuc1)
+        {
+            if (nuc1 == ref_nuc)
+                continue;
+
+            double term = log(1-cdfs[nuc1]);
+            
+            for(size_t nuc2 = 0; nuc2 < NUM_NUCS; ++nuc2)
+            {
+                if (nuc2 == nuc1 || nuc2 == ref_nuc)
+                    continue;
+                term += log(cdfs[nuc2]);
+            }
+            p_val = log_sum(p_val, term);
+        }
+        
+        p_vals[i] = sexp(p_val);
+    }
+}
+
+/*
+void SequenceFwd::calc_p_vals(vector<double>& p_vals) const
+{
     p_vals = vector<double>(_len, 1.0);
     boost::math::chi_squared_distribution<double> chisq(3);
     double obs_n,exp_n;
@@ -153,6 +199,7 @@ void SequenceFwd::calc_p_vals(vector<double>& p_vals) const
         p_vals[i] -= boost::math::cdf(chisq,S);
     }
 }
+ */
 
 void SequenceRev::calc_p_vals(vector<double>& p_vals) const
 {
