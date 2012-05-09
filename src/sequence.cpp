@@ -134,6 +134,42 @@ void SequenceFwd::update_exp(const size_t index, const size_t nuc, float mass)
 
 void SequenceFwd::calc_p_vals(vector<double>& p_vals) const
 {
+    p_vals = vector<double>(_len, 1.0);
+    for (size_t i = 0; i < _len; ++i)
+    {
+        double N = sexp(_obs_seq.total(i));        
+        if (N==0)
+            continue;
+        size_t ref_nuc = get_ref(i);
+        double max_obs = 0;
+        for (size_t nuc = 0; nuc < NUM_NUCS; ++nuc)
+        {
+            if (nuc == ref_nuc)
+                continue;
+            
+            double obs_n = sexp(_obs_seq(i,nuc,false));
+            max_obs = max(max_obs,obs_n);
+        }
+        
+        double p_val = HUGE_VAL;
+        
+        for (size_t nuc = 0; nuc < NUM_NUCS; ++nuc)
+        {
+            if (nuc == ref_nuc)
+                continue;
+            
+            double obs_n = sexp(_obs_seq(i,nuc,false));
+            double exp_p = sexp(_exp_seq(i, nuc));
+            normal norm(N*exp_p, N*exp_p*(1-exp_p));
+            p_val = log_sum(p_val, log(cdf(norm, obs_n)));
+        }
+        p_vals[i] -= sexp(p_val);
+    }
+}
+
+/*
+void SequenceFwd::calc_p_vals(vector<double>& p_vals) const
+{
     p_vals = vector<double>(_len, 1);
     for (size_t i = 0; i < _len; ++i)
     {
@@ -176,6 +212,7 @@ void SequenceFwd::calc_p_vals(vector<double>& p_vals) const
         p_vals[i] = sexp(p_val);
     }
 }
+*/
 
 /*
 void SequenceFwd::calc_p_vals(vector<double>& p_vals) const
