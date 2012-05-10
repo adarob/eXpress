@@ -151,7 +151,7 @@ void SequenceFwd::calc_p_vals(vector<double>& p_vals) const
             max_obs = max(max_obs,obs_n);
         }
         
-        double p_val = HUGE_VAL;
+        double p_val = 0;
         
         for (size_t nuc = 0; nuc < NUM_NUCS; ++nuc)
         {
@@ -161,7 +161,7 @@ void SequenceFwd::calc_p_vals(vector<double>& p_vals) const
             double obs_n = sexp(_obs_seq(i,nuc,false));
             double exp_p = sexp(_exp_seq(i, nuc));
             normal norm(N*exp_p, N*exp_p*(1-exp_p));
-            p_val = log_sum(p_val, log(cdf(norm, obs_n)));
+            p_val += log(cdf(norm, obs_n));
         }
         p_vals[i] -= sexp(p_val);
     }

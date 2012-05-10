@@ -466,8 +466,22 @@ size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TargetTable* targ
                     }
                     break;
                 }
-                frag->mass(mass_n);
-                pts.proc_on.push(frag);
+                bool found = false;
+                for(size_t i = 0; i < frag->num_hits(); ++i)
+                {
+                    const FragHit& m = *frag->hits()[i];
+                    Target* t = m.mapped_targ;
+                    if (t->name()=="NM_001199739")
+                    {
+                        found = true;
+                        break;
+                    }
+                }
+                if (found)
+                {
+                    frag->mass(mass_n);
+                    pts.proc_on.push(frag);    
+                }
             }
             else
             {
