@@ -508,7 +508,7 @@ void TargetTable::output_results(string output_dir, size_t tot_counts, bool outp
                     targ_seq.calc_p_vals(p_vals);
                     for (size_t i = 0; i < p_vals.size(); ++i)
                     {
-                        if (p_vals[i] < 0.05 && targ.name() == "NM_001199739")
+                        if (p_vals[i] < 0.05)
                         {
                             edits_file << targ.name() << "\t" << i << "\t" << p_vals[i] << "\t" << NUCS[targ_seq.get_ref(i)];
                             for (size_t nuc=0; nuc < NUM_NUCS; nuc++)

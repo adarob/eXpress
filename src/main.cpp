@@ -399,19 +399,7 @@ void proc_thread(ParseThreadSafety* pts, Globals* globs)
         Fragment* frag = pts->proc_on.pop();
         if (!frag)
             break;
-        bool found = false;
-        for(size_t i = 0; i < frag->num_hits(); ++i)
-        {
-            const FragHit& m = *frag->hits()[i];
-            Target* t = m.mapped_targ;
-            if (t->name()=="NM_001199739")
-            {
-                found = true;
-                break;
-            }
-        }
-        if (found)
-            process_fragment(frag, *globs);
+        process_fragment(frag, *globs);
         pts->proc_out.push(frag);
     }
 }
