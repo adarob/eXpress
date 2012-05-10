@@ -158,10 +158,9 @@ void SequenceFwd::calc_p_vals(vector<double>& p_vals) const
             if (nuc == ref_nuc)
                 continue;
             
-            double obs_n = sexp(_obs_seq(i,nuc,false));
             double exp_p = sexp(_exp_seq(i, nuc));
-            normal norm(N*exp_p, N*exp_p*(1-exp_p));
-            p_val += log(cdf(norm, obs_n));
+            normal norm(N*exp_p, sqrt(N*exp_p*(1-exp_p)));
+            p_val += log(cdf(norm, max_obs));
         }
         p_vals[i] -= sexp(p_val);
     }
