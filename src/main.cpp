@@ -399,7 +399,19 @@ void proc_thread(ParseThreadSafety* pts, Globals* globs)
         Fragment* frag = pts->proc_on.pop();
         if (!frag)
             break;
-        process_fragment(frag, *globs);
+        bool found = false;
+        for(size_t i = 0; i < frag->num_hits(); ++i)
+        {
+            const FragHit& m = *frag->hits()[i];
+            Target* t = m.mapped_targ;
+            if (t->name()=="NM_001199739")
+            {
+                found = true;
+                break;
+            }
+        }
+        if (found)
+            process_fragment(frag, *globs);
         pts->proc_out.push(frag);
     }
 }
@@ -466,22 +478,9 @@ size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TargetTable* targ
                     }
                     break;
                 }
-                bool found = false;
-                for(size_t i = 0; i < frag->num_hits(); ++i)
-                {
-                    const FragHit& m = *frag->hits()[i];
-                    Target* t = m.mapped_targ;
-                    if (t->name()=="NM_001199739")
-                    {
-                        found = true;
-                        break;
-                    }
-                }
-                if (found)
-                {
-                    frag->mass(mass_n);
-                    pts.proc_on.push(frag);    
-                }
+
+                frag->mass(mass_n);
+                pts.proc_on.push(frag);    
             }
             else
             {
