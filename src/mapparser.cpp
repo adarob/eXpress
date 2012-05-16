@@ -109,7 +109,7 @@ MapParser::MapParser(string in_file, string out_file, Library* lib, bool write_a
     }
     else
     {
-        cout << "Attempting to read input in BAM format...\n";
+        cout << "Attempting to read '" << in_file << "' in BAM format...\n";
         BamTools::BamReader* reader = new BamTools::BamReader();
         if (reader->Open(in_file))
         {

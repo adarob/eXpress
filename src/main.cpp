@@ -334,14 +334,13 @@ void process_fragment(Fragment* frag_p)
         bundle = lib.targ_table->merge_bundles(bundle, t->bundle());
         
         double p = likelihoods[i]-total_likelihood;
-        double mass_t = mass_n + p;
         
         double v = HUGE_VAL;
         if (frag.num_hits() > 1)
             v = log_sum(variances[i] - 2*total_mass, total_variance + 2*masses[i] - 4*total_mass);
         
         assert(!isnan(v));
-        assert(!(isnan(mass_t)||isinf(mass_t)));
+        assert(!(isnan(p)||isinf(p)));
         
         m.probability = sexp(p);
         
@@ -642,16 +641,16 @@ int main (int argc, char ** argv)
         if (output_align_samp)
             sprintf(out_map_file_name, "%s/hits.%d.samp", output_dir.c_str(), (int)i+1);
         
+        libs[i].map_parser = new MapParser(file_names[i], string(out_map_file_name), &libs[i], last_round);
+        libs[i].fld = new FLD(fld_alpha, def_fl_max, def_fl_mean, def_fl_stddev);
+        libs[i].mismatch_table = (error_model) ? new MismatchTable(mm_alpha):NULL;
+        libs[i].bias_table = (bias_correct) ? new BiasBoss(bias_alpha):NULL;
+        
         if (i > 0 && (libs[i].map_parser->targ_index() != libs[i-1].map_parser->targ_index() || libs[i].map_parser->targ_lengths() != libs[i-1].map_parser->targ_lengths()))
         {
             cerr << "ERROR: Alignment file headers do not match for '" << file_names[i-1] << "' and '" << file_names[i] << "'.";
             exit(1);
         }
-        
-        libs[i].map_parser = new MapParser(file_names[i], string(out_map_file_name), &libs[i], last_round);
-        libs[i].fld = new FLD(fld_alpha, def_fl_max, def_fl_mean, def_fl_stddev);
-        libs[i].mismatch_table = (error_model) ? new MismatchTable(mm_alpha):NULL;
-        libs[i].bias_table = (bias_correct) ? new BiasBoss(bias_alpha):NULL;
     }
     
     TargetTable targ_table(fasta_file_name, edit_detect, expr_alpha, expr_alpha_map, &libs);
