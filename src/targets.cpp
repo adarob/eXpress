@@ -12,6 +12,8 @@
 #include "fragments.h"
 #include "biascorrection.h"
 #include "mismatchmodel.h"
+#include "mapparser.h"
+#include "library.h"
 #include <iostream>
 #include <fstream>
 #include <cassert>
@@ -19,8 +21,8 @@
 
 using namespace std;
 
-Target::Target(const TargID id, const std::string& name, const std::string& seq, bool prob_seq, double alpha, const Globals* globs)
-:   _globs(globs),
+Target::Target(const TargID id, const std::string& name, const std::string& seq, bool prob_seq, double alpha, const Librarian* libs)
+:   _libs(libs),
     _id(id),
     _name(name),
     _seq_f(seq, 0, prob_seq),
@@ -32,7 +34,7 @@ Target::Target(const TargID id, const std::string& name, const std::string& seq,
     _avg_bias(0),
     _solvable(false)
 { 
-    if (globs->bias_table)
+    if ((_libs->curr_lib()).bias_table)
     {
         _start_bias = new std::vector<float>(seq.length(),0);
         _end_bias = new std::vector<float>(seq.length(),0);
@@ -58,7 +60,7 @@ void Target::add_mass(double p, double v, double mass)
             _curr_params.tot_ambig_mass = log_sum(_curr_params.tot_ambig_mass, mass);
     }
     
-    (_globs->targ_table)->update_total_fpb(mass - _cached_eff_len);
+    (_libs->curr_lib()).targ_table->update_total_fpb(mass - _cached_eff_len);
     
 }  
 
@@ -75,7 +77,7 @@ double Target::rho() const
     if (eff_len == HUGE_VAL)
         return HUGE_VAL;
     
-    return mass(true) - eff_len - (_globs->targ_table)->total_fpb();
+    return mass(true) - eff_len - (_libs->curr_lib()).targ_table->total_fpb();
 }
 
 double Target::mass(bool with_pseudo) const
@@ -96,8 +98,10 @@ double Target::log_likelihood(const FragHit& frag, bool with_pseudo) const
 {
     double ll = 0;
     
-    if (_globs->mismatch_table)
-        ll += (_globs->mismatch_table)->log_likelihood(frag);
+    const Library& lib = _libs->curr_lib();
+    
+    if (lib.mismatch_table)
+        ll += (lib.mismatch_table)->log_likelihood(frag);
     
     const PairStatus ps = frag.pair_status();
     {        
@@ -106,7 +110,7 @@ double Target::log_likelihood(const FragHit& frag, bool with_pseudo) const
         else
             ll += _ret_params->mass;
         
-        if (_globs->bias_table)
+        if (lib.bias_table)
         {
             if (ps != RIGHT_ONLY)
                 ll += _start_bias->at(frag.left);
@@ -115,9 +119,9 @@ double Target::log_likelihood(const FragHit& frag, bool with_pseudo) const
         }
         ll -= (_cached_eff_len + _avg_bias);
     }
-    
+
     if (ps == PAIRED)
-        ll += (_globs->fld)->pdf(frag.length());
+        ll += (lib.fld)->pdf(frag.length());
 
     assert(!(isnan(ll)||isinf(ll)));
     return ll;
@@ -127,7 +131,7 @@ double Target::est_effective_length(FLD* fld, bool with_bias) const
 {
     if (!fld)
     {
-        fld = _globs->fld;
+        fld = (_libs->curr_lib()).fld;
     }
     
     double eff_len = HUGE_VAL;
@@ -155,10 +159,11 @@ double Target::cached_effective_length(bool with_bias) const
 
 void Target::update_target_bias(BiasBoss* bias_table, FLD* fld)
 {
+    const Library& lib = _libs->curr_lib();
     if (!bias_table)
     {
-        bias_table = _globs->bias_table;
-        fld = _globs->fld;
+        bias_table = lib.bias_table;
+        fld = lib.fld;
     }
     else
     {
@@ -172,15 +177,20 @@ void Target::update_target_bias(BiasBoss* bias_table, FLD* fld)
     }
 }
 
-TargetTable::TargetTable(const string& targ_fasta_file, const TransIndex& targ_index, const TransIndex& targ_lengths, bool prob_seqs, double alpha, const AlphaMap* alpha_map, Globals* globs)
-: _globs(globs),
-  _targ_map(targ_index.size(), NULL),
-  _total_fpb(log(alpha*targ_index.size()))
+TargetTable::TargetTable(const string& targ_fasta_file, bool prob_seqs, double alpha, const AlphaMap* alpha_map, const Librarian* libs)
+: _libs(libs)
 {
     cout << "Loading target sequences";
-    if (globs->bias_table)
+    const Library& lib = _libs->curr_lib();
+    const TransIndex& targ_index = lib.map_parser->targ_index();
+    const TransIndex& targ_lengths = lib.map_parser->targ_lengths();
+    if (lib.bias_table)
         cout << " and measuring bias background";
     cout << "...\n\n";
+    
+    size_t num_targs = targ_index.size();
+    _targ_map = vector<Target*>(num_targs, NULL);
+    _total_fpb = log(alpha*num_targs);
     
     boost::unordered_set<string> target_names;
     
@@ -234,9 +244,9 @@ TargetTable::TargetTable(const string& targ_fasta_file, const TransIndex& targ_i
             add_targ(name, seq, prob_seqs, (alpha_map) ? alpha_renorm * alpha_map->find(name)->second : alpha, targ_index, targ_lengths);
         }
         infile.close();
-        if (globs->bias_table)
+        if (lib.bias_table)
         {
-            globs->bias_table->normalize_expectations();
+            lib.bias_table->normalize_expectations();
         }
     }
     else 
@@ -284,9 +294,10 @@ void TargetTable::add_targ(const string& name, const string& seq, bool prob_seq,
         exit(1);
     }
 
-    Target* targ = new Target(it->second, name, seq, prob_seq, alpha, _globs);
-    if (_globs->bias_table)
-        (_globs->bias_table)->update_expectations(*targ);
+    Target* targ = new Target(it->second, name, seq, prob_seq, alpha, _libs);
+    const Library& lib = _libs->curr_lib();
+    if (lib.bias_table)
+        (lib.bias_table)->update_expectations(*targ);
     _targ_map[targ->id()] = targ;
     targ->bundle(_bundle_table.create_bundle(targ));
 }
@@ -571,6 +582,8 @@ void TargetTable::threaded_bias_update(boost::mutex* mut)
     
     bool burned_out_before = false;
     
+    const Library& lib = _libs->curr_lib();
+    
     while(running)
     {
         
@@ -579,21 +592,21 @@ void TargetTable::threaded_bias_update(boost::mutex* mut)
         {
             boost::unique_lock<boost::mutex> lock(*mut);
             if(!fld)
-                fld = new FLD(*(_globs->fld));
+                fld = new FLD(*(lib.fld));
             else
-                *fld = *(_globs->fld);
+                *fld = *(lib.fld);
             
-            if (_globs->bias_table)
+            if (lib.bias_table)
             {
-                BiasBoss& glob_bias_table = *(_globs->bias_table);
+                BiasBoss& lib_bias_table = *(lib.bias_table);
                 if (!bias_table)
                 {
-                    bias_table = new BiasBoss(glob_bias_table);
+                    bias_table = new BiasBoss(lib_bias_table);
                 }
                 else
                 {
-                    glob_bias_table.copy_expectations(*bg_table);
-                    bg_table->copy_observations(glob_bias_table);                    
+                    lib_bias_table.copy_expectations(*bg_table);
+                    bg_table->copy_observations(lib_bias_table);                    
                     delete bias_table;
                     bias_table = bg_table;
                 }

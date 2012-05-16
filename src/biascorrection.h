@@ -136,6 +136,7 @@ class BiasBoss
      */
     BiasBoss(double alpha);
         
+    //DOC
     void copy_observations(const BiasBoss& other);
     void copy_expectations(const BiasBoss& other);
     

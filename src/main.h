@@ -16,26 +16,11 @@
 
 #define foreach BOOST_FOREACH
 
+class MapParser;
 class TargetTable;
 class BiasBoss;
 class MismatchTable;
 class FLD;
-
-/**
- * a struct for holding pointers to the global parameter tables (bias_table, mismatch_table, fld)
- */
-struct Globals
-{
-    FLD* fld;
-    MismatchTable* mismatch_table;
-    BiasBoss* bias_table;
-    TargetTable* targ_table;
-};
-
-/**
- * a global pseudo-random number generator
- */ 
-//extern boost::mt19937 random_gen;
 
 /**
  * a global bool that is true when processing is still occuring

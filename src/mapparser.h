@@ -20,7 +20,7 @@ class ParseThreadSafety;
 class Fragment;
 class FragHit;
 class TargetTable;
-
+class Library;
 
 typedef boost::unordered_map<std::string, size_t> TransIndex;
 
@@ -337,7 +337,7 @@ public:
 
 
 /**
- * The ThreadedMapParser class is meant to be run on as a separate thread from the main processing.
+ * The MapParser class is meant to be run on as a separate thread from the main processing.
  * Once started, this thread will read input from a file or stream in SAM/BAM format, parse, and collect 
  * read alignments into fragment alignments, and fragment alignments into fragments, which are placed on a
  * buffer for the processing thread.  Once the processing thread copies the fragment address from the buffer,
@@ -346,7 +346,7 @@ public:
  *  @date      2011
  *  @copyright Artistic License 2.0
  **/
-class ThreadedMapParser
+class MapParser
 {
     /**
      * a private pointer to the Parser object that will read the input in SAM/BAM format
@@ -358,6 +358,11 @@ class ThreadedMapParser
      */
     Writer* _writer;
     
+    //DOC
+    std::string _in_file;
+    
+    Library* _lib;
+    
     /**
      * a private boolean specifying whether to output the modified alignments
      */
@@ -365,26 +370,28 @@ class ThreadedMapParser
     
 public:
     /**
-     * ThreadedMapParser constructor determines what format the input is in and initializes the correct parser.
+     * MapParser constructor determines what format the input is in and initializes the correct parser.
      * @param input_file string containing the path to the input SAM/BAM file
      * @param output_file string containing the path the output file less its extension (empty if writing is to be disabled)
      */
-    ThreadedMapParser(std::string input_file, std::string output_file, bool write_active);
+    MapParser(std::string input_file, std::string output_file, Library* lib, bool write_active);
     
     /**
-     * ThreadedMapParser destructor deletes the parser and writer (if it exists).
+     * MapParser destructor deletes the parser and writer (if it exists).
      */
-    ~ThreadedMapParser();
+    ~MapParser();
+    
+    //DOC
+    std::string& in_file_name() { return _in_file; }
     
     /**
      * a member function that drives the parse thread
      * when all valid mappings of a fragment have been parsed, its mapped targets are found and the information
      * is passed in a Fragment object to the processing thread through the ParseThreadSafety struct
-     * @param thread_safety a pointer to the struct containing shared locks and data with the processing thread
-     * @param targ_table a pointer to the table of Target objects to lookup the mapped targets
-     DOC
+     * @param thread_safety a pointer to the struct containing shared queues with the processing thread
+     * @param stop_at a size_t indicating how many reads to process before stopping (disabled if 0)
      */
-    void threaded_parse(ParseThreadSafety* thread_safety, TargetTable* targ_table, size_t stop_at=0);
+    void threaded_parse(ParseThreadSafety* thread_safety, size_t stop_at=0);
     
     /**
      * a member function that returns the target-to-index map

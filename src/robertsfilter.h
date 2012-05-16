@@ -13,6 +13,8 @@
 #include <vector>
 #include <boost/unordered_set.hpp>
 
+//DOC
+
 static size_t DEFAULT_LOC_SIZE = 10000;
 static size_t DEFAULT_GLOB_SIZE = 100000;
 

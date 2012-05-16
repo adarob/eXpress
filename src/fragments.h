@@ -18,6 +18,7 @@
 #include "sequence.h"
 
 typedef size_t TargID;
+class Library;
 class Target;
 class TargetTable;
 
@@ -158,8 +159,10 @@ struct FragHit
         return LEFT_ONLY;
     }
     
+    //DOC
     double probability;
     
+    //DOC
     BamTools::BamAlignment bam_l;
     BamTools::BamAlignment bam_r;
     std::string sam_l;
@@ -192,7 +195,11 @@ class Fragment
      */
     std::string _name;
     
+    //DOC
     double _mass;
+    
+    //DOC
+    Library* _lib;
     
     /**
      * a private function that searches for the mate of the given read mapping
@@ -204,12 +211,14 @@ class Fragment
 
 public:
     
-    Fragment(double mass=0);
+    Fragment(Library* lib);
     
     /**
      * Fragment destructor deletes all FragHit objects pointed to by the Fragment
      */
     ~Fragment();
+    
+    const Library* lib() { return _lib; }
     
     /**
      * a member function that adds a new FragHit (single read at this point) to the Fragment
@@ -245,9 +254,11 @@ public:
      */
     const FragHit* sample_hit() const;
     
+    //DOC
     void mass(double m) { _mass = m; }
     double mass() const { return _mass; }
 
+    //DOC
     void sort_hits();
 };
 

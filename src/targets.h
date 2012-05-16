@@ -24,6 +24,7 @@ class FLD;
 class FragHit;
 class BiasBoss;
 class MismatchTable;
+class Librarian;
 
 /**
  *  The RoundParams struct stores the target parameters unique to a given round (iteration) of EM
@@ -78,7 +79,7 @@ class Target
     /**
      * a private pointer to the struct containing pointers to the global parameter tables (bias_table, mismatch_table, fld)
      */
-    const Globals* _globs;
+    const Librarian* _libs;
     
     /**
      * a private TargID that stores the hashed target name
@@ -174,11 +175,11 @@ public:
      * Target Constructor
      * @param name a string that stores the target name
      * @param seq a string that stores the target sequence
-     * @param DOC
+     * @param prob_seq a bool that specifies if the sequence is to be treated probablistically (for RDD detection)
      * @param alpha a double that specifies the intial pseudo-counts (non-logged)
      * @param globs a pointer to the struct containing pointers to the global parameter tables (bias_table, mismatch_table, fld)
      */
-    Target(const size_t id, const std::string& name, const std::string& seq, bool prob_seq, double alpha, const Globals* globs);
+    Target(const size_t id, const std::string& name, const std::string& seq, bool prob_seq, double alpha, const Librarian* libs);
     
     /**
      * Target Destructor deletes bias vectors
@@ -374,7 +375,7 @@ class TargetTable
     /**
      * a private pointer to the struct containing pointers to the global parameter tables (bias_table, mismatch_table, fld)
      */
-    Globals* _globs;
+    const Librarian* _libs;
         
     /**
      * a private map to look up pointers to Target objects by their TargID id
@@ -406,7 +407,7 @@ class TargetTable
      * a private function that validates and adds a target pointer to the table
      * @param name the name of the trancript
      * @param seq the sequence of the target
-     * @param DOC
+     * @param prob_seqs a bool that specifies if the sequence is to be treated probablistically (for RDD detection)
      * @param alpha a double that specifies the initial pseudo-counts for each bp of the target (non-logged)
      * @param targ_index the target-to-index map from the alignment file
      * @param targ_lengths the target-to-length map from the alignment file (for validation)
@@ -419,12 +420,12 @@ public:
      * @param targ_fasta_file a string storing the path to the fasta file from which to load targets
      * @param targ_index the target-to-index map from the alignment file
      * @param targ_lengths the target-to-length map from the alignment file
-     * @param DOC
+     * @param prob_seqs a bool that specifies if the sequence is to be treated probablistically (for RDD detection)
      * @param alpha a double that specifies the intial pseudo-counts for each bp of the targets (non-logged)
      * @param alpha_map an optional pointer to a map object that specifies proportional weights of pseudo-counts for each target
      * @param globs a pointer to the struct containing pointers to the global parameter tables (bias_table, mismatch_table, fld)
      */
-    TargetTable(const std::string& targ_fasta_file, const TransIndex& targ_index, const TransIndex& targ_lengths, bool prob_seqs, double alpha, const AlphaMap* alpha_map, Globals* globs);
+    TargetTable(const std::string& targ_fasta_file, bool prob_seqs, double alpha, const AlphaMap* alpha_map, const Librarian* libs);
     
     /**
      * TargetTable Destructor

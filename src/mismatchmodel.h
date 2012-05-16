@@ -16,7 +16,7 @@ class Target;
 /** 
  * The MismatchTable class is used to store and update mismatch (error) parameters using a first-order
  * Markov model based on nucleotide and position in a ride and to return likelihoods of mismatches in given reads.  
- * All values are stored and returned in log space. 
+ * All values are stored and returned in log space. DOC
  *  @author    Adam Roberts
  *  @date      2011
  *  @copyright Artistic License 2.0
@@ -80,9 +80,11 @@ public:
      * @param f the fragment mapping 
      * @param p the logged posterior probablity of the alignment
      * @param mass the logged mass of the fragment
+     DOC
      */
     void update(const FragHit&, double p, double mass);
     
+    //DOC
     void fix();
     
     /**

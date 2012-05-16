@@ -119,9 +119,11 @@ public:
      */ 
     void set_logged(bool logged);
     
+    //DOC
     void fix();
     bool is_fixed() const { return _fixed; }
     
+    //DOC
     size_t mode(size_t i) const;
 };
 
@@ -140,8 +142,6 @@ template <class T>
 T FrequencyMatrix<T>::operator()(size_t i, size_t j, bool normalized) const
 {
     assert(i*_N+j < _M*_N);
-//    assert(!std::isnan(_array[i*_N+j]));
-//    assert(!std::isnan(_rowsums[i]));
     if (_fixed || !normalized)
         return _array[i*_N+j];
     if (_logged)

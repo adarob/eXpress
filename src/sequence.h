@@ -12,6 +12,8 @@
 #include <string>
 #include "frequencymatrix.h"
 
+//DOC
+
 /**
  * function to encode a nucleotide character to a size_t value
  * @param c the nucleotide character to be encoded

@@ -26,6 +26,7 @@
 #include "mapparser.h"
 #include "threadsafety.h"
 #include "robertsfilter.h"
+#include "library.h"
 
 #ifndef WIN32
     #include "update_check.h"
@@ -50,8 +51,7 @@ size_t stop_at = 0;
 // file location parameters
 string output_dir = ".";
 string fasta_file_name = "";
-string in_map_file_name = "";
-string out_map_file_name = "";
+string in_map_file_names = "";
 
 // intial pseudo-count parameters (non-logged)
 double expr_alpha = .1;
@@ -69,7 +69,8 @@ bool edit_detect = false;
 bool error_model = true;
 bool bias_correct = true;
 bool calc_covar = false;
-bool output_alignments = false;
+bool output_align_prob = false;
+bool output_align_samp = false;
 bool output_running_rounds = false;
 bool output_running_reads = false;
 size_t num_threads = 2;
@@ -154,7 +155,7 @@ bool parse_options(int ac, char ** av)
     ("forget-param,f", po::value<double>(&ff_param)->default_value(ff_param),"")
     ("expr-alpha", po::value<double>(&expr_alpha)->default_value(expr_alpha),"")
     ("stop-at", po::value<size_t>(&stop_at)->default_value(0),"")
-    ("sam-file", po::value<string>(&in_map_file_name)->default_value(""),"")
+    ("sam-file", po::value<string>(&in_map_file_names)->default_value(""),"")
     ("fasta-file", po::value<string>(&fasta_file_name)->default_value(""),"")
     ;
     
@@ -213,7 +214,7 @@ bool parse_options(int ac, char ** av)
     {
         if (direction != BOTH)
         {
-            cerr << "fr-stranded and rf-stranded flags cannot both be specified in the same run.\n";
+            cerr << "ERROR fr-stranded and rf-stranded flags cannot both be specified in the same run.\n";
             return 1;
         }
         direction = RF;
@@ -223,11 +224,19 @@ bool parse_options(int ac, char ** av)
     calc_covar = vm.count("calc-covar");
     bias_correct = !(vm.count("no-bias-correct"));
     error_model = !(vm.count("no-error-model"));
+    output_align_prob = vm.count("output-align-prob");
+    output_align_samp = vm.count("output-align-samp");
     output_running_rounds = vm.count("output-running-rounds");
     output_running_reads = vm.count("output-running-reads");
     batch_mode = vm.count("batch-mode");
     online_additional = vm.count("additional-online");
     both = vm.count("both");
+    
+    if (output_align_prob && output_align_samp)
+    {
+        cerr << "ERROR: Cannot output both alignment probabilties and sampled alignments.";
+        return 1;
+    }
     
     if (num_threads < 2)
         num_threads = 0;
@@ -235,18 +244,8 @@ bool parse_options(int ac, char ** av)
     if (num_threads > 0)
         num_threads -= edit_detect;
     
-    if (remaining_rounds > 0 && in_map_file_name != "")
+    if (remaining_rounds > 0 && in_map_file_names != "")
         last_round = false;
-
-    if (vm.count("output-align-prob"))
-    {
-        out_map_file_name = output_dir + "/hits.prob";
-    }
-    
-    if (vm.count("output-align-samp"))
-    {
-        out_map_file_name = output_dir + "/hits.samp";
-    }
     
     if (prior_file != "")
     {
@@ -267,9 +266,11 @@ bool parse_options(int ac, char ** av)
  * @param frag_p pointer to the fragment to probabilistically assign
  * @param globs a pointer to the struct containing pointers to the global parameter tables (bias_table, mismatch_table, fld)
  */
-void process_fragment(Fragment* frag_p, Globals& globs)
+void process_fragment(Fragment* frag_p)
 {
     Fragment& frag = *frag_p;
+    const Library& lib = *frag.lib();
+    
     frag.sort_hits();
     double mass_n = frag.mass();
     
@@ -283,7 +284,6 @@ void process_fragment(Fragment* frag_p, Globals& globs)
     double total_mass = HUGE_VAL;
     double total_variance = HUGE_VAL;
     size_t num_solvable = 0;
-    
     
     boost::unordered_set<Target*> targ_set;
 
@@ -331,7 +331,7 @@ void process_fragment(Fragment* frag_p, Globals& globs)
         FragHit& m = *frag.hits()[i];
         Target* t  = m.mapped_targ;
  
-        bundle = globs.targ_table->merge_bundles(bundle, t->bundle());
+        bundle = lib.targ_table->merge_bundles(bundle, t->bundle());
         
         double p = likelihoods[i]-total_likelihood;
         double mass_t = mass_n + p;
@@ -357,14 +357,14 @@ void process_fragment(Fragment* frag_p, Globals& globs)
             {
                 t->solvable(true);
             }
-            if ((!burned_out || edit_detect) && globs.mismatch_table)
-                    (globs.mismatch_table)->update(m, p, mass_n);
+            if ((!burned_out || edit_detect) && lib.mismatch_table)
+                    (lib.mismatch_table)->update(m, p, lib.mass_n);
             if (!burned_out)
             {
                 if (m.pair_status() == PAIRED)
-                    (globs.fld)->add_val(m.length(), mass_t);
-                if (globs.bias_table)
-                    (globs.bias_table)->update_observed(m, mass_t);
+                    (lib.fld)->add_val(m.length(), p+lib.mass_n);
+                if (lib.bias_table)
+                    (lib.bias_table)->update_observed(m, p+lib.mass_n);
             }
         }
         
@@ -381,7 +381,7 @@ void process_fragment(Fragment* frag_p, Globals& globs)
                 if ((first_round && last_round) || online_additional)
                     covar += 2*mass_n;
                 
-                globs.targ_table->update_covar(m.targ_id, m2.targ_id, covar); 
+                lib.targ_table->update_covar(m.targ_id, m2.targ_id, covar); 
             }
         }
     }
@@ -392,14 +392,14 @@ void process_fragment(Fragment* frag_p, Globals& globs)
     }
 }
 
-void proc_thread(ParseThreadSafety* pts, Globals* globs)
+void proc_thread(ParseThreadSafety* pts)
 {
     while (true)
     {
         Fragment* frag = pts->proc_on.pop();
         if (!frag)
             break;
-        process_fragment(frag, *globs);
+        process_fragment(frag);
         pts->proc_out.push(frag);
     }
 }
@@ -412,11 +412,9 @@ void proc_thread(ParseThreadSafety* pts, Globals* globs)
  * @param globs a struct containing pointers to the global parameter tables (bias_table, mismatch_table, fld)
  * @return the total number of fragments processed
  */
-size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TargetTable* targ_table, Globals& globs)
+size_t threaded_calc_abundances(Librarian& libs)
 {
     cout << "Processing input fragment alignments...\n";
-    
-    vector<boost::thread*> thread_pool;
     boost::thread* bias_update = NULL;
     
     RobertsFilter frags_seen;
@@ -430,131 +428,139 @@ size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TargetTable* targ
     size_t i = 1;
     size_t j = 6;
     
-    
     Fragment* frag;
     
     while (true)
     {
-        boost::mutex bu_mut;
-        running = true;
-        ParseThreadSafety pts(max((int)num_threads,10));
-        boost::thread parse(&ThreadedMapParser::threaded_parse, &map_parser, &pts, targ_table, stop_at);
-        
-        if (burned_out)
+        for (size_t l = 0; l < libs.size(); l++)
         {
-            for(size_t i=0; i < thread_pool.size(); i++)
-            {
-                thread_pool[i] = new boost::thread(proc_thread, &pts, &globs);
-            }
-        }
-        
-        while(true)
-        {
-            frag = pts.proc_in.pop();
-            if (frag && frags_seen.test_and_push(frag->name()))
-            {
-                cerr << "ERROR: Alignments are not properly sorted. Read '" << frag->name() << "' has alignments which are non-consecutive.\n" ; 
-                exit(1);  
-            }
-            if (num_threads && burned_out)
-            {
-                if (!frag)
-                {
-                    for(size_t i = 0; i < thread_pool.size(); ++i)
-                    {
-                        pts.proc_on.push(NULL);
-                    }
-                    break;
-                }
-
-                frag->mass(mass_n);
-                pts.proc_on.push(frag);    
-            }
-            else
-            {
-                if (!frag)
-                {
-                    break;
-                }
-                {
-                    frag->mass(mass_n);
-                    boost::unique_lock<boost::mutex> lock(bu_mut);
-                    process_fragment(frag, globs);
-                    pts.proc_out.push(frag);
-                }
-            }
-                    
-            if (n == burn_in)
-            {
-                bias_update = new boost::thread(&TargetTable::threaded_bias_update, targ_table, &bu_mut);
-                if (globs.mismatch_table)
-                    (globs.mismatch_table)->activate();
-            }
-            if (n == burn_out)
-            {
-                (globs.mismatch_table)->fix();
-                burned_out = true;
-                thread_pool = vector<boost::thread*>(num_threads);
-                for(size_t i=0; i < thread_pool.size(); i++)
-                {
-                    thread_pool[i] = new boost::thread(proc_thread, &pts, &globs);
-                }
-            }
+            Library& lib = libs[l];
+            libs.set_curr(l);
+            MapParser& map_parser = *lib.map_parser;
+            boost::mutex bu_mut;
+            running = true;
+            ParseThreadSafety pts(max((int)num_threads,10));
+            boost::thread parse(&MapParser::threaded_parse, &map_parser, &pts, stop_at);
+            vector<boost::thread*> thread_pool;
             
-            if (output_running_reads && n == i*pow(10.,(double)j))
-            {
-                boost::unique_lock<boost::mutex> lock(bu_mut);
-                char buff[500];
-                sprintf(buff, "%s/x_" SIZE_T_FMT "", output_dir.c_str(), n);
-                cout << "Writing results to " << buff << endl;
-                string dir(buff);
-                try { fs::create_directories(dir); }
-                catch (fs::filesystem_error& e)
-                {
-                    cerr << e.what() << endl;
-                    exit(1);
-                }
-                targ_table->output_results(dir, n);
+            burned_out = lib.n >= burn_out;
                 
-                ofstream paramfile((dir + "/params.xprs").c_str());
-                (globs.fld)->append_output(paramfile);
-                if (globs.mismatch_table)
-                    (globs.mismatch_table)->append_output(paramfile);
-                if (globs.bias_table)
-                    (globs.bias_table)->append_output(paramfile);
-                paramfile.close();
-
-                if (i++ == 9)
-                {
-                    i = 1;
-                    j++;
-                }
-            }
-            
-            num_frags++;
-            
-            // Output progress
-            if (num_frags % 1000000 == 0)
+            while(true)
             {
-                cout << "Fragments Processed: " << setw(9) << num_frags << "\t Number of Bundles: "<< targ_table->num_bundles() << endl;
-            }
-            n++;
-            mass_n += ff_param*log((double)n-1) - log(pow(n,ff_param) - 1);
-        }
-    
-        running = false;
 
-        parse.join();
-        foreach(boost::thread* t, thread_pool)
-        {
-            t->join();
-        }
+                if (lib.n == burn_in)
+                {
+                    bias_update = new boost::thread(&TargetTable::threaded_bias_update, lib.targ_table, &bu_mut);
+                    if (lib.mismatch_table)
+                        (lib.mismatch_table)->activate();
+                }
+                if (lib.n == burn_out)
+                {
+                    (lib.mismatch_table)->fix();
+                    burned_out = true;
+                }
+                
+                if (burned_out && thread_pool.size() == 0)
+                {
+                    thread_pool = vector<boost::thread*>(num_threads);
+                    for(size_t k=0; k < thread_pool.size(); k++)
+                    {
+                        thread_pool[k] = new boost::thread(proc_thread, &pts);
+                    }
+                }
+                
+                frag = pts.proc_in.pop();
+                if (frag && frags_seen.test_and_push(frag->name()))
+                {
+                    cerr << "ERROR: Alignments are not properly sorted. Read '" << frag->name() << "' has alignments which are non-consecutive.\n" ; 
+                    exit(1);  
+                }
+                if (num_threads && burned_out)
+                {
+                    if (!frag)
+                    {
+                        for(size_t k = 0; k < thread_pool.size(); ++k)
+                        {
+                            pts.proc_on.push(NULL);
+                        }
+                        break;
+                    }
+
+                    frag->mass(mass_n);
+                    pts.proc_on.push(frag);    
+                }
+                else
+                {
+                    if (!frag)
+                    {
+                        break;
+                    }
+                    {
+                        frag->mass(mass_n);
+                        boost::unique_lock<boost::mutex> lock(bu_mut);
+                        process_fragment(frag);
+                        pts.proc_out.push(frag);
+                    }
+                }
+                        
+                if (output_running_reads && n == i*pow(10.,(double)j))
+                {
+                    boost::unique_lock<boost::mutex> lock(bu_mut);
+                    char buff[500];
+                    sprintf(buff, "%s/x_" SIZE_T_FMT "", output_dir.c_str(), n);
+                    cout << "Writing results to " << buff << endl;
+                    string dir(buff);
+                    try { fs::create_directories(dir); }
+                    catch (fs::filesystem_error& e)
+                    {
+                        cerr << e.what() << endl;
+                        exit(1);
+                    }
+                    lib.targ_table->output_results(dir, n);
+                    
+                    sprintf(buff, "%s/params.%d.xprs", dir.c_str(), (int)l+1);
+                    ofstream paramfile(buff);
+                    (lib.fld)->append_output(paramfile);
+                    if (lib.mismatch_table)
+                        (lib.mismatch_table)->append_output(paramfile);
+                    if (lib.bias_table)
+                        (lib.bias_table)->append_output(paramfile);
+                    paramfile.close();
+
+                    if (i++ == 9)
+                    {
+                        i = 1;
+                        j++;
+                    }
+                }
+                
+                num_frags++;
+                
+                // Output progress
+                if (num_frags % 1000000 == 0)
+                {
+                    cout << "Fragments Processed (" << map_parser.in_file_name() << "): " << setw(9) << num_frags << "\t Number of Bundles: "<< lib.targ_table->num_bundles() << endl;
+                }
+                n++;
+                lib.n++;
+                mass_n += ff_param*log((double)n-1) - log(pow(n,ff_param) - 1);
+                lib.mass_n += ff_param*log((double)lib.n-1) - log(pow(lib.n,ff_param) - 1);
+            }
         
-        if (bias_update)
-        {
-            bias_update->join();
-            delete bias_update;
-            bias_update = NULL;
+            running = false;
+
+            parse.join();
+            foreach(boost::thread* t, thread_pool)
+            {
+                t->join();
+            }
+            
+            if (bias_update)
+            {
+                bias_update->join();
+                delete bias_update;
+                bias_update = NULL;
+            }
         }
         
         if (online_additional && remaining_rounds--)
@@ -570,13 +576,16 @@ size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TargetTable* targ
                     cerr << e.what() << endl;
                     exit(1);
                 }
-                targ_table->output_results(dir, num_frags);
+                libs[0].targ_table->output_results(dir, num_frags);
             }
             cout << remaining_rounds << " remaining rounds." << endl;
             first_round = false;
             last_round = (remaining_rounds==0 && !both);
-            map_parser.write_active(last_round);
-            map_parser.reset_reader();
+            for (size_t l = 0; l < libs.size(); l++)
+            {
+                libs[l].map_parser->write_active(last_round);
+                libs[l].map_parser->reset_reader();
+            }
             num_frags = 0;
         }
         else
@@ -586,7 +595,7 @@ size_t threaded_calc_abundances(ThreadedMapParser& map_parser, TargetTable* targ
     }
         
  
-    cout << "COMPLETED: Processed " << num_frags << " mapped fragments, targets are in " << targ_table->num_bundles() << " bundles\n";
+    cout << "COMPLETED: Processed " << num_frags << " mapped fragments, targets are in " << libs[0].targ_table->num_bundles() << " bundles\n";
     
     return num_frags;
 }
@@ -613,16 +622,46 @@ int main (int argc, char ** argv)
         exit(1);
     }
     
-    Globals globs;
-    globs.fld = new FLD(fld_alpha, def_fl_max, def_fl_mean, def_fl_stddev);
-    globs.mismatch_table = (error_model) ? new MismatchTable(mm_alpha):NULL;
     
-    ThreadedMapParser map_parser(in_map_file_name, out_map_file_name, last_round);
-    globs.bias_table = (bias_correct) ? new BiasBoss(bias_alpha):NULL;
-    TargetTable targ_table(fasta_file_name, map_parser.targ_index(), map_parser.targ_lengths(), edit_detect, expr_alpha, expr_alpha_map, &globs);
-    globs.targ_table = &targ_table;
+    vector<string> file_names;
+    char buff[999];
+    strcpy(buff, in_map_file_names.c_str());
+    char * pch = strtok (buff,",");
+    while (pch != NULL)
+    {
+        file_names.push_back(pch);
+        pch = strtok (NULL, ",");
+    }
+
+    Librarian libs(file_names.size());
+    for(size_t i = 0; i < file_names.size(); ++i)
+    {
+        char out_map_file_name[500] = "";
+        if (output_align_prob)
+            sprintf(out_map_file_name, "%s/hits.%d.prob", output_dir.c_str(), (int)i+1);
+        if (output_align_samp)
+            sprintf(out_map_file_name, "%s/hits.%d.samp", output_dir.c_str(), (int)i+1);
+        
+        if (i > 0 && (libs[i].map_parser->targ_index() != libs[i-1].map_parser->targ_index() || libs[i].map_parser->targ_lengths() != libs[i-1].map_parser->targ_lengths()))
+        {
+            cerr << "ERROR: Alignment file headers do not match for '" << file_names[i-1] << "' and '" << file_names[i] << "'.";
+            exit(1);
+        }
+        
+        libs[i].map_parser = new MapParser(file_names[i], string(out_map_file_name), &libs[i], last_round);
+        libs[i].fld = new FLD(fld_alpha, def_fl_max, def_fl_mean, def_fl_stddev);
+        libs[i].mismatch_table = (error_model) ? new MismatchTable(mm_alpha):NULL;
+        libs[i].bias_table = (bias_correct) ? new BiasBoss(bias_alpha):NULL;
+    }
     
-    double num_targ = (double)map_parser.targ_index().size();
+    TargetTable targ_table(fasta_file_name, edit_detect, expr_alpha, expr_alpha_map, &libs);
+    for (size_t i = 0; i < libs.size(); ++i)
+    {
+        libs[i].targ_table = &targ_table;
+        if (bias_correct)
+            libs[i].bias_table->copy_expectations(*(libs.curr_lib().bias_table));
+    }
+    double num_targ = (double)targ_table.size();
     
     if (calc_covar && (double)SSIZE_MAX < num_targ*(num_targ+1))
     {
@@ -630,7 +669,7 @@ int main (int argc, char ** argv)
         calc_covar = false;
     }
     
-    size_t tot_counts = threaded_calc_abundances(map_parser, &targ_table, globs);
+    size_t tot_counts = threaded_calc_abundances(libs);
     
     if (both)
     {
@@ -659,23 +698,30 @@ int main (int argc, char ** argv)
         remaining_rounds--;
         cout << "\nRe-estimating counts with additional round of EM (" << remaining_rounds << " remaining)...\n";
         last_round = (remaining_rounds == 0);
-        map_parser.write_active(last_round);
-        map_parser.reset_reader();
-        tot_counts = threaded_calc_abundances(map_parser, &targ_table, globs);
+        for (size_t l = 0; l < libs.size(); l++)
+        {
+            libs[l].map_parser->write_active(last_round);
+            libs[l].map_parser->reset_reader();
+        }
+        tot_counts = threaded_calc_abundances(libs);
         targ_table.round_reset();
     }
     
 	cout << "Writing results to file...\n";
     
     targ_table.output_results(output_dir, tot_counts, calc_covar, edit_detect);
-    ofstream paramfile((output_dir + "/params.xprs").c_str());
-    (globs.fld)->append_output(paramfile);
-    if (globs.mismatch_table)
-        (globs.mismatch_table)->append_output(paramfile);
-    if (globs.bias_table)
-        (globs.bias_table)->append_output(paramfile);
-    paramfile.close();
-    
+    for (size_t i=0; i < libs.size(); ++i)
+    {
+        char paramfile_name[500];
+        sprintf(paramfile_name, "%s/params.%d.xprs", output_dir.c_str(), (int)i+1);
+        ofstream paramfile(paramfile_name);
+        (libs[i].fld)->append_output(paramfile);
+        if (libs[i].mismatch_table)
+            (libs[i].mismatch_table)->append_output(paramfile);
+        if (libs[i].bias_table)
+            (libs[i].bias_table)->append_output(paramfile);
+        paramfile.close();
+    }
     cout << "Done\n";
     
     return 0;

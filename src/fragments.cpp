@@ -10,11 +10,10 @@
 #include "main.h"
 #include <string.h>
 #include <stdlib.h>
-//#include <boost/random/discrete_distribution.hpp>
 
 using namespace std;
 
-Fragment::Fragment(double mass) : _mass(mass) {}
+Fragment::Fragment(Library* lib) : _lib(lib) {}
 
 Fragment::~Fragment()
 {

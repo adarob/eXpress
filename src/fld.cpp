@@ -52,6 +52,7 @@ size_t FLD::min_val() const
 
 void FLD::add_val(size_t len, double mass)
 {
+    assert(!isnan(mass));
     if (len > max_val()) len = max_val();
     if (len < _min) _min = len;
     
@@ -68,6 +69,7 @@ void FLD::add_val(size_t len, double mass)
         }
         offset++;
     }
+    
 }
 
 double FLD::pdf(size_t len) const

@@ -11,6 +11,7 @@
 #include "fragments.h"
 #include "targets.h"
 #include "threadsafety.h"
+#include "library.h"
 
 using namespace std;
 
@@ -94,8 +95,8 @@ size_t cigar_length(vector<BamTools::CigarOp>& cigar_vec, vector<Indel>& inserts
     return j;
 }
 
-ThreadedMapParser::ThreadedMapParser(string in_file, string out_file, bool write_active) 
-: _write_active(write_active)
+MapParser::MapParser(string in_file, string out_file, Library* lib, bool write_active) 
+: _in_file(in_file), _lib(lib), _write_active(write_active)
 {
     
     bool is_sam = false;
@@ -158,25 +159,28 @@ ThreadedMapParser::ThreadedMapParser(string in_file, string out_file, bool write
     }
 }
 
-ThreadedMapParser::~ThreadedMapParser()
+MapParser::~MapParser()
 {
     delete _parser;
     if (_writer)
         delete _writer;
 }
 
-void ThreadedMapParser::threaded_parse(ParseThreadSafety* thread_safety_p, TargetTable* targ_table, size_t stop_at)
+void MapParser::threaded_parse(ParseThreadSafety* thread_safety_p, size_t stop_at)
 {
     ParseThreadSafety& pts = *thread_safety_p;
     bool fragments_remain = true;
     size_t n = 0;
     size_t still_out = 0;
+    
+    TargetTable& targ_table = *(_lib->targ_table);
+    
     while (!stop_at || n < stop_at)
     {
         Fragment* frag = NULL;
         while (fragments_remain)
         {
-            frag = new Fragment(); 
+            frag = new Fragment(_lib); 
             fragments_remain = _parser->next_fragment(*frag);
             if (frag->num_hits())
                 break;
@@ -186,7 +190,7 @@ void ThreadedMapParser::threaded_parse(ParseThreadSafety* thread_safety_p, Targe
         for (size_t i = 0; frag && i < frag->hits().size(); ++i)
         {
             FragHit& m = *(frag->hits()[i]);
-            Target* t = targ_table->get_targ(m.targ_id);
+            Target* t = targ_table.get_targ(m.targ_id);
             if (!t)
             {
                 cerr << "ERROR: Target sequence at index '" << m.targ_id << "' not found. Verify that it is in the SAM/BAM header and FASTA file.\n";

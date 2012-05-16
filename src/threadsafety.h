@@ -12,6 +12,8 @@
 #include <boost/thread.hpp>
 #include <queue>
 
+//DOC
+
 class Fragment;
 
 class ThreadSafeFragQueue
