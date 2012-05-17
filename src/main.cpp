@@ -403,6 +403,40 @@ void proc_thread(ParseThreadSafety* pts)
     }
 }
 
+void output_results(Librarian& libs, size_t tot_counts, int n=-1)
+{
+    char buff[500];
+    string dir = output_dir;
+    if (n >= 0)
+    {
+        sprintf(buff, "%s/x_%d", output_dir.c_str(), n);
+        cout << "Writing results to " << buff << endl;
+        dir = string(buff);
+        try { fs::create_directories(dir); }
+        catch (fs::filesystem_error& e)
+        {
+            cerr << e.what() << endl;
+            exit(1);
+        }
+    }
+    libs[0].targ_table->output_results(dir, tot_counts, last_round&calc_covar, last_round&edit_detect);
+    
+    for (size_t l = 0; l < libs.size(); l++)
+    {
+        if (libs.size() > 0)
+            sprintf(buff, "%s/params.%d.xprs", dir.c_str(), (int)l+1);
+        else
+            sprintf(buff, "%s/params.xprs", dir.c_str());
+        ofstream paramfile(buff);
+        (libs[l].fld)->append_output(paramfile);
+        if (libs[l].mismatch_table)
+            (libs[l].mismatch_table)->append_output(paramfile);
+        if (libs[l].bias_table)
+            (libs[l].bias_table)->append_output(paramfile);
+        paramfile.close();
+    }
+}
+
 /**
  * This is the driver function for the main processing thread.  This function keeps track of the current fragment mass and sends fragments to be
  * processed once they are passed by the parsing thread.
@@ -505,27 +539,7 @@ size_t threaded_calc_abundances(Librarian& libs)
                 if (output_running_reads && n == i*pow(10.,(double)j))
                 {
                     boost::unique_lock<boost::mutex> lock(bu_mut);
-                    char buff[500];
-                    sprintf(buff, "%s/x_" SIZE_T_FMT "", output_dir.c_str(), n);
-                    cout << "Writing results to " << buff << endl;
-                    string dir(buff);
-                    try { fs::create_directories(dir); }
-                    catch (fs::filesystem_error& e)
-                    {
-                        cerr << e.what() << endl;
-                        exit(1);
-                    }
-                    lib.targ_table->output_results(dir, n);
-                    
-                    sprintf(buff, "%s/params.%d.xprs", dir.c_str(), (int)l+1);
-                    ofstream paramfile(buff);
-                    (lib.fld)->append_output(paramfile);
-                    if (lib.mismatch_table)
-                        (lib.mismatch_table)->append_output(paramfile);
-                    if (lib.bias_table)
-                        (lib.bias_table)->append_output(paramfile);
-                    paramfile.close();
-
+                    output_results(libs, n, (int)n);
                     if (i++ == 9)
                     {
                         i = 1;
@@ -566,17 +580,9 @@ size_t threaded_calc_abundances(Librarian& libs)
         {
             if (output_running_rounds)
             {
-                char buff[500];
-                sprintf(buff, "%s/x_" SIZE_T_FMT "", output_dir.c_str(), remaining_rounds);
-                string dir(buff);
-                try { fs::create_directories(dir); }
-                catch (fs::filesystem_error& e)
-                {
-                    cerr << e.what() << endl;
-                    exit(1);
-                }
-                libs[0].targ_table->output_results(dir, num_frags);
+                output_results(libs, n, (int)remaining_rounds);
             }
+            
             cout << remaining_rounds << " remaining rounds." << endl;
             first_round = false;
             last_round = (remaining_rounds==0 && !both);
@@ -592,13 +598,11 @@ size_t threaded_calc_abundances(Librarian& libs)
             break;
         }
     }
-        
- 
+    
     cout << "COMPLETED: Processed " << num_frags << " mapped fragments, targets are in " << libs[0].targ_table->num_bundles() << " bundles\n";
     
     return num_frags;
 }
-
 
 int main (int argc, char ** argv)
 {     
@@ -620,7 +624,6 @@ int main (int argc, char ** argv)
         cerr << "ERROR: cannot create directory " << output_dir << ".\n";
         exit(1);
     }
-    
     
     vector<string> file_names;
     char buff[999];
@@ -683,16 +686,7 @@ int main (int argc, char ** argv)
     {
         if (output_running_rounds)
         {
-            char buff[500];
-            sprintf(buff, "%s/x_" SIZE_T_FMT "", output_dir.c_str(), remaining_rounds);
-            string dir(buff);
-            try { fs::create_directories(dir); }
-            catch (fs::filesystem_error& e)
-            {
-                cerr << e.what() << endl;
-                exit(1);
-            }
-            targ_table.output_results(dir, tot_counts);
+            output_results(libs, tot_counts, (int)remaining_rounds);
         }
         remaining_rounds--;
         cout << "\nRe-estimating counts with additional round of EM (" << remaining_rounds << " remaining)...\n";
@@ -707,20 +701,7 @@ int main (int argc, char ** argv)
     }
     
 	cout << "Writing results to file...\n";
-    
-    targ_table.output_results(output_dir, tot_counts, calc_covar, edit_detect);
-    for (size_t i=0; i < libs.size(); ++i)
-    {
-        char paramfile_name[500];
-        sprintf(paramfile_name, "%s/params.%d.xprs", output_dir.c_str(), (int)i+1);
-        ofstream paramfile(paramfile_name);
-        (libs[i].fld)->append_output(paramfile);
-        if (libs[i].mismatch_table)
-            (libs[i].mismatch_table)->append_output(paramfile);
-        if (libs[i].bias_table)
-            (libs[i].bias_table)->append_output(paramfile);
-        paramfile.close();
-    }
+    output_results(libs, tot_counts);
     cout << "Done\n";
     
     return 0;
