@@ -423,7 +423,7 @@ void output_results(Librarian& libs, size_t tot_counts, int n=-1)
     
     for (size_t l = 0; l < libs.size(); l++)
     {
-        if (libs.size() > 0)
+        if (libs.size() > 1)
             sprintf(buff, "%s/params.%d.xprs", dir.c_str(), (int)l+1);
         else
             sprintf(buff, "%s/params.xprs", dir.c_str());
@@ -450,7 +450,6 @@ size_t threaded_calc_abundances(Librarian& libs)
     cout << "Processing input fragment alignments...\n";
     boost::thread* bias_update = NULL;
     
-    RobertsFilter frags_seen;
     
     size_t n = 1;
     size_t num_frags = 0;
@@ -475,6 +474,7 @@ size_t threaded_calc_abundances(Librarian& libs)
             ParseThreadSafety pts(max((int)num_threads,10));
             boost::thread parse(&MapParser::threaded_parse, &map_parser, &pts, stop_at);
             vector<boost::thread*> thread_pool;
+            RobertsFilter frags_seen;
             
             burned_out = lib.n >= burn_out;
                 
@@ -503,7 +503,7 @@ size_t threaded_calc_abundances(Librarian& libs)
                 }
                 
                 frag = pts.proc_in.pop();
-                if (frag && frags_seen.test_and_push(frag->name()))
+                if (frag && first_round && frags_seen.test_and_push(frag->name()))
                 {
                     cerr << "ERROR: Alignments are not properly sorted. Read '" << frag->name() << "' has alignments which are non-consecutive.\n" ; 
                     exit(1);  
@@ -634,6 +634,9 @@ int main (int argc, char ** argv)
         file_names.push_back(pch);
         pch = strtok (NULL, ",");
     }
+    
+    if (file_names.size() == 0)
+        file_names.push_back("");
 
     Librarian libs(file_names.size());
     for(size_t i = 0; i < file_names.size(); ++i)
