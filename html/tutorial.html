@@ -249,7 +249,7 @@
         or BAM format.  These can either be stored in a file or
         streamed directly from an aligner. It is important that you
         allow as many multi-mappings as possible. You can also allow
-        many mismatches during mapping since eXpress builds an error model to probabalistically assign the reads, although this will increase mapping time.</li>
+        many mismatches during mapping since eXpress builds an error model to probabalistically assign the reads, although this will increase mapping time.  If you are combining reads from several library preparations or from sequencing runs using different read lengths, please see the <a href="manual#sam">Manual</a> for important details on how the alignments should be input.</li>
 		  </ol>
 		  <h2 id="example">An example</h2>
 		  <p>In the following two sub-sections, you will run eXpress on a sample RNA-Seq dataset with simulated reads from UGT3A2 and the HOXC cluster using the human genome build hg18.  Both the transcript sequences (transcripts.fasta) and raw reads (reads_1.fastq, reads_2.fastq) can be found in the <tt>&lt;YOUR_EXPRESS_DIR&gt;/sample_data</tt> directory.  For this example to work, you will need to have both <a href=http://bowtie-bio.sourceforge.net>Bowtie</a> and <a href=http://samtools.sf.net>SAMtools</a> installed, but in general any aligner will work and the conversion to BAM is not necessary unless you have insufficient disk space to store the uncompressed SAM.</p>
