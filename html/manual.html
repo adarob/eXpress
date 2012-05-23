@@ -123,10 +123,10 @@
         <li><a href="#">Download<!--[if IE 7]><!--></a><!--<![endif]-->
           <!--[if lte IE 6]><table><tr><td><![endif]-->
             <ul>
-              <li><a href=downloads/express-1.0.0/express-1.0.0-macosx_x86_64.tgz onClick="_gaq.push(['_trackEvent', 'Downloads', 'Mac', 'Manual']);" target="_blank">Mac OS X (64-bit)</a></li>
-              <li><a href=downloads/express-1.0.0/express-1.0.0-linux_x86_64.tgz onClick="_gaq.push(['_trackEvent', 'Downloads', 'Linux', 'Manual']);" target="_blank">Linux (64-bit)</a></li>
-              <li><a href=downloads/express-1.0.0/express-1.0.0-win32_x86_64.zip onClick="_gaq.push(['_trackEvent', 'Downloads', 'Windows', 'Manual']);" target="_blank">Windows (64-bit)</a></li>
-              <li><a href=downloads/express-1.0.0/express-1.0.0-src.tgz onClick="_gaq.push(['_trackEvent', 'Downloads', 'Source', 'Manual']);" target="_blank">Source Code</a></li>
+              <li><a href=downloads/express-1.1.0/express-1.1.0-macosx_x86_64.tgz onClick="_gaq.push(['_trackEvent', 'Downloads', 'Mac', 'Manual']);" target="_blank">Mac OS X (64-bit)</a></li>
+              <li><a href=downloads/express-1.1.0/express-1.1.0-linux_x86_64.tgz onClick="_gaq.push(['_trackEvent', 'Downloads', 'Linux', 'Manual']);" target="_blank">Linux (64-bit)</a></li>
+              <li><a href=downloads/express-1.1.0/express-1.1.0-win32_x86_64.zip onClick="_gaq.push(['_trackEvent', 'Downloads', 'Windows', 'Manual']);" target="_blank">Windows (64-bit)</a></li>
+              <li><a href=downloads/express-1.1.0/express-1.1.0-src.tgz onClick="_gaq.push(['_trackEvent', 'Downloads', 'Source', 'Manual']);" target="_blank">Source Code</a></li>
               <li><a href="downloads" onClick="_gaq.push(['_trackEvent', 'Downloads', 'Previous','Manual']);">Previous Versions</a></li>
             </ul>
           <!--[if lte IE 6]></td></tr></table></a><![endif]-->
@@ -175,13 +175,13 @@
 	  
 		  <p id="options">The following is a detailed description of the options used to control eXpress:
 		  <table> 
-		  <tr><td WIDTH=30% VALIGN=top><b>Arguments:</b></td><td WIDTH=70% VALIGN=top></td></tr> 
+		  <tr><td WIDTH=40% VALIGN=top><b>Arguments:</b></td><td WIDTH=60% VALIGN=top></td></tr> 
 		  
 		  <tr><td VALIGN=top nowrap><tt>&lt;target_seqs.fasta&gt;</tt></td>
 		  <td VALIGN=top>A file of target sequences in <a href=http://en.wikipedia.org/wiki/FASTA_format>multi-FASTA</a> format. See <a href="#fasta">Input Files</a> for more details.</td></tr> 
 		  
-		  <tr><td VALIGN=top nowrap><tt>&lt;aligned_lib.1.(sam/bam),aligned_lib.2.(sam/bam),...,aligned_lib.N.(sam/bam)&gt;</tt></td>
-		  <td VALIGN=top>A comma-separated list of filenames for reads alignmed to the target sequences in the <a href="http://samtools.sourceforge.net"> 
+		  <tr><td VALIGN=top nowrap><tt>&lt;lib_1.sam,lib_2.sam,...,lib_N.sam&gt;</tt></td>
+		  <td VALIGN=top>A comma-separated list of filenames for reads aligned to the target sequences in <a href="http://samtools.sourceforge.net"> 
 		  SAM format</a>. See <a href="#sam">Input Files</a> for more details.</td></tr> 
 		  
 		  <tr><td VALIGN=top><b>General Options:</b></td><td VALIGN=top></td></tr>
@@ -328,8 +328,8 @@
  	  <tr><th scope="row">3</th><td>Second Read Mismach</td><td>The first-order Markov model for mismatches between the reference and observed nucleotides for the second read sequenced in a pair.</td><td>Same as above.</td></tr> 
 	  <tr><th scope="row">4</th><td>5' Sequence-Specific Bias</td><td>Parameters relating to the likelihood of the sequence surrounding the 5' end of a fragment in transcript coordinates.  See <a href="http://genomebiology.com/2011/12/3/R22/abstract">Roberts, et al. (2010a)</a> for more details.</td><td>This section is divided into 3 subsections.  First is a matrix of the empirical nucleotide distribution for observed fragments ("Observed Marginal Distribution") at each position in a window surrounding the 5' end of the fragment.  The column headers give the 0-indexed position number with negatives being upstream in the target sequence.  Each row gives the probability for a different nucleotide, which is specified in the first column followed by a colon.  Note that since this is a probability distribution, each column will sum to 1.  The second subsection contains the "Observed Conditional Probabilities".  These are the conditional probabilities for the 3rd order Markov model, the columns specifying the conditional event in the observed fragments and the row specifying the window position.  The third matrix is the "Expected Conditional Probabilities".  This matrix is similar to the previous, except the probabilities are calculated assuming target sampling based only on fragment length and relative abundance, and fragment sampling within a target dependent only on length (no sequence biases).  Bias weights in eXpress are calculated by taking the ratio of obesrved to expected probability.</td></tr> 
 	  <tr><th scope="row">5</th><td>3' Sequence-Specific Bias</td><td>Parameters relating to the likelihood of the sequence surrounding the 3' end of a fragment in transcript coordinates.  See <a href="http://genomebiology.com/2011/12/3/R22/abstract">Roberts, et al. (2010a)</a> for more details.</td><td>Same as above, except for the 3' fragment end.</td></tr> 
-	  </table>
-If multiple alignment files were given, a separate parameter output will be output for each with a unique index identifying its position in the command-line argument given by the user (ie, the second SAM file in the argument list will be given the name 'params.2.xprs').</p>
+	  </table></p>
+	  <p>If multiple alignment files were provided, a separate parameter output will be output for each with a unique index identifying its position in the command-line argument given by the user (ie, the second SAM file in the argument list will be named 'params.2.xprs').</p>
 	  
       <h2 id="covar">Count Variance-Covariance (varcov.xprs)</h2>
       <p>This file is produced only when the <tt><a href="options">--calc-covars</a></tt> option flag is used as described <a href="#running">above</a>.  The file contains the estimated variances and covariances on the counts between pairs of targets that shared multi-mapped reads, primarily to be used in differential expression analysis.  Since the covariance between targets in different bundles is always 0, the full sparse matrix is broken up into smaller tab-delimited matrices for each bundle.  An example of this output for the sample dataset used in the <a href=tutorial.html#example>Getting Starting</a> tutorial is shown below:</p>

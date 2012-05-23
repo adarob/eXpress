@@ -421,10 +421,11 @@ void TargetTable::output_results(string output_dir, size_t tot_counts, bool outp
         }        
         
         // Calculate total counts for bundle and bundle-level rho
+        // Do not include pseudo-mass because it will screw up multi-round results
         double l_bundle_mass = HUGE_VAL;
         for (size_t i = 0; i < bundle_targ.size(); ++i)
         {
-            l_bundle_mass = log_sum(l_bundle_mass, bundle_targ[i]->mass()); 
+            l_bundle_mass = log_sum(l_bundle_mass, bundle_targ[i]->mass(false)); 
         }
         
         if (bundle->counts())
@@ -438,7 +439,7 @@ void TargetTable::output_results(string output_dir, size_t tot_counts, bool outp
             for (size_t i = 0; i < bundle_targ.size(); ++i)
             {
                 Target& targ = *bundle_targ[i];
-                double l_targ_frac = targ.mass() - l_bundle_mass;
+                double l_targ_frac = targ.mass(false) - l_bundle_mass;
                 targ_counts[i] = sexp(l_targ_frac + l_bundle_counts);
                 if (targ_counts[i] > (double)targ.tot_counts() || targ_counts[i] < (double)targ.uniq_counts())
                     requires_projection = true;

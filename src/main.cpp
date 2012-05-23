@@ -334,7 +334,6 @@ void process_fragment(Fragment* frag_p)
         bundle = lib.targ_table->merge_bundles(bundle, t->bundle());
         
         double p = likelihoods[i]-total_likelihood;
-        
         double v = HUGE_VAL;
         if (frag.num_hits() > 1)
             v = log_sum(variances[i] - 2*total_mass, total_variance + 2*masses[i] - 4*total_mass);

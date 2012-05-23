@@ -124,10 +124,10 @@
         <li><a href="#">Download<!--[if IE 7]><!--></a><!--<![endif]-->
           <!--[if lte IE 6]><table><tr><td><![endif]-->
             <ul>
-              <li><a href=downloads/express-1.0.0/express-1.0.0-macosx_x86_64.tgz onClick="_gaq.push(['_trackEvent', 'Downloads', 'Mac', 'FAQ']);" target="_blank">Mac OS X (64-bit)</a></li>
-              <li><a href=downloads/express-1.0.0/express-1.0.0-linux_x86_64.tgz onClick="_gaq.push(['_trackEvent', 'Downloads', 'Linux', 'FAQ']);" target="_blank">Linux (64-bit)</a></li>
-              <li><a href=downloads/express-1.0.0/express-1.0.0-win32_x86_64.zip onClick="_gaq.push(['_trackEvent', 'Downloads', 'Windows', 'FAQ']);" target="_blank">Windows (64-bit)</a></li>
-              <li><a href=downloads/express-1.0.0/express-1.0.0-src.tgz onClick="_gaq.push(['_trackEvent', 'Downloads', 'Source', 'FAQ']);" target="_blank">Source Code</a></li>
+              <li><a href=downloads/express-1.1.0/express-1.1.0-macosx_x86_64.tgz onClick="_gaq.push(['_trackEvent', 'Downloads', 'Mac', 'FAQ']);" target="_blank">Mac OS X (64-bit)</a></li>
+              <li><a href=downloads/express-1.1.0/express-1.1.0-linux_x86_64.tgz onClick="_gaq.push(['_trackEvent', 'Downloads', 'Linux', 'FAQ']);" target="_blank">Linux (64-bit)</a></li>
+              <li><a href=downloads/express-1.1.0/express-1.1.0-win32_x86_64.zip onClick="_gaq.push(['_trackEvent', 'Downloads', 'Windows', 'FAQ']);" target="_blank">Windows (64-bit)</a></li>
+              <li><a href=downloads/express-1.1.0/express-1.1.0-src.tgz onClick="_gaq.push(['_trackEvent', 'Downloads', 'Source', 'FAQ']);" target="_blank">Source Code</a></li>
               <li><a href="downloads" onClick="_gaq.push(['_trackEvent', 'Downloads', 'Previous','FAQ']);">Previous Versions</a></li>
            </ul>
           <!--[if lte IE 6]></td></tr></table></a><![endif]-->
@@ -168,8 +168,17 @@
 	<p>No, eXpress is also able to accept a SAM or BAM file as input (see <a href=manual.html#input>Manual</a> and <a href=tutorial.html#reqin>Getting Started</a> for more information on how to use different inputs. If given an alignment file, eXpress is also able to do multiple passes over the data to improve accuracy.  See the <a href=manual.html#running>Manual</a> for more details on different iterative modes.</p>
 	<p>&rarr; <a href="#top">Back to top.</a></p>
    	<h2 id="single">Does eXpress accept both single-end and paired-end read alignments?</h2>
-	<p>Yes, eXpress accepts both types of reads, even in the same alignment file.  However, to maximize accuracy of the bias correction and fragment length calculations, you should not mix reads generated in separate library preps.</p>
+	<p>Yes, eXpress accepts both types of reads, even in the same alignment file.  However, to maximize accuracy of the bias correction and fragment length calculations, you should not mix reads generated in separate library preps. See <a href="#seppreps">below</a> for more details.</p>
     <p>&rarr; <a href="#top">Back to top.</a></p>
+
+   	<h2 id="seppreps">Can I give eXpress a combined set of reads generated in different library preparations or with different read lengths?</h2>
+	<p>Yes, but you have to do so carefully.  eXpress can take a comma-separated list of SAM filenames as its command-line input.  When this is done, eXpress will assume that each alignment file contains reads fir the same sample but sequenced from a different library preparation and/or using a different read length.  It will then estimate auxiliary parameters independently for each set but will combine the count/abundance results. Since some overall power is lost when smaller alignment sets are used, any reads generated from the same library preparation using the same read lengths should be combined into a single alignment file.  See the <a href="manual.html#sam">Manual</a> for more details.</p>
+    <p>&rarr; <a href="#top">Back to top.</a></p>
+
+   	<h2 id="strip">Why does eXpress say it processed 0 fragments when I gave it a bunch of paired-end reads?</h2>
+	<p>This is most likely because the paired-end reads do not have matching names in your alignment file. eXpress knows that your reads are supposed to be paired-end in this case, but it assumes one end is unmapped and tosses the fragment when the matching reads cannot be found.  See the <a href="manual.html#sam">Manual</a> for details on how to address this issue.</p>
+    <p>&rarr; <a href="#top">Back to top.</a></p>
+
     <h2 id="pub">When will the eXpress method be published?</h2>
 	<p>We have submitted a manuscript and expect it to be published in the coming months.</p>
 	<p>&rarr; <a href="#top">Back to top.</a></p>
