@@ -70,7 +70,7 @@ void SequenceFwd::set(const std::string& seq, bool rev)
         ref_seq[i] = (rev) ? complement(ctoi(seq[seq.length()-1-i])) : ctoi(seq[i]);
         if (_prob)
         {
-            _est_seq.increment(i, ref_seq[i], log(2));
+            _est_seq.increment(i, ref_seq[i], log((float)2));
         }
     }
     _ref_seq = ref_seq;
