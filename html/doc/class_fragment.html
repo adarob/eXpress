@@ -27,7 +27,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
  <tr style="height: 56px;">
   <td id="projectlogo"><img alt="Logo" src="logo_small.png"></td>
   <td style="padding-left: 0.5em;">
-   <div id="projectname">eXpress&#160;<span id="projectnumber">0.9.5 BETA</span></div>
+   <div id="projectname">eXpress&#160;<span id="projectnumber">1.1.0</span></div>
    <div id="projectbrief"><a href=http://bio.math.berkeley.edu/eXpress>http://bio.math.berkeley.edu/eXpress</a></div>
   </td>
  </tr>
@@ -93,19 +93,29 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <table class="memberdecls">
 <tr><td colspan="2"><h2><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae322110344b444389015ef14410c93ac"></a><!-- doxytag: member="Fragment::Fragment" ref="ae322110344b444389015ef14410c93ac" args="(Library *lib)" -->
+&#160;</td><td class="memItemRight" valign="bottom"><b>Fragment</b> (<a class="el" href="struct_library.html">Library</a> *lib)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_fragment.html#afafef6f55cd0df3527e50d6ce01a182a">~Fragment</a> ()</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae9f7786da865431bd1b81bb17bb2c1fc"></a><!-- doxytag: member="Fragment::lib" ref="ae9f7786da865431bd1b81bb17bb2c1fc" args="()" -->
+const <a class="el" href="struct_library.html">Library</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>lib</b> ()</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_fragment.html#a29dc3beb491b6267b1e983d3e5b1a790">add_map_end</a> (<a class="el" href="struct_frag_hit.html">FragHit</a> *f)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">const std::string &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_fragment.html#a8c633e802207ee017022008cf7ad5b3e">name</a> () const </td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">const size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_fragment.html#a32b40ddfd8b60387368fde18ba682755">num_hits</a> () const </td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">const std::vector&lt; <a class="el" href="struct_frag_hit.html">FragHit</a> * &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_fragment.html#a3f5edd9e3af16628065df333d50def86">hits</a> () const </td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">const <a class="el" href="struct_frag_hit.html">FragHit</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_fragment.html#ada58f148f77e7040d2bdf4c70a978974">sample_hit</a> () const </td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab25105849e32ffc913259749c8b87ebd"></a><!-- doxytag: member="Fragment::mass" ref="ab25105849e32ffc913259749c8b87ebd" args="(double m)" -->
+void&#160;</td><td class="memItemRight" valign="bottom"><b>mass</b> (double m)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab90cf0c2761ccd98856fafc25d25ac58"></a><!-- doxytag: member="Fragment::mass" ref="ab90cf0c2761ccd98856fafc25d25ac58" args="() const " -->
+double&#160;</td><td class="memItemRight" valign="bottom"><b>mass</b> () const </td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a746777beef02d59ae7ea6895af826a34"></a><!-- doxytag: member="Fragment::sort_hits" ref="a746777beef02d59ae7ea6895af826a34" args="()" -->
+void&#160;</td><td class="memItemRight" valign="bottom"><b>sort_hits</b> ()</td></tr>
 </table>
 <hr/><a name="_details"></a><h2>Detailed Description</h2>
 <div class="textblock"><p>The <a class="el" href="class_fragment.html">Fragment</a> class stores information for all multi-mappings of a single fragment. By design, only paired-end mappings of paired-end reads will be accepted. All mappings of single-end reads will be accepted. </p>
 <dl class="author"><dt><b>Author:</b></dt><dd>Adam Roberts </dd></dl>
 <dl class="date"><dt><b>Date:</b></dt><dd>2011  Artistic License 2.0 </dd></dl>
 
-<p>Definition at line <a class="el" href="fragments_8h_source.html#l00177">177</a> of file <a class="el" href="fragments_8h_source.html">fragments.h</a>.</p>
+<p>Definition at line <a class="el" href="fragments_8h_source.html#l00180">180</a> of file <a class="el" href="fragments_8h_source.html">fragments.h</a>.</p>
 </div><hr/><h2>Constructor &amp; Destructor Documentation</h2>
 <a class="anchor" id="afafef6f55cd0df3527e50d6ce01a182a"></a><!-- doxytag: member="Fragment::~Fragment" ref="afafef6f55cd0df3527e50d6ce01a182a" args="()" -->
 <div class="memitem">
@@ -122,7 +132,7 @@ Public Member Functions</h2></td></tr>
 <div class="memdoc">
 <p><a class="el" href="class_fragment.html">Fragment</a> destructor deletes all <a class="el" href="struct_frag_hit.html">FragHit</a> objects pointed to by the <a class="el" href="class_fragment.html">Fragment</a> </p>
 
-<p>Definition at line <a class="el" href="fragments_8cpp_source.html#l00017">17</a> of file <a class="el" href="fragments_8cpp_source.html">fragments.cpp</a>.</p>
+<p>Definition at line <a class="el" href="fragments_8cpp_source.html#l00018">18</a> of file <a class="el" href="fragments_8cpp_source.html">fragments.cpp</a>.</p>
 
 </div>
 </div>
@@ -149,7 +159,7 @@ Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="fragments_8cpp_source.html#l00030">30</a> of file <a class="el" href="fragments_8cpp_source.html">fragments.cpp</a>.</p>
+<p>Definition at line <a class="el" href="fragments_8cpp_source.html#l00031">31</a> of file <a class="el" href="fragments_8cpp_source.html">fragments.cpp</a>.</p>
 
 </div>
 </div>
@@ -169,7 +179,7 @@ Public Member Functions</h2></td></tr>
 <p>a member function that returns <a class="el" href="struct_frag_hit.html">FragHit</a> multi-mappings of the fragment </p>
 <dl class="return"><dt><b>Returns:</b></dt><dd>a vector containing pointers to the <a class="el" href="struct_frag_hit.html">FragHit</a> multi-mappings </dd></dl>
 
-<p>Definition at line <a class="el" href="fragments_8h_source.html#l00234">234</a> of file <a class="el" href="fragments_8h_source.html">fragments.h</a>.</p>
+<p>Definition at line <a class="el" href="fragments_8h_source.html#l00248">248</a> of file <a class="el" href="fragments_8h_source.html">fragments.h</a>.</p>
 
 </div>
 </div>
@@ -189,7 +199,7 @@ Public Member Functions</h2></td></tr>
 <p>a member function that returns the SAM "Query Template Name" (fragment name) </p>
 <dl class="return"><dt><b>Returns:</b></dt><dd>the string SAM "Query Template Name" (fragment name) </dd></dl>
 
-<p>Definition at line <a class="el" href="fragments_8h_source.html#l00222">222</a> of file <a class="el" href="fragments_8h_source.html">fragments.h</a>.</p>
+<p>Definition at line <a class="el" href="fragments_8h_source.html#l00236">236</a> of file <a class="el" href="fragments_8h_source.html">fragments.h</a>.</p>
 
 </div>
 </div>
@@ -209,7 +219,7 @@ Public Member Functions</h2></td></tr>
 <p>a member function that returns the number of multi-mappings for the fragment </p>
 <dl class="return"><dt><b>Returns:</b></dt><dd>number of multi-mappings for fragment </dd></dl>
 
-<p>Definition at line <a class="el" href="fragments_8h_source.html#l00228">228</a> of file <a class="el" href="fragments_8h_source.html">fragments.h</a>.</p>
+<p>Definition at line <a class="el" href="fragments_8h_source.html#l00242">242</a> of file <a class="el" href="fragments_8h_source.html">fragments.h</a>.</p>
 
 </div>
 </div>
@@ -229,7 +239,7 @@ Public Member Functions</h2></td></tr>
 <p>a member function that returns a single <a class="el" href="struct_frag_hit.html">FragHit</a> of the fragment sampled at random based on the probabalistic assignment </p>
 <dl class="return"><dt><b>Returns:</b></dt><dd>a randomly sampled <a class="el" href="struct_frag_hit.html">FragHit</a> </dd></dl>
 
-<p>Definition at line <a class="el" href="fragments_8cpp_source.html#l00098">98</a> of file <a class="el" href="fragments_8cpp_source.html">fragments.cpp</a>.</p>
+<p>Definition at line <a class="el" href="fragments_8cpp_source.html#l00099">99</a> of file <a class="el" href="fragments_8cpp_source.html">fragments.cpp</a>.</p>
 
 </div>
 </div>
@@ -242,7 +252,7 @@ Public Member Functions</h2></td></tr>
   <div id="nav-path" class="navpath">
     <ul>
       <li class="navelem"><a class="el" href="class_fragment.html">Fragment</a>      </li>
-      <li class="footer">Generated on Sun Apr 8 2012 11:49:01 for eXpress by&#160;
+      <li class="footer">Generated on Wed May 23 2012 22:06:18 for eXpress by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </li>
     </ul>

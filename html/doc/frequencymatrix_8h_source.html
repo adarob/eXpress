@@ -27,7 +27,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
  <tr style="height: 56px;">
   <td id="projectlogo"><img alt="Logo" src="logo_small.png"></td>
   <td style="padding-left: 0.5em;">
-   <div id="projectname">eXpress&#160;<span id="projectnumber">0.9.5 BETA</span></div>
+   <div id="projectname">eXpress&#160;<span id="projectnumber">1.1.0</span></div>
    <div id="projectbrief"><a href=http://bio.math.berkeley.edu/eXpress>http://bio.math.berkeley.edu/eXpress</a></div>
   </td>
  </tr>
@@ -91,49 +91,179 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00008"></a>00008 <span class="comment">//  Created by Adam Roberts on 4/23/11.</span>
 <a name="l00009"></a>00009 <span class="comment">//  Copyright 2011 Adam Roberts. All rights reserved.</span>
 <a name="l00010"></a>00010 <span class="comment">//</span>
-<a name="l00011"></a>00011 <span class="preprocessor">#include &quot;boost/multi_array.hpp&quot;</span>
-<a name="l00012"></a>00012 <span class="preprocessor">#include &lt;vector&gt;</span>
-<a name="l00013"></a>00013 
-<a name="l00024"></a><a class="code" href="class_frequency_matrix.html">00024</a> <span class="keyword">class </span><a class="code" href="class_frequency_matrix.html">FrequencyMatrix</a>
-<a name="l00025"></a>00025 {
-<a name="l00029"></a>00029     std::vector&lt;double&gt; _array;
-<a name="l00030"></a>00030     
-<a name="l00034"></a>00034     std::vector&lt;double&gt; _rowsums;
-<a name="l00035"></a>00035     
-<a name="l00039"></a>00039     <span class="keywordtype">size_t</span> _M;
-<a name="l00040"></a>00040     
-<a name="l00044"></a>00044     <span class="keywordtype">size_t</span> _N;
-<a name="l00045"></a>00045     
-<a name="l00049"></a>00049     <span class="keywordtype">bool</span> _logged;
-<a name="l00050"></a>00050     
-<a name="l00051"></a>00051 <span class="keyword">public</span>:
+<a name="l00011"></a>00011 <span class="preprocessor">#include &lt;vector&gt;</span>
+<a name="l00012"></a>00012 <span class="preprocessor">#include &lt;cassert&gt;</span>
+<a name="l00013"></a>00013 <span class="preprocessor">#include &quot;main.h&quot;</span>
+<a name="l00014"></a>00014 
+<a name="l00025"></a>00025 <span class="keyword">template</span> &lt;<span class="keyword">class</span> T&gt;
+<a name="l00026"></a><a class="code" href="class_frequency_matrix.html">00026</a> <span class="keyword">class </span><a class="code" href="class_frequency_matrix.html">FrequencyMatrix</a>
+<a name="l00027"></a>00027 {
+<a name="l00031"></a>00031     std::vector&lt;T&gt; _array;
+<a name="l00032"></a>00032     
+<a name="l00036"></a>00036     std::vector&lt;T&gt; _rowsums;
+<a name="l00037"></a>00037     
+<a name="l00041"></a>00041     <span class="keywordtype">size_t</span> _M;
+<a name="l00042"></a>00042     
+<a name="l00046"></a>00046     <span class="keywordtype">size_t</span> _N;
+<a name="l00047"></a>00047     
+<a name="l00051"></a>00051     <span class="keywordtype">bool</span> _logged;
 <a name="l00052"></a>00052     
-<a name="l00056"></a><a class="code" href="class_frequency_matrix.html#a9bf1c990b218963fe22abb434862f930">00056</a>     <a class="code" href="class_frequency_matrix.html#a9bf1c990b218963fe22abb434862f930">FrequencyMatrix</a>(){};
-<a name="l00057"></a>00057     
-<a name="l00065"></a>00065     <a class="code" href="class_frequency_matrix.html#a9bf1c990b218963fe22abb434862f930">FrequencyMatrix</a>(<span class="keywordtype">size_t</span> m, <span class="keywordtype">size_t</span> n, <span class="keywordtype">double</span> alpha, <span class="keywordtype">bool</span> logged = <span class="keyword">true</span>);
-<a name="l00066"></a>00066    
-<a name="l00073"></a>00073     <span class="keywordtype">double</span> <a class="code" href="class_frequency_matrix.html#aa182384d4cd1ccf03d51eabc1a6511a5">operator()</a>(<span class="keywordtype">size_t</span> i, <span class="keywordtype">size_t</span> j) <span class="keyword">const</span>;
-<a name="l00074"></a>00074     
-<a name="l00080"></a>00080     <span class="keywordtype">double</span> <a class="code" href="class_frequency_matrix.html#aa182384d4cd1ccf03d51eabc1a6511a5">operator()</a>(<span class="keywordtype">size_t</span> k) <span class="keyword">const</span>;
-<a name="l00081"></a>00081     
-<a name="l00088"></a>00088     <span class="keywordtype">void</span> <a class="code" href="class_frequency_matrix.html#ab5b9c15d7d7660ea5804d6081a672991">increment</a>(<span class="keywordtype">size_t</span> i, <span class="keywordtype">size_t</span> j, <span class="keywordtype">double</span> incr_amt);
-<a name="l00089"></a>00089     
-<a name="l00095"></a>00095     <span class="keywordtype">void</span> <a class="code" href="class_frequency_matrix.html#ab5b9c15d7d7660ea5804d6081a672991">increment</a>(<span class="keywordtype">size_t</span> k, <span class="keywordtype">double</span> incr_amt);
-<a name="l00096"></a>00096     
-<a name="l00102"></a><a class="code" href="class_frequency_matrix.html#af833fe86c53b4cf735d24a71a176182b">00102</a>     <span class="keywordtype">double</span> <a class="code" href="class_frequency_matrix.html#af833fe86c53b4cf735d24a71a176182b">arr</a>(<span class="keywordtype">size_t</span> k)<span class="keyword"> const </span>{ <span class="keywordflow">return</span> _array[k]; }
-<a name="l00103"></a>00103     
-<a name="l00109"></a><a class="code" href="class_frequency_matrix.html#af4aef437a9a3b739f84bbeb13a366f52">00109</a>     <span class="keywordtype">double</span> <a class="code" href="class_frequency_matrix.html#af4aef437a9a3b739f84bbeb13a366f52">row</a>(<span class="keywordtype">size_t</span> i)<span class="keyword"> const </span>{ <span class="keywordflow">return</span> _rowsums[i]; } 
-<a name="l00110"></a>00110     
-<a name="l00115"></a>00115     <span class="keywordtype">void</span> <a class="code" href="class_frequency_matrix.html#a51d153eb0ea0b398fb82fc97a66fed91">set_logged</a>(<span class="keywordtype">bool</span> logged);
-<a name="l00116"></a>00116 };
-<a name="l00117"></a>00117 
-<a name="l00118"></a>00118 <span class="preprocessor">#endif</span>
+<a name="l00053"></a>00053     <span class="keywordtype">bool</span> _fixed;
+<a name="l00054"></a>00054     
+<a name="l00055"></a>00055 <span class="keyword">public</span>:
+<a name="l00056"></a>00056     
+<a name="l00060"></a><a class="code" href="class_frequency_matrix.html#a80c5e1b9d93e47d8521bf7331cb0b683">00060</a>     <a class="code" href="class_frequency_matrix.html#a80c5e1b9d93e47d8521bf7331cb0b683">FrequencyMatrix</a>(){};
+<a name="l00061"></a>00061     
+<a name="l00069"></a>00069     <a class="code" href="class_frequency_matrix.html#a80c5e1b9d93e47d8521bf7331cb0b683">FrequencyMatrix</a>(<span class="keywordtype">size_t</span> m, <span class="keywordtype">size_t</span> n, T alpha, <span class="keywordtype">bool</span> logged = <span class="keyword">true</span>);
+<a name="l00070"></a>00070    
+<a name="l00078"></a>00078     T <a class="code" href="class_frequency_matrix.html#a6fffa758a9e2aeda42a9c6f472575eb5">operator()</a>(<span class="keywordtype">size_t</span> i, <span class="keywordtype">size_t</span> j, <span class="keywordtype">bool</span> normalized=<span class="keyword">true</span>) <span class="keyword">const</span>;
+<a name="l00079"></a>00079     
+<a name="l00085"></a>00085     T <a class="code" href="class_frequency_matrix.html#a6fffa758a9e2aeda42a9c6f472575eb5">operator()</a>(<span class="keywordtype">size_t</span> k) <span class="keyword">const</span>;
+<a name="l00086"></a>00086     
+<a name="l00093"></a>00093     <span class="keywordtype">void</span> <a class="code" href="class_frequency_matrix.html#ad268ed465764bf16453374c1cb2bba5a">increment</a>(<span class="keywordtype">size_t</span> i, <span class="keywordtype">size_t</span> j, T incr_amt);
+<a name="l00094"></a>00094     
+<a name="l00100"></a>00100     <span class="keywordtype">void</span> <a class="code" href="class_frequency_matrix.html#ad268ed465764bf16453374c1cb2bba5a">increment</a>(<span class="keywordtype">size_t</span> k, T incr_amt);
+<a name="l00101"></a>00101     
+<a name="l00107"></a><a class="code" href="class_frequency_matrix.html#a3be0a501fc984310b4cb025f274b586b">00107</a>     <span class="keywordtype">double</span> <a class="code" href="class_frequency_matrix.html#a3be0a501fc984310b4cb025f274b586b">arr</a>(<span class="keywordtype">size_t</span> k)<span class="keyword"> const </span>{ <span class="keywordflow">return</span> _array[k]; }
+<a name="l00108"></a>00108     
+<a name="l00114"></a><a class="code" href="class_frequency_matrix.html#a126c46c82bb7c0cbfd0b7da437e77f5d">00114</a>     <span class="keywordtype">double</span> <a class="code" href="class_frequency_matrix.html#a126c46c82bb7c0cbfd0b7da437e77f5d">total</a>(<span class="keywordtype">size_t</span> i)<span class="keyword"> const </span>{ <span class="keywordflow">return</span> _rowsums[i]; } 
+<a name="l00115"></a>00115     
+<a name="l00120"></a>00120     <span class="keywordtype">void</span> <a class="code" href="class_frequency_matrix.html#a6857dcca06cd242fc2a6c7edd764963d">set_logged</a>(<span class="keywordtype">bool</span> logged);
+<a name="l00121"></a>00121     
+<a name="l00122"></a>00122     <span class="comment">//DOC</span>
+<a name="l00123"></a>00123     <span class="keywordtype">void</span> fix();
+<a name="l00124"></a>00124     <span class="keywordtype">bool</span> is_fixed()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> _fixed; }
+<a name="l00125"></a>00125     
+<a name="l00126"></a>00126     <span class="comment">//DOC</span>
+<a name="l00127"></a>00127     <span class="keywordtype">size_t</span> mode(<span class="keywordtype">size_t</span> i) <span class="keyword">const</span>;
+<a name="l00128"></a>00128 };
+<a name="l00129"></a>00129 
+<a name="l00130"></a>00130 
+<a name="l00131"></a>00131 <span class="keyword">template</span> &lt;<span class="keyword">class</span> T&gt;
+<a name="l00132"></a><a class="code" href="class_frequency_matrix.html#a910a2b6c65dc9ad8ac03dc553bc6c924">00132</a> <a class="code" href="class_frequency_matrix.html#a80c5e1b9d93e47d8521bf7331cb0b683">FrequencyMatrix&lt;T&gt;::FrequencyMatrix</a>(<span class="keywordtype">size_t</span> m, <span class="keywordtype">size_t</span> n, T alpha, <span class="keywordtype">bool</span> logged)
+<a name="l00133"></a>00133 : _array(m*n, logged ? log(alpha):alpha),
+<a name="l00134"></a>00134 _rowsums(m, logged ? log(n*alpha):n*alpha),
+<a name="l00135"></a>00135 _M(m),
+<a name="l00136"></a>00136 _N(n),
+<a name="l00137"></a>00137 _logged(logged),
+<a name="l00138"></a>00138 _fixed(false)
+<a name="l00139"></a>00139 {}
+<a name="l00140"></a>00140 
+<a name="l00141"></a>00141 <span class="keyword">template</span> &lt;<span class="keyword">class</span> T&gt;
+<a name="l00142"></a><a class="code" href="class_frequency_matrix.html#a6fffa758a9e2aeda42a9c6f472575eb5">00142</a> T <a class="code" href="class_frequency_matrix.html#a6fffa758a9e2aeda42a9c6f472575eb5">FrequencyMatrix&lt;T&gt;::operator()</a>(<span class="keywordtype">size_t</span> i, <span class="keywordtype">size_t</span> j, <span class="keywordtype">bool</span> normalized)<span class="keyword"> const</span>
+<a name="l00143"></a>00143 <span class="keyword"></span>{
+<a name="l00144"></a>00144     assert(i*_N+j &lt; _M*_N);
+<a name="l00145"></a>00145     <span class="keywordflow">if</span> (_fixed || !normalized)
+<a name="l00146"></a>00146         <span class="keywordflow">return</span> _array[i*_N+j];
+<a name="l00147"></a>00147     <span class="keywordflow">if</span> (_logged)
+<a name="l00148"></a>00148         <span class="keywordflow">return</span> _array[i*_N+j]-_rowsums[i];
+<a name="l00149"></a>00149     <span class="keywordflow">else</span>
+<a name="l00150"></a>00150         <span class="keywordflow">return</span> _array[i*_N+j]/_rowsums[i];
+<a name="l00151"></a>00151 }
+<a name="l00152"></a>00152 
+<a name="l00153"></a>00153 <span class="keyword">template</span> &lt;<span class="keyword">class</span> T&gt;
+<a name="l00154"></a><a class="code" href="class_frequency_matrix.html#a97b3a592c8bbed88e3f538d6126621e7">00154</a> T <a class="code" href="class_frequency_matrix.html#a6fffa758a9e2aeda42a9c6f472575eb5">FrequencyMatrix&lt;T&gt;::operator()</a>(<span class="keywordtype">size_t</span> k)<span class="keyword"> const</span>
+<a name="l00155"></a>00155 <span class="keyword"></span>{
+<a name="l00156"></a>00156     <span class="keywordflow">return</span> operator()(0, k);
+<a name="l00157"></a>00157 }
+<a name="l00158"></a>00158 
+<a name="l00159"></a>00159 <span class="keyword">template</span> &lt;<span class="keyword">class</span> T&gt;
+<a name="l00160"></a><a class="code" href="class_frequency_matrix.html#ad268ed465764bf16453374c1cb2bba5a">00160</a> <span class="keywordtype">void</span> <a class="code" href="class_frequency_matrix.html#ad268ed465764bf16453374c1cb2bba5a">FrequencyMatrix&lt;T&gt;::increment</a>(<span class="keywordtype">size_t</span> i, <span class="keywordtype">size_t</span> j, T incr_amt)
+<a name="l00161"></a>00161 {
+<a name="l00162"></a>00162     <span class="keywordflow">if</span> (_fixed)
+<a name="l00163"></a>00163         <span class="keywordflow">return</span>;
+<a name="l00164"></a>00164     
+<a name="l00165"></a>00165     <span class="keywordtype">size_t</span> k = i*_N+j;
+<a name="l00166"></a>00166     assert(k &lt; _M*_N);
+<a name="l00167"></a>00167     <span class="keywordflow">if</span> (_logged)
+<a name="l00168"></a>00168     {
+<a name="l00169"></a>00169         _array[k] = log_sum(_array[k], incr_amt);
+<a name="l00170"></a>00170         _rowsums[i] = log_sum(_rowsums[i], incr_amt);
+<a name="l00171"></a>00171     }
+<a name="l00172"></a>00172     <span class="keywordflow">else</span>
+<a name="l00173"></a>00173     {
+<a name="l00174"></a>00174         _array[k] += incr_amt;
+<a name="l00175"></a>00175         _rowsums[i] += incr_amt;
+<a name="l00176"></a>00176     }
+<a name="l00177"></a>00177 <span class="comment">//    assert(!std::isnan(_rowsums[i]) &amp;&amp; !std::isinf(_rowsums[i]));</span>
+<a name="l00178"></a>00178 }
+<a name="l00179"></a>00179 
+<a name="l00180"></a>00180 <span class="keyword">template</span> &lt;<span class="keyword">class</span> T&gt;
+<a name="l00181"></a><a class="code" href="class_frequency_matrix.html#abf161ab32e3317e9551d4814b14717f5">00181</a> <span class="keywordtype">void</span> <a class="code" href="class_frequency_matrix.html#ad268ed465764bf16453374c1cb2bba5a">FrequencyMatrix&lt;T&gt;::increment</a>(<span class="keywordtype">size_t</span> k, T incr_amt)
+<a name="l00182"></a>00182 {
+<a name="l00183"></a>00183     increment(0, k, incr_amt);
+<a name="l00184"></a>00184 }
+<a name="l00185"></a>00185 
+<a name="l00186"></a>00186 <span class="keyword">template</span> &lt;<span class="keyword">class</span> T&gt;
+<a name="l00187"></a><a class="code" href="class_frequency_matrix.html#a6857dcca06cd242fc2a6c7edd764963d">00187</a> <span class="keywordtype">void</span> <a class="code" href="class_frequency_matrix.html#a6857dcca06cd242fc2a6c7edd764963d">FrequencyMatrix&lt;T&gt;::set_logged</a>(<span class="keywordtype">bool</span> logged)
+<a name="l00188"></a>00188 {
+<a name="l00189"></a>00189     <span class="keywordflow">if</span> (logged == _logged || _fixed)
+<a name="l00190"></a>00190         <span class="keywordflow">return</span>;
+<a name="l00191"></a>00191     
+<a name="l00192"></a>00192     <span class="keywordflow">if</span> (logged)
+<a name="l00193"></a>00193     {
+<a name="l00194"></a>00194         <span class="keywordflow">for</span>(<span class="keywordtype">size_t</span> i = 0; i &lt; _M*_N; ++i)
+<a name="l00195"></a>00195         {
+<a name="l00196"></a>00196             _array[i] = log(_array[i]);
+<a name="l00197"></a>00197         }
+<a name="l00198"></a>00198         <span class="keywordflow">for</span>(<span class="keywordtype">size_t</span> i = 0; i &lt; _M; ++i)
+<a name="l00199"></a>00199         {
+<a name="l00200"></a>00200             _rowsums[i] = log(_rowsums[i]);
+<a name="l00201"></a>00201         }
+<a name="l00202"></a>00202     }
+<a name="l00203"></a>00203     <span class="keywordflow">else</span>
+<a name="l00204"></a>00204     {
+<a name="l00205"></a>00205         <span class="keywordflow">for</span>(<span class="keywordtype">size_t</span> i = 0; i &lt; _M*_N; ++i)
+<a name="l00206"></a>00206         {
+<a name="l00207"></a>00207             _array[i] = sexp(_array[i]);
+<a name="l00208"></a>00208         }
+<a name="l00209"></a>00209         <span class="keywordflow">for</span>(<span class="keywordtype">size_t</span> i = 0; i &lt; _M; ++i)
+<a name="l00210"></a>00210         {
+<a name="l00211"></a>00211             _rowsums[i] = sexp(_rowsums[i]);
+<a name="l00212"></a>00212         }
+<a name="l00213"></a>00213     }
+<a name="l00214"></a>00214     _logged = logged;
+<a name="l00215"></a>00215 }
+<a name="l00216"></a>00216 
+<a name="l00217"></a>00217 <span class="keyword">template</span> &lt;<span class="keyword">class</span> T&gt;
+<a name="l00218"></a>00218 <span class="keywordtype">size_t</span> <a class="code" href="class_frequency_matrix.html">FrequencyMatrix&lt;T&gt;::mode</a>(<span class="keywordtype">size_t</span> i)<span class="keyword"> const</span>
+<a name="l00219"></a>00219 <span class="keyword"></span>{
+<a name="l00220"></a>00220     <span class="keywordtype">size_t</span> k = i*_N;
+<a name="l00221"></a>00221     <span class="keywordtype">size_t</span> arg = 0;
+<a name="l00222"></a>00222     T val = _array[k]; 
+<a name="l00223"></a>00223     <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> j = 1; j &lt; _N; j++)
+<a name="l00224"></a>00224     {
+<a name="l00225"></a>00225         <span class="keywordflow">if</span> (_array[k+j] &gt; val)
+<a name="l00226"></a>00226         {
+<a name="l00227"></a>00227             val = _array[k+j];
+<a name="l00228"></a>00228             arg = j;
+<a name="l00229"></a>00229         }
+<a name="l00230"></a>00230     }
+<a name="l00231"></a>00231     <span class="keywordflow">return</span> arg;
+<a name="l00232"></a>00232 }
+<a name="l00233"></a>00233 
+<a name="l00234"></a>00234 <span class="keyword">template</span> &lt;<span class="keyword">class</span> T&gt;
+<a name="l00235"></a>00235 <span class="keywordtype">void</span> <a class="code" href="class_frequency_matrix.html">FrequencyMatrix&lt;T&gt;::fix</a>()
+<a name="l00236"></a>00236 {
+<a name="l00237"></a>00237     <span class="keywordflow">if</span> (_fixed)
+<a name="l00238"></a>00238         <span class="keywordflow">return</span>;
+<a name="l00239"></a>00239     <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; _M; ++i)
+<a name="l00240"></a>00240     {
+<a name="l00241"></a>00241         <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> j = 0; j &lt; _N; ++j)
+<a name="l00242"></a>00242         {
+<a name="l00243"></a>00243             _array[i*_N+j] = operator()(i,j);
+<a name="l00244"></a>00244         }
+<a name="l00245"></a>00245     }
+<a name="l00246"></a>00246     _fixed = <span class="keyword">true</span>;
+<a name="l00247"></a>00247 }
+<a name="l00248"></a>00248 
+<a name="l00249"></a>00249 <span class="preprocessor">#endif</span>
 </pre></div></div>
 </div>
   <div id="nav-path" class="navpath">
     <ul>
       <li class="navelem"><b>frequencymatrix.h</b>      </li>
-      <li class="footer">Generated on Sun Apr 8 2012 11:48:58 for eXpress by&#160;
+      <li class="footer">Generated on Wed May 23 2012 22:06:16 for eXpress by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </li>
     </ul>

@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
-<title>eXpress: FrequencyMatrix Class Reference</title>
+<title>eXpress: FrequencyMatrix&lt; T &gt; Class Template Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/search.js"></script>
@@ -27,7 +27,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
  <tr style="height: 56px;">
   <td id="projectlogo"><img alt="Logo" src="logo_small.png"></td>
   <td style="padding-left: 0.5em;">
-   <div id="projectname">eXpress&#160;<span id="projectnumber">0.9.5 BETA</span></div>
+   <div id="projectname">eXpress&#160;<span id="projectnumber">1.1.0</span></div>
    <div id="projectbrief"><a href=http://bio.math.berkeley.edu/eXpress>http://bio.math.berkeley.edu/eXpress</a></div>
   </td>
  </tr>
@@ -83,7 +83,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a>  </div>
   <div class="headertitle">
-<h1>FrequencyMatrix Class Reference</h1>  </div>
+<h1>FrequencyMatrix&lt; T &gt; Class Template Reference</h1>  </div>
 </div>
 <div class="contents">
 <!-- doxytag: class="FrequencyMatrix" -->
@@ -93,29 +93,40 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <table class="memberdecls">
 <tr><td colspan="2"><h2><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_frequency_matrix.html#a9bf1c990b218963fe22abb434862f930">FrequencyMatrix</a> ()</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_frequency_matrix.html#a83bd4b89608c43cdfa898465d6adab89">FrequencyMatrix</a> (size_t m, size_t n, double alpha, bool logged=true)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_frequency_matrix.html#aa182384d4cd1ccf03d51eabc1a6511a5">operator()</a> (size_t i, size_t j) const </td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_frequency_matrix.html#a1e99db815a8aa8800f6156fe5d1b7387">operator()</a> (size_t k) const </td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_frequency_matrix.html#ab5b9c15d7d7660ea5804d6081a672991">increment</a> (size_t i, size_t j, double incr_amt)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_frequency_matrix.html#a2412ae2d8e95e8d5fcb9ac3c943617b5">increment</a> (size_t k, double incr_amt)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_frequency_matrix.html#af833fe86c53b4cf735d24a71a176182b">arr</a> (size_t k) const </td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_frequency_matrix.html#af4aef437a9a3b739f84bbeb13a366f52">row</a> (size_t i) const </td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_frequency_matrix.html#a51d153eb0ea0b398fb82fc97a66fed91">set_logged</a> (bool logged)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_frequency_matrix.html#a80c5e1b9d93e47d8521bf7331cb0b683">FrequencyMatrix</a> ()</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_frequency_matrix.html#a910a2b6c65dc9ad8ac03dc553bc6c924">FrequencyMatrix</a> (size_t m, size_t n, T alpha, bool logged=true)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">T&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_frequency_matrix.html#a6fffa758a9e2aeda42a9c6f472575eb5">operator()</a> (size_t i, size_t j, bool normalized=true) const </td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">T&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_frequency_matrix.html#a97b3a592c8bbed88e3f538d6126621e7">operator()</a> (size_t k) const </td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_frequency_matrix.html#ad268ed465764bf16453374c1cb2bba5a">increment</a> (size_t i, size_t j, T incr_amt)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_frequency_matrix.html#abf161ab32e3317e9551d4814b14717f5">increment</a> (size_t k, T incr_amt)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_frequency_matrix.html#a3be0a501fc984310b4cb025f274b586b">arr</a> (size_t k) const </td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_frequency_matrix.html#a126c46c82bb7c0cbfd0b7da437e77f5d">total</a> (size_t i) const </td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_frequency_matrix.html#a6857dcca06cd242fc2a6c7edd764963d">set_logged</a> (bool logged)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1a80b0d20ec65b2317a439e0153d3690"></a><!-- doxytag: member="FrequencyMatrix::fix" ref="a1a80b0d20ec65b2317a439e0153d3690" args="()" -->
+void&#160;</td><td class="memItemRight" valign="bottom"><b>fix</b> ()</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ade19dfa1d5f9664c193450c751ea5d13"></a><!-- doxytag: member="FrequencyMatrix::is_fixed" ref="ade19dfa1d5f9664c193450c751ea5d13" args="() const " -->
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>is_fixed</b> () const </td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a61d8529e8cb60e5442b313a1ffe3dd40"></a><!-- doxytag: member="FrequencyMatrix::mode" ref="a61d8529e8cb60e5442b313a1ffe3dd40" args="(size_t i) const " -->
+size_t&#160;</td><td class="memItemRight" valign="bottom"><b>mode</b> (size_t i) const </td></tr>
 </table>
 <hr/><a name="_details"></a><h2>Detailed Description</h2>
-<div class="textblock"><p>The <a class="el" href="class_frequency_matrix.html">FrequencyMatrix</a> class keeps track of the frequency parameters in order to allow for constant-time probability look-ups and updates. The table is rectangular to allow for multiple distributions to be stored in one <a class="el" href="class_frequency_matrix.html">FrequencyMatrix</a>. Rows are distributions. Values are in log space by default. </p>
+<div class="textblock"><h3>template&lt;class T&gt;<br/>
+ class FrequencyMatrix&lt; T &gt;</h3>
+
+<p>The <a class="el" href="class_frequency_matrix.html">FrequencyMatrix</a> class keeps track of the frequency parameters in order to allow for constant-time probability look-ups and updates. The table is rectangular to allow for multiple distributions to be stored in one <a class="el" href="class_frequency_matrix.html">FrequencyMatrix</a>. Rows are distributions. Values are in log space by default. </p>
 <dl class="author"><dt><b>Author:</b></dt><dd>Adam Roberts </dd></dl>
 <dl class="date"><dt><b>Date:</b></dt><dd>2011  Artistic License 2.0 </dd></dl>
 
-<p>Definition at line <a class="el" href="frequencymatrix_8h_source.html#l00024">24</a> of file <a class="el" href="frequencymatrix_8h_source.html">frequencymatrix.h</a>.</p>
+<p>Definition at line <a class="el" href="frequencymatrix_8h_source.html#l00026">26</a> of file <a class="el" href="frequencymatrix_8h_source.html">frequencymatrix.h</a>.</p>
 </div><hr/><h2>Constructor &amp; Destructor Documentation</h2>
-<a class="anchor" id="a9bf1c990b218963fe22abb434862f930"></a><!-- doxytag: member="FrequencyMatrix::FrequencyMatrix" ref="a9bf1c990b218963fe22abb434862f930" args="()" -->
+<a class="anchor" id="a80c5e1b9d93e47d8521bf7331cb0b683"></a><!-- doxytag: member="FrequencyMatrix::FrequencyMatrix" ref="a80c5e1b9d93e47d8521bf7331cb0b683" args="()" -->
 <div class="memitem">
 <div class="memproto">
+<div class="memtemplate">
+template&lt;class T&gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">FrequencyMatrix::FrequencyMatrix </td>
+          <td class="memname"><a class="el" href="class_frequency_matrix.html">FrequencyMatrix</a>&lt; T &gt;::<a class="el" href="class_frequency_matrix.html">FrequencyMatrix</a> </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td><code> [inline]</code></td>
@@ -125,16 +136,18 @@ Public Member Functions</h2></td></tr>
 <div class="memdoc">
 <p>dummy constructor </p>
 
-<p>Definition at line <a class="el" href="frequencymatrix_8h_source.html#l00056">56</a> of file <a class="el" href="frequencymatrix_8h_source.html">frequencymatrix.h</a>.</p>
+<p>Definition at line <a class="el" href="frequencymatrix_8h_source.html#l00060">60</a> of file <a class="el" href="frequencymatrix_8h_source.html">frequencymatrix.h</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a83bd4b89608c43cdfa898465d6adab89"></a><!-- doxytag: member="FrequencyMatrix::FrequencyMatrix" ref="a83bd4b89608c43cdfa898465d6adab89" args="(size_t m, size_t n, double alpha, bool logged=true)" -->
+<a class="anchor" id="a910a2b6c65dc9ad8ac03dc553bc6c924"></a><!-- doxytag: member="FrequencyMatrix::FrequencyMatrix" ref="a910a2b6c65dc9ad8ac03dc553bc6c924" args="(size_t m, size_t n, T alpha, bool logged=true)" -->
 <div class="memitem">
 <div class="memproto">
+<div class="memtemplate">
+template&lt;class T&gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">FrequencyMatrix::FrequencyMatrix </td>
+          <td class="memname"><a class="el" href="class_frequency_matrix.html">FrequencyMatrix</a>&lt; T &gt;::<a class="el" href="class_frequency_matrix.html">FrequencyMatrix</a> </td>
           <td>(</td>
           <td class="paramtype">size_t&#160;</td>
           <td class="paramname"><em>m</em>, </td>
@@ -148,7 +161,7 @@ Public Member Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">double&#160;</td>
+          <td class="paramtype">T&#160;</td>
           <td class="paramname"><em>alpha</em>, </td>
         </tr>
         <tr>
@@ -176,17 +189,19 @@ Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="frequencymatrix_8cpp_source.html#l00016">16</a> of file <a class="el" href="frequencymatrix_8cpp_source.html">frequencymatrix.cpp</a>.</p>
+<p>Definition at line <a class="el" href="frequencymatrix_8h_source.html#l00132">132</a> of file <a class="el" href="frequencymatrix_8h_source.html">frequencymatrix.h</a>.</p>
 
 </div>
 </div>
 <hr/><h2>Member Function Documentation</h2>
-<a class="anchor" id="af833fe86c53b4cf735d24a71a176182b"></a><!-- doxytag: member="FrequencyMatrix::arr" ref="af833fe86c53b4cf735d24a71a176182b" args="(size_t k) const " -->
+<a class="anchor" id="a3be0a501fc984310b4cb025f274b586b"></a><!-- doxytag: member="FrequencyMatrix::arr" ref="a3be0a501fc984310b4cb025f274b586b" args="(size_t k) const " -->
 <div class="memitem">
 <div class="memproto">
+<div class="memtemplate">
+template&lt;class T&gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">double FrequencyMatrix::arr </td>
+          <td class="memname">double <a class="el" href="class_frequency_matrix.html">FrequencyMatrix</a>&lt; T &gt;::arr </td>
           <td>(</td>
           <td class="paramtype">size_t&#160;</td>
           <td class="paramname"><em>k</em></td><td>)</td>
@@ -204,16 +219,18 @@ Public Member Functions</h2></td></tr>
 </dl>
 <dl class="return"><dt><b>Returns:</b></dt><dd>a double specifying the raw value stored at the given position of the flattened matrix </dd></dl>
 
-<p>Definition at line <a class="el" href="frequencymatrix_8h_source.html#l00102">102</a> of file <a class="el" href="frequencymatrix_8h_source.html">frequencymatrix.h</a>.</p>
+<p>Definition at line <a class="el" href="frequencymatrix_8h_source.html#l00107">107</a> of file <a class="el" href="frequencymatrix_8h_source.html">frequencymatrix.h</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="ab5b9c15d7d7660ea5804d6081a672991"></a><!-- doxytag: member="FrequencyMatrix::increment" ref="ab5b9c15d7d7660ea5804d6081a672991" args="(size_t i, size_t j, double incr_amt)" -->
+<a class="anchor" id="ad268ed465764bf16453374c1cb2bba5a"></a><!-- doxytag: member="FrequencyMatrix::increment" ref="ad268ed465764bf16453374c1cb2bba5a" args="(size_t i, size_t j, T incr_amt)" -->
 <div class="memitem">
 <div class="memproto">
+<div class="memtemplate">
+template&lt;class T&gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">void FrequencyMatrix::increment </td>
+          <td class="memname">void <a class="el" href="class_frequency_matrix.html">FrequencyMatrix</a>&lt; T &gt;::increment </td>
           <td>(</td>
           <td class="paramtype">size_t&#160;</td>
           <td class="paramname"><em>i</em>, </td>
@@ -227,7 +244,7 @@ Public Member Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">double&#160;</td>
+          <td class="paramtype">T&#160;</td>
           <td class="paramname"><em>incr_amt</em>&#160;</td>
         </tr>
         <tr>
@@ -248,16 +265,18 @@ Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="frequencymatrix_8cpp_source.html#l00039">39</a> of file <a class="el" href="frequencymatrix_8cpp_source.html">frequencymatrix.cpp</a>.</p>
+<p>Definition at line <a class="el" href="frequencymatrix_8h_source.html#l00160">160</a> of file <a class="el" href="frequencymatrix_8h_source.html">frequencymatrix.h</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a2412ae2d8e95e8d5fcb9ac3c943617b5"></a><!-- doxytag: member="FrequencyMatrix::increment" ref="a2412ae2d8e95e8d5fcb9ac3c943617b5" args="(size_t k, double incr_amt)" -->
+<a class="anchor" id="abf161ab32e3317e9551d4814b14717f5"></a><!-- doxytag: member="FrequencyMatrix::increment" ref="abf161ab32e3317e9551d4814b14717f5" args="(size_t k, T incr_amt)" -->
 <div class="memitem">
 <div class="memproto">
+<div class="memtemplate">
+template&lt;class T&gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">void FrequencyMatrix::increment </td>
+          <td class="memname">void <a class="el" href="class_frequency_matrix.html">FrequencyMatrix</a>&lt; T &gt;::increment </td>
           <td>(</td>
           <td class="paramtype">size_t&#160;</td>
           <td class="paramname"><em>k</em>, </td>
@@ -265,7 +284,7 @@ Public Member Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">double&#160;</td>
+          <td class="paramtype">T&#160;</td>
           <td class="paramname"><em>incr_amt</em>&#160;</td>
         </tr>
         <tr>
@@ -285,16 +304,18 @@ Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="frequencymatrix_8cpp_source.html#l00056">56</a> of file <a class="el" href="frequencymatrix_8cpp_source.html">frequencymatrix.cpp</a>.</p>
+<p>Definition at line <a class="el" href="frequencymatrix_8h_source.html#l00181">181</a> of file <a class="el" href="frequencymatrix_8h_source.html">frequencymatrix.h</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a1e99db815a8aa8800f6156fe5d1b7387"></a><!-- doxytag: member="FrequencyMatrix::operator()" ref="a1e99db815a8aa8800f6156fe5d1b7387" args="(size_t k) const " -->
+<a class="anchor" id="a97b3a592c8bbed88e3f538d6126621e7"></a><!-- doxytag: member="FrequencyMatrix::operator()" ref="a97b3a592c8bbed88e3f538d6126621e7" args="(size_t k) const " -->
 <div class="memitem">
 <div class="memproto">
+<div class="memtemplate">
+template&lt;class T &gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">double FrequencyMatrix::operator() </td>
+          <td class="memname">T <a class="el" href="class_frequency_matrix.html">FrequencyMatrix</a>&lt; T &gt;::operator() </td>
           <td>(</td>
           <td class="paramtype">size_t&#160;</td>
           <td class="paramname"><em>k</em></td><td>)</td>
@@ -312,16 +333,18 @@ Public Member Functions</h2></td></tr>
 </dl>
 <dl class="return"><dt><b>Returns:</b></dt><dd>a double specifying the probability of the given position in the flattened matrix (logged if table is logged) </dd></dl>
 
-<p>Definition at line <a class="el" href="frequencymatrix_8cpp_source.html#l00033">33</a> of file <a class="el" href="frequencymatrix_8cpp_source.html">frequencymatrix.cpp</a>.</p>
+<p>Definition at line <a class="el" href="frequencymatrix_8h_source.html#l00154">154</a> of file <a class="el" href="frequencymatrix_8h_source.html">frequencymatrix.h</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="aa182384d4cd1ccf03d51eabc1a6511a5"></a><!-- doxytag: member="FrequencyMatrix::operator()" ref="aa182384d4cd1ccf03d51eabc1a6511a5" args="(size_t i, size_t j) const " -->
+<a class="anchor" id="a6fffa758a9e2aeda42a9c6f472575eb5"></a><!-- doxytag: member="FrequencyMatrix::operator()" ref="a6fffa758a9e2aeda42a9c6f472575eb5" args="(size_t i, size_t j, bool normalized=true) const " -->
 <div class="memitem">
 <div class="memproto">
+<div class="memtemplate">
+template&lt;class T &gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">double FrequencyMatrix::operator() </td>
+          <td class="memname">T <a class="el" href="class_frequency_matrix.html">FrequencyMatrix</a>&lt; T &gt;::operator() </td>
           <td>(</td>
           <td class="paramtype">size_t&#160;</td>
           <td class="paramname"><em>i</em>, </td>
@@ -330,7 +353,13 @@ Public Member Functions</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">size_t&#160;</td>
-          <td class="paramname"><em>j</em>&#160;</td>
+          <td class="paramname"><em>j</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>normalized</em> = <code>true</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -345,21 +374,52 @@ Public Member Functions</h2></td></tr>
   <table class="params">
     <tr><td class="paramname">i</td><td>the distribution (row) </td></tr>
     <tr><td class="paramname">j</td><td>the value (column) </td></tr>
+    <tr><td class="paramname">normalized</td><td>a bool specifying whether or not the frequency should be normalized </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="return"><dt><b>Returns:</b></dt><dd>a double specifying the probability of the given value in the given distribution (logged if table is logged) </dd></dl>
 
-<p>Definition at line <a class="el" href="frequencymatrix_8cpp_source.html#l00024">24</a> of file <a class="el" href="frequencymatrix_8cpp_source.html">frequencymatrix.cpp</a>.</p>
+<p>Definition at line <a class="el" href="frequencymatrix_8h_source.html#l00142">142</a> of file <a class="el" href="frequencymatrix_8h_source.html">frequencymatrix.h</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="af4aef437a9a3b739f84bbeb13a366f52"></a><!-- doxytag: member="FrequencyMatrix::row" ref="af4aef437a9a3b739f84bbeb13a366f52" args="(size_t i) const " -->
+<a class="anchor" id="a6857dcca06cd242fc2a6c7edd764963d"></a><!-- doxytag: member="FrequencyMatrix::set_logged" ref="a6857dcca06cd242fc2a6c7edd764963d" args="(bool logged)" -->
 <div class="memitem">
 <div class="memproto">
+<div class="memtemplate">
+template&lt;class T &gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">double FrequencyMatrix::row </td>
+          <td class="memname">void <a class="el" href="class_frequency_matrix.html">FrequencyMatrix</a>&lt; T &gt;::set_logged </td>
+          <td>(</td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>logged</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>a member function that converts the table between log-space and non-log space </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramname">logged</td><td>bool specifying if the table should be converted to logged or non-logged space </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Definition at line <a class="el" href="frequencymatrix_8h_source.html#l00187">187</a> of file <a class="el" href="frequencymatrix_8h_source.html">frequencymatrix.h</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a126c46c82bb7c0cbfd0b7da437e77f5d"></a><!-- doxytag: member="FrequencyMatrix::total" ref="a126c46c82bb7c0cbfd0b7da437e77f5d" args="(size_t i) const " -->
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class T&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">double <a class="el" href="class_frequency_matrix.html">FrequencyMatrix</a>&lt; T &gt;::total </td>
           <td>(</td>
           <td class="paramtype">size_t&#160;</td>
           <td class="paramname"><em>i</em></td><td>)</td>
@@ -377,46 +437,19 @@ Public Member Functions</h2></td></tr>
 </dl>
 <dl class="return"><dt><b>Returns:</b></dt><dd>a double specifying the raw row sum for the given distribution </dd></dl>
 
-<p>Definition at line <a class="el" href="frequencymatrix_8h_source.html#l00109">109</a> of file <a class="el" href="frequencymatrix_8h_source.html">frequencymatrix.h</a>.</p>
+<p>Definition at line <a class="el" href="frequencymatrix_8h_source.html#l00114">114</a> of file <a class="el" href="frequencymatrix_8h_source.html">frequencymatrix.h</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a51d153eb0ea0b398fb82fc97a66fed91"></a><!-- doxytag: member="FrequencyMatrix::set_logged" ref="a51d153eb0ea0b398fb82fc97a66fed91" args="(bool logged)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void FrequencyMatrix::set_logged </td>
-          <td>(</td>
-          <td class="paramtype">bool&#160;</td>
-          <td class="paramname"><em>logged</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-<p>a member function that converts the table between log-space and non-log space </p>
-<dl><dt><b>Parameters:</b></dt><dd>
-  <table class="params">
-    <tr><td class="paramname">logged</td><td>bool specifying if the table should be converted to logged or non-logged space </td></tr>
-  </table>
-  </dd>
-</dl>
-
-<p>Definition at line <a class="el" href="frequencymatrix_8cpp_source.html#l00061">61</a> of file <a class="el" href="frequencymatrix_8cpp_source.html">frequencymatrix.cpp</a>.</p>
-
-</div>
-</div>
-<hr/>The documentation for this class was generated from the following files:<ul>
+<hr/>The documentation for this class was generated from the following file:<ul>
 <li>src/<a class="el" href="frequencymatrix_8h_source.html">frequencymatrix.h</a></li>
-<li>src/<a class="el" href="frequencymatrix_8cpp_source.html">frequencymatrix.cpp</a></li>
 </ul>
 </div>
 </div>
   <div id="nav-path" class="navpath">
     <ul>
       <li class="navelem"><a class="el" href="class_frequency_matrix.html">FrequencyMatrix</a>      </li>
-      <li class="footer">Generated on Sun Apr 8 2012 11:49:01 for eXpress by&#160;
+      <li class="footer">Generated on Wed May 23 2012 22:06:18 for eXpress by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </li>
     </ul>
