@@ -18,7 +18,7 @@
 #include "sequence.h"
 
 typedef size_t TargID;
-class Library;
+struct Library;
 class Target;
 class TargetTable;
 
