@@ -76,7 +76,6 @@ bool output_running_reads = false;
 size_t num_threads = 2;
 
 // directional parameters
-enum Direction{ BOTH, FR, RF };
 Direction direction = BOTH;
 
 bool running = true;

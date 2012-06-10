@@ -364,21 +364,22 @@ void project_to_polytope(vector<Target*> bundle_targ, vector<double>& targ_count
         
         if (approx_eq(unbound_counts + bound_counts, bundle_counts))
             return;
-        
+	
+	if (unbound_counts == 0) 
+	{
+            polytope_bound = vector<bool>(bundle_targ.size(), false);
+	    unbound_counts = bound_counts;
+	    bound_counts = 0;
+	}
         double normalizer = (bundle_counts - bound_counts)/unbound_counts;
-        
-        bool unbound_exist = false;
+
         for (size_t i = 0; i < bundle_targ.size(); ++i)
         {    
             if (!polytope_bound[i])
             {
                 targ_counts[i] *= normalizer;
-                unbound_exist = true;
             }
         }
-                
-        if (!unbound_exist)
-            polytope_bound = vector<bool>(bundle_targ.size(), false);
     }
 }
 
@@ -441,7 +442,8 @@ void TargetTable::output_results(string output_dir, size_t tot_counts, bool outp
                 Target& targ = *bundle_targ[i];
                 double l_targ_frac = targ.mass(false) - l_bundle_mass;
                 targ_counts[i] = sexp(l_targ_frac + l_bundle_counts);
-                if (targ_counts[i] > (double)targ.tot_counts() || targ_counts[i] < (double)targ.uniq_counts())
+                assert(!isinf(targ_counts[i]) && !isnan(targ_counts[i]));
+		if (targ_counts[i] > (double)targ.tot_counts() || targ_counts[i] < (double)targ.uniq_counts())
                     requires_projection = true;
             }
                         
@@ -455,6 +457,7 @@ void TargetTable::output_results(string output_dir, size_t tot_counts, bool outp
             {
                 Target& targ = *bundle_targ[i];
                 double l_eff_len = targ.est_effective_length();
+		assert(!isinf(targ_counts[i]) && !isnan(targ_counts[i]));
 
                 // Calculate count variance
                 double mass_var = targ.mass_var(false);

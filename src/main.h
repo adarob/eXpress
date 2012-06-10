@@ -36,6 +36,9 @@ extern bool running;
 extern bool burned_out;
 extern bool edit_detect;
 
+enum Direction { BOTH, FR, RF };
+extern Direction direction;
+
 /**
  * a global size_t specifying the maximum read length supported
  */

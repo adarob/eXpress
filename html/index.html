@@ -161,16 +161,18 @@
         <div class="corner-content-1col-top"></div>                        
         <div class="content-1col-nobox">
           <h1>News</h1>
-          <h2>05.22.2012 &bull; eXpress 1.1.0 Released, Bowtie2 "bug" solved</h2>
-	  <p>The Bowtie2 "bug" we reported previously was actually due to mistakes made by several users in sorting files.  Output from Bowtie and Bowtie2 are already in the correct order with alignments grouped by read.  If you are using a different aligner, you <emph>may</emph> need to sort the alignments.  See the <a href=manual.html#sam>Manual</a> for more details and sorting commands. To help avoid these issues in the future, we have implemented a method that will detect improperly ordered alignments in input files with high probability (see Release Notes below).</p>
+          <h2>05.22.2012 &bull; eXpress 1.1.0 Released</h2>
+	  <p>This release brings an important new feature allowing users to combine reads from a single sample sequenced from different library prepartions or using different reads lengths.  Please read the <a href="faq#seppreps">FAQ</a> and <a href="manual#sam">Manual</a> for details on how to use this feature.</p>
+	  <p>The Bowtie2 "bug" we reported previously was actually due to mistakes made by several users in sorting files.  Output from Bowtie and Bowtie2 are already in the correct order with alignments grouped by read and do not need to be re-sorted.  If you are using a different aligner, you <emph>may</emph> need to sort the alignments.  See the <a href="manual.html#sam">Manual</a> for more details and sorting commands. To help avoid these issues in the future, we have implemented a method that will detect improperly ordered alignments in input files (see Release Notes below).</p>
 <p><b>Release Notes:</b>
 <ul>
-<li>Added a method to detect improperly ordered SAM files with high probability.</li>
 <li>Added the ability to combine reads sequenced from different library preparations or using different read lengths.  See the <a href="faq.html#seppreps">FAQ</a> for important details if using this feature.</li>
+<li>Added a method to detect improperly ordered SAM/BAM files.</li>
 <li>Fixed bug where it was not possible to enable additional-batch mode.</li>
 </ul></p>
 	  <h2>05.01.2012 &bull; Follow-up for Bowtie2 users</h2>
-          <p>Some users have asked questions about the Bowtie2 bug we reported yesterday.  We have developed a way to test if this bug will affect your results and by how much.  You should run one of the pairs of commands below (depending on if you file is in SAM or BAM format).  The first command prints how many reads (+ header lines) eXpress will see due to the bug and the second command prints how many reads (+ header lines) eXpress would see without the bug (the correct number).  The difference between the two will tell you how many reads are being "double counted" by eXpress.  If this number is relatively small, there is no cause for alarm.  If it is large, you should sort your file and rerun eXpress.  The commands to do this sorting can be found in the <a href=manual.html#sam>Manual</a>.  Please let us know if you have any further questions about this by emailing us at <a mailto:ask.xprs@gmail.com>ask.xprs@gmail.com</a>.  
+          <p><b>UPDATE (05.22.2012):</b> It has been discovered that this "bug" was not related to Bowtie2 but was due to users imporoperly sorting their alignment files.  See the 05.22.2012 announcement for more details.</p>
+<p>Some users have asked questions about the Bowtie2 bug we reported yesterday.  We have developed a way to test if this bug will affect your results and by how much.  You should run one of the pairs of commands below (depending on if you file is in SAM or BAM format).  The first command prints how many reads (+ header lines) eXpress will see due to the bug and the second command prints how many reads (+ header lines) eXpress would see without the bug (the correct number).  The difference between the two will tell you how many reads are being "double counted" by eXpress.  If this number is relatively small, there is no cause for alarm.  If it is large, you should sort your file and rerun eXpress.  The commands to do this sorting can be found in the <a href=manual.html#sam>Manual</a>.  Please let us know if you have any further questions about this by emailing us at <a mailto:ask.xprs@gmail.com>ask.xprs@gmail.com</a>.  
           <h4>Test commands:</h4>
 		  <p>(w/ SAM files)
 		  <ol><li><pre class="sc"><code>cut -f1 hits.sam | uniq | sort | wc -l
@@ -179,7 +181,8 @@
  		  <p>(w/ BAM files)
 		  <ol><li><pre class="sc"><code>samtools view hits.bam | cut -f1 | uniq | sort | wc -l
 		  <br>samtools view hits.bam | cut -f1 | uniq | sort | uniq | wc -l</code></pre></li></ol>
-          <h2>04.30.2012 &bull; Warning for Bowtie2 users</h2>
+          <h2>04.30.2012 &bull; Warning for Bowtie2 users (UPDATED)</h2>
+          <p><b>UPDATE (05.22.2012):</b> It has been discovered that this "bug" was not related to Bowtie2 but was due to users imporoperly sorting their alignment files.  See the 05.22.2012 announcement for more details.</p>
 		  <p>Due to a bug in Bowtie2, the alignments for a given read aren't guaranteed to be in a consecutive block in the SAM output.  Therefore, you must use the --reorder option until the bug is fixed or sort your alignment file using the commands in the <a href=http://bio.math.berkeley.edu/eXpress/manual.html#sam>Manual</a>.</p>
 		  <p>This bug will cause eXpress to produce incorrect results with no errors or notifications.</p>
           <h2>04.08.2012 &bull; eXpress 1.0.0 released</h2>
