@@ -19,7 +19,7 @@ MarkovModel::MarkovModel(size_t order, size_t window_size, size_t num_pos, doubl
 : _order((int)order),
   _window_size((int)window_size),
   _num_pos((int)num_pos),
-  _params(num_pos, FrequencyMatrix<double>(pow((double)NUM_NUCS, (double)order), NUM_NUCS, alpha)),
+  _params(num_pos, FrequencyMatrix<double>((size_t)pow((double)NUM_NUCS, (double)order), NUM_NUCS, alpha)),
   _bitclear((1<<(2*order))-1)
 {}
 

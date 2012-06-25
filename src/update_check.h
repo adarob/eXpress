@@ -32,7 +32,7 @@ int parse_version_str(char* version_str)
 	char* token = strtok(version_str,".");
     for(int i = 0; i < NUM_SEPS; ++i)
     {
-		version_int += atoi(token)*pow(100.,NUM_SEPS-i);
+      version_int += atoi(token)*(int)pow(100.,NUM_SEPS-i);
 	}
 	return version_int;
 }

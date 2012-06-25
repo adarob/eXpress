@@ -14,7 +14,7 @@ set(CMAKE_CXX_FLAGS_MINSIZEREL "-Os ${CMAKE_CXX_FLAGS}")
 
 set(CMAKE_BUILD_TYPE Release)
 set(Boost_USE_STATIC_LIBS ON)
-find_package(Boost 1.41
+find_package(Boost 1.39
     COMPONENTS
     thread
 	system

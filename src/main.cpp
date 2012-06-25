@@ -12,6 +12,7 @@
 #include <boost/program_options.hpp>
 #include <boost/thread.hpp>
 #include <iostream>
+#include <iomanip>
 #include <fstream>
 #include <stdio.h>
 #include <stdlib.h>
