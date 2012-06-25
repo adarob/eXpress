@@ -129,10 +129,10 @@
         <li><a href="#">Download<!--[if IE 7]><!--></a><!--<![endif]-->
           <!--[if lte IE 6]><table><tr><td><![endif]-->
             <ul>
-              <li><a href=downloads/express-1.1.0/express-1.1.0-macosx_x86_64.tgz onClick="_gaq.push(['_trackEvent', 'Downloads', 'Mac', 'home-menu']);" target="_blank">Mac OS X (64-bit)</a></li>
-              <li><a href=downloads/express-1.1.0/express-1.1.0-linux_x86_64.tgz onClick="_gaq.push(['_trackEvent', 'Downloads', 'Linux', 'home-menu']);" target="_blank">Linux (64-bit)</a></li>
-              <li><a href=downloads/express-1.1.0/express-1.1.0-win32_x86_64.zip onClick="_gaq.push(['_trackEvent', 'Downloads', 'Windows', 'home-menu']);" target="_blank">Windows (64-bit)</a></li>
-              <li><a href=downloads/express-1.1.0/express-1.1.0-src.tgz onClick="_gaq.push(['_trackEvent', 'Downloads', 'Source', 'home-menu']);" target="_blank">Source Code</a></li>
+              <li><a href=downloads/express-1.1.1/express-1.1.1-macosx_x86_64.tgz onClick="_gaq.push(['_trackEvent', 'Downloads', 'Mac', 'home-menu']);" target="_blank">Mac OS X (64-bit)</a></li>
+              <li><a href=downloads/express-1.1.1/express-1.1.1-linux_x86_64.tgz onClick="_gaq.push(['_trackEvent', 'Downloads', 'Linux', 'home-menu']);" target="_blank">Linux (64-bit)</a></li>
+              <li><a href=downloads/express-1.1.1/express-1.1.1-win32_x86_64.zip onClick="_gaq.push(['_trackEvent', 'Downloads', 'Windows', 'home-menu']);" target="_blank">Windows (64-bit)</a></li>
+              <li><a href=downloads/express-1.1.1/express-1.1.1-src.tgz onClick="_gaq.push(['_trackEvent', 'Downloads', 'Source', 'home-menu']);" target="_blank">Source Code</a></li>
               <li><a href="downloads" onClick="_gaq.push(['_trackEvent', 'Downloads', 'Previous','home-menu']);">Previous Versions</a></li>
             </ul>
           <!--[if lte IE 6]></td></tr></table></a><![endif]-->
@@ -161,6 +161,14 @@
         <div class="corner-content-1col-top"></div>                        
         <div class="content-1col-nobox">
           <h1>News</h1>
+          <h2>06.24.2012 &bull; eXpress 1.1.1 released</h2>
+          <p>This release includes pathes for the minor bugs listed below.
+   		  <ul>
+		  <li>The stand-specific modes (<tt>--fr-stranded</tt> and <tt>--rf-stranded</tt>) were not being enabled by the command-line arguments. This has been corrected.</li>
+   		  <li>In rare cases, NaN and negative counts were being output in results.xprs. This issue has also been corrected.</li>
+		  <li>Linux build is now compiled on CentOS 5 with GCC 4.4.6 for improved compatibility with older installations.</li>
+   		  </ul></p>
+   		  <p>Thanks to the users who reported and helped fix these bugs.</p>
           <h2>05.22.2012 &bull; eXpress 1.1.0 Released</h2>
 	  <p>This release brings an important new feature allowing users to combine reads from a single sample sequenced from different library prepartions or using different reads lengths.  Please read the <a href="faq#seppreps">FAQ</a> and <a href="manual#sam">Manual</a> for details on how to use this feature.</p>
 	  <p>The Bowtie2 "bug" we reported previously was actually due to mistakes made by several users in sorting files.  Output from Bowtie and Bowtie2 are already in the correct order with alignments grouped by read and do not need to be re-sorted.  If you are using a different aligner, you <emph>may</emph> need to sort the alignments.  See the <a href="manual.html#sam">Manual</a> for more details and sorting commands. To help avoid these issues in the future, we have implemented a method that will detect improperly ordered alignments in input files (see Release Notes below).</p>
@@ -260,11 +268,11 @@
         <div class="subcontent-box">
           <h1>Download</h1>                    
           <h5>Current Release</h5>
-          <p>eXpress 1.1.0
-          <br />&rarr; <a href="downloads/express-1.1.0/express-1.1.0-macosx_x86_64.tgz" onClick="_gaq.push(['_trackEvent', 'Downloads', 'Mac', 'home-side']);" target="_blank">Mac OS X (64-bit) Binary</a>
-          <br />&rarr; <a href="downloads/express-1.1.0/express-1.1.0-linux_x86_64.tgz" onClick="_gaq.push(['_trackEvent', 'Downloads', 'Linux', 'home-side']);" target="_blank">Linux (64-bit) Binary</a>
-          <br />&rarr; <a href="downloads/express-1.1.0/express-1.1.0-win32_x86_64.zip" onClick="_gaq.push(['_trackEvent', 'Downloads', 'Windows', 'home-side']);" target="_blank">Windows (64-bit) Binary</a>
-          <br />&rarr; <a href="downloads/express-1.1.0/express-1.1.0-src.tgz" onClick="_gaq.push(['_trackEvent', 'Downloads', 'Source', 'home-side']); " target="_blank">Source</a>
+          <p>eXpress 1.1.1
+          <br />&rarr; <a href="downloads/express-1.1.1/express-1.1.1-macosx_x86_64.tgz" onClick="_gaq.push(['_trackEvent', 'Downloads', 'Mac', 'home-side']);" target="_blank">Mac OS X (64-bit) Binary</a>
+          <br />&rarr; <a href="downloads/express-1.1.1/express-1.1.1-linux_x86_64.tgz" onClick="_gaq.push(['_trackEvent', 'Downloads', 'Linux', 'home-side']);" target="_blank">Linux (64-bit) Binary</a>
+          <br />&rarr; <a href="downloads/express-1.1.1/express-1.1.1-win32_x86_64.zip" onClick="_gaq.push(['_trackEvent', 'Downloads', 'Windows', 'home-side']);" target="_blank">Windows (64-bit) Binary</a>
+          <br />&rarr; <a href="downloads/express-1.1.1/express-1.1.1-src.tgz" onClick="_gaq.push(['_trackEvent', 'Downloads', 'Source', 'home-side']); " target="_blank">Source</a>
           <h5>Previous Versions</h5>
           <p>&rarr; <a href="downloads" onClick="_gaq.push(['_trackEvent', 'Downloads', 'Previous','home-side']);">View All</a>
 
