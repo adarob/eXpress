@@ -55,7 +55,9 @@ class Sequence
 {
     
 public:
-        
+
+    Sequence() {}
+    virtual ~Sequence() {}
     /**
      * a member function that returns the encoded character at the given index
      * @param index the index of the encoded character to return (assumed to be < _len)

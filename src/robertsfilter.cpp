@@ -25,7 +25,7 @@ bool RobertsFilter::test_and_push(const string& frag_name)
         size_t r = _global_set.size();
         if (_global_set.size() == _global_size)
         {
-            r = rand()/double(RAND_MAX)*(_global_size-1);
+	  r = (size_t)(rand()/double(RAND_MAX)*(_global_size-1));
             _global_set.erase(_global_vector[r]);
         }
 

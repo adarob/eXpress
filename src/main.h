@@ -58,7 +58,7 @@ const double EPSILON = 0.0001;
 
 inline bool approx_eq(double a, double b, double eps=EPSILON)
 {
-    return abs(a-b) < eps;
+    return fabs(a-b) < eps;
 }
 
 /**
