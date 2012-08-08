@@ -62,7 +62,7 @@ void Fragment::add_open_mate(FragHit* new_p)
         FragHit& om = **it;
         if (nm.targ_id == om.targ_id && (size_t)nm.mate_l == om.left && (size_t)om.mate_l == nm.left)
         {
-            if (nm.left < om.left)
+	    if (nm.left < om.left || (nm.left == om.left && nm.seq_r.empty()))
             {
                 assert(nm.seq_r.empty());
                 nm.right = om.right;
