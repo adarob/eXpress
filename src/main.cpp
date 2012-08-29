@@ -482,7 +482,7 @@ size_t threaded_calc_abundances(Librarian& libs)
 
                 if (lib.n == burn_in)
                 {
-                    bias_update = new boost::thread(&TargetTable::threaded_bias_update, lib.targ_table, &bu_mut);
+                    bias_update = new boost::thread(&TargetTable::asynch_bias_update, lib.targ_table, &bu_mut);
                     if (lib.mismatch_table)
                         (lib.mismatch_table)->activate();
                 }
@@ -605,7 +605,7 @@ size_t threaded_calc_abundances(Librarian& libs)
 
 int main (int argc, char ** argv)
 {     
-    srand ( time(NULL) );
+    srand(time(NULL));
     int parse_ret = parse_options(argc,argv);
     if (parse_ret)
         return parse_ret;

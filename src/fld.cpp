@@ -31,7 +31,10 @@ FLD::FLD(double alpha, size_t max_val, size_t mean, size_t std_dev) :
     
     for (size_t i = 0; i <= max_val; ++i)
     {  
-        double mass = tot + log(boost::math::cdf(norm,i+0.5) - boost::math::cdf(norm,i-0.5));
+        double norm_mass = boost::math::cdf(norm,i+0.5) - boost::math::cdf(norm,i-0.5);
+        double mass = -numeric_limits<double>::max();
+        if (norm_mass != 0)
+            mass = tot + log(boost::math::cdf(norm,i+0.5) - boost::math::cdf(norm,i-0.5));
         _hist[i] = mass;
         _sum = log_sum(_sum, log((double)i)+mass);
         _tot_mass = log_sum(_tot_mass, mass);
