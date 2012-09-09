@@ -1,10 +1,10 @@
-//
-//  targets.cpp
-//  express
-//
-//  Created by Adam Roberts on 3/20/11.
-//  Copyright 2011 Adam Roberts. All rights reserved.
-//
+/**
+ *  targets.cpp
+ *  express
+ *
+ *  Created by Adam Roberts on 3/20/11.
+ *  Copyright 2011 Adam Roberts. All rights reserved.
+ */
 
 #include "main.h"
 #include "targets.h"
@@ -21,7 +21,7 @@
 
 using namespace std;
 
-Target::Target(const TargID id, const std::string& name, const std::string& seq,
+Target::Target(TargID id, const std::string& name, const std::string& seq,
                bool prob_seq, double alpha, const Librarian* libs)
    : _libs(libs),
      _id(id),
@@ -75,7 +75,7 @@ double Target::mass(bool with_pseudo) const {
   if (!with_pseudo) {
       return _ret_params->mass;
   }
-  return log_sum(_ret_params->mass, _alpha+_cached_eff_len);
+  return log_sum(_ret_params->mass, _alpha+_cached_eff_len+_avg_bias);
 }
 
 double Target::mass_var(bool with_pseudo) const {
@@ -87,33 +87,34 @@ double Target::mass_var(bool with_pseudo) const {
 
 double Target::log_likelihood(const FragHit& frag, bool with_pseudo) const {
   double ll = 0;
-
+  
+  const PairStatus ps = frag.pair_status();
   const Library& lib = _libs->curr_lib();
    
   if (lib.mismatch_table) {
-      ll += (lib.mismatch_table)->log_likelihood(frag);
+    ll += (lib.mismatch_table)->log_likelihood(frag);
   }
-    
-  const PairStatus ps = frag.pair_status();
-  {
-    if (with_pseudo) {
-      ll += log_sum(_ret_params->mass, _alpha+_cached_eff_len + _avg_bias);
-    } else {
-      ll += _ret_params->mass;
-        
-      if (lib.bias_table) {
-        if (ps != RIGHT_ONLY) {
-          ll += _start_bias->at(frag.left);
-        }
-        if (ps != LEFT_ONLY) {
-          ll += _end_bias->at(frag.right-1);
-        }
-        ll -= (_cached_eff_len + _avg_bias);
-      }
+
+  double tot_mass = mass(with_pseudo);
+  double tot_eff_len = cached_effective_length(lib.bias_table);
+  foreach (const Target* neighbor, frag.neighbors) {
+    tot_mass = log_sum(tot_mass, neighbor->mass(with_pseudo));
+    tot_eff_len = log_sum(tot_eff_len,
+                          neighbor->cached_effective_length(lib.bias_table));
+  }
+  ll += tot_mass - tot_eff_len;
+     
+  if (lib.bias_table) {
+    if (ps != RIGHT_ONLY) {
+      ll += _start_bias->at(frag.left);
+    }
+    if (ps != LEFT_ONLY) {
+      ll += _end_bias->at(frag.right-1);
     }
   }
+
   if (ps == PAIRED) {
-      ll += (lib.fld)->pdf(frag.length());
+    ll += (lib.fld)->pmf(frag.length());
   }
   
   assert(!(isnan(ll)||isinf(ll)));
@@ -128,7 +129,7 @@ double Target::est_effective_length(FLD* fld, bool with_bias) const {
   double eff_len = HUGE_VAL;
      
   for(size_t l = fld->min_val(); l <= min(length(), fld->max_val()); l++) {
-    eff_len = log_sum(eff_len, fld->pdf(l)+log((double)length()-l+1));
+    eff_len = log_sum(eff_len, fld->pmf(l)+log((double)length()-l+1));
   }
   
   if (with_bias) {
@@ -370,7 +371,7 @@ void TargetTable::output_results(string output_dir, size_t tot_counts,
   foreach (Bundle* bundle, _bundle_table.bundles()) {
     ++bundle_id;
         
-    const vector<Target*>& bundle_targ = bundle->targets();
+    const vector<Target*>& bundle_targ = *(bundle->targets());
         
     if (output_varcov) {
       varcov_file << ">" << bundle_id << ": ";
@@ -578,7 +579,7 @@ void TargetTable::asynch_bias_update(boost::mutex* mutex) {
         
     burned_out_before = burned_out;
         
-    vector<double> fl_cdf = fld->cdf();
+    vector<double> fl_cdf = fld->cmf();
         
     foreach(Target* targ, _targ_map) {
       targ->lock();

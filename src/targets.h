@@ -1,10 +1,10 @@
-//
-//  targets.h
-//  express
-//
-//  Created by Adam Roberts on 3/20/11.
-//  Copyright 2011 Adam Roberts. All rights reserved.
-//
+/**
+ *  targets.h
+ *  express
+ *
+ *  Created by Adam Roberts on 3/20/11.
+ *  Copyright 2011 Adam Roberts. All rights reserved.
+ */
 
 #ifndef TRANSCRIPTS_H
 #define TRANSCRIPTS_H
@@ -21,7 +21,7 @@
 #include "sequence.h"
 
 class FLD;
-class FragHit;
+struct FragHit;
 class BiasBoss;
 class MismatchTable;
 class Librarian;
@@ -33,8 +33,7 @@ class Librarian;
  * @date      2012
  * @copyright Artistic License 2.0
  **/
-struct RoundParams
-{
+struct RoundParams {
   /**
    * A public double that stores the (logged) assigned mass based on observed
    * fragment mapping probabilities.
@@ -74,8 +73,7 @@ typedef size_t TargID;
  *  @date    2011
  *  @copyright Artistic License 2.0
  **/
-class Target
-{
+class Target {
   /**
    * A private pointer to the struct containing pointers to the global
    * parameter tables (bias_table, mismatch_table, fld).
@@ -165,7 +163,8 @@ class Target
   
 public:
   /**
-   * Target Constructor
+   * Target Constructor.
+   * @param id a unique TargID identifier.
    * @param name a string that stores the target name.
    * @param seq a string that stores the target sequence.
    * @param prob_seq a bool that specifies if the sequence is to be treated
@@ -175,7 +174,7 @@ public:
    * @param libs a pointer to the struct containing pointers to the global
    *        parameter tables (bias_table, mismatch_table, fld).
    */
-  Target(const size_t id, const std::string& name, const std::string& seq,
+  Target(TargID id, const std::string& name, const std::string& seq,
        bool prob_seq, double alpha, const Librarian* libs);
   /**
    * A member function that locks the target mutex to provide thread safety.
@@ -374,8 +373,7 @@ typedef boost::unordered_map<std::string, double> AlphaMap;
  *  @date    2011
  *  @copyright Artistic License 2.0
  **/
-class TargetTable
-{
+class TargetTable {
   /**
    * A private pointer to the struct containing pointers to the global parameter
    * tables (bias_table, mismatch_table, fld).
@@ -400,7 +398,6 @@ class TargetTable
    * (including pseudo-counts) to allow for rho calculations.
    */
   double _total_fpb;
-
   /**
    * A private mutex to make accesses to _total_fpb thread-safe.
    */
@@ -415,7 +412,7 @@ class TargetTable
    *        of the target (non-logged).
    * @param targ_index the target-to-index map from the alignment file.
    * @param targ_lengths the target-to-length map from the alignment file, for
-            validation.
+   *        validation.
    */
   void add_targ(const std::string& name, const std::string& seq, bool prob_seqs,
                 double alpha, const TransIndex& targ_index,
@@ -423,7 +420,7 @@ class TargetTable
 
 public:
   /**
-   * TargetTable Constructor
+   * TargetTable Constructor.
    * @param targ_fasta_file a string storing the path to the fasta file from
    *        which to load targets.
    * @param prob_seqs a bool that specifies if the sequence is to be treated

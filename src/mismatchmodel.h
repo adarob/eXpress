@@ -10,7 +10,7 @@
 
 #include "frequencymatrix.h"
 
-class FragHit;
+struct FragHit;
 class Target;
 
 /** 

@@ -42,7 +42,7 @@ extern Direction direction;
 /**
  * a global size_t specifying the maximum read length supported
  */
-const size_t MAX_READ_LEN = 200;
+const size_t MAX_READ_LEN = 1200;
 
 /**
  * a global size_t specifying the number of possible nucleotides

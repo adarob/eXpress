@@ -18,9 +18,9 @@
 
 class ParseThreadSafety;
 class Fragment;
-class FragHit;
+struct FragHit;
 class TargetTable;
-class Library;
+struct Library;
 
 typedef boost::unordered_map<std::string, size_t> TransIndex;
 
@@ -391,7 +391,7 @@ public:
      * @param thread_safety a pointer to the struct containing shared queues with the processing thread
      * @param stop_at a size_t indicating how many reads to process before stopping (disabled if 0)
      */
-    void threaded_parse(ParseThreadSafety* thread_safety, size_t stop_at=0);
+    void threaded_parse(ParseThreadSafety* thread_safety, size_t stop_at=0, size_t num_neighbors=0);
     
     /**
      * a member function that returns the target-to-index map

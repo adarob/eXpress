@@ -166,68 +166,77 @@ MapParser::~MapParser()
         delete _writer;
 }
 
-void MapParser::threaded_parse(ParseThreadSafety* thread_safety_p, size_t stop_at)
-{
-    ParseThreadSafety& pts = *thread_safety_p;
-    bool fragments_remain = true;
-    size_t n = 0;
-    size_t still_out = 0;
+void MapParser::threaded_parse(ParseThreadSafety* thread_safety_p,
+                               size_t stop_at,
+                               size_t num_neighbors) {
+  ParseThreadSafety& pts = *thread_safety_p;
+  bool fragments_remain = true;
+  size_t n = 0;
+  size_t still_out = 0;
     
-    TargetTable& targ_table = *(_lib->targ_table);
+  TargetTable& targ_table = *(_lib->targ_table);
     
-    while (!stop_at || n < stop_at)
-    {
-        Fragment* frag = NULL;
-        while (fragments_remain)
-        {
-            frag = new Fragment(_lib); 
-            fragments_remain = _parser->next_fragment(*frag);
-            if (frag->num_hits())
-                break;
-            delete frag;
-            frag = NULL;
+  while (!stop_at || n < stop_at) {
+    Fragment* frag = NULL;
+    while (fragments_remain) {
+      frag = new Fragment(_lib);
+      fragments_remain = _parser->next_fragment(*frag);
+      if (frag->num_hits()) {
+        break;
+      }
+      delete frag;
+      frag = NULL;
+    }
+    for (size_t i = 0; frag && i < frag->hits().size(); ++i) {
+      FragHit& m = *(frag->hits()[i]);
+      Target* t = targ_table.get_targ(m.targ_id);
+      if (!t) {
+        cerr << "ERROR: Target sequence at index '" << m.targ_id
+             << "' not found. Verify that it is in the SAM/BAM header and "
+             << "FASTA file.\n";
+        exit(1);
+      }
+      m.mapped_targ = t;
+      assert(t->id() == m.targ_id);
+      
+      // Add num_neighbors targets on either side to the neighbors list.
+      // Used for experimental feature.
+      for (TargID j = 1; j <= num_neighbors;  j++) {
+        if (j <= m.targ_id) {
+          m.neighbors.push_back(targ_table.get_targ(m.targ_id - j));
         }
-        for (size_t i = 0; frag && i < frag->hits().size(); ++i)
-        {
-            FragHit& m = *(frag->hits()[i]);
-            Target* t = targ_table.get_targ(m.targ_id);
-            if (!t)
-            {
-                cerr << "ERROR: Target sequence at index '" << m.targ_id << "' not found. Verify that it is in the SAM/BAM header and FASTA file.\n";
-                exit(1);
-            }
-            m.mapped_targ = t;
-            assert(t->id() == m.targ_id);
+        if (j + m.targ_id < targ_table.size()) {
+          m.neighbors.push_back(targ_table.get_targ(m.targ_id + j));
         }
-        Fragment* done_frag = pts.proc_out.pop(false);
-        while (done_frag)
-        {
-            if (_writer && _write_active)
-                _writer->write_fragment(*done_frag);
-            delete done_frag;
-            still_out--;
-            done_frag = pts.proc_out.pop(false);
-        }
+      }
+    }
+    boost::scoped_ptr<Fragment> done_frag(pts.proc_out.pop(false));
+    while (done_frag) {
+      if (_writer && _write_active) {
+        _writer->write_fragment(*done_frag);
+      }
+      still_out--;
+      done_frag.reset(pts.proc_out.pop(false));
+    }
 
-        
-        if (!frag)
-            break;
-        
-        pts.proc_in.push(frag);
-        n++;
-        still_out++;
+    if (!frag) {
+      break;
     }
     
-    pts.proc_in.push(NULL);
+    pts.proc_in.push(frag);
+    n++;
+    still_out++;
+  }
     
-    while (still_out)
-    {
-        Fragment* done_frag = pts.proc_out.pop(true);
-        if (_writer && _write_active)
-            _writer->write_fragment(*done_frag);
-        delete done_frag;
-        still_out--;
+  pts.proc_in.push(NULL);
+    
+  while (still_out) {
+    boost::scoped_ptr<Fragment> done_frag(pts.proc_out.pop(true));
+    if (_writer && _write_active) {
+      _writer->write_fragment(*done_frag);
     }
+    still_out--;
+  }
 }
 
 BAMParser::BAMParser(BamTools::BamReader* reader)

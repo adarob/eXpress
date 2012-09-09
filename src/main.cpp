@@ -75,6 +75,7 @@ bool output_align_samp = false;
 bool output_running_rounds = false;
 bool output_running_reads = false;
 size_t num_threads = 2;
+size_t num_neighbors = 0;
 
 // directional parameters
 Direction direction = BOTH;
@@ -92,172 +93,175 @@ size_t remaining_rounds = 0;
 typedef boost::unordered_map<string, double> AlphaMap;
 AlphaMap* expr_alpha_map = NULL;
 
-AlphaMap* parse_priors(string in_file)
-{
-    ifstream ifs(in_file.c_str());
-    if(!ifs.is_open())
-    {
-        cerr << "ERROR: Unable to open input priors file '" << in_file << "'.\n" ; 
-        exit(1);
-    }
-    AlphaMap* alphas = new AlphaMap();
+AlphaMap* parse_priors(string in_file) {
+  ifstream ifs(in_file.c_str());
+  if (!ifs.is_open()) {
+    cerr << "ERROR: Unable to open input priors file '" << in_file << "'.\n" ;
+    exit(1);
+  }
+  AlphaMap* alphas = new AlphaMap();
     
-    string line;
+  string line;
     
-    while(ifs.good())
-    {
-        getline(ifs,line);
+  while(ifs.good()) {
+    getline(ifs,line);
         
-        size_t idx = line.find_first_of("\t ");
-        if (idx!=string::npos)
-        {
-            string name = line.substr(0,idx);
-            string val = line.substr(idx+1);
-            (*alphas)[name] = atof(val.c_str());
-        }
+    size_t idx = line.find_first_of("\t ");
+    if (idx!=string::npos) {
+      string name = line.substr(0,idx);
+      string val = line.substr(idx+1);
+      (*alphas)[name] = atof(val.c_str());
     }
-    return alphas;
+  }
+  return alphas;
 };
 
-bool parse_options(int ac, char ** av)
-{
-    po::options_description generic("Allowed options");
-    generic.add_options()
-    ("help,h", "produce help message")
-    ("output-dir,o", po::value<string>(&output_dir)->default_value("."), "write all output files to this directory")
-    ("num-threads,p", po::value<size_t>(&num_threads)->default_value(2), "number of threads (>= 2)")
-    ("frag-len-mean,m", po::value<int>(&def_fl_mean)->default_value(def_fl_mean), "prior estimate for average fragment length")
-    ("frag-len-stddev,s", po::value<int>(&def_fl_stddev)->default_value(def_fl_stddev), "prior estimate for fragment length std deviation")
-    ("additional-batch,B", po::value<size_t>(&remaining_rounds)->default_value(remaining_rounds), "number of additional batch EM rounds after initial online round")
-      ("additional-online,O", po::value<size_t>(&remaining_rounds), "number of additional online EM rounds after initial online round")
-    ("output-align-prob", "output alignments (sam/bam) with probabilistic assignments")
-    ("output-align-samp", "output alignments (sam/bam) with sampled assignments")
-    ("fr-stranded", "accept only forward->reverse alignments (second-stranded protocols)")
-    ("rf-stranded", "accept only reverse->forward alignments (first-stranded protocols)")
-    ("calc-covar", "calculate and output covariance matrix")
-    ("no-update-check", "disables automatic check for update via web")
-    ;
+bool parse_options(int ac, char ** av) {
+  po::options_description generic("Allowed options");
+  generic.add_options()
+  ("help,h", "produce help message")
+  ("output-dir,o", po::value<string>(&output_dir)->default_value("."),
+   "write all output files to this directory")
+  ("num-threads,p", po::value<size_t>(&num_threads)->default_value(2),
+   "number of threads (>= 2)")
+  ("frag-len-mean,m", po::value<int>(&def_fl_mean)->default_value(def_fl_mean),
+   "prior estimate for average fragment length")
+  ("frag-len-stddev,s",
+   po::value<int>(&def_fl_stddev)->default_value(def_fl_stddev),
+   "prior estimate for fragment length std deviation")
+  ("additional-batch,B",
+   po::value<size_t>(&remaining_rounds)->default_value(remaining_rounds),
+   "number of additional batch EM rounds after initial online round")
+  ("additional-online,O", po::value<size_t>(&remaining_rounds),
+   "number of additional online EM rounds after initial online round")
+  ("output-align-prob",
+   "output alignments (sam/bam) with probabilistic assignments")
+  ("output-align-samp",
+   "output alignments (sam/bam) with sampled assignments")
+  ("fr-stranded",
+   "accept only forward->reverse alignments (second-stranded protocols)")
+  ("rf-stranded",
+   "accept only reverse->forward alignments (first-stranded protocols)")
+  ("calc-covar", "calculate and output covariance matrix")
+  ("no-update-check", "disables automatic check for update via web")
+  ;
     
-    string prior_file = "";
+  string prior_file = "";
     
-    po::options_description hidden("Hidden options");
-    hidden.add_options()
-    ("edit-detect","")
-    ("no-bias-correct","")
-    ("no-error-model","")
-    ("single-round", "")
-    ("output-running-rounds", "")    
-    ("output-running-reads", "")
-    ("batch-mode","")
-    ("both","")
-    ("burn-out", po::value<size_t>(&burn_out)->default_value(burn_out), "")
-    ("prior-params", po::value<string>(&prior_file)->default_value(""), "")
-    ("forget-param,f", po::value<double>(&ff_param)->default_value(ff_param),"")
-    ("expr-alpha", po::value<double>(&expr_alpha)->default_value(expr_alpha),"")
-    ("stop-at", po::value<size_t>(&stop_at)->default_value(0),"")
-    ("sam-file", po::value<string>(&in_map_file_names)->default_value(""),"")
-    ("fasta-file", po::value<string>(&fasta_file_name)->default_value(""),"")
-    ;
+  po::options_description hidden("Hidden options");
+  hidden.add_options()
+  ("edit-detect","")
+  ("no-bias-correct","")
+  ("no-error-model","")
+  ("single-round", "")
+  ("output-running-rounds", "")
+  ("output-running-reads", "")
+  ("batch-mode","")
+  ("both","")
+  ("burn-out", po::value<size_t>(&burn_out)->default_value(burn_out), "")
+  ("prior-params", po::value<string>(&prior_file)->default_value(""), "")
+  ("forget-param,f", po::value<double>(&ff_param)->default_value(ff_param), "")
+  ("expr-alpha", po::value<double>(&expr_alpha)->default_value(expr_alpha), "")
+  ("stop-at", po::value<size_t>(&stop_at)->default_value(0), "")
+  ("sam-file", po::value<string>(&in_map_file_names)->default_value(""), "")
+  ("fasta-file", po::value<string>(&fasta_file_name)->default_value(""), "")
+  ("num-neighbors", po::value<size_t>(&num_neighbors)->default_value(0), "")
+  ;
     
-    po::positional_options_description positional;
-    positional.add("fasta-file",1).add("sam-file",1);
+  po::positional_options_description positional;
+  positional.add("fasta-file",1).add("sam-file",1);
+   
+  po::options_description cmdline_options;
+  cmdline_options.add(generic).add(hidden);
     
-    po::options_description cmdline_options;
-    cmdline_options.add(generic).add(hidden);
+  bool error = false;
+  po::variables_map vm;
+  try {
+    po::store(po::command_line_parser(ac, av).options(cmdline_options)
+              .positional(positional).run(), vm);
+  } catch (po::error& e) {
+    cerr << "Command-Line Argument Error: "<< e.what() << endl;
+    error = true;
+  }
+  po::notify(vm);
     
-    bool error = false;
-    po::variables_map vm;
-    try 
-    {
-        po::store(po::command_line_parser(ac, av).options(cmdline_options).positional(positional).run(), vm);
-    }
-    catch (po::error& e)
-    {
-        cerr << "Command-Line Argument Error: "<< e.what() << endl;
-        error = true;
-    }
-    po::notify(vm);
-    
-    if (ff_param > 1.0 || ff_param < 0.5)
-    {
-        cerr << "Command-Line Argument Error: forget-param/f option must be between 0.5 and 1.0\n\n";
-        error= true;
-    }
+  if (ff_param > 1.0 || ff_param < 0.5) {
+    cerr << "Command-Line Argument Error: forget-param/f option must be "
+         << "between 0.5 and 1.0\n\n";
+    error= true;
+  }
         
-    if (fasta_file_name == "")
-    {
-        cerr << "Command-Line Argument Error: target sequence fasta file required\n\n";
-        error = true;
-    }
+  if (fasta_file_name == "") {
+    cerr << "Command-Line Argument Error: target sequence fasta file "
+         << "required\n\n";
+    error = true;
+  }
     
-    if (error || vm.count("help")) 
-    {
-        cerr << "express v" << PACKAGE_VERSION << endl;
-        cerr << "-----------------------------\n"; 
-        cerr << "File Usage:  express [options] <target_seqs.fa> <hits.(sam/bam)>\n";
-        cerr << "Piped Usage: bowtie [options] -S <index> <reads.fq> | express [options] <target_seqs.fa>\n";
-        cerr << "Required arguments:\n";
-        cerr << " <target_seqs.fa>                     target sequence file in fasta format\n";
-        cerr << " <hits.(sam/bam)>                     read alignment file in SAM or BAM format\n";
-        
-        cerr << generic;
-        
-        return 1;
-    }
+  if (error || vm.count("help")) {
+    cerr << "express v" << PACKAGE_VERSION << endl
+         << "-----------------------------\n"
+         << "File Usage:  express [options] <target_seqs.fa> <hits.(sam/bam)>\n"
+         << "Piped Usage: bowtie [options] -S <index> <reads.fq> | express "
+         << "[options] <target_seqs.fa>\n"
+         << "Required arguments:\n"
+         << " <target_seqs.fa>       target sequence file in fasta format\n"
+         << " <hits.(sam/bam)>       read alignment file in SAM or BAM format\n"
+         << generic;
+    return 1;
+  }
     
-    if (vm.count("fr-stranded"))
-    {
-        direction = FR;
-    }
+  if (vm.count("fr-stranded")) {
+    direction = FR;
+  }
     
-    if (vm.count("rf-stranded"))
-    {
-        if (direction != BOTH)
-        {
-            cerr << "ERROR fr-stranded and rf-stranded flags cannot both be specified in the same run.\n";
-            return 1;
-        }
-        direction = RF;
+  if (vm.count("rf-stranded")) {
+    if (direction != BOTH) {
+      cerr << "ERROR fr-stranded and rf-stranded flags cannot both be "
+           << "specified in the same run.\n";
+      return 1;
     }
+    direction = RF;
+  }
 
-    edit_detect = vm.count("edit-detect");
-    calc_covar = vm.count("calc-covar");
-    bias_correct = !(vm.count("no-bias-correct"));
-    error_model = !(vm.count("no-error-model"));
-    output_align_prob = vm.count("output-align-prob");
-    output_align_samp = vm.count("output-align-samp");
-    output_running_rounds = vm.count("output-running-rounds");
-    output_running_reads = vm.count("output-running-reads");
-    batch_mode = vm.count("batch-mode");
-    online_additional = vm.count("additional-online");
-    both = vm.count("both");
+  edit_detect = vm.count("edit-detect");
+  calc_covar = vm.count("calc-covar");
+  bias_correct = !(vm.count("no-bias-correct"));
+  error_model = !(vm.count("no-error-model"));
+  output_align_prob = vm.count("output-align-prob");
+  output_align_samp = vm.count("output-align-samp");
+  output_running_rounds = vm.count("output-running-rounds");
+  output_running_reads = vm.count("output-running-reads");
+  batch_mode = vm.count("batch-mode");
+  online_additional = vm.count("additional-online");
+  both = vm.count("both");
+   
+  if (output_align_prob && output_align_samp) {
+    cerr << "ERROR: Cannot output both alignment probabilties and sampled "
+         << "alignments.";
+    return 1;
+  }
     
-    if (output_align_prob && output_align_samp)
-    {
-        cerr << "ERROR: Cannot output both alignment probabilties and sampled alignments.";
-        return 1;
-    }
-    
-    if (num_threads < 2)
-        num_threads = 0;
-    num_threads -= 2;
-    if (num_threads > 0)
-        num_threads -= edit_detect;
-    
-    if (remaining_rounds > 0 && in_map_file_names != "")
-        last_round = false;
-    
-    if (prior_file != "")
-    {
-        expr_alpha_map = parse_priors(prior_file);
-    }
+  if (num_threads < 2) {
+    num_threads = 0;
+  }
+  num_threads -= 2;
+  if (num_threads > 0) {
+    num_threads -= edit_detect;
+  }
+  if (remaining_rounds > 0 && in_map_file_names != "") {
+    last_round = false;
+  }
+  if (prior_file != "") {
+    expr_alpha_map = parse_priors(prior_file);
+  }
     
 #ifndef WIN32
-    if (!vm.count("no-update-check"))
-        check_version(PACKAGE_VERSION);
+  if (!vm.count("no-update-check")) {
+    check_version(PACKAGE_VERSION);
+  }
 #endif
     
-    return 0;
+  return 0;
 }
 
 /**
@@ -266,128 +270,129 @@ bool parse_options(int ac, char ** av)
  * @param frag_p pointer to the fragment to probabilistically assign
  * @param globs a pointer to the struct containing pointers to the global parameter tables (bias_table, mismatch_table, fld)
  */
-void process_fragment(Fragment* frag_p)
-{
-    Fragment& frag = *frag_p;
-    const Library& lib = *frag.lib();
+void process_fragment(Fragment* frag_p) {
+  Fragment& frag = *frag_p;
+  const Library& lib = *frag.lib();
     
-    frag.sort_hits();
-    double mass_n = frag.mass();
-    
-    assert(frag.num_hits());
+  frag.sort_hits();
+  double mass_n = frag.mass();
+   
+  assert(frag.num_hits());
         
-    // calculate marginal likelihoods
-    vector<double> likelihoods(frag.num_hits(),0);
-    vector<double> masses(frag.num_hits(),0);
-    vector<double> variances(frag.num_hits(), 0);
-    double total_likelihood = HUGE_VAL;
-    double total_mass = HUGE_VAL;
-    double total_variance = HUGE_VAL;
-    size_t num_solvable = 0;
+  // calculate marginal likelihoods
+  vector<double> likelihoods(frag.num_hits(), 0);
+  vector<double> masses(frag.num_hits(), 0);
+  vector<double> variances(frag.num_hits(), 0);
+  double total_likelihood = HUGE_VAL;
+  double total_mass = HUGE_VAL;
+  double total_variance = HUGE_VAL;
+  size_t num_solvable = 0;
     
-    boost::unordered_set<Target*> targ_set;
+  boost::unordered_set<Target*> targ_set;
 
-    if (frag.num_hits()>1)
-    {
-        for(size_t i = 0; i < frag.num_hits(); ++i)
-        {
-            
-            const FragHit& m = *frag.hits()[i];
-            Target* t = m.mapped_targ;
-            if (targ_set.count(t) == 0)
-            {
-                t->lock();
-                targ_set.insert(t);
-            }
-            likelihoods[i] = t->log_likelihood(m, first_round);
-            masses[i] = t->mass();
-            variances[i] = t->mass_var();
-            total_likelihood = log_sum(total_likelihood, likelihoods[i]);
-            total_mass = log_sum(total_mass, masses[i]);
-            total_variance = log_sum(total_variance, variances[i]);
-            num_solvable += t->solvable();
-        }
-    }
-    else
-    {
-        Target* t = frag.hits()[0]->mapped_targ;
+  if (frag.num_hits()>1) {
+    for (size_t i = 0; i < frag.num_hits(); ++i) {
+      const FragHit& m = *frag.hits()[i];
+      Target* t = m.mapped_targ;
+      if (targ_set.count(t) == 0) {
         t->lock();
         targ_set.insert(t);
-        total_likelihood = likelihoods[0];
+      }
+      foreach (Target* neighbor, m.neighbors) {
+        if (targ_set.count(neighbor) == 0) {
+          neighbor->lock();
+          targ_set.insert(neighbor);
+        }
+      }
+      likelihoods[i] = t->log_likelihood(m, first_round);
+      masses[i] = t->mass();
+      variances[i] = t->mass_var();
+      total_likelihood = log_sum(total_likelihood, likelihoods[i]);
+      total_mass = log_sum(total_mass, masses[i]);
+      total_variance = log_sum(total_variance, variances[i]);
+      num_solvable += t->solvable();
     }
-    
-    assert(!islzero(total_likelihood));
-    
-    // merge bundles
-    Bundle* bundle = frag.hits()[0]->mapped_targ->bundle();
-    if (first_round)
-    {
-        bundle->incr_counts();
+  } else {
+    Target* t = frag.hits()[0]->mapped_targ;
+    t->lock();
+    targ_set.insert(t);
+    total_likelihood = likelihoods[0];
+    foreach (Target* neighbor, frag.hits()[0]->neighbors) {
+      if (targ_set.count(neighbor) == 0) {
+        neighbor->lock();
+        targ_set.insert(neighbor);
+      }
     }
+  }
     
-    // normalize marginal likelihoods
-    for(size_t i = 0; i < frag.num_hits(); ++i)
-    {
-        FragHit& m = *frag.hits()[i];
-        Target* t  = m.mapped_targ;
+  assert(!islzero(total_likelihood));
+    
+  // merge bundles
+  Bundle* bundle = frag.hits()[0]->mapped_targ->bundle();
+  if (first_round) {
+    bundle->incr_counts();
+  }
+    
+  // normalize marginal likelihoods
+  for (size_t i = 0; i < frag.num_hits(); ++i) {
+    FragHit& m = *frag.hits()[i];
+    Target* t  = m.mapped_targ;
  
-        bundle = lib.targ_table->merge_bundles(bundle, t->bundle());
+    bundle = lib.targ_table->merge_bundles(bundle, t->bundle());
         
-        double p = likelihoods[i]-total_likelihood;
-        double v = HUGE_VAL;
-        if (frag.num_hits() > 1)
-            v = log_sum(variances[i] - 2*total_mass, total_variance + 2*masses[i] - 4*total_mass);
+    double p = likelihoods[i]-total_likelihood;
+    double v = HUGE_VAL;
+    if (frag.num_hits() > 1) {
+      v = log_sum(variances[i] - 2*total_mass,
+                  total_variance + 2*masses[i] - 4*total_mass);
+    }
+    assert(!isnan(v));
+    assert(!(isnan(p)||isinf(p)));
         
-        assert(!isnan(v));
-        assert(!(isnan(p)||isinf(p)));
+    m.probability = sexp(p);
+     
+    assert(!isinf(m.probability));
         
-        m.probability = sexp(p);
+    t->add_mass(p, v, mass_n);
         
-        assert(!isinf(m.probability));
-        
-        t->add_mass(p, v, mass_n);
-        
-        // update parameters
-        if (first_round)
-        {
-            t->incr_counts(frag.num_hits()==1);
-            if (!t->solvable() && num_solvable == frag.num_hits()-1)
-            {
-                t->solvable(true);
-            }
-            if ((!burned_out || edit_detect) && lib.mismatch_table)
+    // update parameters
+    if (first_round) {
+      t->incr_counts(frag.num_hits()==1);
+      if (!t->solvable() && num_solvable == frag.num_hits()-1) {
+        t->solvable(true);
+      }
+      if ((!burned_out || edit_detect) && lib.mismatch_table) {
                     (lib.mismatch_table)->update(m, p, lib.mass_n);
-            if (!burned_out)
-            {
-                if (m.pair_status() == PAIRED)
-                    (lib.fld)->add_val(m.length(), p+lib.mass_n);
-                if (lib.bias_table)
-                    (lib.bias_table)->update_observed(m, p+lib.mass_n);
-            }
+      }
+      if (!burned_out) {
+        if (m.pair_status() == PAIRED) {
+          (lib.fld)->add_val(m.length(), p+lib.mass_n);
         }
+        if (lib.bias_table) {
+          (lib.bias_table)->update_observed(m, p+lib.mass_n);
+        }
+      }
+    }
         
-        if (calc_covar && (last_round || online_additional))
-        {
-            for(size_t j = i+1; j < frag.num_hits(); ++j)
-            {
-                const FragHit& m2 = *frag.hits()[j];
-                double p2 = likelihoods[j]-total_likelihood;
-                if (sexp(p2) == 0)
-                    continue;
-                
-                double covar = p + p2;
-                if ((first_round && last_round) || online_additional)
-                    covar += 2*mass_n;
-                
-                lib.targ_table->update_covar(m.targ_id, m2.targ_id, covar); 
-            }
+    if (calc_covar && (last_round || online_additional)) {
+      for (size_t j = i+1; j < frag.num_hits(); ++j) {
+        const FragHit& m2 = *frag.hits()[j];
+        double p2 = likelihoods[j]-total_likelihood;
+        if (sexp(p2) == 0) {
+          continue;
         }
+        double covar = p + p2;
+        if ((first_round && last_round) || online_additional) {
+          covar += 2*mass_n;
+        }
+        lib.targ_table->update_covar(m.targ_id, m2.targ_id, covar);
+      }
     }
+  }
     
-    foreach (Target* t, targ_set)
-    {
-        t->unlock();
-    }
+  foreach (Target* t, targ_set) {
+    t->unlock();
+  }
 }
 
 void proc_thread(ParseThreadSafety* pts)
@@ -471,7 +476,7 @@ size_t threaded_calc_abundances(Librarian& libs)
             boost::mutex bu_mut;
             running = true;
             ParseThreadSafety pts(max((int)num_threads,10));
-            boost::thread parse(&MapParser::threaded_parse, &map_parser, &pts, stop_at);
+            boost::thread parse(&MapParser::threaded_parse, &map_parser, &pts, stop_at, num_neighbors);
             vector<boost::thread*> thread_pool;
             RobertsFilter frags_seen;
             
