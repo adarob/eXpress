@@ -24,8 +24,8 @@ const vector<double> KERNEL = boost::assign::list_of(-2.7725887222397811)
 
 FLD::FLD(double alpha, size_t max_val, size_t mean, size_t std_dev)
     : _hist(max_val+1),
-      _tot_mass(HUGE_VAL),
-      _sum(HUGE_VAL),
+      _tot_mass(LOG_0),
+      _sum(LOG_0),
       _min(max_val) {
   assert(KERNEL.size() % 2 == 1);
   boost::math::normal norm(mean, std_dev);
@@ -42,8 +42,8 @@ FLD::FLD(double alpha, size_t max_val, size_t mean, size_t std_dev)
                        boost::math::cdf(norm,i-0.5));
     }
     _hist[i] = mass;
-    _sum = log_sum(_sum, log((double)i)+mass);
-    _tot_mass = log_sum(_tot_mass, mass);
+    _sum = log_add(_sum, log((double)i)+mass);
+    _tot_mass = log_add(_tot_mass, mass);
   }
 }
 
@@ -73,9 +73,9 @@ void FLD::add_val(size_t len, double mass) {
   for (size_t i = 0; i < KERNEL.size(); i++) {
     if (offset > 0 && offset <= max_val()) {
       double k_mass = mass + KERNEL[i];
-      _hist[offset] = log_sum(_hist[offset], k_mass);
-      _sum = log_sum(_sum, log((double)offset)+k_mass);
-      _tot_mass = log_sum(_tot_mass, k_mass);
+      _hist[offset] = log_add(_hist[offset], k_mass);
+      _sum = log_add(_sum, log((double)offset)+k_mass);
+      _tot_mass = log_add(_tot_mass, k_mass);
     }
     offset++;
   }
@@ -89,10 +89,10 @@ double FLD::pmf(size_t len) const {
 }
 
 vector<double> FLD::cmf() const {
-  double cum = HUGE_VAL;
+  double cum = LOG_0;
   vector<double> cdf(_hist.size());
   for (size_t i = 0; i < _hist.size(); ++i) {
-    cum = log_sum(cum, _hist[i]);
+    cum = log_add(cum, _hist[i]);
     cdf[i] = cum - _tot_mass;
   }
   assert(approx_eq(cum, _tot_mass));

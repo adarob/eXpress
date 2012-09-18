@@ -149,7 +149,7 @@ void BiasBoss::copy_expectations(const BiasBoss& other) {
 
 void BiasBoss::update_expectations(const Target& targ, double mass,
                                    const vector<double>& fl_cdf) {
-  if (mass == HUGE_VAL) {
+  if (mass == LOG_0) {
     return;
   }
   
@@ -169,8 +169,8 @@ void BiasBoss::update_observed(const FragHit& hit, double normalized_mass)
 {
   assert (hit.pair_status() != PAIRED || hit.length() > WINDOW);
     
-  const Sequence& t_seq_fwd = hit.mapped_targ->seq(0);
-  const Sequence& t_seq_rev = hit.mapped_targ->seq(1);
+  const Sequence& t_seq_fwd = hit.targ->seq(0);
+  const Sequence& t_seq_rev = hit.targ->seq(1);
 
   if (hit.pair_status() != RIGHT_ONLY) {
     _5_seq_bias.increment_observed(t_seq_fwd, hit.left, normalized_mass);
@@ -184,8 +184,8 @@ void BiasBoss::update_observed(const FragHit& hit, double normalized_mass)
 double BiasBoss::get_target_bias(std::vector<float>& start_bias,
                                  std::vector<float>& end_bias,
                                  const Target& targ) const {
-  double tot_start = HUGE_VAL;
-  double tot_end = HUGE_VAL;
+  double tot_start = LOG_0;
+  double tot_end = LOG_0;
     
   const Sequence& t_seq_fwd = targ.seq(0);
   const Sequence& t_seq_rev = targ.seq(1);
@@ -193,8 +193,8 @@ double BiasBoss::get_target_bias(std::vector<float>& start_bias,
   for (size_t i = 0; i < targ.length(); ++i) {
     start_bias[i] = _5_seq_bias.get_weight(t_seq_fwd, i);
     end_bias[targ.length()-i-1] = _3_seq_bias.get_weight(t_seq_rev, i);
-    tot_start = log_sum(tot_start, start_bias[i]);
-    tot_end = log_sum(tot_start, end_bias[i]);
+    tot_start = log_add(tot_start, start_bias[i]);
+    tot_end = log_add(tot_start, end_bias[i]);
   }
     
   double avg_bias = (tot_start + tot_end) - (2*log((double)targ.length()));

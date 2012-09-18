@@ -43,13 +43,13 @@ Target::Target(TargID id, const std::string& name, const std::string& seq,
 }
 
 void Target::add_mass(double p, double v, double mass) {
-  _curr_params.mass = log_sum(_curr_params.mass, p+mass);
-  _curr_params.mass_var = log_sum(_curr_params.mass_var, p+mass*2);
-  if (p != 0.0 || v != HUGE_VAL) {
-    _curr_params.mass_var = log_sum(_curr_params.mass_var, v+2*mass);
-    _curr_params.var_sum = log_sum(_curr_params.var_sum, v+mass);
-    if (p!=HUGE_VAL) {
-      _curr_params.tot_ambig_mass = log_sum(_curr_params.tot_ambig_mass, mass);
+  _curr_params.mass = log_add(_curr_params.mass, p+mass);
+  _curr_params.mass_var = log_add(_curr_params.mass_var, p+mass*2);
+  if (p != 0.0 || v != LOG_0) {
+    _curr_params.mass_var = log_add(_curr_params.mass_var, v+2*mass);
+    _curr_params.var_sum = log_add(_curr_params.var_sum, v+mass);
+    if (p!=LOG_0) {
+      _curr_params.tot_ambig_mass = log_add(_curr_params.tot_ambig_mass, mass);
     }
   }
 
@@ -64,8 +64,8 @@ void Target::round_reset() {
 
 double Target::rho() const {
   double eff_len = cached_effective_length(false);
-  if (eff_len == HUGE_VAL) {
-      return HUGE_VAL;
+  if (eff_len == LOG_0) {
+      return LOG_0;
   }
   
   return mass(true) - eff_len - (_libs->curr_lib()).targ_table->total_fpb();
@@ -75,14 +75,14 @@ double Target::mass(bool with_pseudo) const {
   if (!with_pseudo) {
       return _ret_params->mass;
   }
-  return log_sum(_ret_params->mass, _alpha+_cached_eff_len+_avg_bias);
+  return log_add(_ret_params->mass, _alpha+_cached_eff_len+_avg_bias);
 }
 
 double Target::mass_var(bool with_pseudo) const {
   if (!with_pseudo) {
       return _ret_params->mass_var;
   }
-  return log_sum(_ret_params->mass_var, 2*(_alpha+_cached_eff_len-2));
+  return log_add(_ret_params->mass_var, 2*(_alpha+_cached_eff_len-2));
 }
 
 double Target::log_likelihood(const FragHit& frag, bool with_pseudo) const {
@@ -95,15 +95,6 @@ double Target::log_likelihood(const FragHit& frag, bool with_pseudo) const {
     ll += (lib.mismatch_table)->log_likelihood(frag);
   }
 
-  double tot_mass = mass(with_pseudo);
-  double tot_eff_len = cached_effective_length(lib.bias_table);
-  foreach (const Target* neighbor, frag.neighbors) {
-    tot_mass = log_sum(tot_mass, neighbor->mass(with_pseudo));
-    tot_eff_len = log_sum(tot_eff_len,
-                          neighbor->cached_effective_length(lib.bias_table));
-  }
-  ll += tot_mass - tot_eff_len;
-     
   if (lib.bias_table) {
     if (ps != RIGHT_ONLY) {
       ll += _start_bias->at(frag.left);
@@ -126,10 +117,10 @@ double Target::est_effective_length(FLD* fld, bool with_bias) const {
     fld = (_libs->curr_lib()).fld;
   }
     
-  double eff_len = HUGE_VAL;
+  double eff_len = LOG_0;
      
   for(size_t l = fld->min_val(); l <= min(length(), fld->max_val()); l++) {
-    eff_len = log_sum(eff_len, fld->pmf(l)+log((double)length()-l+1));
+    eff_len = log_add(eff_len, fld->pmf(l)+log((double)length()-l+1));
   }
   
   if (with_bias) {
@@ -386,9 +377,9 @@ void TargetTable::output_results(string output_dir, size_t tot_counts,
         
     // Calculate total counts for bundle and bundle-level rho
     // Do not include pseudo-mass because it will screw up multi-round results
-    double l_bundle_mass = HUGE_VAL;
+    double l_bundle_mass = LOG_0;
     for (size_t i = 0; i < bundle_targ.size(); ++i) {
-      l_bundle_mass = log_sum(l_bundle_mass, bundle_targ[i]->mass(false));
+      l_bundle_mass = log_add(l_bundle_mass, bundle_targ[i]->mass(false));
     }
         
     if (bundle->counts()) {
@@ -536,7 +527,7 @@ double TargetTable::total_fpb() const {
 
 void TargetTable::update_total_fpb(double incr_amt) {
   boost::unique_lock<boost::mutex>(_fpb_mut);
-  _total_fpb = log_sum(_total_fpb, incr_amt);
+  _total_fpb = log_add(_total_fpb, incr_amt);
 }
 
 void TargetTable::asynch_bias_update(boost::mutex* mutex) {

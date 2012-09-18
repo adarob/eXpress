@@ -19,6 +19,14 @@
  *  @copyright Artistic License 2.0
  */
 struct Library {
+  /** 
+   * Path to the input file. Empty if streamed.
+   */
+  std::string in_file_name;
+  /**
+   * Path to the out file. Empty if alignments are not to be output.
+   */
+  std::string out_file_name;
   /**
    * A pointer to the MapParser for parsing the input alignment file for this
    * library.

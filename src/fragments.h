@@ -71,7 +71,7 @@ struct FragHit {
   /**
    * A public pointer to the target mapped to.
    */
-  Target* mapped_targ;
+  Target* targ;
   /**
    * The first ("left") read sequence (according to SAM flag).
    */
@@ -181,6 +181,10 @@ struct FragHit {
     }
     return LEFT_ONLY;
   }
+  
+  //DOC
+  double targ_rho;
+  double const_likelihood;
 };
 
 /**
@@ -257,6 +261,8 @@ public:
    * @return Number of valid alignments for fragment.
    */
   size_t num_hits() const { return _frag_hits.size(); }
+  // DOC
+  FragHit* operator[](size_t i) const { return _frag_hits[i]; }
   /**
    * Accessor for the FragHit objects associated with the fragment. Returned
    * value does not outlive this.

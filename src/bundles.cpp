@@ -16,7 +16,7 @@ using namespace std;
 void CovarTable::increment(TargID targ1, TargID targ2, double incr_amt) {
   size_t pair_id = size()*min(targ1, targ2)+max(targ1, targ2);
   if (_covar_map.count(pair_id)) {
-    _covar_map[pair_id] = log_sum(_covar_map[pair_id], incr_amt);
+    _covar_map[pair_id] = log_add(_covar_map[pair_id], incr_amt);
   } else {
     _covar_map[pair_id] = incr_amt;
   }
@@ -27,7 +27,7 @@ double CovarTable::get(TargID targ1, TargID targ2) {
   if (_covar_map.count(pair_id)) {
     return _covar_map[pair_id];
   } else {
-    return HUGE_VAL;
+    return LOG_0;
   }
 }
 

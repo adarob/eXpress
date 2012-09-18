@@ -56,19 +56,19 @@ struct RoundParams {
   /**
    * RoundParams constructor sets initial values for parameters
    */
-  RoundParams() : mass(HUGE_VAL), tot_ambig_mass(HUGE_VAL), mass_var(HUGE_VAL),
-                  var_sum(HUGE_VAL) {}
+  RoundParams() : mass(LOG_0), tot_ambig_mass(LOG_0), mass_var(LOG_0),
+                  var_sum(LOG_0) {}
 };
 
 typedef size_t TargID;
 
 /**
- * The Target class is used to store objects for the targets
- * being mapped to.  Besides storing basic information about the object
- * (id, length), it also stores a mass based on the number of 
- * fragments mapping to the object.  To help with updating this number,
- * it returns the likelihood that a given fragment originated from it.
- * These values are stored and returned in log space.
+ * The Target class is used to store objects for the targets being mapped to.
+ * Besides storing basic information about the object (id, length), it also
+ * stores a mass based on the number of fragments mapping to the object as well
+ * as parameters for variance. To help with updating these values, it computes
+ * the likelihood that a given fragment originated from it. These values are
+ * stored and returned in log space.
  *  @author  Adam Roberts
  *  @date    2011
  *  @copyright Artistic License 2.0
@@ -308,6 +308,7 @@ public:
     _uniq_counts += incr_amt * uniq;
   }
   /**
+   * DOC
    * A member function that returns (a value proportional to) the log likelihood
    * the given fragment originated from this target.
    * @param frag a FragHit to return the likelihood of originating from this
