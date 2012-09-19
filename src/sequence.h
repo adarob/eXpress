@@ -167,10 +167,20 @@ class SequenceRev: public Sequence
     SequenceFwd* _seq;
     
 public:
-    SequenceRev() {}
+    SequenceRev() : _seq(NULL){}
     SequenceRev(SequenceFwd& seq) : _seq(&seq) {}
-    size_t length() const { return _seq->length(); }
-    bool empty() const { return _seq->empty(); }
+    size_t length() const
+    {
+      if (_seq == NULL)
+	return 0;
+      return _seq->length();
+    }
+    bool empty() const
+    {
+      if (_seq == NULL)
+	return true;
+      return _seq->empty();
+    }
     void set(const std::string& seq, bool rev) { assert(false); }
     size_t operator[](const size_t index) const { return complement(_seq->operator[](length()-index-1)); }    
     size_t get_ref(const size_t index) const { return complement(_seq->get_ref(length()-index-1)); }
