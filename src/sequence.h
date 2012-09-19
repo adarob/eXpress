@@ -177,11 +177,6 @@ class SequenceFwd: public Sequence
    */
   boost::scoped_array<const char> _ref_seq;
   /**
-   * A private bool specifying if the sequence is probabilistic (true) or fixed
-   * to the reference (false).
-   */
-  bool _prob;
-  /**
    * A private FrequencyMatrix to store the posterior nucleotide distributions
    * (if _prob).
    */
@@ -196,6 +191,11 @@ class SequenceFwd: public Sequence
    * (if _prob).
    */
   FrequencyMatrix<float> _exp_seq;
+  /**
+   * A private bool specifying if the sequence is probabilistic (true) or fixed
+   * to the reference (false).
+   */
+  bool _prob;
   /**
    * A private size_t storing the number of nucleotides in the sequence.
    */

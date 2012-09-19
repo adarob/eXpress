@@ -13,10 +13,10 @@
 using namespace std;
 using namespace boost::math;
 
-SequenceFwd::SequenceFwd():  _ref_seq(NULL), _len(0), _prob(0){}
+SequenceFwd::SequenceFwd():  _ref_seq(NULL), _prob(0), _len(0) {}
 
 SequenceFwd::SequenceFwd(const std::string& seq, bool rev, bool prob)
-    : _len(seq.length()), _prob(prob) {
+    : _prob(prob), _len(seq.length()) {
   if (prob) {
     _est_seq = FrequencyMatrix<float>(seq.length(), NUM_NUCS, 0.001);
     _obs_seq = FrequencyMatrix<float>(seq.length(), NUM_NUCS, LOG_0);
@@ -27,7 +27,7 @@ SequenceFwd::SequenceFwd(const std::string& seq, bool rev, bool prob)
 
 SequenceFwd::SequenceFwd(const SequenceFwd& other)
     : _obs_seq(other._obs_seq), _exp_seq(other._exp_seq),
-      _len(other.length()), _prob(other._prob) {
+      _prob(other._prob), _len(other.length()) {
   if (other._ref_seq) {
     char* ref_seq = new char[_len];
     std::copy(other._ref_seq.get(), other._ref_seq.get() + _len, ref_seq);
