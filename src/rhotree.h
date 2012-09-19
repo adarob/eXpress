@@ -54,13 +54,13 @@ class Sap {
 };
 
 class RhoTree {
- protected:
-  std::vector<RhoTree*> _children;
-  FrequencyMatrix<double> _child_rhos;
-  double _alpha;
   size_t _n;
   double _mass;
+ protected:
+  double _alpha;
   double _ff_param;
+  std::vector<RhoTree*> _children;
+  FrequencyMatrix<double> _child_rhos;
  public:
   RhoTree(double alpha, double ff_param)
       : _alpha(alpha), _n(0), _mass(0), _ff_param(ff_param) {}
@@ -69,7 +69,6 @@ class RhoTree {
       delete child;
     }
   }
-  void add_child(RhoTree* child) { _children.push_back(child); }
   void fix() {
     _child_rhos = FrequencyMatrix<double>(1, _children.size(), _alpha);
   }
@@ -78,22 +77,22 @@ class RhoTree {
     _mass += _ff_param*log((double)_n) - log(pow(_n+1,_ff_param) - 1);
     return _mass;
   }
-  double similarity_scalar(const Sap& sap);
+  double similarity_scalar(const Sap& sap) { return 0; } // FIXME
+  virtual void add_child(RhoTree* child) { _children.push_back(child); }
+  virtual bool is_leaf() const = 0;
   virtual void get_rhos(Sap sap, double rho) const = 0;
-  virtual void update_rhos(Sap sap) const = 0;
+  virtual void update_rhos(Sap sap) = 0;
 };
 
 class RangeRhoTree : public RhoTree {
-  std::vector<size_t> child_splits;
   size_t _left;
   size_t _right;
  public:
-  RangeRhoTree(size_t left, size_t right);
+  RangeRhoTree(size_t left, size_t right, double alpha, double ff_param);
   bool is_leaf() const { return _left == _right; }
   size_t left() const { return _left; }
   size_t right() const { return _right; }
   void add_child(RangeRhoTree* child);
-  void fix();
   void get_rhos(Sap frag, double rho) const;
   void update_rhos(Sap frag);
 };
@@ -103,10 +102,12 @@ typedef size_t TreeID;
 
 class RhoForest : public RhoTree {
   // target-to-leaf (id)
-  std::vector<LeafID> _leaf_map;
+  std::vector<LeafID> _target_to_leaf_map;
   // leaf-to-tree (id)
-  std::vector<TreeID> _tree_map;
+  std::vector<TreeID> _leaf_to_tree_map;
+  void load_from_file(std::string infile);
  public:
+  RhoForest(std::string infile, double alpha, double ff_param);
   void process_fragment(Fragment* frag);
   void get_rhos(Sap sap, double rho) { assert(false); }
   void update_rhos(Sap sap) { assert(false); }
