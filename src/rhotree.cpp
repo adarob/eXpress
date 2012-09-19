@@ -126,7 +126,7 @@ void RhoForest::process_fragment(Fragment* frag) {
   tree_saps.push_back(Sap(&params, next_left, frag->num_hits()-1));
   
   // For now we'll assume the full trees are bundles, although nothing except
-  // this assertions relies on that assumption.
+  // this assertion relies on that assumption.
   assert(tree_roots.size() == 0);
 
   // Use breadth-first search to get the rhos
