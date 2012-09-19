@@ -177,11 +177,6 @@ class SequenceFwd: public Sequence
    */
   boost::scoped_array<const char> _ref_seq;
   /**
-   * A private bool specifying if the sequence is probabilistic (true) or fixed
-   * to the reference (false).
-   */
-  bool _prob;
-  /**
    * A private FrequencyMatrix to store the posterior nucleotide distributions
    * (if _prob).
    */
@@ -196,6 +191,11 @@ class SequenceFwd: public Sequence
    * (if _prob).
    */
   FrequencyMatrix<float> _exp_seq;
+  /**
+   * A private bool specifying if the sequence is probabilistic (true) or fixed
+   * to the reference (false).
+   */
+  bool _prob;
   /**
    * A private size_t storing the number of nucleotides in the sequence.
    */
@@ -257,10 +257,20 @@ class SequenceRev: public Sequence {
   SequenceFwd* _seq;
     
  public:
-  SequenceRev() {}
+  SequenceRev() : _seq(NULL){}
   SequenceRev(SequenceFwd& seq) : _seq(&seq) {}
-  size_t length() const { return _seq->length(); }
-  bool empty() const { return _seq->empty(); }
+  size_t length() const {
+    if (_seq == NULL) {
+	return 0;
+    }
+      return _seq->length();
+  }
+  bool empty() const {
+    if (_seq == NULL) {
+      return true;
+    }
+    return _seq->empty();
+  }
   // Set is not allowed in this class.
   void set(const std::string& seq, bool rev) { assert(false); exit(1); }
   size_t operator[](const size_t index) const {
