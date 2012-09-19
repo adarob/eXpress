@@ -138,9 +138,9 @@
 				0ADA18F615508175008020B2 /* robertsfilter.cpp */,
 				0ADA18F315507FF5008020B2 /* robertsfilter.h */,
 				0A63748414CF81AC00D79987 /* sequence.h */,
+				0A63748514CF83A500D79987 /* sequence.cpp */,
 				0A5C7637136F2EF10095365C /* targets.h */,
 				0A5C7636136F2EF10095365C /* targets.cpp */,
-				0A63748514CF83A500D79987 /* sequence.cpp */,
 				0AA3D63614D106B800448167 /* threadsafety.h */,
 				0A04E7BF1540B87200D9A162 /* threadsafety.cpp */,
 			);
