@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Scheme
+   LastUpgradeVersion = "0440"
+   version = "1.3">
+   <BuildAction
+      parallelizeBuildables = "YES"
+      buildImplicitDependencies = "YES">
+      <BuildActionEntries>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "0A5C7607136F2E850095365C"
+               BuildableName = "express"
+               BlueprintName = "express"
+               ReferencedContainer = "container:express.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+      </BuildActionEntries>
+   </BuildAction>
+   <TestAction
+      selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.GDB"
+      selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.GDB"
+      shouldUseLaunchSchemeArgsEnv = "YES"
+      buildConfiguration = "Debug">
+      <Testables>
+      </Testables>
+   </TestAction>
+   <LaunchAction
+      selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
+      selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
+      launchStyle = "0"
+      useCustomWorkingDirectory = "NO"
+      buildConfiguration = "Debug"
+      ignoresPersistentStateOnLaunch = "NO"
+      debugDocumentVersioning = "YES"
+      allowLocationSimulation = "YES">
+      <BuildableProductRunnable>
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "0A5C7607136F2E850095365C"
+            BuildableName = "express"
+            BlueprintName = "express"
+            ReferencedContainer = "container:express.xcodeproj">
+         </BuildableReference>
+      </BuildableProductRunnable>
+      <CommandLineArguments>
+         <CommandLineArgument
+            argument = "--frag-len-mean 250 --frag-len-stddev 50 -B 5 -o $(SRCROOT)/sample_data3/out $(SRCROOT)/sample_data3/hox_ucsc.fa $(SRCROOT)/sample_data3/hits_1M.sam,$(SRCROOT)/sample_data3/hits_1M.sam_2"
+            isEnabled = "NO">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "/Users/adarob/downloads/454Isotigs.fna /Users/adarob/downloads/Mapeo_Isotigs.sam"
+            isEnabled = "YES">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "--output-running-reads -o $(SRCROOT)/sample_data2/out $(SRCROOT)/sample_data2/hg19-ucsc_transcripts.fa /Volumes/math.mcb.berkeley.edu/experiments/express/simulation/hg19_ucsc_bias/hits.bam"
+            isEnabled = "NO">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "-f 0.65 -o $(SRCROOT)/sample_data3/out --output-running-reads --no-bias-correct $(SRCROOT)/sample_data2/hg19-ucsc_transcripts.fa /Volumes/math.mcb.berkeley.edu/experiments/express/simulation/hg19_ucsc_err/hits.bam"
+            isEnabled = "NO">
+         </CommandLineArgument>
+      </CommandLineArguments>
+      <AdditionalOptions>
+      </AdditionalOptions>
+   </LaunchAction>
+   <ProfileAction
+      shouldUseLaunchSchemeArgsEnv = "YES"
+      savedToolIdentifier = ""
+      useCustomWorkingDirectory = "NO"
+      buildConfiguration = "Release"
+      debugDocumentVersioning = "YES">
+      <BuildableProductRunnable>
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "0A5C7607136F2E850095365C"
+            BuildableName = "express"
+            BlueprintName = "express"
+            ReferencedContainer = "container:express.xcodeproj">
+         </BuildableReference>
+      </BuildableProductRunnable>
+   </ProfileAction>
+   <AnalyzeAction
+      buildConfiguration = "Debug">
+   </AnalyzeAction>
+   <ArchiveAction
+      buildConfiguration = "Release"
+      revealArchiveInOrganizer = "YES">
+   </ArchiveAction>
+</Scheme>

@@ -1,105 +1,105 @@
 #ifndef MISMATCH_H
 #define MISMATCH_H
-//
-//  mismatchmodel.h
-//  express
-//
-//  Created by Adam Roberts on 4/23/11.
-//  Copyright 2011 Adam Roberts. All rights reserved.
-//
+
+/**
+ *  mismatchmodel.h
+ *  express
+ *
+ *  Created by Adam Roberts on 4/23/11.
+ *  Copyright 2011 Adam Roberts. All rights reserved.
+ **/
 
 #include "frequencymatrix.h"
 
-class FragHit;
+struct FragHit;
 class Target;
 
 /** 
- * The MismatchTable class is used to store and update mismatch (error) parameters using a first-order
- * Markov model based on nucleotide and position in a ride and to return likelihoods of mismatches in given reads.  
- * All values are stored and returned in log space. DOC
+ * The MismatchTable class is used to store and update mismatch and indel
+ * (error) parameters using a first-order Markov model based on nucleotide and
+ * position in a read. Also computes likelihoods of mismatches and indels in
+ * given fragment mappings. When the target sequences are proabilistic, this
+ * class is responsible for updating those parameters. All values are stored and
+ * returned in log space.
  *  @author    Adam Roberts
  *  @date      2011
  *  @copyright Artistic License 2.0
  **/
-class MismatchTable
-{
-    /**
-     * a vector of FrequencyMatrix objects to store the Markov model parameters for each position in the first ("left") read 
-     */
-    std::vector<FrequencyMatrix<double> > _first_read_mm;
-    
-    /**
-     * a vector of FrequencyMatrix objects to store the Markov model parameters for each position in the second ("right") read 
-     */
-    std::vector<FrequencyMatrix<double> > _second_read_mm;
-    
-    /**
-     * a FrequencyMatrix storing the observations of insertions of given lengths 
-     */
-    FrequencyMatrix<double> _insert_params;
+class MismatchTable {
+  /**
+   * A vector of FrequencyMatrix objects to store the Markov model parameters
+   * for each position in the first ("left") read.
+   */
+  std::vector<FrequencyMatrix<double> > _first_read_mm;
+  /**
+   * A vector of FrequencyMatrix objects to store the Markov model parameters
+   * for each position in the second ("right") read.
+   */
+  std::vector<FrequencyMatrix<double> > _second_read_mm;
+  /**
+   * A FrequencyMatrix storing the observations of insertions of given lengths.
+   */
+  FrequencyMatrix<double> _insert_params;
+  /**
+   * A FrequencyMatrix storing the observations of deletions of given lengths.
+   */
+  FrequencyMatrix<double> _delete_params;
+  /**
+   * A size_t storing the maximum observed read length.
+   */
+  size_t _max_len;
+  /**
+   * A boolean specifying whether or not the table values are burned in. When
+   * inactive, a log-likelihood is not computed (0 is returned) and
+   * probabalistic target sequences are not updated.
+   */
+  bool _active;
 
-    /**
-     * a FrequencyMatrix storing the observations of deletions of given lengths 
-     */
-    FrequencyMatrix<double> _delete_params;
-    
-    /**
-     * a size_t storing the maximum observed read length
-     */
-    size_t _max_len;
-    
-    /**
-     * a boolean specifying whether or not the table values should be used to return a log-likelihood 
-     */
-    bool _active;
-
-public:
-   
-    /**
-     * MismatchTable constructor initializes the model parameters using the specified (non-logged) pseudo-counts.
-     * @param alpha a double containing the non-logged pseudo-counts for parameter initialization
-     */
-    MismatchTable(double alpha);
-    
-    /**
-     * member function that 'activates' the table to allow its values to be used in calculating log-likelihoods
-     * when it is sufficiently burned-in
-     * @param active a boolean specifying whether to activate (true) or deactivate (false)
-     */
-    void activate(bool active = true) { _active = active; }
-    
-    /**
-     * member function returns the log likeihood of mismatches in the mapping given the current error model parematers
-     * @param f the fragment mapping to calculate the log likelihood for
-     * @return the log likelihood of the mapping based on mismatches
-     */
-    double log_likelihood(const FragHit& f) const;
-    
-    /**
-     * member function that updates the error model parameters based on a mapping and its (logged) mass
-     * @param f the fragment mapping 
-     * @param p the logged posterior probablity of the alignment
-     * @param mass the logged mass of the fragment
-     DOC
-     */
-    void update(const FragHit&, double p, double mass);
-    
-    //DOC
-    void fix();
-    
-    /**
-     * member function that returns a string containing a collapsed confusion matrix based on the model parameters for the first read
-     * @return a space-separated string for the flattened, collapsed confusion matrix in row-major format (observed value as rows)
-     */
-    std::string to_string() const;
-    
-    /**
-     * a member function that outputs the final model parameters in a tab-separated file
-     * the file has 1 row for each read position and the parameters are in columns indexed 
-     * as (ref, prev, obs) in base 4 with A,C,G,T encoded as 0,1,2,3.
-     * @param file stream to append to
-     */
-    void append_output(std::ofstream& outfile) const;
+ public:
+  /**
+   * MismatchTable constructor initializes the model parameters using the
+   * specified (non-logged) pseudo-counts.
+   * @param alpha a double containing the non-logged pseudo-counts for parameter
+   *        initialization
+   */
+  MismatchTable(double alpha);
+  /**
+   * Mutator to set the _active member variable to allow for log_likelihood
+   * calculations. Used to skip calculations before burn-in completes.
+   * @param active a boolean specifying whether to activate (true) or deactivate
+   *        (false)
+   */
+  void activate(bool active = true) { _active = active; }
+  /**
+   * A member function that returns the log likelihood of mismatches and indels
+   * in the mapping given the current error model parematers. Returns 0 if
+   * _active is false.
+   * @param f the fragment mapping to calculate the log likelihood for.
+   * @return The log likelihood of the mapping based on mismatches and indels.
+   */
+  double log_likelihood(const FragHit& f) const;
+  /**
+   * A member function that updates the error model parameters based on a
+   * mapping and its (logged) mass. Also updates the sequence parameters if
+   * they are probabilistic and active_ is true.
+   * @param f the fragment mapping.
+   * @param p the logged posterior probablity of the alignment.
+   * @param mass the logged mass of the fragment.
+   */
+  void update(const FragHit&, double p, double mass);
+  /**
+   * Freezes the parameters to allow for faster computation after burn out.
+   * Cannot be undone.
+   */
+  void fix();
+  /**
+   * A member function that appends the final model parameters in tab-separated
+   * format to the given file. The output has 1 row for each read position and
+   * the parameters are in columns indexed as (ref, prev, obs) in base 4 with
+   * A,C,G,T encoded as 0,1,2,3.
+   * @param file stream to append to.
+   */
+  void append_output(std::ofstream& outfile) const;
 };
 
 #endif
