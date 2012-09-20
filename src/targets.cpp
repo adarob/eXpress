@@ -94,6 +94,15 @@ double Target::log_likelihood(const FragHit& frag, bool with_pseudo) const {
   if (lib.mismatch_table) {
     ll += (lib.mismatch_table)->log_likelihood(frag);
   }
+  
+  double tot_mass = mass(with_pseudo);
+  double tot_eff_len = cached_effective_length(lib.bias_table);
+  foreach (const Target* neighbor, frag.neighbors) {
+    tot_mass = log_add(tot_mass, neighbor->mass(with_pseudo));
+    tot_eff_len = log_add(tot_eff_len,
+                          neighbor->cached_effective_length(lib.bias_table));
+  }
+  ll += tot_mass - tot_eff_len;
 
   if (lib.bias_table) {
     if (ps != RIGHT_ONLY) {
