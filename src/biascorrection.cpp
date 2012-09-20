@@ -194,7 +194,7 @@ double BiasBoss::get_target_bias(std::vector<float>& start_bias,
     start_bias[i] = _5_seq_bias.get_weight(t_seq_fwd, i);
     end_bias[targ.length()-i-1] = _3_seq_bias.get_weight(t_seq_rev, i);
     tot_start = log_add(tot_start, start_bias[i]);
-    tot_end = log_add(tot_start, end_bias[i]);
+    tot_end = log_add(tot_end, end_bias[i]);
   }
     
   double avg_bias = (tot_start + tot_end) - (2*log((double)targ.length()));
