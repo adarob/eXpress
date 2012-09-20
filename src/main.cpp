@@ -328,6 +328,19 @@ void output_results(Librarian& libs, size_t tot_counts, int n=-1) {
  * parameters.
  * @param frag_p pointer to the fragment to probabilistically assign.
  */
+
+
+void process_fragment_tree(Fragment* frag_p) {
+  // replace target ids and sort
+  // get rhos from tree
+  // compute likelihoods and pass in to update tree
+  // on batch rounds, use two different trees, both of which are "flat"
+  
+  // VARIANCE???
+  
+  // update auxilary params
+}
+
 void process_fragment(Fragment* frag_p) {
   Fragment& frag = *frag_p;
   const Library& lib = *frag.lib();
@@ -487,7 +500,6 @@ size_t threaded_calc_abundances(Librarian& libs) {
     
   size_t n = 1;
   size_t num_frags = 0;
-  double mass_n = 0;
   cout << setiosflags(ios::left);
     
   // For log-scale output
@@ -532,13 +544,9 @@ size_t threaded_calc_abundances(Librarian& libs) {
           }
         }
 
-        // Pop next parsed fragment and set mass
+        // Pop next parsed fragment
         frag = pts.proc_in.pop();
-        if (frag) {
-          frag->mass(mass_n);
-        }
-
-        // Test that we have not already seen this fragment
+        // Test that we have not already seen alignments from this fragment
         if (frag && first_round && frags_seen.test_and_push(frag->name())) {
           cerr << "ERROR: Alignments are not properly sorted. Read '"
               << frag->name()
@@ -591,7 +599,6 @@ size_t threaded_calc_abundances(Librarian& libs) {
         
         n++;
         lib.n++;
-        mass_n += ff_param*log((double)n-1) - log(pow(n,ff_param) - 1);
         lib.mass_n += ff_param*log((double)lib.n-1) -
                       log(pow(lib.n,ff_param) - 1);
       }
