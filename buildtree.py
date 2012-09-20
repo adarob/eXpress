@@ -6,14 +6,23 @@ import heapq
 class SimilarityMatrix:
   def __init__(self, n):
     self.M = {}
-    self.partners = {}
+    self.partners = []
     self.heap = []
+    self.deleted = set([])
     self.n = n
-  
+    for i in xrange(n):
+      self.partners.append(set([]))
+
   #assumes i < j
-  def increment(self, i, j, amt=1):
+  def increment(self, i, j, amt=1.):
+    assert (i != j)
     pair = (i,j)
-    self.M[pair] = self.M.get(pair, 0) + amt
+    if pair in self.M:
+      self.M[pair] += amt
+    else:
+      self.partners[i].add(j)
+      self.partners[j].add(i)
+      self.M[pair] = amt
   
   def init_heap(self):
     self.heap = []
@@ -23,53 +32,73 @@ class SimilarityMatrix:
   #assumes i < j
   def merge(self, i, j):
     del self.M[(i,j)]
-    for k in xrange(self.n):
-      if i != k and j != k:
-        i_key = (min(i,k), max(i,k))
-        j_key = (min(j,k), max(j,k))
-        n_key = (k, self.n)
-        self.M[n_key] = (self.M[i_key] + self.M[j_key]) / 2.
-        del self.M[i_key]
-        del self.M[j_key]
-        heapq.heappush(self.heap, (-self.M[n_key], n_key))
-        self.n += 1
-        
-  def find_max(self):
+    self.deleted.add(i)
+    self.deleted.add(j)
+    self.partners.append((self.partners[i] | self.partners[j]) - self.deleted)
+    for k in (self.partners[i] & self.partners[j]) - self.deleted:
+      i_key = (min(i,k), max(i,k))
+      j_key = (min(j,k), max(j,k))
+      n_key = (k, self.n)
+      self.M[n_key] = (self.M[i_key] + self.M[j_key]) / 2.
+      del self.M[i_key]
+      del self.M[j_key]
+      heapq.heappush(self.heap, (-self.M[n_key], n_key))
+    for k in (self.partners[i] - self.partners[j]) - self.deleted:
+      i_key = (min(i,k), max(i,k))
+      n_key = (k, self.n)
+      self.M[n_key] = self.M[i_key]
+      del self.M[i_key]
+      heapq.heappush(self.heap, (-self.M[n_key], n_key))
+    for k in (self.partners[j] - self.partners[i]) - self.deleted:
+      j_key = (min(j,k), max(j,k))
+      n_key = (k, self.n)
+      self.M[n_key] = self.M[j_key]
+      del self.M[j_key]
+      heapq.heappush(self.heap, (-self.M[n_key], n_key))
+    self.n += 1
+
+  def get_max(self):
     while True:
       if len(self.heap) == 0:
         return (None, None)
       val, pair = heapq.heappop(self.heap)
-      if pair in self.M:
+      if not (pair[0] in self.deleted or pair[1] in self.deleted):
         return pair
         
 #initialize matrix
 def initialize_matrix(infile):
   import pysam
-  samfile = pysam.Samfile(infile, 'r')
+  samfile = pysam.Samfile(infile)
   M = SimilarityMatrix(samfile.nreferences)
+  lengths = samfile.lengths
   curr_qname = ''
-  curr_targets = [] 
+  curr_targets = set([]) 
+  n = 0
   for read in samfile:
     if read.qname != curr_qname:
+      n += 1
+      if n % 100000 == 0:
+        print n
       if len(curr_targets) > 1:
+        curr_targets = list(curr_targets)
         curr_targets.sort()
-        k = 0
-        for i in curr_targets:
-          k += 1
-          for j in curr_targets[k:]:
-            M.increment(i,j, 2./(samfile.lengths[i] + samfile.lengths[j]))
-        curr_targets = []
-    curr_qname = read.qname
+        for i in xrange(len(curr_targets)):
+          x = curr_targets[i]
+          for j in xrange(i+1, len(curr_targets)):
+            y = curr_targets[j]
+            M.increment(x,y, 2./(lengths[x] + lengths[y]))
+      curr_targets = set([])
+      curr_qname = read.qname
 
     if read.is_unmapped:
       continue
 
     if not read.is_paired:
-      curr_targets.append(read.tid)
+      curr_targets.add(read.tid)
       continue
 
     if read.is_proper_pair and read.is_reverse:
-      curr_targets.append(read.tid)
+      curr_targets.add(read.tid)
       continue
   return M
   
@@ -93,28 +122,36 @@ class Tree:
     return s
     
 class Forest:
-  def __init__(self):
-    self.nodes = {}
+  def __init__(self, num_leaves):
+    self.nodes = []
+    for i in xrange(num_leaves):
+      self.nodes.append(Tree(i))
   
   def add_node(self, id, *child_ids):
-    self.nodes[id] = Tree(id, *(self.nodes[child_id] for child_id in child_ids))
+    self.nodes.append(Tree(id, *(self.nodes[child_id] for child_id in child_ids)))
   
   def to_string(self):
     s = ''
-    for node in self.nodes.values():
-      if node.parent == None:
+    num_leaves = 0
+    for node in self.nodes:
+      if node.parent == None and len(node.children) > 0:
         s += node.to_string() + '\n'
       num_leaves += node.is_leaf()
-    s = '%d, %d' % (num_leaves, len(self.nodes)) + s
+    s = '%d, %d\n' % (num_leaves, len(self.nodes)) + s
     return s
 
-# destructive for C
-def build_forest(C):
-  F = Forest()
+# destructive for M
+def build_forest(M):
+  F = Forest(M.n)
+  M.init_heap()
   while True:
-    i,j = C.find_min()
+    i,j = M.get_max()
     if i == None:
       return F
-    F.add_node(C.n, i, j)
-    C.merge(i,j)
-    
+    F.add_node(M.n, i, j)
+    M.merge(i,j)
+  return F
+  
+M = initialize_matrix('/home/adarob/experiments/express/simulation/hg19_ucsc_err_flip/hits.bam')
+F = build_forest(M)
+file('forest_flip.out','w').write(F.to_string())
