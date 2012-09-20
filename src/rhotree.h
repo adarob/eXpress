@@ -35,6 +35,9 @@ class Sap {
   size_t _r;
   
  public:
+  Sap (SapData* params) : _params(params),
+                          _l(params->leaf_ids.front()),
+                          _r(_params->leaf_ids.back()) {}
   Sap (SapData* params, size_t l, size_t r) : _params(params), _l(l), _r(r) {}
   size_t size() const { return _r + 1 - _l; }
   size_t leaf_id(size_t i) const {
@@ -56,61 +59,67 @@ class Sap {
 class RhoTree {
   size_t _n;
   double _mass;
- protected:
-  double _alpha;
+
+protected:
   double _ff_param;
   std::vector<RhoTree*> _children;
   FrequencyMatrix<double> _child_rhos;
- public:
-  RhoTree(double alpha, double ff_param)
-      : _alpha(alpha), _n(0), _mass(0), _ff_param(ff_param) {}
-  virtual ~RhoTree() {
-    foreach(RhoTree* child, _children) {
-      delete child;
-    }
-  }
-  void fix() {
-    _child_rhos = FrequencyMatrix<double>(1, _children.size(), _alpha);
-  }
+
+  virtual void add_child(RhoTree* child) { _children.push_back(child); }
+  virtual void set_rhos(Sap sap) const = 0;
+  virtual void get_rhos(Sap sap, double rho) const = 0;
+  virtual void update_rhos(Sap sap) = 0;
   double next_mass() {
     _n++;
     _mass += _ff_param*log((double)_n) - log(pow(_n+1,_ff_param) - 1);
     return _mass;
   }
   double similarity_scalar(const Sap& sap) { return 0; } // FIXME
-  virtual void add_child(RhoTree* child) { _children.push_back(child); }
+
+public:
+  RhoTree(double ff_param)
+      : _n(0), _mass(0), _ff_param(ff_param) {}
+  virtual ~RhoTree() {
+    foreach(RhoTree* child, _children) {
+      delete child;
+    }
+  }
+  
   virtual bool is_leaf() const = 0;
-  virtual void get_rhos(Sap sap, double rho) const = 0;
-  virtual void update_rhos(Sap sap) = 0;
 };
 
 class RangeRhoTree : public RhoTree {
   size_t _left;
   size_t _right;
+ protected:
+  void add_child(RangeRhoTree* child);
+  void set_rhos(Sap sap);
+  void get_rhos(Sap sap, double rho) const;
+  void update_rhos(Sap sap);
  public:
-  RangeRhoTree(size_t left, size_t right, double alpha, double ff_param);
+  RangeRhoTree(size_t left, size_t right, double ff_param);
   bool is_leaf() const { return _left == _right; }
   size_t left() const { return _left; }
   size_t right() const { return _right; }
-  void add_child(RangeRhoTree* child);
-  void get_rhos(Sap frag, double rho) const;
-  void update_rhos(Sap frag);
 };
 
 typedef size_t LeafID;
 typedef size_t TreeID;
 
-class RhoForest : public RhoTree {
+class RangeRhoForest : public RangeRhoTree {
   // target-to-leaf (id)
   std::vector<LeafID> _target_to_leaf_map;
   // leaf-to-tree (id)
   std::vector<TreeID> _leaf_to_tree_map;
   void load_from_file(std::string infile);
- public:
-  RhoForest(std::string infile, double alpha, double ff_param);
+  void set_alphas(std::vector<double> target_alphas);
+protected:
+  void get_rhos(Sap sap, double rho);
+  void update_rhos(Sap sap);
+public:
+  RhoForest(std::string infile, std::vector<double> target_alphas,
+            double ff_param);
   void process_fragment(Fragment* frag);
-  void get_rhos(Sap sap, double rho) { assert(false); }
-  void update_rhos(Sap sap) { assert(false); }
 };
 
 #endif /* defined(__express__rhotree__) */

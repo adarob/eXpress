@@ -6,6 +6,7 @@ import heapq
 class SimilarityMatrix:
   def __init__(self, n):
     self.M = {}
+    self.partners = {}
     self.heap = []
     self.n = n
   

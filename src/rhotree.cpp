@@ -25,7 +25,7 @@ Sap Sap::branch(size_t split) {
   return Sap(_params, old_left, _l-1);
 }
 
-void RhoForest::load_from_file(string infile_path) {
+void RangeRhoForest::load_from_file(string infile_path) {
   ifstream infile (infile_path.c_str());
   string line;
   
@@ -58,7 +58,7 @@ void RhoForest::load_from_file(string infile_path) {
       child = atoi(edge.substr(split+1).c_str());
       if (child < num_leaves) {
         assert(!_target_to_leaf_map[child]);
-        nodes[next_leaf_id] = new RangeRhoTree(child, child, _ff_param, _alpha);
+        nodes[next_leaf_id] = new RangeRhoTree(child, child, _ff_param);
         _target_to_leaf_map[child] = next_leaf_id;
         _leaf_to_tree_map[next_leaf_id] = _children.size();
         child = next_leaf_id;
@@ -68,7 +68,7 @@ void RhoForest::load_from_file(string infile_path) {
       if (!nodes[parent]) {
         nodes[parent] = new RangeRhoTree(nodes[child]->left(),
                                          nodes[child]->right(),
-                                         _ff_param, _alpha);
+                                         _ff_param);
       }
       if (nodes[parent]->right() != nodes[child]->left() + 1) {
         cerr << "ERROR: '" << infile_path << "' does not specify a proper "
@@ -81,64 +81,69 @@ void RhoForest::load_from_file(string infile_path) {
   }
 }
 
-void RhoForest::process_fragment(Fragment* frag) {
+SapData RangeRhoForest::initialize_sapdata(Fragment* frag) {
   SapData params(frag->num_hits());
+  
+  for (size_t i = 0; i < frag->num_hits()) {
+    FragHit& hit = *(frag->hits()[i]);
+    params.leaf_ids[i] = _target_to_leaf_map[hit.targ_id]
+    if (i == 0) {
+      params.tree = _leaf_to_tree_map[_params.leaf_ids[i]];
+    } else {
+      assert(_leaf_to_tree_map[_params.leaf_ids[i]] == params.tree);
+    }
+  }
+}
+
+void RangeRhoForest::set_alphas(vector<double> target_alphas) {
+  SapData params(target_alphas.size());
+  for (size_t i = 0; i < target_alphas.size(); i++) {
+    LeafID leaf = _target_to_leaf_map[i];
+    params.leaf_ids[leaf] = leaf;
+    params.rhos[leaf] = target_alphas[i];
+  }
+  set_rhos(Sap(&params));
+}
+
+void RangeRhoForest::get_rhos(Sap sap) {
+  TreeID tree = sap.tree_root();
+  _children[tree]->get_rhos(sap, _child_rhos(tree));
+  return params.rhos;
+}
+
+void RangeRhoForest::update_rhos(Sap sap) {
+  TreeID tree = sap.tree_root();
+  
+  // Don't compute a scalar here to save time. These should always be valuable.
+  double mass = next_mass();
+  // Update the rhos throughout the forest using the computed likelihoods.
+  _child_rhos.increment(tree_id, mass + tree_saps[j].fraction());
+  _children[tree]->update_rhos(tree_saps[j]);
+}
+
+void RangeRhoForest::process_fragment(Fragment* frag) {
+  // TODO: Assume the likelihoods are pre-computed, perhaps pass in through the probabilities field?
   
   // Everything is much easier and faster when the mapping is unique.
   if (frag->num_hits() == 1) {
+    SapData params(1);
     FragHit& hit = *frag->hits()[0];
-    hit.targ_id = _target_to_leaf_map[hit.targ_id];
-    params.leaf_ids[0] = hit.targ_id;
-    TreeID tree_id = _leaf_to_tree_map[hit.targ_id];
+    params.leaf_ids[0] = _target_to_leaf_map[hit.targ_id]
+    params.tree = _leaf_to_tree_map[params.leaf_ids[0]]];
     params.accum_assignments[1] = 0;
     double mass = next_mass();
-    _child_rhos.increment(tree_id, mass);
+    _child_rhos.increment(params.tree, mass);
     _children[tree_id]->update_rhos(Sap(&params, 0, 0));
     return;
   }
 
-  // These are the relevant roots and associated saps.
-  vector<TreeID> tree_roots;
-  vector<Sap> tree_saps;
-  
-  const TreeID NONE = _children.size() + 1;
-  TreeID curr_tree = NONE;
-  
-  // Look up leaf ids and find the relevant trees.
-  size_t next_left = 0;
-  for (size_t i = 0; i < frag->num_hits(); ++i) {
-    FragHit& hit = *frag->hits()[i];
-    // This is not very elegant since it replaces the target id with the leaf
-    // id, but it allows for easy sorting.
-    hit.targ_id = _target_to_leaf_map[hit.targ_id];
-    params.leaf_ids[i] = hit.targ_id;
-    TreeID tree = _leaf_to_tree_map[hit.targ_id];
-    if (tree != curr_tree) {
-      if (curr_tree != NONE) {
-        tree_roots.push_back(curr_tree);
-        tree_saps.push_back(Sap(&params, next_left, i));
-        next_left = i + 1;
-      }
-      curr_tree = tree;
-    }
-  }
-  tree_roots.push_back(curr_tree);
-  tree_saps.push_back(Sap(&params, next_left, frag->num_hits()-1));
-  
-  // For now we'll assume the full trees are bundles, although nothing except
-  // this assertions relies on that assumption.
-  assert(tree_roots.size() == 0);
-
-  // Use breadth-first search to get the rhos
-  for (size_t j = 0; j < tree_roots.size(); ++j) {
-    size_t tree_id = tree_roots[j];
-    _children[tree_id]->get_rhos(tree_saps[j], _child_rhos(tree_id));
-  }
-  
-  // Sort the FragHits based on leaf_id.
-  frag->sort_hits();
+  SapData params = initialize_sapdata(frag);
+  // TODO: sort leaf_ids and create a mapping to fraghits
+  Sap sap(&params);
+  get_rhos(sap);
   
   // Compute the individual and total likelihoods.
+  // TODO: change this to use the mapping and the probability field
   double total_likelihood = LOG_0;
   for (size_t i = 0; i < frag->num_hits(); ++i) {
     FragHit& hit = *frag->hits()[i];
@@ -151,22 +156,15 @@ void RhoForest::process_fragment(Fragment* frag) {
   for (size_t i = 0; i < frag->num_hits(); ++i) {
     double frac = params.const_likelihoods[i] + params.rhos[i] -
                   total_likelihood;
+    frag[i]->probability = frac;
     params.accum_assignments[i+1] = log_add(frac, params.accum_assignments[i]);
   }
-    
-  // Don't compute a scalar here to save time. These should always be valuable.
-  double mass = next_mass();
-  // Update the rhos throughout the forest using the computed likelihoods.
-  for (size_t j = 0; j < tree_roots.size(); ++j) {
-    size_t tree_id = tree_roots[j];
-    _child_rhos.increment(tree_id, mass + tree_saps[j].fraction());
-    _children[tree_id]->update_rhos(tree_saps[j]);
-  }
+  
+  update_rhos(sap);
 }
 
-RangeRhoTree::RangeRhoTree(size_t left, size_t right, double alpha,
-                           double ff_param)
-: RhoTree(alpha, ff_param), _left(left), _right(right) {
+RangeRhoTree::RangeRhoTree(size_t left, size_t right, double ff_param)
+    : RhoTree(ff_param), _left(left), _right(right) {
 }
 
 void RangeRhoTree::add_child(RangeRhoTree* child) {
@@ -178,6 +176,21 @@ void RangeRhoTree::add_child(RangeRhoTree* child) {
     _right = child->right();
   }
   RhoTree::add_child(child);
+}
+
+RangeRhoTree::set_rhos(Sap sap) {
+  _child_rhos = FrequencyMatrix<double>(1, _children.size(), LOG_0);
+  for (size_t i = 0; i < _children.size(); ++i) {
+    RangeRhoTree& child = *static_cast<RangeRhoTree*>(_children[i]);
+    Sap branch_sap = sap.branch(child.right());
+    if (branch_sap.size()) {
+      child.set_rhos(branch_sap);
+      _child_rhos.increment(i, branch_sap.rhos(i));
+    }
+    if (sap.size() == 0) {
+      break;
+    }
+  }
 }
 
 void RangeRhoTree::get_rhos(Sap sap, double rho) const {
