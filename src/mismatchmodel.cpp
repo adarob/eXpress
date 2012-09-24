@@ -175,7 +175,8 @@ void MismatchTable::update(const FragHit& f, double p, double mass) {
   vector<Indel>::const_iterator del = f.deletes_l.begin();
     
   vector<double> joint_probs(NUM_NUCS);
-    
+  
+  assert(targ.length() >= f.right);
   while (i < f.seq_l.length()) {
     if (del != f.deletes_l.end() && del->pos == i) {
       _delete_params.increment(del->len, mass);

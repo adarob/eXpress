@@ -173,7 +173,7 @@
 		0A5C75FF136F2E850095365C /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0440;
+				LastUpgradeCheck = 0450;
 			};
 			buildConfigurationList = 0A5C7602136F2E850095365C /* Build configuration list for PBXProject "express" */;
 			compatibilityVersion = "Xcode 3.2";

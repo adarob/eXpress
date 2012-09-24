@@ -37,6 +37,7 @@ size_t cigar_length(const char* cigar_str, vector<Indel>& inserts,
     char op_char = toupper(*t);
     switch(op_char) {
       case 'I':
+      case 'S':
         inserts.push_back(Indel(i, op_len));
         i += op_len;
         break;
@@ -73,6 +74,7 @@ size_t cigar_length(vector<BamTools::CigarOp>& cigar_vec,
     size_t op_len = cigar_vec[k].Length;
     switch(op_char) {
       case 'I':
+      case 'S':
         inserts.push_back(Indel(i, op_len));
         i += op_len;
         break;
@@ -263,7 +265,10 @@ bool BAMParser::map_end_from_alignment(BamTools::BamAlignment& a) {
   }
     
   if (a.IsPaired() && (!a.IsMateMapped() || a.RefID != a.MateRefID ||
-                       a.IsReverseStrand() == a.IsMateReverseStrand())) {
+                       a.IsReverseStrand() == a.IsMateReverseStrand() ||
+                       (a.IsReverseStrand() && a.MatePosition > a.Position) ||
+                       (a.IsMateReverseStrand() &&
+                        a.MatePosition < a.Position))) {
     return false;
   }
   
@@ -377,8 +382,10 @@ bool SAMParser::map_end_from_line(char* line) {
   FragHit& f = *_frag_buff;
   string sam_line(line);
   char *p = strtok(line, "\t");
-  int sam_flag=0;
-  bool paired=0;
+  int sam_flag = 0;
+  bool paired = 0;
+  bool reversed;
+  bool other_reversed;
   
   int i = 0;
   while (p && i <= 9) {
@@ -396,8 +403,8 @@ bool SAMParser::map_end_from_line(char* line) {
         if (paired && (sam_flag & 0x8)) {
           goto stop;
         }
-        bool reversed = sam_flag & 0x10;
-        bool other_reversed = sam_flag & 0x20;
+        reversed = sam_flag & 0x10;
+        other_reversed = sam_flag & 0x20;
         if (paired && reversed == other_reversed) {
           goto stop;
         }
@@ -446,6 +453,10 @@ bool SAMParser::map_end_from_line(char* line) {
       }
       case 7: {
         f.mate_l = atoi(p)-1;
+        if (paired && ((reversed && f.left < f.mate_l) ||
+                       (other_reversed && f.left > f.mate_l))) {
+          goto stop;
+        }
         break;
       }
       case 8: {
