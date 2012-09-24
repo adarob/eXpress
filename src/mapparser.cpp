@@ -384,8 +384,8 @@ bool SAMParser::map_end_from_line(char* line) {
   char *p = strtok(line, "\t");
   int sam_flag = 0;
   bool paired = 0;
-  bool reversed;
-  bool other_reversed;
+  bool reversed = 0;
+  bool other_reversed = 0;
   
   int i = 0;
   while (p && i <= 9) {
@@ -453,8 +453,8 @@ bool SAMParser::map_end_from_line(char* line) {
       }
       case 7: {
         f.mate_l = atoi(p)-1;
-        if (paired && ((reversed && f.left < f.mate_l) ||
-                       (other_reversed && f.left > f.mate_l))) {
+        if (paired && ((reversed && f.left < (size_t)f.mate_l) ||
+                       (other_reversed && f.left > (size_t)f.mate_l))) {
           goto stop;
         }
         break;
