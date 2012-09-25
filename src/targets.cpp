@@ -67,7 +67,7 @@ double Target::rho() const {
   if (eff_len == LOG_0) {
       return LOG_0;
   }
-  
+
   return mass(true) - eff_len - (_libs->curr_lib()).targ_table->total_fpb();
 }
 
@@ -87,14 +87,14 @@ double Target::mass_var(bool with_pseudo) const {
 
 double Target::log_likelihood(const FragHit& frag, bool with_pseudo) const {
   double ll = 0;
-  
+
   const PairStatus ps = frag.pair_status();
   const Library& lib = _libs->curr_lib();
-   
+
   if (lib.mismatch_table) {
     ll += (lib.mismatch_table)->log_likelihood(frag);
   }
-  
+
   double tot_mass = mass(with_pseudo);
   double tot_eff_len = cached_effective_length(lib.bias_table);
   foreach (const Target* neighbor, frag.neighbors) {
@@ -116,7 +116,7 @@ double Target::log_likelihood(const FragHit& frag, bool with_pseudo) const {
   if (ps == PAIRED) {
     ll += (lib.fld)->pmf(frag.length());
   }
-  
+
   assert(!(isnan(ll)||isinf(ll)));
   return ll;
 }
@@ -125,13 +125,13 @@ double Target::est_effective_length(FLD* fld, bool with_bias) const {
   if (!fld) {
     fld = (_libs->curr_lib()).fld;
   }
-    
+
   double eff_len = LOG_0;
-     
+
   for(size_t l = fld->min_val(); l <= min(length(), fld->max_val()); l++) {
     eff_len = log_add(eff_len, fld->pmf(l)+log((double)length()-l+1));
   }
-  
+
   if (with_bias) {
     eff_len += _avg_bias;
   }
@@ -170,13 +170,13 @@ TargetTable::TargetTable(const string& targ_fasta_file, bool prob_seqs,
         cout << " and measuring bias background";
   }
   cout << "...\n\n";
-    
+
   size_t num_targs = targ_index.size();
   _targ_map = vector<Target*>(num_targs, NULL);
   _total_fpb = log(alpha*num_targs);
 
   boost::unordered_set<string> target_names;
- 
+
   double alpha_renorm = 1.0;
   if (alpha_map) {
     double alpha_total = 0;
@@ -186,7 +186,7 @@ TargetTable::TargetTable(const string& targ_fasta_file, bool prob_seqs,
     }
     alpha_renorm = (alpha * alpha_map->size())/alpha_total;
   }
-    
+
   ifstream infile (targ_fasta_file.c_str());
   string line;
   string seq = "";
@@ -235,13 +235,13 @@ TargetTable::TargetTable(const string& targ_fasta_file, bool prob_seqs,
          << "'.\n" ;
     exit(1);
   }
-  
+
   if (size() == 0) {
     cerr << "ERROR: No targets found in MultiFASTA file '" << targ_fasta_file
          << "'.\n" ;
     exit(1);
   }
-    
+
   for(TransIndex::const_iterator it = targ_index.begin();
       it != targ_index.end(); ++it) {
     if (!_targ_map[it->second]) {
@@ -267,7 +267,7 @@ void TargetTable::add_targ(const string& name, const string& seq, bool prob_seq,
          << "' exists in MultiFASTA but not alignment (SAM/BAM) file.\n";
     return;
   }
-    
+
   if (targ_lengths.find(name)->second != seq.length()) {
     cerr << "ERROR: Target '" << name << "' differs in length between "
          << "MultiFASTA and alignment (SAM/BAM) files ("<< seq.length()
@@ -317,14 +317,14 @@ void project_to_polytope(vector<Target*> bundle_targ,
         targ_counts[i] = targ.uniq_counts();
         polytope_bound[i] = true;
       }
-           
+
       if (polytope_bound[i]) {
         bound_counts += targ_counts[i];
       } else {
         unbound_counts += targ_counts[i];
       }
     }
-        
+
     if (approx_eq(unbound_counts + bound_counts, bundle_counts)) {
       return;
     }
@@ -334,7 +334,7 @@ void project_to_polytope(vector<Target*> bundle_targ,
 	    unbound_counts = bound_counts;
 	    bound_counts = 0;
 	  }
-    
+
     double normalizer = (bundle_counts - bound_counts)/unbound_counts;
     for (size_t i = 0; i < bundle_targ.size(); ++i) {
       if (!polytope_bound[i]) {
@@ -358,7 +358,7 @@ void TargetTable::output_results(string output_dir, size_t tot_counts,
                << "P(T)\tobs_A\tobs_C\tobs_G\tobs_T\texp_A\texp_C\texp_G\texp_T"
                << endl;
   }
-    
+
   fprintf(expr_file, "bundle_id\ttarget_id\tlength\teff_length\ttot_counts\t"
                      "uniq_counts\test_counts\teff_counts\tambig_distr_alpha\t"
                      "ambig_distr_beta\tfpkm\tfpkm_conf_low\tfpkm_conf_high\t"
@@ -366,13 +366,13 @@ void TargetTable::output_results(string output_dir, size_t tot_counts,
 
   double l_bil = log(1000000000.);
   double l_tot_counts = log((double)tot_counts);
-    
+
   size_t bundle_id = 0;
   foreach (Bundle* bundle, _bundle_table.bundles()) {
     ++bundle_id;
-        
+
     const vector<Target*>& bundle_targ = *(bundle->targets());
-        
+
     if (output_varcov) {
       varcov_file << ">" << bundle_id << ": ";
       for (size_t i = 0; i < bundle_targ.size(); ++i) {
@@ -383,18 +383,18 @@ void TargetTable::output_results(string output_dir, size_t tot_counts,
       }
       varcov_file << endl;
     }
-        
+
     // Calculate total counts for bundle and bundle-level rho
     // Do not include pseudo-mass because it will screw up multi-round results
     double l_bundle_mass = LOG_0;
     for (size_t i = 0; i < bundle_targ.size(); ++i) {
       l_bundle_mass = log_add(l_bundle_mass, bundle_targ[i]->mass(false));
     }
-        
+
     if (bundle->counts()) {
       double l_bundle_counts = log((double)bundle->counts());
       double l_var_renorm = 2*(l_bundle_counts - l_bundle_mass);
-  
+
       vector<double> targ_counts(bundle_targ.size(),0);
       bool requires_projection = false;
 
@@ -405,11 +405,11 @@ void TargetTable::output_results(string output_dir, size_t tot_counts,
         requires_projection |= targ_counts[i] > (double)targ.tot_counts() ||
                                targ_counts[i] < (double)targ.uniq_counts();
       }
-                        
+
       if (bundle_targ.size() > 1 && requires_projection) {
         project_to_polytope(bundle_targ, targ_counts, bundle->counts());
       }
-            
+
       // Calculate individual counts and rhos
       for (size_t i = 0; i < bundle_targ.size(); ++i) {
         Target& targ = *bundle_targ[i];
@@ -420,47 +420,46 @@ void TargetTable::output_results(string output_dir, size_t tot_counts,
         double count_alpha = 0;
         double count_beta = 0;
         double count_var = 0;
-             
+
         if (targ.tot_counts() != targ.uniq_counts()) {
           double n = targ.tot_counts()-targ.uniq_counts();
           double m = (targ_counts[i] - targ.uniq_counts())/n;
           double v = sexp(targ.var_sum() - targ.tot_ambig_mass());
-                    
+
           double a = -m*(m*m - m + v)/v;
           double b = (m-1)*(m*m - m + v)/v;
           if (!targ.solvable()) {
             a = 1;
             b = 1;
           }
-                    
+
           if (targ.solvable() && (v == 0 || a < 0 || b < 0)) {
             count_var = mass_var;
           } else {
             count_var = n*a*b*(a+b+n)/((a+b)*(a+b)*(a+b+1));
           }
-                    
           count_alpha = a;
           count_beta = b;
           assert(!isnan(count_var) && !isinf(count_var));
         }
-                
+
         double fpkm_std_dev = sexp(0.5*(mass_var + l_var_renorm));
         double fpkm_constant = sexp(l_bil - l_eff_len - l_tot_counts);
         double targ_fpkm = targ_counts[i] * fpkm_constant;
         double fpkm_lo = max(0.0,
                              (targ_counts[i] - 2*fpkm_std_dev) * fpkm_constant);
         double fpkm_hi = (targ_counts[i] + 2*fpkm_std_dev) * fpkm_constant;
-                
+
         double eff_len = sexp(l_eff_len);
         double eff_counts = targ_counts[i] / eff_len * targ.length();
-                
+
         fprintf(expr_file, "" SIZE_T_FMT "\t%s\t" SIZE_T_FMT "\t%f\t" SIZE_T_FMT
                           "\t" SIZE_T_FMT "\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%c\n",
                bundle_id, targ.name().c_str(), targ.length(), eff_len,
                targ.tot_counts(), targ.uniq_counts(), targ_counts[i],
                eff_counts, count_alpha, count_beta, targ_fpkm, fpkm_lo, fpkm_hi,
                (targ.solvable())?'T':'F');
-            
+
          if (output_varcov) {
            for (size_t j = 0; j < bundle_targ.size(); ++j) {
              if (j) {
@@ -476,7 +475,8 @@ void TargetTable::output_results(string output_dir, size_t tot_counts,
            }
            varcov_file << endl;
          }
-         
+
+
          if (output_rdds) {
            const Sequence& targ_seq = targ.seq();
            vector<double> p_vals;
@@ -507,7 +507,7 @@ void TargetTable::output_results(string output_dir, size_t tot_counts,
                 bundle_id, targ.name().c_str(), targ.length(),
                 sexp(targ.est_effective_length()), 0, 0, 0.0, 0.0, 0.0, 0.0,
                 0.0, 0.0, 0.0, 'T');
-                
+
          if (output_varcov) {
            for (size_t j = 0; j < bundle_targ.size(); ++j) {
              if (j) {
@@ -543,11 +543,11 @@ void TargetTable::asynch_bias_update(boost::mutex* mutex) {
   BiasBoss* bg_table = NULL;
   boost::scoped_ptr<BiasBoss> bias_table;
   boost::scoped_ptr<FLD> fld;
-  
+
   bool burned_out_before = false;
-    
+
   const Library& lib = _libs->curr_lib();
-    
+
   while(running) {
     if (bg_table) {
        bg_table->normalize_expectations();
@@ -576,11 +576,11 @@ void TargetTable::asynch_bias_update(boost::mutex* mutex) {
     if (!edit_detect && burned_out && burned_out_before) {
       break;
     }
-        
+
     burned_out_before = burned_out;
-        
+
     vector<double> fl_cdf = fld->cmf();
-        
+
     foreach(Target* targ, _targ_map) {
       targ->lock();
       targ->update_target_bias(bias_table.get(), fld.get());
@@ -593,7 +593,7 @@ void TargetTable::asynch_bias_update(boost::mutex* mutex) {
       }
     }
   }
-    
+
   if (bg_table) {
      delete bg_table;
   }

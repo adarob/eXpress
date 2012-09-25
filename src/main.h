@@ -100,7 +100,7 @@ inline double log_add(double x, double y) {
   if (fabs(y) == LOG_0) {
     return x;
   }
-   
+
   if (y > x) {
     std::swap(x,y);
   }
@@ -123,7 +123,7 @@ inline double log_sub(double x, double y) {
   if (fabs(y) == LOG_0) {
     return x;
   }
-  
+
   double diff = x+log(1-exp(y-x));
   return diff;
 }

@@ -65,7 +65,6 @@ double SeqWeightTable::get_weight(const Sequence& seq, size_t i) const {
   return _observed.seq_prob(seq, left) - _expected.seq_prob(seq, left);
 }
 
-
 void SeqWeightTable::append_output(ofstream& outfile) const {
   char buff[200];
   string header = "";
@@ -74,9 +73,9 @@ void SeqWeightTable::append_output(ofstream& outfile) const {
     header += buff;
   }
   header += '\n';
-    
+
   outfile << "\tObserved Marginal Distribution\n" << header;
-    
+
   for (size_t j = 0; j < NUM_NUCS; j++) {
     outfile << NUCS[j] << ":\t";
     for (int i = 0; i < WINDOW; i++) {
@@ -84,9 +83,9 @@ void SeqWeightTable::append_output(ofstream& outfile) const {
     }
     outfile<<endl;
   }
-    
+
   outfile << "\tObserved Conditional Probabilities\nPosition\t";
-    
+
   for (size_t j = 0; j < pow((double)NUM_NUCS, (double)FG_ORDER+1); j++) {
     string s = "->";
     s += NUCS[j & 3];
@@ -98,7 +97,7 @@ void SeqWeightTable::append_output(ofstream& outfile) const {
     outfile << s << '\t';
   }
   outfile << endl;
-    
+
   for (int i = 0; i < WINDOW; i++) {
     outfile << i-SURROUND << ":\t";
     for (size_t j = 0; j < pow((double)NUM_NUCS, (double)FG_ORDER+1); j++) {
@@ -107,9 +106,9 @@ void SeqWeightTable::append_output(ofstream& outfile) const {
     }
     outfile<<endl;
   }
-    
+
   outfile << "\tBackground Conditional Probabilities\nPosition\t";
-    
+
   for (size_t j = 0; j < pow((double)NUM_NUCS, (double)BG_ORDER+1); j++) {
     string s = "->";
     s += NUCS[j & 3];
@@ -121,7 +120,7 @@ void SeqWeightTable::append_output(ofstream& outfile) const {
     outfile << s << '\t';
   }
   outfile << endl;
-  
+
   for (size_t i = 0; i < BG_ORDER+1; i++) {
     outfile << i << ":\t";
     for (size_t j = 0; j <  pow((double)NUM_NUCS, (double)BG_ORDER+1); j++) {
@@ -152,7 +151,7 @@ void BiasBoss::update_expectations(const Target& targ, double mass,
   if (mass == LOG_0) {
     return;
   }
-  
+
   const Sequence& seq_fwd = targ.seq(0);
   const Sequence& seq_rev = targ.seq(1);
 
@@ -168,7 +167,7 @@ void BiasBoss::normalize_expectations() {
 void BiasBoss::update_observed(const FragHit& hit, double normalized_mass)
 {
   assert (hit.pair_status() != PAIRED || hit.length() > WINDOW);
-    
+
   const Sequence& t_seq_fwd = hit.targ->seq(0);
   const Sequence& t_seq_rev = hit.targ->seq(1);
 
@@ -186,7 +185,7 @@ double BiasBoss::get_target_bias(std::vector<float>& start_bias,
                                  const Target& targ) const {
   double tot_start = LOG_0;
   double tot_end = LOG_0;
-    
+
   const Sequence& t_seq_fwd = targ.seq(0);
   const Sequence& t_seq_rev = targ.seq(1);
 
@@ -196,7 +195,7 @@ double BiasBoss::get_target_bias(std::vector<float>& start_bias,
     tot_start = log_add(tot_start, start_bias[i]);
     tot_end = log_add(tot_end, end_bias[i]);
   }
-    
+
   double avg_bias = (tot_start + tot_end) - (2*log((double)targ.length()));
   assert(!isnan(avg_bias));
   return avg_bias;

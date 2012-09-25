@@ -40,8 +40,10 @@ namespace fs = boost::filesystem;
 // the forgetting factor parameter controls the growth of the fragment mass
 double ff_param = 0.85;
 
-// the burn-in parameter determines how many reads are required before the 
-// error and bias models are applied to probabilistic assignment 
+// the burn-in parameter determines how many reads are required before the
+
+// error and bias models are applied to probabilistic assignment
+
 size_t burn_in = 100000;
 //size_t burn_in = 100;
 size_t burn_out = 5000000;
@@ -105,12 +107,12 @@ AlphaMap* parse_priors(string in_file) {
     exit(1);
   }
   AlphaMap* alphas = new AlphaMap();
-    
+
   string line;
-    
+
   while(ifs.good()) {
     getline(ifs,line);
-        
+
     size_t idx = line.find_first_of("\t ");
     if (idx!=string::npos) {
       string name = line.substr(0,idx);
@@ -156,9 +158,9 @@ bool parse_options(int ac, char ** av) {
   ("calc-covar", "calculate and output covariance matrix")
   ("no-update-check", "disables automatic check for update via web")
   ;
-    
+
   string prior_file = "";
-    
+
   po::options_description hidden("Hidden options");
   hidden.add_options()
   ("edit-detect","")
@@ -178,13 +180,13 @@ bool parse_options(int ac, char ** av) {
   ("fasta-file", po::value<string>(&fasta_file_name)->default_value(""), "")
   ("num-neighbors", po::value<size_t>(&num_neighbors)->default_value(0), "")
   ;
-    
+
   po::positional_options_description positional;
   positional.add("fasta-file",1).add("sam-file",1);
-   
+
   po::options_description cmdline_options;
   cmdline_options.add(generic).add(hidden);
-    
+
   bool error = false;
   po::variables_map vm;
   try {
@@ -195,19 +197,19 @@ bool parse_options(int ac, char ** av) {
     error = true;
   }
   po::notify(vm);
-    
+
   if (ff_param > 1.0 || ff_param < 0.5) {
     cerr << "Command-Line Argument Error: forget-param/f option must be "
          << "between 0.5 and 1.0\n\n";
     error= true;
   }
-        
+
   if (fasta_file_name == "") {
     cerr << "Command-Line Argument Error: target sequence fasta file "
          << "required\n\n";
     error = true;
   }
-    
+
   if (error || vm.count("help")) {
     cerr << "express v" << PACKAGE_VERSION << endl
          << "-----------------------------\n"
@@ -220,11 +222,11 @@ bool parse_options(int ac, char ** av) {
          << generic;
     return 1;
   }
-    
+
   if (vm.count("fr-stranded")) {
     direction = FR;
   }
-    
+
   if (vm.count("rf-stranded")) {
     if (direction != BOTH) {
       cerr << "ERROR fr-stranded and rf-stranded flags cannot both be "
@@ -245,13 +247,13 @@ bool parse_options(int ac, char ** av) {
   batch_mode = vm.count("batch-mode");
   online_additional = vm.count("additional-online");
   both = vm.count("both");
-   
+
   if (output_align_prob && output_align_samp) {
     cerr << "ERROR: Cannot output both alignment probabilties and sampled "
          << "alignments.";
     return 1;
   }
-  
+
   // We have 1 processing thread and 1 parsing thread always, so we should not
   // count these as additional threads.
   if (num_threads < 2) {
@@ -267,13 +269,13 @@ bool parse_options(int ac, char ** av) {
   if (prior_file != "") {
     expr_alpha_map = parse_priors(prior_file);
   }
-    
+
 #ifndef WIN32
   if (!vm.count("no-update-check")) {
     check_version(PACKAGE_VERSION);
   }
 #endif
-    
+
   return 0;
 }
 
@@ -302,7 +304,7 @@ void output_results(Librarian& libs, size_t tot_counts, int n=-1) {
   }
   libs[0].targ_table->output_results(dir, tot_counts, last_round&calc_covar,
                                      last_round&edit_detect);
-    
+
   for (size_t l = 0; l < libs.size(); l++) {
     if (libs.size() > 1) {
       sprintf(buff, "%s/params.%d.xprs", dir.c_str(), (int)l+1);
@@ -331,13 +333,13 @@ void output_results(Librarian& libs, size_t tot_counts, int n=-1) {
 void process_fragment(Fragment* frag_p) {
   Fragment& frag = *frag_p;
   const Library& lib = *frag.lib();
-  
+
   // sort hits to avoid deadlock
   frag.sort_hits();
   double mass_n = frag.mass();
-  
+
   assert(frag.num_hits());
-  
+
   vector<double> likelihoods(frag.num_hits(), 0);
   vector<double> masses(frag.num_hits(), 0);
   vector<double> variances(frag.num_hits(), 0);
@@ -345,10 +347,10 @@ void process_fragment(Fragment* frag_p) {
   double total_mass = LOG_0;
   double total_variance = LOG_0;
   size_t num_solvable = 0;
-  
+
   // set of locked targets
   boost::unordered_set<Target*> targ_set;
-  
+
   // calculate marginal likelihoods and lock targets.
   if (frag.num_hits()>1) {
     for (size_t i = 0; i < frag.num_hits(); ++i) {
@@ -385,22 +387,22 @@ void process_fragment(Fragment* frag_p) {
       }
     }
   }
-  
+
   assert(!islzero(total_likelihood));
-  
+
   // merge bundles
   Bundle* bundle = frag.hits()[0]->targ->bundle();
   if (first_round) {
     bundle->incr_counts();
   }
-  
+
   // normalize marginal likelihoods
   for (size_t i = 0; i < frag.num_hits(); ++i) {
     FragHit& m = *frag.hits()[i];
     Target* t  = m.targ;
-    
+
     bundle = lib.targ_table->merge_bundles(bundle, t->bundle());
-    
+
     double p = likelihoods[i]-total_likelihood;
     double v = LOG_0;
     if (frag.num_hits() > 1) {
@@ -409,13 +411,13 @@ void process_fragment(Fragment* frag_p) {
     }
     assert(!isnan(v));
     assert(!(isnan(p)||isinf(p)));
-    
+
     m.probability = sexp(p);
-    
+
     assert(!isinf(m.probability));
-    
+
     t->add_mass(p, v, mass_n);
-    
+
     // update parameters
     if (first_round) {
       t->incr_counts(frag.num_hits()==1);
@@ -449,7 +451,7 @@ void process_fragment(Fragment* frag_p) {
       }
     }
   }
-  
+
   foreach (Target* t, targ_set) {
     t->unlock();
   }
@@ -484,18 +486,18 @@ void proc_thread(ParseThreadSafety* pts) {
 size_t threaded_calc_abundances(Librarian& libs) {
   cout << "Processing input fragment alignments...\n";
   boost::scoped_ptr<boost::thread> bias_update;
-    
+
   size_t n = 1;
   size_t num_frags = 0;
   double mass_n = 0;
   cout << setiosflags(ios::left);
-    
+
   // For log-scale output
   size_t i = 1;
   size_t j = 6;
-    
+
   Fragment* frag;
-    
+
   while (true) {
     // Loop through libraries
     for (size_t l = 0; l < libs.size(); l++) {
@@ -510,7 +512,7 @@ size_t threaded_calc_abundances(Librarian& libs) {
                           stop_at, num_neighbors);
       vector<boost::thread*> thread_pool;
       RobertsFilter frags_seen;
-            
+
       burned_out = lib.n >= burn_out;
       while(true) {
         if (lib.n == burn_in) {
@@ -545,7 +547,7 @@ size_t threaded_calc_abundances(Librarian& libs) {
               << "' has alignments which are non-consecutive.\n";
           exit(1);
         }
-        
+
         // If multi-threaded and burned out, push to the processing queue
         if (num_threads && burned_out) {
           // If no more fragments, send stop signal (NULL) to processing threads
@@ -570,7 +572,7 @@ size_t threaded_calc_abundances(Librarian& libs) {
             pts.proc_out.push(frag);
           }
         }
-        
+
         // Output intermediate results, if necessary
         if (output_running_reads && n == i*pow(10.,(double)j)) {
           boost::unique_lock<boost::mutex> lock(bu_mut);
@@ -581,21 +583,21 @@ size_t threaded_calc_abundances(Librarian& libs) {
           }
         }
         num_frags++;
-                
+
         // Output progress
         if (num_frags % 1000000 == 0) {
           cout << "Fragments Processed (" << lib.in_file_name << "): "
                << setw(9) << num_frags << "\t Number of Bundles: "
                << lib.targ_table->num_bundles() << endl;
         }
-        
+
         n++;
         lib.n++;
         mass_n += ff_param*log((double)n-1) - log(pow(n,ff_param) - 1);
         lib.mass_n += ff_param*log((double)lib.n-1) -
                       log(pow(lib.n,ff_param) - 1);
       }
-      
+
       // Signal bias update thread to stop
       running = false;
 
@@ -603,18 +605,18 @@ size_t threaded_calc_abundances(Librarian& libs) {
       foreach(boost::thread* t, thread_pool) {
         t->join();
       }
-            
+
       if (bias_update) {
         bias_update->join();
         bias_update.reset(NULL);
       }
     }
-        
+
     if (online_additional && remaining_rounds--) {
       if (output_running_rounds) {
         output_results(libs, n, (int)remaining_rounds);
       }
-            
+
       cout << remaining_rounds << " remaining rounds." << endl;
       first_round = false;
       last_round = (remaining_rounds==0 && !both);
@@ -627,11 +629,11 @@ size_t threaded_calc_abundances(Librarian& libs) {
       break;
     }
   }
-    
+
   cout << "COMPLETED: Processed " << num_frags
        << " mapped fragments, targets are in "
        << libs[0].targ_table->num_bundles() << " bundles\n";
-    
+
   return num_frags;
 }
 
@@ -639,15 +641,17 @@ size_t threaded_calc_abundances(Librarian& libs) {
  * The main function instantiates the library parameter tables and parsers,
  * calls the processing function, and outputs the results. Also handles
  * additional batch rounds.
- */ 
+ */
+
 int main (int argc, char ** argv)
-{     
+{
+
   srand((unsigned int)time(NULL));
   int parse_ret = parse_options(argc,argv);
   if (parse_ret) {
     return parse_ret;
   }
-   
+
   if (output_dir != ".") {
     try {
       fs::create_directories(output_dir);
@@ -655,12 +659,12 @@ int main (int argc, char ** argv)
       cerr << e.what() << endl;
     }
   }
-    
+
   if (!fs::exists(output_dir)) {
     cerr << "ERROR: cannot create directory " << output_dir << ".\n";
     exit(1);
   }
-    
+
   // Prase input file names and instantiate Libray structs.
   vector<string> file_names;
   char buff[999];
@@ -690,7 +694,7 @@ int main (int argc, char ** argv)
     libs[i].fld = new FLD(fld_alpha, def_fl_max, def_fl_mean, def_fl_stddev);
     libs[i].mismatch_table = (error_model) ? new MismatchTable(mm_alpha):NULL;
     libs[i].bias_table = (bias_correct) ? new BiasBoss(bias_alpha):NULL;
-        
+
     if (i > 0 &&
         (libs[i].map_parser->targ_index() != libs[i-1].map_parser->targ_index()
          || libs[i].map_parser->targ_lengths() !=
@@ -700,7 +704,7 @@ int main (int argc, char ** argv)
       exit(1);
     }
   }
-    
+
   TargetTable targ_table(fasta_file_name, edit_detect, expr_alpha,
                          expr_alpha_map, &libs);
   for (size_t i = 0; i < libs.size(); ++i) {
@@ -710,21 +714,21 @@ int main (int argc, char ** argv)
     }
   }
   double num_targ = (double)targ_table.size();
-    
+
   if (calc_covar && (double)SSIZE_MAX < num_targ*(num_targ+1)) {
     cerr << "Warning: Your system is unable to represent large enough values "
          << "for efficiently hashing target pairs.  Covariance calculation "
          << "will be disabled.\n";
     calc_covar = false;
   }
-    
+
   size_t tot_counts = threaded_calc_abundances(libs);
-    
+
   if (both) {
     remaining_rounds = 1;
     online_additional = false;
   }
-    
+
   targ_table.round_reset();
   ff_param = 1.0;
   first_round = false;
@@ -743,10 +747,10 @@ int main (int argc, char ** argv)
      tot_counts = threaded_calc_abundances(libs);
      targ_table.round_reset();
   }
-    
+
 	cout << "Writing results to file...\n";
   output_results(libs, tot_counts);
   cout << "Done\n";
-    
+
   return 0;
 }

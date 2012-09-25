@@ -160,7 +160,7 @@ class Target {
    * are solvable.
    */
   bool _solvable;
-  
+
 public:
   /**
    * Target Constructor.
@@ -351,13 +351,15 @@ public:
    * An accessor for the _solvable flag.
    * @return a boolean specifying whether or not the target has a unique
    *         solution for its abundance estimate.
-   */  
+   */
+
   bool solvable() { return _solvable; }
   /**
    * A mutator that sets the _solvable flag.
    * @param a boolean specifying whether or not the target has a unique solution
    *        for its abundance estimate.
-   */   
+   */
+
   void solvable(bool s) { _solvable = s; }
 };
 
@@ -402,7 +404,8 @@ class TargetTable {
   /**
    * A private mutex to make accesses to _total_fpb thread-safe.
    */
-  mutable boost::mutex _fpb_mut;  
+  mutable boost::mutex _fpb_mut;
+
   /**
    * A private function that validates and adds a target pointer to the table.
    * @param name the name of the trancript.
@@ -458,12 +461,14 @@ public:
   /**
    * An accessor for the (logged) total mass per base, including pseudo-counts.
    * @return The (logged) total mass per base, including pseudo-counts.
-   */  
+   */
+
   double total_fpb() const;
   /**
    * a member function that increments the (logged) total mass per base.
    * @param incr_amt the (logged) amount to increment by.
-   */   
+   */
+
   void update_total_fpb(double incr_amt);
   /**
    * A member function that increases the (logged) covariance between two

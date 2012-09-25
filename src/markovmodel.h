@@ -47,7 +47,7 @@ class MarkovModel {
    * probabilities indices.
    */
   size_t _bitclear;
-    
+
  public:
   /**
    * MarkovModel Constructor.
@@ -109,6 +109,5 @@ class MarkovModel {
    */
   void calc_marginals();
 };
-
 
 #endif

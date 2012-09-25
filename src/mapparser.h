@@ -46,7 +46,7 @@ class Parser {
    * A private pointer to the current fragment mapping being parsed.
    */
   FragHit* _frag_buff;
-  
+
  public:
   /**
    * Dummy destructor.
@@ -99,7 +99,7 @@ class Writer {
    * (true) or all output with their respective posterior probabilities (false).
    */
   bool _sample;
-    
+
  public:
   /**
    * Dummy destructor.
@@ -133,7 +133,7 @@ class BAMParser : public Parser {
    * @return True if the mapping is valid and false otherwise
    */
   bool map_end_from_alignment(BamTools::BamAlignment& alignment);
-    
+
  public:
   /**
    * BAMParser constructor sets the reader.
@@ -184,7 +184,7 @@ class SAMParser : public Parser
    * @return True if the mapping is valid and false otherwise
    */
   bool map_end_from_line(char* line);
-  
+
 public:
   /**
    * SAMParser constructor removes the header and parses the first line to
@@ -225,7 +225,7 @@ class BAMWriter : public Writer {
    * the BAM file. Automatically deleted with BAMWriter object.
    */
   boost::scoped_ptr<BamTools::BamWriter> _writer;
-    
+
  public:
   /**
    * BAMWriter constructor stores a pointer to the BamTools::BamWriter object
@@ -233,7 +233,8 @@ class BAMWriter : public Writer {
    * @param writer pointer to the BamTools::BamWriter objected assocaited with
    *        the output BAM file.
    * @param sample specifies if a single alignment should be sampled based on
-   *        posteriors (true) or all output with their respective posterior 
+   *        posteriors (true) or all output with their respective posterior
+
    *        probabilities (false).
    */
   BAMWriter(BamTools::BamWriter* writer, bool sample);
@@ -250,11 +251,11 @@ class BAMWriter : public Writer {
   void write_fragment(Fragment& f);
 };
 
-
 /**
  * The SAMWriter class writes Fragment objects back to file in SAM format with
  * per-mapping probabilistic assignments, or by sampling a single mapping based
- * on assignment probabilities. 
+ * on assignment probabilities.
+
  *  @author    Adam Roberts
  *  @date      2011
  *  @copyright Artistic License 2.0
@@ -265,7 +266,7 @@ class SAMWriter : public Writer {
    * written in SAM format. Deleted with the SAMWriter object.
    */
   boost::scoped_ptr<std::ostream> _out;
-  
+
  public:
   /**
    * SAMWriter constructor stores a pointer to the output stream.
@@ -321,7 +322,7 @@ class MapParser
    * processing.
    */
   bool _write_active;
-    
+
  public:
   /**
    * MapParser constructor determines what format the input is in and
@@ -369,7 +370,5 @@ class MapParser
    */
   void reset_reader() { _parser->reset(); }
 };
-
-
 
 #endif

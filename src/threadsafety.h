@@ -44,7 +44,8 @@ class ThreadSafeFragQueue {
  public:
   /**
    * ThreadSafeFragQueue Constructor.
-   * @param max_size a size_t representing the number of Fragments allowed in 
+   * @param max_size a size_t representing the number of Fragments allowed in
+
    *        the queue before blocking on a push.
    */
   ThreadSafeFragQueue(size_t max_size);

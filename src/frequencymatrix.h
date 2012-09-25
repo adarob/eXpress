@@ -52,7 +52,7 @@ class FrequencyMatrix {
    * and normalized.
    */
   bool _fixed;
-    
+
 public:
   /**
    * Dummy FrequencyMatrix Constructor.
@@ -172,7 +172,7 @@ void FrequencyMatrix<T>::increment(size_t i, size_t j, T incr_amt) {
   if (_fixed) {
     return;
   }
-    
+
   size_t k = i*_N+j;
   assert(k < _M*_N);
   if (_logged) {

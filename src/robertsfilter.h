@@ -77,5 +77,4 @@ class RobertsFilter {
   bool test_and_push(const std::string& key);
 };
 
-
 #endif

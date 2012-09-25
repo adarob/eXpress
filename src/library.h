@@ -19,7 +19,8 @@
  *  @copyright Artistic License 2.0
  */
 struct Library {
-  /** 
+  /**
+
    * Path to the input file. Empty if streamed.
    */
   std::string in_file_name;
@@ -45,10 +46,12 @@ struct Library {
   /**
    * A pointer to the BiasBoss containing the learned bias distribution for this
    * library.
-   */  
+   */
+
   BiasBoss* bias_table;
   /**
-   * A pointer to the TargetTable containing the target parameters (abundance, 
+   * A pointer to the TargetTable containing the target parameters (abundance,
+
    * effective length) for this library.
    */
   TargetTable* targ_table;
@@ -82,7 +85,7 @@ class Librarian
    * The index of the library currently being processed.
    */
   size_t _curr;
-    
+
 public:
   /**
    * Librarian Constructor.

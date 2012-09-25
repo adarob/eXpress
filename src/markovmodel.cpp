@@ -26,21 +26,20 @@ MarkovModel::MarkovModel(size_t order, size_t window_size,
       _bitclear((1<<(2*order))-1) {
 }
 
-
 void MarkovModel::update(const Sequence& seq, int left, double mass) {
   int i = 0;
   int j = left;
   int seq_len = (int)seq.length();
-    
+
   size_t cond = 0;
-    
+
   if (left < _order) {
     i = _order-left;
     for (j=0; j < min(_order, i); j++) {
       cond = (cond << 2) + seq[j];
     }
   }
-    
+
   while (i < _window_size && j < seq_len) {
     size_t index = min(i, _num_pos-1);
     size_t curr = seq[j];
@@ -64,20 +63,20 @@ void MarkovModel::fast_learn(const Sequence& seq, double mass,
   if (seq.length() < (size_t)_order) {
     return;
   }
-    
+
   size_t cond = 0;
   for (int i = 0; i < _order; ++i) {
      cond = (cond << 2) + seq[i];
   }
-    
+
   for (size_t i = _order; i < seq.length(); ++i) {
     size_t curr = seq[i];
-        
+
     double mass_i = mass;
     if (seq.length()-i < fl_cmf.size()) {
       mass_i += fl_cmf[seq.length()-i];
     }
-        
+
     if (seq.prob()) {
       for (size_t nuc = 0; nuc < NUM_NUCS; nuc++) {
         _params[_order].increment(cond, nuc, seq.get_prob(i, nuc) + mass_i);
@@ -112,7 +111,7 @@ double MarkovModel::seq_prob(const Sequence& seq, int left) const {
   int i = 0;
   int j = left;
   int seq_len = (int)seq.length();
-    
+
   size_t cond = 0;
   double v = 0;
 
@@ -123,7 +122,7 @@ double MarkovModel::seq_prob(const Sequence& seq, int left) const {
     }
     v = i*LOG_QUARTER;
   }
-        
+
   while (i < _window_size && j < seq_len) {
     size_t index = min(i, _num_pos -1);
     size_t curr = seq[j];

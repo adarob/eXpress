@@ -20,7 +20,7 @@ bool RobertsFilter::test_and_push(const string& key) {
   if (_local_set.count(key) || _global_set.count(key)) {
     return true;
   }
-    
+
   _local_set.insert(key);
   _local_queue.push(key);
   if (_local_set.size() > _local_size) {

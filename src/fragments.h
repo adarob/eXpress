@@ -76,7 +76,7 @@ struct FragHit {
    * The first ("left") read sequence (according to SAM flag).
    */
   SequenceFwd seq_l;
-    
+
   /**
    * The second ("right") read sequence (according to SAM flag).
    */
@@ -181,7 +181,7 @@ struct FragHit {
     }
     return LEFT_ONLY;
   }
-  
+
   //DOC
   double targ_rho;
   double const_likelihood;
@@ -189,7 +189,8 @@ struct FragHit {
 
 /**
  * The Fragment class stores information for all alignments of a single fragment.
- * By design, only paired-end mappings of paired-end reads will be accepted. 
+ * By design, only paired-end mappings of paired-end reads will be accepted.
+
  * All mappings of single-end reads will be accepted.
  *  @author    Adam Roberts
  *  @date      2011
@@ -293,6 +294,5 @@ public:
    */
   void sort_hits();
 };
-
 
 #endif
