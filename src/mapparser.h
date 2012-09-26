@@ -20,6 +20,7 @@ class Fragment;
 class ParseThreadSafety;
 class TargetTable;
 struct FragHit;
+struct ReadHit;
 struct Library;
 
 typedef boost::unordered_map<std::string, size_t> TransIndex;
@@ -43,9 +44,9 @@ class Parser {
    */
   TransIndex _targ_lengths;
   /**
-   * A private pointer to the current fragment mapping being parsed.
+   * A private pointer to the current read hit mapping being parsed.
    */
-  FragHit* _frag_buff;
+  ReadHit* _read_buff;
 
  public:
   /**
@@ -128,7 +129,7 @@ class BAMParser : public Parser {
   boost::scoped_ptr<BamTools::BamReader> _reader;
   /**
    * A private member function to parse a single read alignment and store the
-   * data in _frag_buff.
+   * data in _read_buff.
    * @param alignment a BamAlignment containing the data parsed by BamTools.
    * @return True if the mapping is valid and false otherwise
    */
@@ -179,7 +180,7 @@ class SAMParser : public Parser
   std::string _header;
   /**
    * A private member function to parse a single read alignment and store the
-   * data in _frag_buff.
+   * data in _read_buff.
    * @param alignment a BamAlignment containing the data parsed by BamTools.
    * @return True if the mapping is valid and false otherwise
    */

@@ -168,14 +168,14 @@ void BiasBoss::update_observed(const FragHit& hit, double normalized_mass)
 {
   assert (hit.pair_status() != PAIRED || hit.length() > WINDOW);
 
-  const Sequence& t_seq_fwd = hit.targ->seq(0);
-  const Sequence& t_seq_rev = hit.targ->seq(1);
+  const Sequence& t_seq_fwd = hit.target()->seq(0);
+  const Sequence& t_seq_rev = hit.target()->seq(1);
 
   if (hit.pair_status() != RIGHT_ONLY) {
-    _5_seq_bias.increment_observed(t_seq_fwd, hit.left, normalized_mass);
+    _5_seq_bias.increment_observed(t_seq_fwd, hit.left(), normalized_mass);
   }
   if (hit.pair_status() != LEFT_ONLY) {
-    _3_seq_bias.increment_observed(t_seq_rev, t_seq_rev.length()-hit.right,
+    _3_seq_bias.increment_observed(t_seq_rev, t_seq_rev.length()-hit.right(),
                                    normalized_mass);
   }
 }

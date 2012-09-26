@@ -25,70 +25,58 @@ Fragment::~Fragment() {
   }
 }
 
-bool Fragment::add_map_end(FragHit* h)
+bool Fragment::add_map_end(ReadHit* r)
 {
   if (_name.empty()) {
-    _name = h->name;
-  } else if (_name != h->name) {
-        return false;
+    _name = r->name;
+  } else if (_name != r->name) {
+    return false;
   }
 
-  if (h->mate_l >= 0) {
-        add_open_mate(h);
+  if (r->mate_l >= 0) {
+    add_open_mate(r);
   } else {  // single-end fragment
-    _frag_hits.push_back(h);
+    _frag_hits.push_back(new FragHit(r));
   }
 
   return true;
 }
 
-void Fragment::add_open_mate(FragHit* new_p) {
+void Fragment::add_open_mate(ReadHit* nm) {
   bool found = false;
 
-  FragHit& nm = *new_p;
-  for( vector<FragHit*>::iterator it = _open_mates.begin();
+  for(vector<ReadHit*>::iterator it = _open_mates.begin();
       it != _open_mates.end(); ++it) {
-    FragHit& om = **it;
-    if (nm.targ_id == om.targ_id &&
-        (size_t)nm.mate_l == om.left &&
-        (size_t)om.mate_l == nm.left) {
-	    if (nm.left < om.left || (nm.left == om.left && nm.seq_r.empty())) {
-        assert(nm.seq_r.empty());
-        nm.right = om.right;
-        nm.seq_r = om.seq_r;
-        nm.sam_r = om.sam_r;
-        nm.bam_r = om.bam_r;
-        nm.inserts_r = om.inserts_r;
-        nm.deletes_r = om.deletes_r;
+    ReadHit* om = *it;
+    if (nm->targ_id == om->targ_id &&
+        (size_t)nm->mate_l == om->left &&
+        (size_t)om->mate_l == nm->left &&
+        nm->first != om->first &&
+        nm->reversed != om->reversed) {
+      FragHit* h = NULL;
+	    if (nm->left < om->left || (nm->left == om->left && om->reversed)) {
+        h = new FragHit(nm, om);
       } else {
-        assert(nm.seq_l.empty());
-        nm.left = om.left;
-        nm.seq_l = om.seq_l;
-        nm.sam_l = om.sam_l;
-        nm.bam_l = om.bam_l;
-        nm.inserts_l = om.inserts_l;
-        nm.deletes_l = om.deletes_l;
+        h = new FragHit(om, nm);
       }
 
-      assert(nm.left_first == om.left_first);
       found = true;
-      delete *it;
-      _frag_hits.push_back(&nm);
+      _frag_hits.push_back(h);
       _open_mates.erase(it);
       break;
     }
   }
 
   if (!found) {
-    _open_mates.push_back(&nm);
+    _open_mates.push_back(nm);
   }
 }
 
 const FragHit* Fragment::sample_hit() const {
   vector<double> probs(_frag_hits.size());
-  probs[0] = _frag_hits[0]->probability;
+  probs[0] = _frag_hits[0]->probability();
   for (size_t i=1; i < _frag_hits.size(); ++i) {
-    probs[i] = probs[i-1] + _frag_hits[i]->probability;
+    probs[i] = probs[i-1] + _frag_hits[i]->probability();
   }
 
   double r = rand()/double(RAND_MAX)*probs.back();
@@ -97,7 +85,7 @@ const FragHit* Fragment::sample_hit() const {
 }
 
 bool fraghit_compare(FragHit* h1, FragHit* h2) {
-    return h1->targ_id < h2->targ_id;
+  return h1->targ_id() < h2->targ_id();
 }
 
 void Fragment::sort_hits() {

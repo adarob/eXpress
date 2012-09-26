@@ -170,26 +170,28 @@ void MapParser::threaded_parse(ParseThreadSafety* thread_safety_p,
     }
     for (size_t i = 0; frag && i < frag->hits().size(); ++i) {
       FragHit& m = *(frag->hits()[i]);
-      Target* t = targ_table.get_targ(m.targ_id);
+      Target* t = targ_table.get_targ(m.target_id());
       if (!t) {
-        cerr << "ERROR: Target sequence at index '" << m.targ_id
+        cerr << "ERROR: Target sequence at index '" << m.target_id()
              << "' not found. Verify that it is in the SAM/BAM header and "
              << "FASTA file.\n";
         exit(1);
       }
-      m.targ = t;
-      assert(t->id() == m.targ_id);
+      m.target(t);
+      assert(t->id() == m.target_id());
 
       // Add num_neighbors targets on either side to the neighbors list.
       // Used for experimental feature.
+      vector<Target*> neighbors;
       for (TargID j = 1; j <= num_neighbors;  j++) {
-        if (j <= m.targ_id) {
-          m.neighbors.push_back(targ_table.get_targ(m.targ_id - j));
+        if (j <= m.target_id()) {
+          neighbors.push_back(targ_table.get_targ(m.target_id() - j));
         }
-        if (j + m.targ_id < targ_table.size()) {
-          m.neighbors.push_back(targ_table.get_targ(m.targ_id + j));
+        if (j + m.target_id() < targ_table.size()) {
+          neighbors.push_back(targ_table.get_targ(m.target_id() + j));
         }
       }
+      m.neighbors(neighbors);
     }
     boost::scoped_ptr<Fragment> done_frag(pts.proc_out.pop(false));
     while (done_frag) {
@@ -229,8 +231,8 @@ BAMParser::BAMParser(BamTools::BamReader* reader) : _reader(reader) {
     _targ_lengths[ref.RefName] = ref.RefLength;
   }
 
-  // Get first valid FragHit
-  _frag_buff = new FragHit();
+  // Get first valid ReadHit
+  _read_buff = new ReadHit();
   do {
     if (!_reader->GetNextAlignment(a)) {
       cerr << "ERROR: Input BAM file contains no valid alignments.\n";
@@ -240,61 +242,57 @@ BAMParser::BAMParser(BamTools::BamReader* reader) : _reader(reader) {
 }
 
 bool BAMParser::next_fragment(Fragment& nf) {
-  nf.add_map_end(_frag_buff);
+  nf.add_map_end(_read_buff);
 
   BamTools::BamAlignment a;
-  _frag_buff = new FragHit();
+  _read_buff = new ReadHit();
 
   while(true) {
     if (!_reader->GetNextAlignment(a)) {
       return false;
     } else if (!map_end_from_alignment(a)) {
       continue;
-    } else if (!nf.add_map_end(_frag_buff)) {
+    } else if (!nf.add_map_end(_read_buff)) {
       return true;
     }
-    _frag_buff = new FragHit();
+    _read_buff = new ReadHit();
   }
 }
 
 bool BAMParser::map_end_from_alignment(BamTools::BamAlignment& a) {
-  FragHit& f = *_frag_buff;
+  ReadHit& r = *_read_buff;
 
   if (!a.IsMapped()) {
     return false;
   }
 
-  if (a.IsPaired() && (!a.IsMateMapped() || a.RefID != a.MateRefID ||
-                       a.IsReverseStrand() == a.IsMateReverseStrand() ||
-                       (a.IsReverseStrand() && a.MatePosition > a.Position) ||
-                       (a.IsMateReverseStrand() &&
-                        a.MatePosition < a.Position))) {
+  bool is_paired = a.IsPaired();
+  bool is_reversed = a.IsReverseStrand();
+  bool is_mate_reversed = a.IsMateReverseStrand();
+  if (is_paired && (!a.IsMateMapped() || a.RefID != a.MateRefID ||
+                    is_reversed == is_mate_reversed ||
+                    (is_reversed && a.MatePosition > a.Position) ||
+                    (is_mate_reversed && a.MatePosition < a.Position))) {
+    return false;
+  }
+  
+  bool left_first = (!is_paired && !is_reversed) ||
+                    (a.IsFirstMate() && !is_reversed)||
+                    (a.IsSecondMate() && is_reversed);
+
+  if ((direction == RF && left_first) || (direction == FR && !left_first)) {
     return false;
   }
 
-  f.left_first = (!a.IsPaired() && !a.IsReverseStrand()) ||
-                 (a.IsFirstMate() && !a.IsReverseStrand())||
-                 (a.IsSecondMate() && a.IsReverseStrand());
-
-  if ((direction == RF && f.left_first) || (direction == FR && !f.left_first)) {
-    return false;
-  }
-
-  f.name = a.Name;
-  f.targ_id = a.RefID;
-  f.left = a.Position;
-  f.mate_l = a.MatePosition;
-
-  if (a.IsReverseStrand()) {
-    f.seq_r.set(a.QueryBases, 1);
-    f.bam_r = a;
-    f.right = f.left + cigar_length(a.CigarData, f.inserts_r, f.deletes_r);
-  } else {
-    f.seq_l.set(a.QueryBases, 0);
-    f.bam_l = a;
-    f.right = f.left + cigar_length(a.CigarData, f.inserts_l, f.deletes_l);
-  }
-
+  r.name = a.Name;
+  r.reversed = is_reversed;
+  r.first = a.IsFirstMate();
+  r.targ_id = a.RefID;
+  r.left = a.Position;
+  r.mate_l = a.MatePosition;
+  r.seq.set(a.QueryBases, 1);
+  r.bam = a;
+  r.right = r.left + cigar_length(a.CigarData, r.inserts, r.deletes);
   return true;
 }
 
@@ -303,7 +301,7 @@ void BAMParser::reset() {
 
   // Get first valid FragHit
   BamTools::BamAlignment a;
-  _frag_buff = new FragHit();
+  _read_buff = new ReadHit();
   do {
     _reader->GetNextAlignment(a);
   } while(!map_end_from_alignment(a));
@@ -313,7 +311,7 @@ SAMParser::SAMParser(istream* in) {
   _in = in;
 
   char line_buff[BUFF_SIZE];
-  _frag_buff = new FragHit();
+  _read_buff = new ReadHit();
   _header = "";
 
   // Parse header
@@ -358,9 +356,9 @@ SAMParser::SAMParser(istream* in) {
 }
 
 bool SAMParser::next_fragment(Fragment& nf) {
-  nf.add_map_end(_frag_buff);
+  nf.add_map_end(_read_buff);
 
-  _frag_buff = new FragHit();
+  _read_buff = new ReadHit();
   char line_buff[BUFF_SIZE];
 
   while(_in->good()) {
@@ -368,29 +366,29 @@ bool SAMParser::next_fragment(Fragment& nf) {
     if (!map_end_from_line(line_buff)) {
       continue;
     }
-    if (!nf.add_map_end(_frag_buff)) {
+    if (!nf.add_map_end(_read_buff)) {
       break;
     }
-    _frag_buff = new FragHit();
+    _read_buff = new ReadHit();
   }
 
   return _in->good();
 }
 
 bool SAMParser::map_end_from_line(char* line) {
-  FragHit& f = *_frag_buff;
+  ReadHit& r = *_read_buff;
   string sam_line(line);
   char *p = strtok(line, "\t");
   int sam_flag = 0;
   bool paired = 0;
-  bool reversed = 0;
+  bool left_first = 0;
   bool other_reversed = 0;
 
   int i = 0;
   while (p && i <= 9) {
     switch(i++) {
       case 0: {
-        f.name = p;
+        r.name = p;
         break;
       }
       case 1: {
@@ -402,16 +400,16 @@ bool SAMParser::map_end_from_line(char* line) {
         if (paired && (sam_flag & 0x8)) {
           goto stop;
         }
-        reversed = sam_flag & 0x10;
+        r.reversed = sam_flag & 0x10;
         other_reversed = sam_flag & 0x20;
-        if (paired && reversed == other_reversed) {
+        if (paired && r.reversed == other_reversed) {
           goto stop;
         }
-        bool first = sam_flag & 0x40;
-        f.left_first = ((!paired && !reversed) || (first && !reversed) ||
-                        (!first && reversed));
-        if ((direction == RF && f.left_first) ||
-            (direction == FR && !f.left_first)) {
+        r.first = sam_flag & 0x40;
+        left_first = ((!paired && !r.reversed) || (r.first && !r.reversed) ||
+                        (!r.first && r.reversed));
+        if ((direction == RF && left_first) ||
+            (direction == FR && !left_first)) {
   		    goto stop;
         }
         break;
@@ -425,22 +423,18 @@ bool SAMParser::map_end_from_line(char* line) {
               << "it is in the SAM/BAM header and FASTA file.\n";
           exit(1);
         }
-        f.targ_id = _targ_index[p];
+        r.targ_id = _targ_index[p];
         break;
       }
       case 3: {
-        f.left = (size_t)(atoi(p)-1);
+        r.left = (size_t)(atoi(p)-1);
         break;
       }
       case 4: {
         break;
       }
       case 5: {
-        if (sam_flag & 0x10) {
-          f.right = f.left + cigar_length(p, f.inserts_r, f.deletes_r);
-        } else {
-          f.right = f.left + cigar_length(p, f.inserts_l, f.deletes_l);
-        }
+        r.right = r.left + cigar_length(p, r.inserts, r.deletes);
         break;
       }
       case 6: {
@@ -451,9 +445,9 @@ bool SAMParser::map_end_from_line(char* line) {
         break;
       }
       case 7: {
-        f.mate_l = atoi(p)-1;
-        if (paired && ((reversed && f.left < (size_t)f.mate_l) ||
-                       (other_reversed && f.left > (size_t)f.mate_l))) {
+        r.mate_l = atoi(p)-1;
+        if (paired && ((r.reversed && r.left < (size_t)r.mate_l) ||
+                       (other_reversed && r.left > (size_t)r.mate_l))) {
           goto stop;
         }
         break;
@@ -462,13 +456,8 @@ bool SAMParser::map_end_from_line(char* line) {
         break;
       }
       case 9: {
-        if (sam_flag & 0x10) {
-          f.seq_r.set(p, 1);
-          f.sam_r = sam_line;
-        } else {
-          f.seq_l.set(p, 0);
-          f.sam_l = sam_line;
-        }
+        r.seq.set(p, 1);
+        r.sam = sam_line;
         goto stop;
       }
     }
@@ -485,7 +474,7 @@ void SAMParser::reset() {
 
   // Load first alignment
   char line_buff[BUFF_SIZE];
-  _frag_buff = new FragHit();
+  _read_buff = new ReadHit();
 
   while(_in->good()) {
     _in->getline(line_buff, BUFF_SIZE-1, '\n');
@@ -513,23 +502,23 @@ void BAMWriter::write_fragment(Fragment& f) {
     const FragHit* hit = f.sample_hit();
     PairStatus ps = hit->pair_status();
     if (ps != RIGHT_ONLY) {
-      _writer->SaveAlignment(hit->bam_l);
+      _writer->SaveAlignment(hit->left_read()->bam);
     }
     if (ps != LEFT_ONLY) {
-      _writer->SaveAlignment(hit->bam_r);
+      _writer->SaveAlignment(hit->right_read()->bam);
     }
   } else {
     double total = 0;
     foreach(FragHit* hit, f.hits()) {
-      total += hit->probability;
+      total += hit->probability();
       PairStatus ps = hit->pair_status();
       if (ps != RIGHT_ONLY) {
-        hit->bam_l.AddTag("XP","f",(float)hit->probability);
-        _writer->SaveAlignment(hit->bam_l);
+        hit->left_read()->bam.AddTag("XP","f",(float)hit->probability());
+        _writer->SaveAlignment(hit->left_read()->bam);
       }
       if (ps != LEFT_ONLY) {
-        hit->bam_r.AddTag("XP","f",(float)hit->probability);
-        _writer->SaveAlignment(hit->bam_r);
+        hit->right_read()->bam.AddTag("XP","f",(float)hit->probability());
+        _writer->SaveAlignment(hit->right_read()->bam);
       }
     }
     assert(approx_eq(total, 1.0));
@@ -548,22 +537,25 @@ void SAMWriter::write_fragment(Fragment& f) {
   if (_sample) {
     const FragHit* hit = f.sample_hit();
     PairStatus ps = hit->pair_status();
+
     if (ps != RIGHT_ONLY) {
-      *_out << hit->sam_l << endl;
+      *_out << hit->left_read()->sam << endl;
     }
     if (ps != LEFT_ONLY) {
-      *_out << hit->sam_r << endl;
+      *_out << hit->right_read()->sam << endl;
     }
   } else {
     double total = 0;
-    foreach(FragHit* hit, f.hits()) {
-      total += hit->probability;
+    foreach(const FragHit* hit, f.hits()) {
+      total += hit->probability();
       PairStatus ps = hit->pair_status();
       if (ps != RIGHT_ONLY) {
-        *_out << hit->sam_l << " XP:f:" << (float)hit->probability << endl;
+        *_out << hit->left_read()->sam << " XP:f:" << (float)hit->probability()
+              << endl;
       }
       if (ps != LEFT_ONLY) {
-        *_out << hit->sam_r << " XP:f:" << (float)hit->probability << endl;
+        *_out << hit->right_read()->sam << " XP:f:" << (float)hit->probability()
+              << endl;
       }
     }
     assert(approx_eq(total, 1.0));

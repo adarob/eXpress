@@ -355,13 +355,13 @@ void process_fragment(Fragment* frag_p) {
   if (frag.num_hits()>1) {
     for (size_t i = 0; i < frag.num_hits(); ++i) {
       const FragHit& m = *frag.hits()[i];
-      Target* t = m.targ;
+      Target* t = m.target();
       if (targ_set.count(t) == 0) {
         t->lock();
         targ_set.insert(t);
       }
       // lock neighbors
-      foreach (Target* neighbor, m.neighbors) {
+      foreach (Target* neighbor, *m.neighbors()) {
         if (targ_set.count(neighbor) == 0) {
           neighbor->lock();
           targ_set.insert(neighbor);
@@ -376,11 +376,11 @@ void process_fragment(Fragment* frag_p) {
       num_solvable += t->solvable();
     }
   } else {
-    Target* t = frag.hits()[0]->targ;
+    Target* t = frag.hits()[0]->target();
     t->lock();
     targ_set.insert(t);
     total_likelihood = likelihoods[0];
-    foreach (Target* neighbor, frag.hits()[0]->neighbors) {
+    foreach (Target* neighbor, *frag.hits()[0]->neighbors()) {
       if (targ_set.count(neighbor) == 0) {
         neighbor->lock();
         targ_set.insert(neighbor);
@@ -391,7 +391,7 @@ void process_fragment(Fragment* frag_p) {
   assert(!islzero(total_likelihood));
 
   // merge bundles
-  Bundle* bundle = frag.hits()[0]->targ->bundle();
+  Bundle* bundle = frag.hits()[0]->target()->bundle();
   if (first_round) {
     bundle->incr_counts();
   }
@@ -399,7 +399,7 @@ void process_fragment(Fragment* frag_p) {
   // normalize marginal likelihoods
   for (size_t i = 0; i < frag.num_hits(); ++i) {
     FragHit& m = *frag.hits()[i];
-    Target* t  = m.targ;
+    Target* t  = m.target();
 
     bundle = lib.targ_table->merge_bundles(bundle, t->bundle());
 
@@ -412,9 +412,9 @@ void process_fragment(Fragment* frag_p) {
     assert(!isnan(v));
     assert(!(isnan(p)||isinf(p)));
 
-    m.probability = sexp(p);
+    m.probability(sexp(p));
 
-    assert(!isinf(m.probability));
+    assert(!isinf(m.probability()));
 
     t->add_mass(p, v, mass_n);
 
@@ -447,7 +447,7 @@ void process_fragment(Fragment* frag_p) {
         if ((first_round && last_round) || online_additional) {
           covar += 2*mass_n;
         }
-        lib.targ_table->update_covar(m.targ_id, m2.targ_id, covar);
+        lib.targ_table->update_covar(m.target_id(), m2.target_id(), covar);
       }
     }
   }

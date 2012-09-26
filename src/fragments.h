@@ -16,6 +16,7 @@
 #include <cassert>
 #include <api/BamAlignment.h>
 #include "sequence.h"
+#include "boost/scoped_ptr.hpp"
 
 typedef size_t TargID;
 struct Library;
@@ -53,138 +54,216 @@ struct Indel {
   Indel(size_t p, size_t l) : pos(p), len(l) {}
 };
 
+// DOC
+/**
+ * A public bool specifying which read comes first in target coordinates.
+ * The second read (according to SAM flag) is reverse complemented when
+ * true, and the "left" (first according to SAM flag) is reverse complemented
+ * when false. In other words, the "left" read is truly left of the "right"
+ * read in target coordinate space when true.
+ */
+struct ReadHit {
+  /**
+   * A public string for the SAM "Query Template Name" (fragment name)
+   */
+  std::string name;
+  bool first;
+  bool reversed;
+  /**
+   * A public TargID for the target mapped to.
+   */
+  size_t targ_id;
+  /**
+   * A public size_t containing the 0-based leftmost coordinate mapped to in the
+   * target.
+   */
+  size_t left;
+  /**
+   * A public size_t containing the position following the 0-based rightmost
+   * coordinate mapped to in the target.
+   */
+  size_t right;
+  /**
+   * The read sequence.
+   */
+  SequenceFwd seq;
+  /**
+   * A public vector of Indel objects storing all insertions to the reference in
+   * the read. Insertions are stored in read order.
+   */
+  std::vector<Indel> inserts;
+  /**
+   * A public vector of Indel objects storing all insertions to the reference in
+   * the read. Deletions are stored in read order.
+   */
+  std::vector<Indel> deletes;
+  /**
+   * A public BamAlignment object storing the raw alignment information from
+   * BamTools for the read. Only valid if BAM file is input.
+   */
+  BamTools::BamAlignment bam;
+  /**
+   * A public string storing the raw alignment information from for the read.
+   * Only valid if SAM file is input.
+   */
+  std::string sam;
+  /**
+   * A public int containing the left position for the mate of the read.
+   * -1 if single-end fragment. This is temporarily used to help find the mate
+   * but is not used after.
+   */
+  int mate_l;
+};
+
 /**
  * The FragHit struct stores the information for a single fragment alignment.
  *  @author    Adam Roberts
  *  @date      2011
  *  @copyright Artistic License 2.0
  **/
-struct FragHit {
-  /**
-   * A public string for the SAM "Query Template Name" (fragment name)
-   */
-  std::string name;
-  /**
-   * A public TargID for the target mapped to.
-   */
-  TargID targ_id;
+class FragHit {
   /**
    * A public pointer to the target mapped to.
    */
-  Target* targ;
+  Target* _target;
   /**
-   * The first ("left") read sequence (according to SAM flag).
+   * Data for the upstream (left) read.
    */
-  SequenceFwd seq_l;
-
+  boost::scoped_ptr<ReadHit> _read_l;
   /**
-   * The second ("right") read sequence (according to SAM flag).
+   * Data for the downstream (right) read.
+   * PairStatus is PAIRED.
    */
-  SequenceFwd seq_r;
-  /**
-   * A public size_t containing the 0-based leftmost coordinate mapped to in the
-   * target. Valid only iff PairStatus is PAIRED or LEFT_ONLY.
-   */
-  size_t left;
-  /**
-   * A public size_t containing the position following the 0-based rightmost
-   * coordinate mapped to in the target. Valid iff PairStatus is PAIRED or
-   * RIGHT_ONLY.
-   */
-  size_t right;
-  /**
-   * A public int containing the left position for the mate of the "left" read.
-   * 0 if single-end fragment. This is temporarily used to help find the mate
-   * but is not used after.
-   */
-  int mate_l;
-  /**
-   * A public bool specifying which read comes first in target coordinates.
-   * The "right" (second according to SAM flag) is reverse complemented when
-   * true, and the "left" (first according to SAM flag) is reverse complemented
-   * when false. In other words, the "left" read is truly left of the "right"
-   * read in target coordinate space when true.
-   */
-  bool left_first;
-  /**
-   * A public vector of Indel objects storing all insertions to the reference in
-   * the "left" read. Insertions are stored in read order.
-   */
-  std::vector<Indel> inserts_l;
-  /**
-   * A public vector of Indel objects storing all insertions to the reference in
-   * the "left" read. Deletions are stored in read order.
-   */
-  std::vector<Indel> deletes_l;
-  /**
-   * A public vector of Indel objects storing all insertions to the reference in
-   * the "right" read. Insertions are stored in read order.
-   */
-  std::vector<Indel> inserts_r;
-  /**
-   * A public vector of Indel objects storing all deletions to the reference in
-   * the "right" read. Deletions are stored in read order.
-   */
-  std::vector<Indel> deletes_r;
+  boost::scoped_ptr<ReadHit> _read_r;
   /**
    * A public double storing the posterior probability of the mapping after
    * processing. The posteriors of all mappings for a given Fragment should sum
    * to 1.
    */
-  double probability;
-  /**
-   * A public BamAlignment object storing the raw alignment information from
-   * BamTools for the "left" read. Only valid if BAM file is input.
-   */
-  BamTools::BamAlignment bam_l;
-  /**
-   * A public BamAlignment object storing the raw alignment information from
-   * BamTools for the "right" read. Only valid if BAM file is input.
-   */
-  BamTools::BamAlignment bam_r;
-  /**
-   * A public string storing the raw alignment information from for the "left"
-   * read. Only valid if SAM file is input.
-   */
-  std::string sam_l;
-  /**
-   * A public string storing the raw alignment information from for the "right"
-   * read. Only valid if SAM file is input.
-   */
-  std::string sam_r;
+  double _probability;
   /**
    * A public vector storing pointers to "neighboring" targets. This is being
    * used for an experimental feature and may be removed.
    */
-  std::vector<Target*> neighbors;
+  std::vector<Target*> _neighbors;
+  
+public:
+  FragHit(ReadHit* h) : _target(NULL), _probability(LOG_0){
+    if (h->left) {
+      _read_l.reset(h);
+    } else {
+      _read_r.reset(h);
+    }
+  }
+  FragHit(ReadHit* l, ReadHit* r) : _read_l(l), _read_r(r) {
+    assert(!l->reversed);
+    assert(r->reversed);
+    assert(l->name == r->name);
+    assert(l->targ_id == r->targ_id);
+    assert(l->left < r->left);
+    assert(l->first != r->first);
+  }
+  double probability() const {
+    return _probability;
+  }
+  void probability(double p) {
+    _probability = p;
+  }
+  Target* target() const {
+    return _target;
+  }
+  void target(Target* target) {
+    _target = target;
+  }
+  const std::vector<Target*>* neighbors() const { return &_neighbors; }
+  void neighbors(const std::vector<Target*>& neighbors) {
+    _neighbors = neighbors;
+  }
+  TargID target_id() const {
+    if (_read_l) {
+      return _read_l->targ_id;
+    }
+    assert(_read_r);
+    return _read_r->targ_id;
+  }
+  size_t left() const {
+    if (_read_l) {
+      return _read_l->left;
+    }
+    assert(_read_r);
+    return _read_r->left;
+  }
+  size_t right() const {
+    if (_read_r) {
+      return _read_r->right;
+    }
+    assert(_read_l);
+    return _read_l->left;
+  }
+  TargID targ_id() const {
+    if (_read_l) {
+      return _read_l->targ_id;
+    }
+    assert(_read_r);
+    return _read_r->targ_id;
+  }
   /**
    * A member function returning the length of the fragment according to this
-   * mapping. Note that this result will be invalid if the fragment is
-   * single-end.
+   * mapping. Returns 0 if the fragment is single-end.
    * @return Length of fragment mapping.
    */
   size_t length() const {
-    assert (right >= left);
-    return right - left;
+    if (_read_l && _read_r) {
+      return _read_r->right - _read_l->left;
+    }
+    return 0;
   }
+  ReadHit* left_read() {
+    if (_read_l) {
+      return _read_l.get();
+    }
+    return NULL;
+  }
+  ReadHit* right_read() {
+    if (_read_r) {
+      return _read_r.get();
+    }
+    return NULL;
+  }
+  ReadHit* first_read() {
+    if (_read_l && _read_l) {
+      return _read_l.get();
+    }
+    assert(_read_r);
+    return _read_r.get();
+  }
+  ReadHit* second_read() {
+    if (_read_l && !_read_l->first) {
+      return _read_l.get();
+    } else if (_read_r && !_read_r->first) {
+      return _read_r.get();
+    } else {
+      return NULL;
+    }
+  }
+  const ReadHit* left_read() const { return left_read(); }
+  const ReadHit* right_read() const { return right_read(); }
+  const ReadHit* first_read() const { return first_read(); }
+  const ReadHit* second_read() const { return second_read(); }
   /**
    * A member function returning whether the mapping is PAIRED, LEFT_ONLY, or
    * RIGHT_ONLY, as defined in the PairStatus enum definition.
    * @return The pair status of the mapping
    */
   PairStatus pair_status() const {
-    if (!seq_l.empty() && !seq_r.empty()) {
+    if (_read_l && _read_r) {
       return PAIRED;
     }
-    if (seq_l.empty()) {
-      return RIGHT_ONLY;
+    if (_read_l) {
+      return LEFT_ONLY;
     }
-    return LEFT_ONLY;
+    return RIGHT_ONLY;
   }
-
-  //DOC
-  double targ_rho;
-  double const_likelihood;
 };
 
 /**
@@ -207,7 +286,7 @@ class Fragment {
    * pairs have not been found. Temporarily useful when parsing the input to
    * find mates but is not used after.
    */
-  std::vector<FragHit*> _open_mates;
+  std::vector<ReadHit*> _open_mates;
   /**
    * A private string for the SAM "Query Template Name" (fragment name).
    */
@@ -227,7 +306,7 @@ class Fragment {
    * If found, the mates are combined into a single FragHit and added to
    * frag_hits. If not found, the read mapping is added to open_mates.
    */
-  void add_open_mate(FragHit* om);
+  void add_open_mate(ReadHit* om);
 
 public:
   /**
@@ -251,7 +330,7 @@ public:
    * @param f the FragHit to be added.
    * @return False iff the read name does not match the Fragment name.
    */
-  bool add_map_end(FragHit* f);
+  bool add_map_end(ReadHit* f);
   /**
    * A member function that returns a reference to the "Query Template Name".
    * @return Reference to the SAM "Query Template Name" (fragment name).
