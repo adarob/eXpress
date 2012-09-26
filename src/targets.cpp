@@ -253,7 +253,7 @@ TargetTable::TargetTable(const string& targ_fasta_file, bool prob_seqs,
 }
 
 TargetTable::~TargetTable() {
-  foreach( Target* targ, _targ_map) {
+  foreach(Target* targ, _targ_map) {
     delete targ;
   }
 }

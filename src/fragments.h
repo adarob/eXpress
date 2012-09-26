@@ -160,7 +160,7 @@ public:
     assert(r->reversed);
     assert(l->name == r->name);
     assert(l->targ_id == r->targ_id);
-    assert(l->left < r->left);
+    assert(l->left <= r->left);
     assert(l->first != r->first);
   }
   double probability() const {
@@ -218,26 +218,26 @@ public:
     }
     return 0;
   }
-  ReadHit* left_read() {
+  const ReadHit* left_read() const {
     if (_read_l) {
       return _read_l.get();
     }
     return NULL;
   }
-  ReadHit* right_read() {
+  const ReadHit* right_read() const {
     if (_read_r) {
       return _read_r.get();
     }
     return NULL;
   }
-  ReadHit* first_read() {
+  const ReadHit* first_read() const {
     if (_read_l && _read_l) {
       return _read_l.get();
     }
     assert(_read_r);
     return _read_r.get();
   }
-  ReadHit* second_read() {
+  const ReadHit* second_read() const {
     if (_read_l && !_read_l->first) {
       return _read_l.get();
     } else if (_read_r && !_read_r->first) {
@@ -246,10 +246,18 @@ public:
       return NULL;
     }
   }
-  const ReadHit* left_read() const { return left_read(); }
-  const ReadHit* right_read() const { return right_read(); }
-  const ReadHit* first_read() const { return first_read(); }
-  const ReadHit* second_read() const { return second_read(); }
+  ReadHit* left_read() {
+    return const_cast<ReadHit*>(const_cast<const FragHit*>(this)->left_read());
+  }
+  ReadHit* right_read() {
+    return const_cast<ReadHit*>(const_cast<const FragHit*>(this)->right_read());
+  }
+  ReadHit* first_read() {
+    return const_cast<ReadHit*>(const_cast<const FragHit*>(this)->first_read());
+  }
+  ReadHit* second_read() {
+    return const_cast<ReadHit*>(const_cast<const FragHit*>(this)->second_read());
+  }
   /**
    * A member function returning whether the mapping is PAIRED, LEFT_ONLY, or
    * RIGHT_ONLY, as defined in the PairStatus enum definition.
