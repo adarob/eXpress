@@ -26,13 +26,41 @@ MarkovModel::MarkovModel(size_t order, size_t window_size,
       _bitclear((1<<(2*order))-1) {
 }
 
+vector<int> MarkovModel::get_indices(const Sequence& seq, int left) {
+  int i = 0;
+  int j = left;
+  int seq_len = (int)seq.length();
+  
+  vector<int> indices(_window_size, -1);
+  
+  size_t cond = 0;
+  
+  if (left < _order) {
+    i = _order-left;
+    for (j=0; j < min(_order, i); j++) {
+      cond = (cond << 2) + seq[j];
+    }
+  }
+  
+  while (i < _window_size && j < seq_len) {
+    size_t index = min(i, _num_pos-1);
+    size_t curr = seq[j];
+    cond = (cond << 2) + curr;
+    indices[index] = (int)cond;
+    cond &= _bitclear;
+    i++;
+    j++;
+  }
+  return indices;
+}
+
 void MarkovModel::update(const Sequence& seq, int left, double mass) {
   int i = 0;
   int j = left;
   int seq_len = (int)seq.length();
 
   size_t cond = 0;
-
+  
   if (left < _order) {
     i = _order-left;
     for (j=0; j < min(_order, i); j++) {
@@ -55,6 +83,29 @@ void MarkovModel::update(const Sequence& seq, int left, double mass) {
     i++;
     j++;
   }
+}
+
+vector<int> MarkovModel::get_indices(const Sequence& seq) {
+  assert(_num_pos==_order+1);
+  
+  vector<int> indices(seq.length(), -1);
+  
+  if (seq.length() < (size_t)_order) {
+    return indices;
+  }
+  
+  size_t cond = 0;
+  for (int i = 0; i < _order; ++i) {
+    cond = (cond << 2) + seq[i];
+  }
+  
+  for (size_t i = _order; i < seq.length(); ++i) {
+    size_t curr = seq[i];
+    cond = (cond << 2) + curr;
+    indices[i] = (int)cond;
+    cond &= _bitclear;
+  }
+  return indices;
 }
 
 void MarkovModel::fast_learn(const Sequence& seq, double mass,

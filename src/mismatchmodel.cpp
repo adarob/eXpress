@@ -25,6 +25,79 @@ MismatchTable::MismatchTable(double alpha)
       _active(false){
 }
 
+void MismatchTable::get_indices(const FragHit& f,
+                           vector<char>& left_indices,
+                           vector<char>& right_indices) const {
+
+  const Target& targ = *f.target();
+  const Sequence& t_seq_fwd = targ.seq(0);
+  const Sequence& t_seq_rev = targ.seq(1);
+  
+  if (f.left_read()) {
+    const ReadHit& read_l = *f.left_read();
+    
+    left_indices = vector<char>(read_l.seq.length(), 255);
+    
+    size_t i = 0;  // read index
+    size_t j = read_l.left;  // genomic index
+    
+    vector<Indel>::const_iterator ins = read_l.inserts.begin();
+    vector<Indel>::const_iterator del = read_l.deletes.begin();
+    
+    while (i < read_l.seq.length()) {
+      if (del != read_l.deletes.end() && del->pos == i) {
+        j += del->len;
+        del++;
+      } else if (ins != read_l.inserts.end() && ins->pos == i) {
+        i += ins->len;
+        ins++;
+      } else {
+        size_t cur = read_l.seq[i];
+        size_t prev = (i) ? (read_l.seq[i-1] << 2) : 0;
+        size_t ref = t_seq_fwd[j];
+        size_t index = prev + ref;
+        left_indices[i] = (index << 2) + cur;
+        
+        i++;
+        j++;
+      }
+    }
+  }
+  
+  if (f.right_read()) {
+    const ReadHit& read_r = *f.right_read();
+    
+    right_indices = vector<char>(read_r.seq.length(), 255);
+
+    size_t r_len = read_r.seq.length();
+    size_t i = 0;
+    size_t j = targ.length() - read_r.right;
+        
+    vector<Indel>::const_iterator ins = read_r.inserts.end()-1;
+    vector<Indel>::const_iterator del = read_r.deletes.end()-1;
+    
+    while (i < r_len) {
+      if (del != read_r.deletes.begin() - 1 && del->pos == r_len - i) {
+        j += del->len;
+        del--;
+      } else if (ins != read_r.inserts.begin() - 1
+                 && ins->pos + ins->len == r_len - i) {
+        i += ins->len;
+        ins--;
+      } else {
+        size_t cur = read_r.seq[i];
+        size_t prev = (i) ? (read_r.seq[i-1] << 2) : 0;
+        size_t ref = t_seq_rev[j];
+        size_t index = prev + ref;;
+        right_indices[i] = (index << 2) + cur;
+        
+        i++;
+        j++;
+      }
+    }
+  }
+}
+
 double MismatchTable::log_likelihood(const FragHit& f) const {
   if (!_active) {
     return 0;
@@ -47,8 +120,6 @@ double MismatchTable::log_likelihood(const FragHit& f) const {
     size_t del_len = 0;
     vector<Indel>::const_iterator ins = read_l.inserts.begin();
     vector<Indel>::const_iterator del = read_l.deletes.begin();
-
-    read_l.mismatch_index_cache = vector<char>(read_l.seq.length());
     
     while (i < read_l.seq.length()) {
       if (del != read_l.deletes.end() && del->pos == i) {
@@ -85,9 +156,8 @@ double MismatchTable::log_likelihood(const FragHit& f) const {
           ll += trans_prob;
         } else {
           size_t ref = t_seq_fwd[j];
-          size_t index = ((prev + ref) << 2) + cur;
-          ll += left_mm[i](index);
-          read_l.mismatch_index_cache[i] = index;
+          size_t index = prev + ref;
+          ll += left_mm[i](index, cur);
         }
         i++;
         j++;
@@ -102,12 +172,10 @@ double MismatchTable::log_likelihood(const FragHit& f) const {
                                                         _first_read_mm :
                                                         _second_read_mm;
     
-    read_r.mismatch_index_cache = vector<char>(read_r.seq.length());
-
     size_t r_len = read_r.seq.length();
     size_t i = 0;
     size_t j = targ.length() - read_r.right;
-    
+
     size_t del_len = 0;
 
     vector<Indel>::const_iterator ins = read_r.inserts.end()-1;
@@ -149,11 +217,9 @@ double MismatchTable::log_likelihood(const FragHit& f) const {
           ll += trans_prob;
         } else {
           size_t ref = t_seq_rev[j];
-          size_t index = ((prev + ref) << 2) + cur;
-          ll += right_mm[i](index);
-          read_r.mismatch_index_cache[i] = index;
+          size_t index = prev + ref;;
+          ll += right_mm[i](index, cur);
         }
-
         i++;
         j++;
       }
@@ -179,7 +245,6 @@ void MismatchTable::update(const FragHit& f, double p, double mass) {
     vector<FrequencyMatrix<double> >& left_mm = (read_l.first) ?
                                                 _first_read_mm :
                                                 _second_read_mm;
-    read_l.mismatch_index_cache = vector<char>(read_l.seq.length());
     size_t i = 0;  // read index
     size_t j = read_l.left;  // genomic index
 
@@ -211,10 +276,10 @@ void MismatchTable::update(const FragHit& f, double p, double mass) {
         del_len = 0;
         _insert_params.increment(0, mass);
 
+        size_t cur = read_l.seq[i];
+        size_t prev = (i) ? (read_l.seq[i-1] << 2) : 0;
         // Update the seq parameters only after burn-in (active)
         if (t_seq_fwd.prob() && _active) {
-          size_t cur = read_l.seq[i];
-          size_t prev = (i) ? (read_l.seq[i-1] << 2) : 0;
           
           t_seq_fwd.update_obs(j, cur, p);
 
@@ -233,7 +298,6 @@ void MismatchTable::update(const FragHit& f, double p, double mass) {
             Z = log_add(Z, joint_probs[nuc]);
           }
 
-          // TODO: Can use the cached value by & with 0x110011 and adding nuc << 2
           for (size_t nuc = 0; !left_mm[i].is_fixed() && nuc < NUM_NUCS; nuc++) {
             size_t index = prev + nuc;
             left_mm[i].increment(index, cur,
@@ -243,12 +307,10 @@ void MismatchTable::update(const FragHit& f, double p, double mass) {
           for (size_t nuc=0; nuc < NUM_NUCS; nuc++) {
             t_seq_fwd.update_est(j, nuc, p + joint_probs[nuc] - Z);
           }
-        } else if (read_l.mismatch_index_cache.empty()) {
-          size_t prev = (i) ? (read_l.seq[i-1] << 2) : 0;
-          size_t index = ((prev + t_seq_fwd[j]) << 2) + read_l.seq[i];
-          left_mm[i].increment(index, mass + p);
         } else {
-          left_mm[i].increment(read_l.mismatch_index_cache[i], mass + p);
+          size_t ref = t_seq_fwd[j];
+          size_t index = prev + ref;
+          left_mm[i].increment(index, cur, mass + p);
         }
 
         i++;
@@ -294,10 +356,10 @@ void MismatchTable::update(const FragHit& f, double p, double mass) {
         del_len = 0;
         _insert_params.increment(0, mass);
 
-        if (t_seq_rev.prob() && _active) {
-          size_t cur = read_r.seq[i];
-          size_t prev = (i) ? (read_r.seq[i-1] << 2) : 0;
-          
+        size_t cur = read_r.seq[i];
+        size_t prev = (i) ? (read_r.seq[i-1] << 2) : 0;
+
+        if (t_seq_rev.prob() && _active) {          
           t_seq_rev.update_obs(j, cur, p);
 
           double Z = LOG_0;
@@ -323,12 +385,10 @@ void MismatchTable::update(const FragHit& f, double p, double mass) {
           for (size_t nuc=0; nuc < NUM_NUCS; nuc++) {
             t_seq_rev.update_est(j, nuc, p + joint_probs[nuc] - Z);
           }
-        } else if (read_r.mismatch_index_cache.empty()) {
-          size_t prev = (i) ? (read_r.seq[i-1] << 2) : 0;
-          size_t index = ((prev + t_seq_rev[j]) << 2) + read_r.seq[i];
-          right_mm[i].increment(index, mass+p);
         } else {
-          right_mm[i].increment(read_r.mismatch_index_cache[i], mass+p);
+          size_t ref = t_seq_rev[j];
+          size_t index = prev + ref;
+          right_mm[i].increment(index, mass+p);
         }
 
         i++;

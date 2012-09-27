@@ -71,6 +71,10 @@ class MismatchTable {
    *        (false)
    */
   void activate(bool active = true) { _active = active; }
+  // DOC
+  void get_indices(const FragHit& f,
+                   std::vector<char>& left_indices,
+                   std::vector<char>& right_indices) const;
   /**
    * A member function that returns the log likelihood of mismatches and indels
    * in the mapping given the current error model parematers. Returns 0 if

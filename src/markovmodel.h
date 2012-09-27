@@ -83,6 +83,9 @@ class MarkovModel {
    * @param mass the amount to increment the parameters by (logged).
    */
   void update(const Sequence& seq, int left, double mass);
+  //DOC
+  std::vector<int> get_indices(const Sequence& seq, int left);
+  std::vector<int> get_indices(const Sequence& seq);
   /**
    * Computes the marginal probability of transitioning to the given nucleotide
    * at position w in the model.
