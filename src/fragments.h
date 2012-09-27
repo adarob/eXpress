@@ -102,6 +102,8 @@ struct ReadHit {
    * BamTools for the read. Only valid if BAM file is input.
    */
   BamTools::BamAlignment bam;
+  mutable std::vector<char> bias_index_cache;
+  mutable std::vector<char> mismatch_index_cache;
   /**
    * A public string storing the raw alignment information from for the read.
    * Only valid if SAM file is input.
