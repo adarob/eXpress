@@ -301,6 +301,7 @@ void BAMParser::reset() {
 
   // Get first valid FragHit
   BamTools::BamAlignment a;
+  delete _read_buff;
   _read_buff = new ReadHit();
   do {
     _reader->GetNextAlignment(a);
@@ -474,6 +475,7 @@ void SAMParser::reset() {
 
   // Load first alignment
   char line_buff[BUFF_SIZE];
+  delete _read_buff;
   _read_buff = new ReadHit();
 
   while(_in->good()) {
