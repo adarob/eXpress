@@ -83,8 +83,26 @@ class MarkovModel {
    * @param mass the amount to increment the parameters by (logged).
    */
   void update(const Sequence& seq, int left, double mass);
-  //DOC
+  /**
+   * A member function that computes and returns the parameter table indices
+   * used to compute and update the likelihood for the given sequence at the
+   * window started at the given position. Negative values indicate that the
+   * position is not used in the likelihood computation.
+   * @param seq the sequence to find the indices for.
+   * @param left the position where the window should begin in the sequence.
+   * @return A vector of indices into the parameter tables that would be used
+   *         in a likelihood calculation.
+   */
   std::vector<int> get_indices(const Sequence& seq, int left);
+  /**
+   * A member function that computes and returns the parameter table indices
+   * used to fast_learn (see below) the likelihood for the given sequence.
+   * Negative values indicate that the position is not used in the fast_learn
+   * computation.
+   * @param seq the sequence to find the indices for.
+   * @return A vector of indices into the parameter tables that would be used
+   *         in a fast_learn.
+   */
   std::vector<int> get_indices(const Sequence& seq);
   /**
    * Computes the marginal probability of transitioning to the given nucleotide

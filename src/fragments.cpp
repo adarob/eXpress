@@ -85,7 +85,7 @@ const FragHit* Fragment::sample_hit() const {
 }
 
 bool fraghit_compare(FragHit* h1, FragHit* h2) {
-  return h1->targ_id() < h2->targ_id();
+  return h1->target_id() < h2->target_id();
 }
 
 void Fragment::sort_hits() {

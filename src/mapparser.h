@@ -44,7 +44,7 @@ class Parser {
    */
   TransIndex _targ_lengths;
   /**
-   * A private pointer to the current read hit mapping being parsed.
+   * A private pointer to the current/last read mapping being parsed.
    */
   ReadHit* _read_buff;
 

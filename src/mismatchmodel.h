@@ -71,7 +71,15 @@ class MismatchTable {
    *        (false)
    */
   void activate(bool active = true) { _active = active; }
-  // DOC
+  /**
+   * A member function that computes and returns the parameter table indices
+   * used to compute and update the likelihood based on the given FragHit.
+   * Negative values indicate that the position is not used in the likelihood
+   * computation.
+   * @param f the FragHit to find the table indices for.
+   * @param left_indices the vector to store the left read's indices in.
+   * @param right_indices the vector to store the right read's indices in.
+   */
   void get_indices(const FragHit& f,
                    std::vector<char>& left_indices,
                    std::vector<char>& right_indices) const;

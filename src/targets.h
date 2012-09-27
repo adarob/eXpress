@@ -308,7 +308,6 @@ public:
     _uniq_counts += incr_amt * uniq;
   }
   /**
-   * DOC
    * A member function that returns (a value proportional to) the log likelihood
    * the given fragment originated from this target.
    * @param frag a FragHit to return the likelihood of originating from this
