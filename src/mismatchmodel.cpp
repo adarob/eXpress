@@ -48,6 +48,8 @@ double MismatchTable::log_likelihood(const FragHit& f) const {
     vector<Indel>::const_iterator ins = read_l.inserts.begin();
     vector<Indel>::const_iterator del = read_l.deletes.begin();
 
+    read_l.mismatch_index_cache = vector<char>(read_l.seq.length());
+    
     while (i < read_l.seq.length()) {
       if (del != read_l.deletes.end() && del->pos == i) {
         ll += _delete_params(del->len);
