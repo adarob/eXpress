@@ -20,7 +20,6 @@
  */
 struct Library {
   /**
-
    * Path to the input file. Empty if streamed.
    */
   std::string in_file_name;
@@ -47,11 +46,9 @@ struct Library {
    * A pointer to the BiasBoss containing the learned bias distribution for this
    * library.
    */
-
   BiasBoss* bias_table;
   /**
    * A pointer to the TargetTable containing the target parameters (abundance,
-
    * effective length) for this library.
    */
   TargetTable* targ_table;

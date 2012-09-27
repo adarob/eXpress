@@ -290,7 +290,7 @@ bool BAMParser::map_end_from_alignment(BamTools::BamAlignment& a) {
   r.targ_id = a.RefID;
   r.left = a.Position;
   r.mate_l = a.MatePosition;
-  r.seq.set(a.QueryBases, 1);
+  r.seq.set(a.QueryBases, is_reversed);
   r.bam = a;
   r.right = r.left + cigar_length(a.CigarData, r.inserts, r.deletes);
   return true;
@@ -457,7 +457,7 @@ bool SAMParser::map_end_from_line(char* line) {
         break;
       }
       case 9: {
-        r.seq.set(p, 1);
+        r.seq.set(p, r.reversed);
         r.sam = sam_line;
         goto stop;
       }

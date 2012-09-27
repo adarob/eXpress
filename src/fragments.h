@@ -151,10 +151,10 @@ class FragHit {
   
 public:
   FragHit(ReadHit* h) : _target(NULL), _probability(LOG_0){
-    if (h->left) {
-      _read_l.reset(h);
-    } else {
+    if (h->reversed) {
       _read_r.reset(h);
+    } else {
+      _read_l.reset(h);
     }
   }
   FragHit(ReadHit* l, ReadHit* r) : _read_l(l), _read_r(r) {
@@ -200,7 +200,7 @@ public:
       return _read_r->right;
     }
     assert(_read_l);
-    return _read_l->left;
+    return _read_l->right;
   }
   TargID targ_id() const {
     if (_read_l) {
