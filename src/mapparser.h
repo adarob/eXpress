@@ -9,12 +9,13 @@
 #ifndef express_mapparser_h
 #define express_mapparser_h
 
-#include <vector>
-#include <string>
-#include <boost/thread.hpp>
-#include <boost/unordered_map.hpp>
 #include <api/BamReader.h>
 #include <api/BamWriter.h>
+#include <boost/scoped_ptr.hpp>
+#include <boost/thread.hpp>
+#include <boost/unordered_map.hpp>
+#include <string>
+#include <vector>
 
 class Fragment;
 class ParseThreadSafety;

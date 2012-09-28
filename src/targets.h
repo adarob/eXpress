@@ -9,13 +9,14 @@
 #ifndef TRANSCRIPTS_H
 #define TRANSCRIPTS_H
 
-#include <string>
-#include <map>
-#include <boost/unordered_map.hpp>
-#include <vector>
+#include <boost/scoped_ptr.hpp>
 #include <boost/thread.hpp>
+#include <boost/unordered_map.hpp>
 #include <iostream>
 #include <fstream>
+#include <map>
+#include <string>
+#include <vector>
 #include "main.h"
 #include "bundles.h"
 #include "sequence.h"
