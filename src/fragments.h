@@ -172,8 +172,8 @@ public:
    * @param l pointer to the ReadHit struct for the upstream (left) read.
    * @param r pointer to the ReadHit struct for the downstream (right) read.
    */
-  FragHit(ReadHit* l, ReadHit* r) : _target(NULL), _probability(LOG_0),
-                                    _read_l(l), _read_r(r) {
+  FragHit(ReadHit* l, ReadHit* r) : _target(NULL), _read_l(l), _read_r(r),
+                                    _probability(LOG_0) {
     assert(!l->reversed);
     assert(r->reversed);
     assert(l->name == r->name);
