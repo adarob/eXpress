@@ -22,7 +22,7 @@
 #include "sequence.h"
 
 class FLD;
-struct FragHit;
+class FragHit;
 class BiasBoss;
 class MismatchTable;
 class Librarian;

@@ -475,6 +475,13 @@ public:
    * are aligned to.
    */
   void sort_hits();
+  //DOC
+  bool paired() const {
+    if (_frag_hits.empty()) {
+      return false;
+    }
+    return (_frag_hits[0]->pair_status() == PAIRED);
+  }
 };
 
 #endif

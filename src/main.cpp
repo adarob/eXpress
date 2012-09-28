@@ -28,6 +28,7 @@
 #include "threadsafety.h"
 #include "robertsfilter.h"
 #include "library.h"
+#include "alignments.pb.h"
 
 #ifndef WIN32
   #include "update_check.h"
@@ -37,15 +38,15 @@ using namespace std;
 namespace po = boost::program_options;
 namespace fs = boost::filesystem;
 
+// DOC
+bool preprocess_spark;
+
 // the forgetting factor parameter controls the growth of the fragment mass
 double ff_param = 0.85;
 
 // the burn-in parameter determines how many reads are required before the
-
 // error and bias models are applied to probabilistic assignment
-
 size_t burn_in = 100000;
-//size_t burn_in = 100;
 size_t burn_out = 5000000;
 bool burned_out = false;
 
@@ -163,6 +164,7 @@ bool parse_options(int ac, char ** av) {
 
   po::options_description hidden("Hidden options");
   hidden.add_options()
+  ("preprocess-spark","")
   ("edit-detect","")
   ("no-bias-correct","")
   ("no-error-model","")
@@ -236,6 +238,7 @@ bool parse_options(int ac, char ** av) {
     direction = RF;
   }
 
+  preprocess_spark = vm.count("preprocess-spark");
   edit_detect = vm.count("edit-detect");
   calc_covar = vm.count("calc-covar");
   bias_correct = !(vm.count("no-bias-correct"));
@@ -642,16 +645,8 @@ size_t threaded_calc_abundances(Librarian& libs) {
  * calls the processing function, and outputs the results. Also handles
  * additional batch rounds.
  */
-
-int main (int argc, char ** argv)
-{
-
-  srand((unsigned int)time(NULL));
-  int parse_ret = parse_options(argc,argv);
-  if (parse_ret) {
-    return parse_ret;
-  }
-
+int estimation_main() {
+  
   if (output_dir != ".") {
     try {
       fs::create_directories(output_dir);
@@ -659,13 +654,13 @@ int main (int argc, char ** argv)
       cerr << e.what() << endl;
     }
   }
-
+  
   if (!fs::exists(output_dir)) {
     cerr << "ERROR: cannot create directory " << output_dir << ".\n";
     exit(1);
   }
-
-  // Prase input file names and instantiate Libray structs.
+  
+  // Parse input file names and instantiate Libray structs.
   vector<string> file_names;
   char buff[999];
   strcpy(buff, in_map_file_names.c_str());
@@ -694,17 +689,17 @@ int main (int argc, char ** argv)
     libs[i].fld = new FLD(fld_alpha, def_fl_max, def_fl_mean, def_fl_stddev);
     libs[i].mismatch_table = (error_model) ? new MismatchTable(mm_alpha):NULL;
     libs[i].bias_table = (bias_correct) ? new BiasBoss(bias_alpha):NULL;
-
+    
     if (i > 0 &&
         (libs[i].map_parser->targ_index() != libs[i-1].map_parser->targ_index()
          || libs[i].map_parser->targ_lengths() !=
-            libs[i-1].map_parser->targ_lengths())) {
-      cerr << "ERROR: Alignment file headers do not match for '"
-           << file_names[i-1] << "' and '" << file_names[i] << "'.";
-      exit(1);
-    }
+         libs[i-1].map_parser->targ_lengths())) {
+          cerr << "ERROR: Alignment file headers do not match for '"
+          << file_names[i-1] << "' and '" << file_names[i] << "'.";
+          exit(1);
+        }
   }
-
+  
   TargetTable targ_table(fasta_file_name, edit_detect, expr_alpha,
                          expr_alpha_map, &libs);
   for (size_t i = 0; i < libs.size(); ++i) {
@@ -714,21 +709,21 @@ int main (int argc, char ** argv)
     }
   }
   double num_targ = (double)targ_table.size();
-
+  
   if (calc_covar && (double)SSIZE_MAX < num_targ*(num_targ+1)) {
     cerr << "Warning: Your system is unable to represent large enough values "
-         << "for efficiently hashing target pairs.  Covariance calculation "
-         << "will be disabled.\n";
+    << "for efficiently hashing target pairs.  Covariance calculation "
+    << "will be disabled.\n";
     calc_covar = false;
   }
-
+  
   size_t tot_counts = threaded_calc_abundances(libs);
-
+  
   if (both) {
     remaining_rounds = 1;
     online_additional = false;
   }
-
+  
   targ_table.round_reset();
   ff_param = 1.0;
   first_round = false;
@@ -738,19 +733,138 @@ int main (int argc, char ** argv)
     }
     remaining_rounds--;
     cout << "\nRe-estimating counts with additional round of EM ("
-         << remaining_rounds << " remaining)...\n";
+    << remaining_rounds << " remaining)...\n";
     last_round = (remaining_rounds == 0);
     for (size_t l = 0; l < libs.size(); l++) {
       libs[l].map_parser->write_active(last_round);
       libs[l].map_parser->reset_reader();
-     }
-     tot_counts = threaded_calc_abundances(libs);
-     targ_table.round_reset();
+    }
+    tot_counts = threaded_calc_abundances(libs);
+    targ_table.round_reset();
   }
-
+  
 	cout << "Writing results to file...\n";
   output_results(libs, tot_counts);
   cout << "Done\n";
+  
+  return 0;
+}
 
+int preprocess_main() {
+  Librarian libs(1);
+  Library& lib = libs[0];
+  lib.in_file_name = in_map_file_names;
+  lib.out_file_name = "";
+  lib.bias_table = NULL;
+  MapParser map_parser(&lib, false);
+  lib.map_parser = &map_parser;
+  lib.fld = new FLD(fld_alpha, def_fl_max, def_fl_mean, def_fl_stddev);
+  MarkovModel bias_model(3, 21, 21, 0);
+  MismatchTable mismatch_table(mm_alpha);
+  TargetTable targ_table(fasta_file_name, 0, expr_alpha,
+                         expr_alpha_map, &libs);
+  lib.targ_table = &targ_table;
+
+  fstream out((in_map_file_names + ".pb").c_str(),
+              ios::out | ios::binary | ios::trunc);
+  
+  cout << "Processing input fragment alignments...\n";
+  size_t num_frags = 0;
+  cout << setiosflags(ios::left);
+  Fragment* frag;
+  
+  ParseThreadSafety pts(10);
+  boost::thread parse(&MapParser::threaded_parse, &map_parser, &pts,
+                      stop_at, 0);
+  RobertsFilter frags_seen;
+  while(true) {
+    // Pop next parsed fragment and set mass
+    frag = pts.proc_in.pop();
+    
+    if (!frag) {
+      break;
+    }
+    
+    // Test that we have not already seen this fragment
+    if (frags_seen.test_and_push(frag->name())) {
+      cerr << "ERROR: Alignments are not properly sorted. Read '"
+           << frag->name() << "' has alignments which are non-consecutive.\n";
+      exit(1);
+    }
+    
+    proto::Fragment frag_proto;
+    frag_proto.set_paired(frag->paired());
+    for (size_t i = 0; i < frag->num_hits(); ++i) {
+      FragHit& fh = *(*frag)[i];
+      proto::FragmentAlignment align_proto;
+      align_proto.set_target_id((unsigned int)fh.target_id());
+      align_proto.set_length((unsigned int)fh.length());
+      
+      vector<char> left_mm_indices;
+      vector<char> right_mm_indices;
+      
+      mismatch_table.get_indices(fh, left_mm_indices, right_mm_indices);
+      
+      ReadHit* read_l = fh.left_read();
+      if (read_l) {
+        proto::ReadAlignment& read_proto = *align_proto.mutable_read_l();
+        read_proto.set_first(read_l->first);
+        foreach (char& x, left_mm_indices) {
+          read_proto.add_error_indices(x);
+        }
+        vector<int> bias_indices = bias_model.get_indices(fh.target()->seq(0),
+                                                          (int)read_l->left);
+        foreach (int& x, bias_indices) {
+          read_proto.add_bias_indices(x);
+        }
+      }
+      ReadHit* read_r = fh.right_read();
+      if (read_r) {
+        proto::ReadAlignment& read_proto = *align_proto.mutable_read_r();
+        read_proto.set_first(read_r->first);
+        foreach (char& x, right_mm_indices) {
+          read_proto.add_error_indices(x);
+        }
+        vector<int> bias_indices = bias_model.get_indices(fh.target()->seq(1),
+                                                    (int)(fh.target()->length()
+                                                          - read_r->right));
+        foreach (int& x, bias_indices) {
+          read_proto.add_bias_indices(x);
+        }
+      }
+    }
+    frag_proto.SerializeToOstream(&out);
+    
+    pts.proc_out.push(frag);
+
+    num_frags++;
+
+    // Output progress
+    if (num_frags % 1000000 == 0) {
+      cout << "Fragments Processed: " << setw(9) << num_frags << endl;
+    }
+  }
+  out.close();
+  
+  parse.join();
+
+  return 0;
+}
+
+int main (int argc, char ** argv)
+{
+
+  srand((unsigned int)time(NULL));
+  int parse_ret = parse_options(argc,argv);
+  if (parse_ret) {
+    return parse_ret;
+  }
+  
+  if (preprocess_spark) {
+    return preprocess_main();
+  }
+  return estimation_main();
+
+  
   return 0;
 }

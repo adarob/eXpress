@@ -32,7 +32,7 @@ vector<int> MarkovModel::get_indices(const Sequence& seq, int left) {
   int seq_len = (int)seq.length();
   
   vector<int> indices(_window_size, -1);
-  
+
   size_t cond = 0;
   
   if (left < _order) {

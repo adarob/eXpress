@@ -20,7 +20,7 @@
 class Fragment;
 class ParseThreadSafety;
 class TargetTable;
-struct FragHit;
+class FragHit;
 struct ReadHit;
 struct Library;
 

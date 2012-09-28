@@ -11,7 +11,7 @@
 
 #include "frequencymatrix.h"
 
-struct FragHit;
+class FragHit;
 class Target;
 
 /**

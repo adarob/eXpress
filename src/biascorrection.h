@@ -17,7 +17,7 @@
 #include "frequencymatrix.h"
 #include "markovmodel.h"
 
-struct FragHit;
+class FragHit;
 class Target;
 
 /**

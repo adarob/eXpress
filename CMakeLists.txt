@@ -14,6 +14,7 @@ set(CMAKE_CXX_FLAGS_MINSIZEREL "-Os ${CMAKE_CXX_FLAGS}")
 
 set(CMAKE_BUILD_TYPE Release)
 set(Boost_USE_STATIC_LIBS ON)
+
 find_package(Boost 1.39
     COMPONENTS
     thread
@@ -21,7 +22,9 @@ find_package(Boost 1.39
 	filesystem
     program_options
     REQUIRED)
-    
+
+find_package(Protobuf REQUIRED)
+
 if(WIN32)
 	set(CMAKE_CXX_FLAGS "/EHsc")
 	set(WIN32_INT 1)
@@ -36,6 +39,6 @@ configure_file (
   )
 
 
-include_directories(${Boost_INCLUDE_DIRS} "${CMAKE_CURRENT_SOURCE_DIR}/bamtools/include") 
+include_directories(${Boost_INCLUDE_DIRS} ${PROTOBUF_INCLUDE_DIR} "${CMAKE_CURRENT_SOURCE_DIR}/bamtools/include") 
 
 add_subdirectory(src)

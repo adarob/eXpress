@@ -161,12 +161,13 @@
         <div class="corner-content-1col-top"></div>                        
         <div class="content-1col-nobox">
           <h1>News</h1>
-          <h2>08.28.2012 &bull; eXpress 1.2.0 released</h2>
+          <h2>09.27.2012 &bull; eXpress 1.2.0 released</h2>
           <p>This maintenance release includes major refactoring and patches for the bugs listed below.
    		  <ul>
    		<li>Refactored fragment objects for readability and performance improvements.</li>
    		<li>Fully completed source documentation and improved formatting style.</li>
 		  <li>Now ignores paired-end fragments where the upstream read is reverse complemented and/or the downstream read is not.</li>
+      <li>Fixed a bug where average bias was computed incorrectly, affecting estimation accuracy.</li>
 		  <li>Fixed a bug where soft clipping was ignored, leading to a segfault.</li>
 		  <li>Fixed a bug where very long reads (> 200 bp) would cause a segfault.</li>
 		  <li>Fixed a bug where small fragment length standard deviations could lead to NaNs.</li>

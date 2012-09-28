@@ -20,6 +20,8 @@
 		0A60597713A1753B00B5C9BA /* libboost_system.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A60597613A1753B00B5C9BA /* libboost_system.a */; };
 		0A63748614CF83A500D79987 /* sequence.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0A63748514CF83A500D79987 /* sequence.cpp */; };
 		0A9F0E1014CF64FF00379DC6 /* markovmodel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0A9F0E0F14CF64FF00379DC6 /* markovmodel.cpp */; };
+		0AC8DF4316165FD4009C4080 /* alignments.pb.cc in Sources */ = {isa = PBXBuildFile; fileRef = 0AC8DF4116165FD3009C4080 /* alignments.pb.cc */; };
+		0AC8DF451616653A009C4080 /* libprotobuf.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0AC8DF441616653A009C4080 /* libprotobuf.a */; };
 		0ACBB2F2143EA2DD001322D2 /* bundles.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0ACBB2F0143EA2DD001322D2 /* bundles.cpp */; };
 		0AD5968913FF20C700EEBDD7 /* mapparser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0AD5968813FF20C700EEBDD7 /* mapparser.cpp */; };
 		0ADA18F715508175008020B2 /* robertsfilter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0ADA18F615508175008020B2 /* robertsfilter.cpp */; };
@@ -65,6 +67,9 @@
 		0A9F0E1114CF650D00379DC6 /* markovmodel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = markovmodel.h; sourceTree = "<group>"; };
 		0AA3D63614D106B800448167 /* threadsafety.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = threadsafety.h; sourceTree = "<group>"; };
 		0AB8C58F155EE921007D6E6F /* library.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = library.h; sourceTree = "<group>"; };
+		0AC8DF4116165FD3009C4080 /* alignments.pb.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = alignments.pb.cc; sourceTree = "<group>"; };
+		0AC8DF4216165FD3009C4080 /* alignments.pb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = alignments.pb.h; sourceTree = "<group>"; };
+		0AC8DF441616653A009C4080 /* libprotobuf.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libprotobuf.a; path = ../../../../../../../opt/local/lib/libprotobuf.a; sourceTree = "<group>"; };
 		0ACBB2F0143EA2DD001322D2 /* bundles.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = bundles.cpp; sourceTree = "<group>"; };
 		0ACBB2F1143EA2DD001322D2 /* bundles.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = bundles.h; sourceTree = "<group>"; };
 		0AD5968713FF20B900EEBDD7 /* mapparser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mapparser.h; sourceTree = "<group>"; };
@@ -85,6 +90,7 @@
 				0A60597713A1753B00B5C9BA /* libboost_system.a in Frameworks */,
 				0A2D58911405F128008891E7 /* libboost_program_options.a in Frameworks */,
 				0ADF037D140C66D500D16BBE /* libbamtools.a in Frameworks */,
+				0AC8DF451616653A009C4080 /* libprotobuf.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -115,6 +121,9 @@
 		0A5C7629136F2EF10095365C /* src */ = {
 			isa = PBXGroup;
 			children = (
+				0AC8DF441616653A009C4080 /* libprotobuf.a */,
+				0AC8DF4116165FD3009C4080 /* alignments.pb.cc */,
+				0AC8DF4216165FD3009C4080 /* alignments.pb.h */,
 				0AB8C58F155EE921007D6E6F /* library.h */,
 				0AEC98C914414B5100DE2C43 /* config.h */,
 				0A4DC487140ACC640091CA28 /* update_check.h */,
@@ -209,6 +218,7 @@
 				0A63748614CF83A500D79987 /* sequence.cpp in Sources */,
 				0A04E7C01540B87200D9A162 /* threadsafety.cpp in Sources */,
 				0ADA18F715508175008020B2 /* robertsfilter.cpp in Sources */,
+				0AC8DF4316165FD4009C4080 /* alignments.pb.cc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -260,6 +270,7 @@
 					"\"$(SRCROOT)/bamtools/include\"",
 					/usr/local/include,
 					/opt/local/include,
+					"$(SRCROOT)/src",
 				);
 				LIBRARY_SEARCH_PATHS = (
 					/usr/local/lib,
@@ -284,6 +295,7 @@
 					"\"$(SRCROOT)/bamtools/include\"",
 					/usr/local/include,
 					/opt/local/include,
+					"$(SRCROOT)/src",
 				);
 				LIBRARY_SEARCH_PATHS = (
 					/usr/local/lib,
