@@ -1,5 +1,5 @@
 # GLOB_RECURSE will allow you to find everything with extension in subdirs
-file(GLOB sources *.cpp)
+file(GLOB sources *.cpp *.cc)
 file(GLOB headers *.h)
 
 add_executable(express ${sources} ${headers})

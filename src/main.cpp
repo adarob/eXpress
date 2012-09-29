@@ -28,7 +28,13 @@
 #include "threadsafety.h"
 #include "robertsfilter.h"
 #include "library.h"
-#include "alignments.pb.h"
+#include "proto/alignments.pb.h"
+#include "proto/targets.pb.h"
+
+
+#include <boost/archive/iterators/base64_from_binary.hpp>
+#include <boost/archive/iterators/transform_width.hpp>
+#include <boost/archive/iterators/ostream_iterator.hpp>
 
 #ifndef WIN32
   #include "update_check.h"
@@ -750,6 +756,15 @@ int estimation_main() {
   return 0;
 }
 
+inline string base64_encode(const string& to_encode) {
+  using namespace boost::archive::iterators;
+  typedef base64_from_binary<transform_width<string::const_iterator,6,8> > it_base64_t;
+  unsigned int writePaddChars = (3-to_encode.length()%3)%3;
+  string base64(it_base64_t(to_encode.begin()), it_base64_t(to_encode.end()));
+  base64.append(writePaddChars,'=');
+  return base64;
+}
+
 int preprocess_main() {
   Librarian libs(1);
   Library& lib = libs[0];
@@ -764,11 +779,43 @@ int preprocess_main() {
   TargetTable targ_table(fasta_file_name, 0, expr_alpha,
                          expr_alpha_map, &libs);
   lib.targ_table = &targ_table;
-
-  fstream out((in_map_file_names + ".pb").c_str(),
-              ios::out | ios::binary | ios::trunc);
   
-  cout << "Processing input fragment alignments...\n";
+  cout << "Converting targets to Protocol Buffers...\n";
+  fstream targ_out((in_map_file_names + ".targ.pb").c_str(),
+                   ios::out | ios::trunc);
+  string out_buff;
+  proto::Target target_proto;
+  for (TargID id = 0; id < targ_table.size(); ++id) {
+    target_proto.Clear();
+    Target& targ = *targ_table.get_targ(id);
+    target_proto.set_name(targ.name());
+    target_proto.set_id((unsigned int)targ.id());
+    target_proto.set_length((unsigned int)targ.length());
+
+    vector<int> bias_indices_l = bias_model.get_indices(targ.seq(0));
+    foreach(int& x, bias_indices_l) {
+      if (x < 0) {
+        x = 256;
+      }
+      target_proto.add_bias_indices_l(x);
+    }
+    
+    vector<int> bias_indices_r = bias_model.get_indices(targ.seq(1));
+    foreach(int& x, bias_indices_r) {
+      if (x < 0) {
+        x = 256;
+      }
+      target_proto.add_bias_indices_r(x);
+    }
+    target_proto.SerializeToString(&out_buff);
+    targ_out << base64_encode(out_buff) << endl;
+  }
+  targ_out.close();
+  
+  cout << "Converting fragment alignments to Protocol Buffers..\n";
+  fstream frag_out((in_map_file_names + ".frag.pb").c_str(),
+                   ios::out | ios::trunc);
+
   size_t num_frags = 0;
   cout << setiosflags(ios::left);
   Fragment* frag;
@@ -795,6 +842,7 @@ int preprocess_main() {
     proto::Fragment frag_proto;
     frag_proto.set_paired(frag->paired());
     for (size_t i = 0; i < frag->num_hits(); ++i) {
+      frag_proto.Clear();
       FragHit& fh = *(*frag)[i];
       proto::FragmentAlignment align_proto;
       align_proto.set_target_id((unsigned int)fh.target_id());
@@ -829,12 +877,16 @@ int preprocess_main() {
                                                     (int)(fh.target()->length()
                                                           - read_r->right));
         foreach (int& x, bias_indices) {
+          if (x < 0) {
+            x = 256;
+          }
           read_proto.add_bias_indices(x);
         }
       }
     }
-    frag_proto.SerializeToOstream(&out);
-    
+    frag_proto.SerializeToString(&out_buff);
+    frag_out << base64_encode(out_buff) << endl;
+
     pts.proc_out.push(frag);
 
     num_frags++;
@@ -844,7 +896,7 @@ int preprocess_main() {
       cout << "Fragments Processed: " << setw(9) << num_frags << endl;
     }
   }
-  out.close();
+  frag_out.close();
   
   parse.join();
 

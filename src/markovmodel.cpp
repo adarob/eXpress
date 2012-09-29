@@ -85,9 +85,7 @@ void MarkovModel::update(const Sequence& seq, int left, double mass) {
   }
 }
 
-vector<int> MarkovModel::get_indices(const Sequence& seq) {
-  assert(_num_pos==_order+1);
-  
+vector<int> MarkovModel::get_indices(const Sequence& seq) {  
   vector<int> indices(seq.length(), -1);
   
   if (seq.length() < (size_t)_order) {
