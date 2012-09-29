@@ -824,7 +824,10 @@ int preprocess_main() {
   boost::thread parse(&MapParser::threaded_parse, &map_parser, &pts,
                       stop_at, 0);
   RobertsFilter frags_seen;
+  proto::Fragment frag_proto;
   while(true) {
+    frag_proto.Clear();
+
     // Pop next parsed fragment and set mass
     frag = pts.proc_in.pop();
     
@@ -839,10 +842,8 @@ int preprocess_main() {
       exit(1);
     }
     
-    proto::Fragment frag_proto;
     frag_proto.set_paired(frag->paired());
     for (size_t i = 0; i < frag->num_hits(); ++i) {
-      frag_proto.Clear();
       FragHit& fh = *(*frag)[i];
       proto::FragmentAlignment align_proto;
       align_proto.set_target_id((unsigned int)fh.target_id());
