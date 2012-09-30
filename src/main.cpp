@@ -845,7 +845,7 @@ int preprocess_main() {
     frag_proto.set_paired(frag->paired());
     for (size_t i = 0; i < frag->num_hits(); ++i) {
       FragHit& fh = *(*frag)[i];
-      proto::FragmentAlignment align_proto;
+      proto::FragmentAlignment& align_proto = *frag_proto.add_alignments();
       align_proto.set_target_id((unsigned int)fh.target_id());
       align_proto.set_length((unsigned int)fh.length());
       
@@ -858,31 +858,34 @@ int preprocess_main() {
       if (read_l) {
         proto::ReadAlignment& read_proto = *align_proto.mutable_read_l();
         read_proto.set_first(read_l->first);
-        foreach (char& x, left_mm_indices) {
-          read_proto.add_error_indices(x);
-        }
-        vector<int> bias_indices = bias_model.get_indices(fh.target()->seq(0),
+        read_proto.set_error_indices(string(left_mm_indices.begin(),
+                                            left_mm_indices.end()));
+        vector<int> bias_indices_i = bias_model.get_indices(fh.target()->seq(0),
                                                           (int)read_l->left);
-        foreach (int& x, bias_indices) {
-          read_proto.add_bias_indices(x);
+        char bias_indices_c[bias_indices_i.size()];
+        for (size_t j = 0; j < bias_indices_i.size(); ++j) {
+          bias_indices_c[j] = (char)bias_indices_i[j];
+          read_proto.add_bias_valid(bias_indices_i[j] >= 0);
         }
+        read_proto.set_bias_indices(string(bias_indices_c,
+                                           bias_indices_i.size()));
       }
       ReadHit* read_r = fh.right_read();
       if (read_r) {
         proto::ReadAlignment& read_proto = *align_proto.mutable_read_r();
         read_proto.set_first(read_r->first);
-        foreach (char& x, right_mm_indices) {
-          read_proto.add_error_indices(x);
-        }
-        vector<int> bias_indices = bias_model.get_indices(fh.target()->seq(1),
+        read_proto.set_error_indices(string(right_mm_indices.begin(),
+                                            right_mm_indices.end()));
+        vector<int> bias_indices_i = bias_model.get_indices(fh.target()->seq(1),
                                                     (int)(fh.target()->length()
                                                           - read_r->right));
-        foreach (int& x, bias_indices) {
-          if (x < 0) {
-            x = 256;
-          }
-          read_proto.add_bias_indices(x);
+        char bias_indices_c[bias_indices_i.size()];
+        for (size_t j = 0; j < bias_indices_i.size(); ++j) {
+          bias_indices_c[j] = (char)bias_indices_i[j];
+          read_proto.add_bias_valid(bias_indices_i[j] >= 0);
         }
+        read_proto.set_bias_indices(string(bias_indices_c,
+                                           bias_indices_i.size()));
       }
     }
     frag_proto.SerializeToString(&out_buff);

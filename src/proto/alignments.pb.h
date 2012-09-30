@@ -99,43 +99,58 @@ class ReadAlignment : public ::google::protobuf::Message {
   inline bool first() const;
   inline void set_first(bool value);
   
-  // repeated uint32 error_indices = 2;
-  inline int error_indices_size() const;
+  // required bytes error_indices = 2;
+  inline bool has_error_indices() const;
   inline void clear_error_indices();
   static const int kErrorIndicesFieldNumber = 2;
-  inline ::google::protobuf::uint32 error_indices(int index) const;
-  inline void set_error_indices(int index, ::google::protobuf::uint32 value);
-  inline void add_error_indices(::google::protobuf::uint32 value);
-  inline const ::google::protobuf::RepeatedField< ::google::protobuf::uint32 >&
-      error_indices() const;
-  inline ::google::protobuf::RepeatedField< ::google::protobuf::uint32 >*
-      mutable_error_indices();
+  inline const ::std::string& error_indices() const;
+  inline void set_error_indices(const ::std::string& value);
+  inline void set_error_indices(const char* value);
+  inline void set_error_indices(const void* value, size_t size);
+  inline ::std::string* mutable_error_indices();
+  inline ::std::string* release_error_indices();
   
-  // repeated uint32 bias_indices = 3;
-  inline int bias_indices_size() const;
+  // required bytes bias_indices = 3;
+  inline bool has_bias_indices() const;
   inline void clear_bias_indices();
   static const int kBiasIndicesFieldNumber = 3;
-  inline ::google::protobuf::uint32 bias_indices(int index) const;
-  inline void set_bias_indices(int index, ::google::protobuf::uint32 value);
-  inline void add_bias_indices(::google::protobuf::uint32 value);
-  inline const ::google::protobuf::RepeatedField< ::google::protobuf::uint32 >&
-      bias_indices() const;
-  inline ::google::protobuf::RepeatedField< ::google::protobuf::uint32 >*
-      mutable_bias_indices();
+  inline const ::std::string& bias_indices() const;
+  inline void set_bias_indices(const ::std::string& value);
+  inline void set_bias_indices(const char* value);
+  inline void set_bias_indices(const void* value, size_t size);
+  inline ::std::string* mutable_bias_indices();
+  inline ::std::string* release_bias_indices();
+  
+  // repeated bool bias_valid = 4;
+  inline int bias_valid_size() const;
+  inline void clear_bias_valid();
+  static const int kBiasValidFieldNumber = 4;
+  inline bool bias_valid(int index) const;
+  inline void set_bias_valid(int index, bool value);
+  inline void add_bias_valid(bool value);
+  inline const ::google::protobuf::RepeatedField< bool >&
+      bias_valid() const;
+  inline ::google::protobuf::RepeatedField< bool >*
+      mutable_bias_valid();
   
   // @@protoc_insertion_point(class_scope:proto.ReadAlignment)
  private:
   inline void set_has_first();
   inline void clear_has_first();
+  inline void set_has_error_indices();
+  inline void clear_has_error_indices();
+  inline void set_has_bias_indices();
+  inline void clear_has_bias_indices();
   
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
   
-  ::google::protobuf::RepeatedField< ::google::protobuf::uint32 > error_indices_;
-  ::google::protobuf::RepeatedField< ::google::protobuf::uint32 > bias_indices_;
+  ::std::string* error_indices_;
+  ::std::string* bias_indices_;
+  ::google::protobuf::RepeatedField< bool > bias_valid_;
   bool first_;
   
   mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(3 + 31) / 32];
+  ::google::protobuf::uint32 _has_bits_[(4 + 31) / 32];
   
   friend void  protobuf_AddDesc_alignments_2eproto();
   friend void protobuf_AssignDesc_alignments_2eproto();
@@ -396,54 +411,145 @@ inline void ReadAlignment::set_first(bool value) {
   first_ = value;
 }
 
-// repeated uint32 error_indices = 2;
-inline int ReadAlignment::error_indices_size() const {
-  return error_indices_.size();
+// required bytes error_indices = 2;
+inline bool ReadAlignment::has_error_indices() const {
+  return (_has_bits_[0] & 0x00000002u) != 0;
+}
+inline void ReadAlignment::set_has_error_indices() {
+  _has_bits_[0] |= 0x00000002u;
+}
+inline void ReadAlignment::clear_has_error_indices() {
+  _has_bits_[0] &= ~0x00000002u;
 }
 inline void ReadAlignment::clear_error_indices() {
-  error_indices_.Clear();
+  if (error_indices_ != &::google::protobuf::internal::kEmptyString) {
+    error_indices_->clear();
+  }
+  clear_has_error_indices();
 }
-inline ::google::protobuf::uint32 ReadAlignment::error_indices(int index) const {
-  return error_indices_.Get(index);
+inline const ::std::string& ReadAlignment::error_indices() const {
+  return *error_indices_;
 }
-inline void ReadAlignment::set_error_indices(int index, ::google::protobuf::uint32 value) {
-  error_indices_.Set(index, value);
+inline void ReadAlignment::set_error_indices(const ::std::string& value) {
+  set_has_error_indices();
+  if (error_indices_ == &::google::protobuf::internal::kEmptyString) {
+    error_indices_ = new ::std::string;
+  }
+  error_indices_->assign(value);
 }
-inline void ReadAlignment::add_error_indices(::google::protobuf::uint32 value) {
-  error_indices_.Add(value);
+inline void ReadAlignment::set_error_indices(const char* value) {
+  set_has_error_indices();
+  if (error_indices_ == &::google::protobuf::internal::kEmptyString) {
+    error_indices_ = new ::std::string;
+  }
+  error_indices_->assign(value);
 }
-inline const ::google::protobuf::RepeatedField< ::google::protobuf::uint32 >&
-ReadAlignment::error_indices() const {
+inline void ReadAlignment::set_error_indices(const void* value, size_t size) {
+  set_has_error_indices();
+  if (error_indices_ == &::google::protobuf::internal::kEmptyString) {
+    error_indices_ = new ::std::string;
+  }
+  error_indices_->assign(reinterpret_cast<const char*>(value), size);
+}
+inline ::std::string* ReadAlignment::mutable_error_indices() {
+  set_has_error_indices();
+  if (error_indices_ == &::google::protobuf::internal::kEmptyString) {
+    error_indices_ = new ::std::string;
+  }
   return error_indices_;
 }
-inline ::google::protobuf::RepeatedField< ::google::protobuf::uint32 >*
-ReadAlignment::mutable_error_indices() {
-  return &error_indices_;
+inline ::std::string* ReadAlignment::release_error_indices() {
+  clear_has_error_indices();
+  if (error_indices_ == &::google::protobuf::internal::kEmptyString) {
+    return NULL;
+  } else {
+    ::std::string* temp = error_indices_;
+    error_indices_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
+    return temp;
+  }
 }
 
-// repeated uint32 bias_indices = 3;
-inline int ReadAlignment::bias_indices_size() const {
-  return bias_indices_.size();
+// required bytes bias_indices = 3;
+inline bool ReadAlignment::has_bias_indices() const {
+  return (_has_bits_[0] & 0x00000004u) != 0;
+}
+inline void ReadAlignment::set_has_bias_indices() {
+  _has_bits_[0] |= 0x00000004u;
+}
+inline void ReadAlignment::clear_has_bias_indices() {
+  _has_bits_[0] &= ~0x00000004u;
 }
 inline void ReadAlignment::clear_bias_indices() {
-  bias_indices_.Clear();
+  if (bias_indices_ != &::google::protobuf::internal::kEmptyString) {
+    bias_indices_->clear();
+  }
+  clear_has_bias_indices();
 }
-inline ::google::protobuf::uint32 ReadAlignment::bias_indices(int index) const {
-  return bias_indices_.Get(index);
+inline const ::std::string& ReadAlignment::bias_indices() const {
+  return *bias_indices_;
 }
-inline void ReadAlignment::set_bias_indices(int index, ::google::protobuf::uint32 value) {
-  bias_indices_.Set(index, value);
+inline void ReadAlignment::set_bias_indices(const ::std::string& value) {
+  set_has_bias_indices();
+  if (bias_indices_ == &::google::protobuf::internal::kEmptyString) {
+    bias_indices_ = new ::std::string;
+  }
+  bias_indices_->assign(value);
 }
-inline void ReadAlignment::add_bias_indices(::google::protobuf::uint32 value) {
-  bias_indices_.Add(value);
+inline void ReadAlignment::set_bias_indices(const char* value) {
+  set_has_bias_indices();
+  if (bias_indices_ == &::google::protobuf::internal::kEmptyString) {
+    bias_indices_ = new ::std::string;
+  }
+  bias_indices_->assign(value);
 }
-inline const ::google::protobuf::RepeatedField< ::google::protobuf::uint32 >&
-ReadAlignment::bias_indices() const {
+inline void ReadAlignment::set_bias_indices(const void* value, size_t size) {
+  set_has_bias_indices();
+  if (bias_indices_ == &::google::protobuf::internal::kEmptyString) {
+    bias_indices_ = new ::std::string;
+  }
+  bias_indices_->assign(reinterpret_cast<const char*>(value), size);
+}
+inline ::std::string* ReadAlignment::mutable_bias_indices() {
+  set_has_bias_indices();
+  if (bias_indices_ == &::google::protobuf::internal::kEmptyString) {
+    bias_indices_ = new ::std::string;
+  }
   return bias_indices_;
 }
-inline ::google::protobuf::RepeatedField< ::google::protobuf::uint32 >*
-ReadAlignment::mutable_bias_indices() {
-  return &bias_indices_;
+inline ::std::string* ReadAlignment::release_bias_indices() {
+  clear_has_bias_indices();
+  if (bias_indices_ == &::google::protobuf::internal::kEmptyString) {
+    return NULL;
+  } else {
+    ::std::string* temp = bias_indices_;
+    bias_indices_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
+    return temp;
+  }
+}
+
+// repeated bool bias_valid = 4;
+inline int ReadAlignment::bias_valid_size() const {
+  return bias_valid_.size();
+}
+inline void ReadAlignment::clear_bias_valid() {
+  bias_valid_.Clear();
+}
+inline bool ReadAlignment::bias_valid(int index) const {
+  return bias_valid_.Get(index);
+}
+inline void ReadAlignment::set_bias_valid(int index, bool value) {
+  bias_valid_.Set(index, value);
+}
+inline void ReadAlignment::add_bias_valid(bool value) {
+  bias_valid_.Add(value);
+}
+inline const ::google::protobuf::RepeatedField< bool >&
+ReadAlignment::bias_valid() const {
+  return bias_valid_;
+}
+inline ::google::protobuf::RepeatedField< bool >*
+ReadAlignment::mutable_bias_valid() {
+  return &bias_valid_;
 }
 
 // -------------------------------------------------------------------
