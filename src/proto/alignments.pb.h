@@ -121,17 +121,12 @@ class ReadAlignment : public ::google::protobuf::Message {
   inline ::std::string* mutable_bias_indices();
   inline ::std::string* release_bias_indices();
   
-  // repeated bool bias_valid = 4;
-  inline int bias_valid_size() const;
-  inline void clear_bias_valid();
-  static const int kBiasValidFieldNumber = 4;
-  inline bool bias_valid(int index) const;
-  inline void set_bias_valid(int index, bool value);
-  inline void add_bias_valid(bool value);
-  inline const ::google::protobuf::RepeatedField< bool >&
-      bias_valid() const;
-  inline ::google::protobuf::RepeatedField< bool >*
-      mutable_bias_valid();
+  // required uint32 bias_start_pos = 4;
+  inline bool has_bias_start_pos() const;
+  inline void clear_bias_start_pos();
+  static const int kBiasStartPosFieldNumber = 4;
+  inline ::google::protobuf::uint32 bias_start_pos() const;
+  inline void set_bias_start_pos(::google::protobuf::uint32 value);
   
   // @@protoc_insertion_point(class_scope:proto.ReadAlignment)
  private:
@@ -141,13 +136,15 @@ class ReadAlignment : public ::google::protobuf::Message {
   inline void clear_has_error_indices();
   inline void set_has_bias_indices();
   inline void clear_has_bias_indices();
+  inline void set_has_bias_start_pos();
+  inline void clear_has_bias_start_pos();
   
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
   
   ::std::string* error_indices_;
-  ::std::string* bias_indices_;
-  ::google::protobuf::RepeatedField< bool > bias_valid_;
   bool first_;
+  ::google::protobuf::uint32 bias_start_pos_;
+  ::std::string* bias_indices_;
   
   mutable int _cached_size_;
   ::google::protobuf::uint32 _has_bits_[(4 + 31) / 32];
@@ -527,29 +524,26 @@ inline ::std::string* ReadAlignment::release_bias_indices() {
   }
 }
 
-// repeated bool bias_valid = 4;
-inline int ReadAlignment::bias_valid_size() const {
-  return bias_valid_.size();
+// required uint32 bias_start_pos = 4;
+inline bool ReadAlignment::has_bias_start_pos() const {
+  return (_has_bits_[0] & 0x00000008u) != 0;
 }
-inline void ReadAlignment::clear_bias_valid() {
-  bias_valid_.Clear();
+inline void ReadAlignment::set_has_bias_start_pos() {
+  _has_bits_[0] |= 0x00000008u;
 }
-inline bool ReadAlignment::bias_valid(int index) const {
-  return bias_valid_.Get(index);
+inline void ReadAlignment::clear_has_bias_start_pos() {
+  _has_bits_[0] &= ~0x00000008u;
 }
-inline void ReadAlignment::set_bias_valid(int index, bool value) {
-  bias_valid_.Set(index, value);
+inline void ReadAlignment::clear_bias_start_pos() {
+  bias_start_pos_ = 0u;
+  clear_has_bias_start_pos();
 }
-inline void ReadAlignment::add_bias_valid(bool value) {
-  bias_valid_.Add(value);
+inline ::google::protobuf::uint32 ReadAlignment::bias_start_pos() const {
+  return bias_start_pos_;
 }
-inline const ::google::protobuf::RepeatedField< bool >&
-ReadAlignment::bias_valid() const {
-  return bias_valid_;
-}
-inline ::google::protobuf::RepeatedField< bool >*
-ReadAlignment::mutable_bias_valid() {
-  return &bias_valid_;
+inline void ReadAlignment::set_bias_start_pos(::google::protobuf::uint32 value) {
+  set_has_bias_start_pos();
+  bias_start_pos_ = value;
 }
 
 // -------------------------------------------------------------------

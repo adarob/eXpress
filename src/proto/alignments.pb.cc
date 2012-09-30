@@ -41,7 +41,7 @@ void protobuf_AssignDesc_alignments_2eproto() {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(ReadAlignment, first_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(ReadAlignment, error_indices_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(ReadAlignment, bias_indices_),
-    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(ReadAlignment, bias_valid_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(ReadAlignment, bias_start_pos_),
   };
   ReadAlignment_reflection_ =
     new ::google::protobuf::internal::GeneratedMessageReflection(
@@ -127,15 +127,15 @@ void protobuf_AddDesc_alignments_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
   ::google::protobuf::DescriptorPool::InternalAddGeneratedFile(
-    "\n\020alignments.proto\022\005proto\"_\n\rReadAlignme"
+    "\n\020alignments.proto\022\005proto\"c\n\rReadAlignme"
     "nt\022\r\n\005first\030\001 \002(\010\022\025\n\rerror_indices\030\002 \002(\014"
-    "\022\024\n\014bias_indices\030\003 \002(\014\022\022\n\nbias_valid\030\004 \003"
-    "(\010\"\202\001\n\021FragmentAlignment\022\021\n\ttarget_id\030\001 "
-    "\002(\r\022\016\n\006length\030\002 \001(\r\022$\n\006read_l\030\003 \001(\0132\024.pr"
-    "oto.ReadAlignment\022$\n\006read_r\030\004 \001(\0132\024.prot"
-    "o.ReadAlignment\"V\n\010Fragment\022\014\n\004name\030\001 \001("
-    "\t\022\016\n\006paired\030\002 \002(\010\022,\n\nalignments\030\003 \003(\0132\030."
-    "proto.FragmentAlignment", 343);
+    "\022\024\n\014bias_indices\030\003 \002(\014\022\026\n\016bias_start_pos"
+    "\030\004 \002(\r\"\202\001\n\021FragmentAlignment\022\021\n\ttarget_i"
+    "d\030\001 \002(\r\022\016\n\006length\030\002 \001(\r\022$\n\006read_l\030\003 \001(\0132"
+    "\024.proto.ReadAlignment\022$\n\006read_r\030\004 \001(\0132\024."
+    "proto.ReadAlignment\"V\n\010Fragment\022\014\n\004name\030"
+    "\001 \001(\t\022\016\n\006paired\030\002 \002(\010\022,\n\nalignments\030\003 \003("
+    "\0132\030.proto.FragmentAlignment", 347);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "alignments.proto", &protobuf_RegisterTypes);
   ReadAlignment::default_instance_ = new ReadAlignment();
@@ -161,7 +161,7 @@ struct StaticDescriptorInitializer_alignments_2eproto {
 const int ReadAlignment::kFirstFieldNumber;
 const int ReadAlignment::kErrorIndicesFieldNumber;
 const int ReadAlignment::kBiasIndicesFieldNumber;
-const int ReadAlignment::kBiasValidFieldNumber;
+const int ReadAlignment::kBiasStartPosFieldNumber;
 #endif  // !_MSC_VER
 
 ReadAlignment::ReadAlignment()
@@ -183,6 +183,7 @@ void ReadAlignment::SharedCtor() {
   first_ = false;
   error_indices_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
   bias_indices_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
+  bias_start_pos_ = 0u;
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
 }
 
@@ -234,8 +235,8 @@ void ReadAlignment::Clear() {
         bias_indices_->clear();
       }
     }
+    bias_start_pos_ = 0u;
   }
-  bias_valid_.Clear();
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
   mutable_unknown_fields()->Clear();
 }
@@ -285,28 +286,22 @@ bool ReadAlignment::MergePartialFromCodedStream(
         } else {
           goto handle_uninterpreted;
         }
-        if (input->ExpectTag(32)) goto parse_bias_valid;
+        if (input->ExpectTag(32)) goto parse_bias_start_pos;
         break;
       }
       
-      // repeated bool bias_valid = 4;
+      // required uint32 bias_start_pos = 4;
       case 4: {
         if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
             ::google::protobuf::internal::WireFormatLite::WIRETYPE_VARINT) {
-         parse_bias_valid:
-          DO_((::google::protobuf::internal::WireFormatLite::ReadRepeatedPrimitive<
-                   bool, ::google::protobuf::internal::WireFormatLite::TYPE_BOOL>(
-                 1, 32, input, this->mutable_bias_valid())));
-        } else if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag)
-                   == ::google::protobuf::internal::WireFormatLite::
-                      WIRETYPE_LENGTH_DELIMITED) {
-          DO_((::google::protobuf::internal::WireFormatLite::ReadPackedPrimitiveNoInline<
-                   bool, ::google::protobuf::internal::WireFormatLite::TYPE_BOOL>(
-                 input, this->mutable_bias_valid())));
+         parse_bias_start_pos:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::uint32, ::google::protobuf::internal::WireFormatLite::TYPE_UINT32>(
+                 input, &bias_start_pos_)));
+          set_has_bias_start_pos();
         } else {
           goto handle_uninterpreted;
         }
-        if (input->ExpectTag(32)) goto parse_bias_valid;
         if (input->ExpectAtEnd()) return true;
         break;
       }
@@ -346,10 +341,9 @@ void ReadAlignment::SerializeWithCachedSizes(
       3, this->bias_indices(), output);
   }
   
-  // repeated bool bias_valid = 4;
-  for (int i = 0; i < this->bias_valid_size(); i++) {
-    ::google::protobuf::internal::WireFormatLite::WriteBool(
-      4, this->bias_valid(i), output);
+  // required uint32 bias_start_pos = 4;
+  if (has_bias_start_pos()) {
+    ::google::protobuf::internal::WireFormatLite::WriteUInt32(4, this->bias_start_pos(), output);
   }
   
   if (!unknown_fields().empty()) {
@@ -379,10 +373,9 @@ void ReadAlignment::SerializeWithCachedSizes(
         3, this->bias_indices(), target);
   }
   
-  // repeated bool bias_valid = 4;
-  for (int i = 0; i < this->bias_valid_size(); i++) {
-    target = ::google::protobuf::internal::WireFormatLite::
-      WriteBoolToArray(4, this->bias_valid(i), target);
+  // required uint32 bias_start_pos = 4;
+  if (has_bias_start_pos()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteUInt32ToArray(4, this->bias_start_pos(), target);
   }
   
   if (!unknown_fields().empty()) {
@@ -415,14 +408,14 @@ int ReadAlignment::ByteSize() const {
           this->bias_indices());
     }
     
+    // required uint32 bias_start_pos = 4;
+    if (has_bias_start_pos()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::UInt32Size(
+          this->bias_start_pos());
+    }
+    
   }
-  // repeated bool bias_valid = 4;
-  {
-    int data_size = 0;
-    data_size = 1 * this->bias_valid_size();
-    total_size += 1 * this->bias_valid_size() + data_size;
-  }
-  
   if (!unknown_fields().empty()) {
     total_size +=
       ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
@@ -448,7 +441,6 @@ void ReadAlignment::MergeFrom(const ::google::protobuf::Message& from) {
 
 void ReadAlignment::MergeFrom(const ReadAlignment& from) {
   GOOGLE_CHECK_NE(&from, this);
-  bias_valid_.MergeFrom(from.bias_valid_);
   if (from._has_bits_[0 / 32] & (0xffu << (0 % 32))) {
     if (from.has_first()) {
       set_first(from.first());
@@ -458,6 +450,9 @@ void ReadAlignment::MergeFrom(const ReadAlignment& from) {
     }
     if (from.has_bias_indices()) {
       set_bias_indices(from.bias_indices());
+    }
+    if (from.has_bias_start_pos()) {
+      set_bias_start_pos(from.bias_start_pos());
     }
   }
   mutable_unknown_fields()->MergeFrom(from.unknown_fields());
@@ -476,7 +471,7 @@ void ReadAlignment::CopyFrom(const ReadAlignment& from) {
 }
 
 bool ReadAlignment::IsInitialized() const {
-  if ((_has_bits_[0] & 0x00000007) != 0x00000007) return false;
+  if ((_has_bits_[0] & 0x0000000f) != 0x0000000f) return false;
   
   return true;
 }
@@ -486,7 +481,7 @@ void ReadAlignment::Swap(ReadAlignment* other) {
     std::swap(first_, other->first_);
     std::swap(error_indices_, other->error_indices_);
     std::swap(bias_indices_, other->bias_indices_);
-    bias_valid_.Swap(&other->bias_valid_);
+    std::swap(bias_start_pos_, other->bias_start_pos_);
     std::swap(_has_bits_[0], other->_has_bits_[0]);
     _unknown_fields_.Swap(&other->_unknown_fields_);
     std::swap(_cached_size_, other->_cached_size_);

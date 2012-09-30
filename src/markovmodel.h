@@ -92,8 +92,9 @@ class MarkovModel {
    * @param left the position where the window should begin in the sequence.
    * @return A vector of indices into the parameter tables that would be used
    *         in a likelihood calculation.
+   DOC
    */
-  std::vector<int> get_indices(const Sequence& seq, int left);
+  size_t get_indices(const Sequence& seq, int left, std::vector<char>& indices);
   /**
    * A member function that computes and returns the parameter table indices
    * used to fast_learn (see below) the likelihood for the given sequence.

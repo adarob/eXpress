@@ -860,15 +860,13 @@ int preprocess_main() {
         read_proto.set_first(read_l->first);
         read_proto.set_error_indices(string(left_mm_indices.begin(),
                                             left_mm_indices.end()));
-        vector<int> bias_indices_i = bias_model.get_indices(fh.target()->seq(0),
-                                                          (int)read_l->left);
-        char bias_indices_c[bias_indices_i.size()];
-        for (size_t j = 0; j < bias_indices_i.size(); ++j) {
-          bias_indices_c[j] = (char)bias_indices_i[j];
-          read_proto.add_bias_valid(bias_indices_i[j] >= 0);
-        }
-        read_proto.set_bias_indices(string(bias_indices_c,
-                                           bias_indices_i.size()));
+        vector<char> bias_indices;
+        size_t start_pos = bias_model.get_indices(fh.target()->seq(0),
+                                                    (int)read_l->left,
+                                                    bias_indices);
+        read_proto.set_bias_start_pos((unsigned int)start_pos);
+        read_proto.set_bias_indices(string(bias_indices.begin(),
+                                           bias_indices.end()));
       }
       ReadHit* read_r = fh.right_read();
       if (read_r) {
@@ -876,16 +874,14 @@ int preprocess_main() {
         read_proto.set_first(read_r->first);
         read_proto.set_error_indices(string(right_mm_indices.begin(),
                                             right_mm_indices.end()));
-        vector<int> bias_indices_i = bias_model.get_indices(fh.target()->seq(1),
-                                                    (int)(fh.target()->length()
-                                                          - read_r->right));
-        char bias_indices_c[bias_indices_i.size()];
-        for (size_t j = 0; j < bias_indices_i.size(); ++j) {
-          bias_indices_c[j] = (char)bias_indices_i[j];
-          read_proto.add_bias_valid(bias_indices_i[j] >= 0);
-        }
-        read_proto.set_bias_indices(string(bias_indices_c,
-                                           bias_indices_i.size()));
+        vector<char> bias_indices;
+        size_t start_pos = bias_model.get_indices(fh.target()->seq(1),
+                                                  (int)(fh.target()->length()
+                                                        - read_r->right),
+                                                  bias_indices);
+        read_proto.set_bias_start_pos((unsigned int)start_pos);
+        read_proto.set_bias_indices(string(bias_indices.begin(),
+                                           bias_indices.end()));
       }
     }
     frag_proto.SerializeToString(&out_buff);
