@@ -317,10 +317,9 @@ void MismatchTable::update(const FragHit& f, double p, double mass) {
   
   if (f.right_read()) {
     const ReadHit& read_r = *f.right_read();
-
-    const vector<FrequencyMatrix<double> >& right_mm = (read_r.first) ?
-                                                        _first_read_mm :
-                                                        _second_read_mm;
+    vector<FrequencyMatrix<double> >& right_mm = (read_r.first) ?
+                                                  _first_read_mm :
+                                                  _second_read_mm;
     
     size_t r_len = read_r.seq.length();
     size_t i = 0;
