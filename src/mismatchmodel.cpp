@@ -235,11 +235,6 @@ void MismatchTable::update(const FragHit& f, double p, double mass) {
   Sequence& t_seq_fwd = targ.seq(0);
   Sequence& t_seq_rev = targ.seq(1);
 
-  
-  vector<FrequencyMatrix<double> >& right_mm = (f.right_read()->first) ?
-                                                    _first_read_mm :
-                                                    _second_read_mm;
-
   if (f.left_read()) {
     const ReadHit& read_l = *f.left_read();
     vector<FrequencyMatrix<double> >& left_mm = (read_l.first) ?
@@ -323,6 +318,10 @@ void MismatchTable::update(const FragHit& f, double p, double mass) {
   if (f.right_read()) {
     const ReadHit& read_r = *f.right_read();
 
+    const vector<FrequencyMatrix<double> >& right_mm = (read_r.first) ?
+                                                        _first_read_mm :
+                                                        _second_read_mm;
+    
     size_t r_len = read_r.seq.length();
     size_t i = 0;
     size_t j = targ.length() - read_r.right;

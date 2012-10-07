@@ -104,7 +104,7 @@ class MarkovModel {
    * @return A vector of indices into the parameter tables that would be used
    *         in a fast_learn.
    */
-  std::vector<int> get_indices(const Sequence& seq);
+  std::vector<char> get_indices(const Sequence& seq);
   /**
    * Computes the marginal probability of transitioning to the given nucleotide
    * at position w in the model.

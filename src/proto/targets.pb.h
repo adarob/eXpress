@@ -115,29 +115,27 @@ class Target : public ::google::protobuf::Message {
   inline ::google::protobuf::uint32 length() const;
   inline void set_length(::google::protobuf::uint32 value);
   
-  // repeated uint32 bias_indices_l = 4;
-  inline int bias_indices_l_size() const;
+  // required bytes bias_indices_l = 4;
+  inline bool has_bias_indices_l() const;
   inline void clear_bias_indices_l();
   static const int kBiasIndicesLFieldNumber = 4;
-  inline ::google::protobuf::uint32 bias_indices_l(int index) const;
-  inline void set_bias_indices_l(int index, ::google::protobuf::uint32 value);
-  inline void add_bias_indices_l(::google::protobuf::uint32 value);
-  inline const ::google::protobuf::RepeatedField< ::google::protobuf::uint32 >&
-      bias_indices_l() const;
-  inline ::google::protobuf::RepeatedField< ::google::protobuf::uint32 >*
-      mutable_bias_indices_l();
+  inline const ::std::string& bias_indices_l() const;
+  inline void set_bias_indices_l(const ::std::string& value);
+  inline void set_bias_indices_l(const char* value);
+  inline void set_bias_indices_l(const void* value, size_t size);
+  inline ::std::string* mutable_bias_indices_l();
+  inline ::std::string* release_bias_indices_l();
   
-  // repeated uint32 bias_indices_r = 5;
-  inline int bias_indices_r_size() const;
+  // required bytes bias_indices_r = 5;
+  inline bool has_bias_indices_r() const;
   inline void clear_bias_indices_r();
   static const int kBiasIndicesRFieldNumber = 5;
-  inline ::google::protobuf::uint32 bias_indices_r(int index) const;
-  inline void set_bias_indices_r(int index, ::google::protobuf::uint32 value);
-  inline void add_bias_indices_r(::google::protobuf::uint32 value);
-  inline const ::google::protobuf::RepeatedField< ::google::protobuf::uint32 >&
-      bias_indices_r() const;
-  inline ::google::protobuf::RepeatedField< ::google::protobuf::uint32 >*
-      mutable_bias_indices_r();
+  inline const ::std::string& bias_indices_r() const;
+  inline void set_bias_indices_r(const ::std::string& value);
+  inline void set_bias_indices_r(const char* value);
+  inline void set_bias_indices_r(const void* value, size_t size);
+  inline ::std::string* mutable_bias_indices_r();
+  inline ::std::string* release_bias_indices_r();
   
   // @@protoc_insertion_point(class_scope:proto.Target)
  private:
@@ -147,14 +145,18 @@ class Target : public ::google::protobuf::Message {
   inline void clear_has_id();
   inline void set_has_length();
   inline void clear_has_length();
+  inline void set_has_bias_indices_l();
+  inline void clear_has_bias_indices_l();
+  inline void set_has_bias_indices_r();
+  inline void clear_has_bias_indices_r();
   
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
   
   ::std::string* name_;
   ::google::protobuf::uint32 id_;
   ::google::protobuf::uint32 length_;
-  ::google::protobuf::RepeatedField< ::google::protobuf::uint32 > bias_indices_l_;
-  ::google::protobuf::RepeatedField< ::google::protobuf::uint32 > bias_indices_r_;
+  ::std::string* bias_indices_l_;
+  ::std::string* bias_indices_r_;
   
   mutable int _cached_size_;
   ::google::protobuf::uint32 _has_bits_[(5 + 31) / 32];
@@ -275,54 +277,120 @@ inline void Target::set_length(::google::protobuf::uint32 value) {
   length_ = value;
 }
 
-// repeated uint32 bias_indices_l = 4;
-inline int Target::bias_indices_l_size() const {
-  return bias_indices_l_.size();
+// required bytes bias_indices_l = 4;
+inline bool Target::has_bias_indices_l() const {
+  return (_has_bits_[0] & 0x00000008u) != 0;
+}
+inline void Target::set_has_bias_indices_l() {
+  _has_bits_[0] |= 0x00000008u;
+}
+inline void Target::clear_has_bias_indices_l() {
+  _has_bits_[0] &= ~0x00000008u;
 }
 inline void Target::clear_bias_indices_l() {
-  bias_indices_l_.Clear();
+  if (bias_indices_l_ != &::google::protobuf::internal::kEmptyString) {
+    bias_indices_l_->clear();
+  }
+  clear_has_bias_indices_l();
 }
-inline ::google::protobuf::uint32 Target::bias_indices_l(int index) const {
-  return bias_indices_l_.Get(index);
+inline const ::std::string& Target::bias_indices_l() const {
+  return *bias_indices_l_;
 }
-inline void Target::set_bias_indices_l(int index, ::google::protobuf::uint32 value) {
-  bias_indices_l_.Set(index, value);
+inline void Target::set_bias_indices_l(const ::std::string& value) {
+  set_has_bias_indices_l();
+  if (bias_indices_l_ == &::google::protobuf::internal::kEmptyString) {
+    bias_indices_l_ = new ::std::string;
+  }
+  bias_indices_l_->assign(value);
 }
-inline void Target::add_bias_indices_l(::google::protobuf::uint32 value) {
-  bias_indices_l_.Add(value);
+inline void Target::set_bias_indices_l(const char* value) {
+  set_has_bias_indices_l();
+  if (bias_indices_l_ == &::google::protobuf::internal::kEmptyString) {
+    bias_indices_l_ = new ::std::string;
+  }
+  bias_indices_l_->assign(value);
 }
-inline const ::google::protobuf::RepeatedField< ::google::protobuf::uint32 >&
-Target::bias_indices_l() const {
+inline void Target::set_bias_indices_l(const void* value, size_t size) {
+  set_has_bias_indices_l();
+  if (bias_indices_l_ == &::google::protobuf::internal::kEmptyString) {
+    bias_indices_l_ = new ::std::string;
+  }
+  bias_indices_l_->assign(reinterpret_cast<const char*>(value), size);
+}
+inline ::std::string* Target::mutable_bias_indices_l() {
+  set_has_bias_indices_l();
+  if (bias_indices_l_ == &::google::protobuf::internal::kEmptyString) {
+    bias_indices_l_ = new ::std::string;
+  }
   return bias_indices_l_;
 }
-inline ::google::protobuf::RepeatedField< ::google::protobuf::uint32 >*
-Target::mutable_bias_indices_l() {
-  return &bias_indices_l_;
+inline ::std::string* Target::release_bias_indices_l() {
+  clear_has_bias_indices_l();
+  if (bias_indices_l_ == &::google::protobuf::internal::kEmptyString) {
+    return NULL;
+  } else {
+    ::std::string* temp = bias_indices_l_;
+    bias_indices_l_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
+    return temp;
+  }
 }
 
-// repeated uint32 bias_indices_r = 5;
-inline int Target::bias_indices_r_size() const {
-  return bias_indices_r_.size();
+// required bytes bias_indices_r = 5;
+inline bool Target::has_bias_indices_r() const {
+  return (_has_bits_[0] & 0x00000010u) != 0;
+}
+inline void Target::set_has_bias_indices_r() {
+  _has_bits_[0] |= 0x00000010u;
+}
+inline void Target::clear_has_bias_indices_r() {
+  _has_bits_[0] &= ~0x00000010u;
 }
 inline void Target::clear_bias_indices_r() {
-  bias_indices_r_.Clear();
+  if (bias_indices_r_ != &::google::protobuf::internal::kEmptyString) {
+    bias_indices_r_->clear();
+  }
+  clear_has_bias_indices_r();
 }
-inline ::google::protobuf::uint32 Target::bias_indices_r(int index) const {
-  return bias_indices_r_.Get(index);
+inline const ::std::string& Target::bias_indices_r() const {
+  return *bias_indices_r_;
 }
-inline void Target::set_bias_indices_r(int index, ::google::protobuf::uint32 value) {
-  bias_indices_r_.Set(index, value);
+inline void Target::set_bias_indices_r(const ::std::string& value) {
+  set_has_bias_indices_r();
+  if (bias_indices_r_ == &::google::protobuf::internal::kEmptyString) {
+    bias_indices_r_ = new ::std::string;
+  }
+  bias_indices_r_->assign(value);
 }
-inline void Target::add_bias_indices_r(::google::protobuf::uint32 value) {
-  bias_indices_r_.Add(value);
+inline void Target::set_bias_indices_r(const char* value) {
+  set_has_bias_indices_r();
+  if (bias_indices_r_ == &::google::protobuf::internal::kEmptyString) {
+    bias_indices_r_ = new ::std::string;
+  }
+  bias_indices_r_->assign(value);
 }
-inline const ::google::protobuf::RepeatedField< ::google::protobuf::uint32 >&
-Target::bias_indices_r() const {
+inline void Target::set_bias_indices_r(const void* value, size_t size) {
+  set_has_bias_indices_r();
+  if (bias_indices_r_ == &::google::protobuf::internal::kEmptyString) {
+    bias_indices_r_ = new ::std::string;
+  }
+  bias_indices_r_->assign(reinterpret_cast<const char*>(value), size);
+}
+inline ::std::string* Target::mutable_bias_indices_r() {
+  set_has_bias_indices_r();
+  if (bias_indices_r_ == &::google::protobuf::internal::kEmptyString) {
+    bias_indices_r_ = new ::std::string;
+  }
   return bias_indices_r_;
 }
-inline ::google::protobuf::RepeatedField< ::google::protobuf::uint32 >*
-Target::mutable_bias_indices_r() {
-  return &bias_indices_r_;
+inline ::std::string* Target::release_bias_indices_r() {
+  clear_has_bias_indices_r();
+  if (bias_indices_r_ == &::google::protobuf::internal::kEmptyString) {
+    return NULL;
+  } else {
+    ::std::string* temp = bias_indices_r_;
+    bias_indices_r_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
+    return temp;
+  }
 }
 
 

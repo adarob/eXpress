@@ -48,7 +48,7 @@ size_t MarkovModel::get_indices(const Sequence& seq, int left, vector<char>& ind
     size_t index = min(i, _num_pos-1) - start_index;
     size_t curr = seq[j];
     cond = (cond << 2) + curr;
-    indices[index] = (int)cond;
+    indices[index] = (char)cond;
     cond &= _bitclear;
     i++;
     j++;
@@ -87,8 +87,8 @@ void MarkovModel::update(const Sequence& seq, int left, double mass) {
   }
 }
 
-vector<int> MarkovModel::get_indices(const Sequence& seq) {  
-  vector<int> indices(seq.length(), -1);
+vector<char> MarkovModel::get_indices(const Sequence& seq) {
+  vector<char> indices(seq.length() - _order, -1);
   
   if (seq.length() < (size_t)_order) {
     return indices;
@@ -102,7 +102,7 @@ vector<int> MarkovModel::get_indices(const Sequence& seq) {
   for (size_t i = _order; i < seq.length(); ++i) {
     size_t curr = seq[i];
     cond = (cond << 2) + curr;
-    indices[i] = (int)cond;
+    indices[i-_order] = (char)cond;
     cond &= _bitclear;
   }
   return indices;

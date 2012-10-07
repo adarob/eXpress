@@ -329,7 +329,7 @@ public:
    * @return The estimated effective length of the target calculated as
    *         \f$ \tilde{l} = \bar{bias}\sum_{l=1}^{L(t)} D(l)(L(t) - l + 1) \f$.
    */
-  double est_effective_length(FLD* fld = NULL, bool with_bias=true) const;
+  double est_effective_length(const FLD* fld = NULL, bool with_bias=true) const;
   /**
    * An accessor for the most recently estimated effective length (logged) as
    * calculated by the bias updater thread.
@@ -353,7 +353,7 @@ public:
    *         solution for its abundance estimate.
    */
 
-  bool solvable() { return _solvable; }
+  bool solvable() const { return _solvable; }
   /**
    * A mutator that sets the _solvable flag.
    * @param a boolean specifying whether or not the target has a unique solution

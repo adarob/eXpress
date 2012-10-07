@@ -792,21 +792,14 @@ int preprocess_main() {
     target_proto.set_id((unsigned int)targ.id());
     target_proto.set_length((unsigned int)targ.length());
 
-    vector<int> bias_indices_l = bias_model.get_indices(targ.seq(0));
-    foreach(int& x, bias_indices_l) {
-      if (x < 0) {
-        x = 256;
-      }
-      target_proto.add_bias_indices_l(x);
-    }
+    vector<char> bias_indices_l = bias_model.get_indices(targ.seq(0));
+    target_proto.set_bias_indices_l(string(bias_indices_l.begin(),
+                                           bias_indices_l.end()));
     
-    vector<int> bias_indices_r = bias_model.get_indices(targ.seq(1));
-    foreach(int& x, bias_indices_r) {
-      if (x < 0) {
-        x = 256;
-      }
-      target_proto.add_bias_indices_r(x);
-    }
+    vector<char> bias_indices_r = bias_model.get_indices(targ.seq(1));
+    target_proto.set_bias_indices_r(string(bias_indices_r.begin(),
+                                           bias_indices_r.end()));
+
     target_proto.SerializeToString(&out_buff);
     targ_out << base64_encode(out_buff) << endl;
   }

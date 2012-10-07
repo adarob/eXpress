@@ -81,8 +81,8 @@ void protobuf_AddDesc_targets_2eproto() {
   ::google::protobuf::DescriptorPool::InternalAddGeneratedFile(
     "\n\rtargets.proto\022\005proto\"b\n\006Target\022\014\n\004name"
     "\030\001 \001(\t\022\n\n\002id\030\002 \002(\r\022\016\n\006length\030\003 \002(\r\022\026\n\016bi"
-    "as_indices_l\030\004 \003(\r\022\026\n\016bias_indices_r\030\005 \003"
-    "(\r", 122);
+    "as_indices_l\030\004 \002(\014\022\026\n\016bias_indices_r\030\005 \002"
+    "(\014", 122);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "targets.proto", &protobuf_RegisterTypes);
   Target::default_instance_ = new Target();
@@ -127,6 +127,8 @@ void Target::SharedCtor() {
   name_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
   id_ = 0u;
   length_ = 0u;
+  bias_indices_l_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
+  bias_indices_r_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
 }
 
@@ -137,6 +139,12 @@ Target::~Target() {
 void Target::SharedDtor() {
   if (name_ != &::google::protobuf::internal::kEmptyString) {
     delete name_;
+  }
+  if (bias_indices_l_ != &::google::protobuf::internal::kEmptyString) {
+    delete bias_indices_l_;
+  }
+  if (bias_indices_r_ != &::google::protobuf::internal::kEmptyString) {
+    delete bias_indices_r_;
   }
   if (this != default_instance_) {
   }
@@ -171,9 +179,17 @@ void Target::Clear() {
     }
     id_ = 0u;
     length_ = 0u;
+    if (has_bias_indices_l()) {
+      if (bias_indices_l_ != &::google::protobuf::internal::kEmptyString) {
+        bias_indices_l_->clear();
+      }
+    }
+    if (has_bias_indices_r()) {
+      if (bias_indices_r_ != &::google::protobuf::internal::kEmptyString) {
+        bias_indices_r_->clear();
+      }
+    }
   }
-  bias_indices_l_.Clear();
-  bias_indices_r_.Clear();
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
   mutable_unknown_fields()->Clear();
 }
@@ -228,50 +244,34 @@ bool Target::MergePartialFromCodedStream(
         } else {
           goto handle_uninterpreted;
         }
-        if (input->ExpectTag(32)) goto parse_bias_indices_l;
+        if (input->ExpectTag(34)) goto parse_bias_indices_l;
         break;
       }
       
-      // repeated uint32 bias_indices_l = 4;
+      // required bytes bias_indices_l = 4;
       case 4: {
         if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
-            ::google::protobuf::internal::WireFormatLite::WIRETYPE_VARINT) {
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
          parse_bias_indices_l:
-          DO_((::google::protobuf::internal::WireFormatLite::ReadRepeatedPrimitive<
-                   ::google::protobuf::uint32, ::google::protobuf::internal::WireFormatLite::TYPE_UINT32>(
-                 1, 32, input, this->mutable_bias_indices_l())));
-        } else if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag)
-                   == ::google::protobuf::internal::WireFormatLite::
-                      WIRETYPE_LENGTH_DELIMITED) {
-          DO_((::google::protobuf::internal::WireFormatLite::ReadPackedPrimitiveNoInline<
-                   ::google::protobuf::uint32, ::google::protobuf::internal::WireFormatLite::TYPE_UINT32>(
-                 input, this->mutable_bias_indices_l())));
+          DO_(::google::protobuf::internal::WireFormatLite::ReadBytes(
+                input, this->mutable_bias_indices_l()));
         } else {
           goto handle_uninterpreted;
         }
-        if (input->ExpectTag(32)) goto parse_bias_indices_l;
-        if (input->ExpectTag(40)) goto parse_bias_indices_r;
+        if (input->ExpectTag(42)) goto parse_bias_indices_r;
         break;
       }
       
-      // repeated uint32 bias_indices_r = 5;
+      // required bytes bias_indices_r = 5;
       case 5: {
         if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
-            ::google::protobuf::internal::WireFormatLite::WIRETYPE_VARINT) {
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
          parse_bias_indices_r:
-          DO_((::google::protobuf::internal::WireFormatLite::ReadRepeatedPrimitive<
-                   ::google::protobuf::uint32, ::google::protobuf::internal::WireFormatLite::TYPE_UINT32>(
-                 1, 40, input, this->mutable_bias_indices_r())));
-        } else if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag)
-                   == ::google::protobuf::internal::WireFormatLite::
-                      WIRETYPE_LENGTH_DELIMITED) {
-          DO_((::google::protobuf::internal::WireFormatLite::ReadPackedPrimitiveNoInline<
-                   ::google::protobuf::uint32, ::google::protobuf::internal::WireFormatLite::TYPE_UINT32>(
-                 input, this->mutable_bias_indices_r())));
+          DO_(::google::protobuf::internal::WireFormatLite::ReadBytes(
+                input, this->mutable_bias_indices_r()));
         } else {
           goto handle_uninterpreted;
         }
-        if (input->ExpectTag(40)) goto parse_bias_indices_r;
         if (input->ExpectAtEnd()) return true;
         break;
       }
@@ -313,16 +313,16 @@ void Target::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormatLite::WriteUInt32(3, this->length(), output);
   }
   
-  // repeated uint32 bias_indices_l = 4;
-  for (int i = 0; i < this->bias_indices_l_size(); i++) {
-    ::google::protobuf::internal::WireFormatLite::WriteUInt32(
-      4, this->bias_indices_l(i), output);
+  // required bytes bias_indices_l = 4;
+  if (has_bias_indices_l()) {
+    ::google::protobuf::internal::WireFormatLite::WriteBytes(
+      4, this->bias_indices_l(), output);
   }
   
-  // repeated uint32 bias_indices_r = 5;
-  for (int i = 0; i < this->bias_indices_r_size(); i++) {
-    ::google::protobuf::internal::WireFormatLite::WriteUInt32(
-      5, this->bias_indices_r(i), output);
+  // required bytes bias_indices_r = 5;
+  if (has_bias_indices_r()) {
+    ::google::protobuf::internal::WireFormatLite::WriteBytes(
+      5, this->bias_indices_r(), output);
   }
   
   if (!unknown_fields().empty()) {
@@ -353,16 +353,18 @@ void Target::SerializeWithCachedSizes(
     target = ::google::protobuf::internal::WireFormatLite::WriteUInt32ToArray(3, this->length(), target);
   }
   
-  // repeated uint32 bias_indices_l = 4;
-  for (int i = 0; i < this->bias_indices_l_size(); i++) {
-    target = ::google::protobuf::internal::WireFormatLite::
-      WriteUInt32ToArray(4, this->bias_indices_l(i), target);
+  // required bytes bias_indices_l = 4;
+  if (has_bias_indices_l()) {
+    target =
+      ::google::protobuf::internal::WireFormatLite::WriteBytesToArray(
+        4, this->bias_indices_l(), target);
   }
   
-  // repeated uint32 bias_indices_r = 5;
-  for (int i = 0; i < this->bias_indices_r_size(); i++) {
-    target = ::google::protobuf::internal::WireFormatLite::
-      WriteUInt32ToArray(5, this->bias_indices_r(i), target);
+  // required bytes bias_indices_r = 5;
+  if (has_bias_indices_r()) {
+    target =
+      ::google::protobuf::internal::WireFormatLite::WriteBytesToArray(
+        5, this->bias_indices_r(), target);
   }
   
   if (!unknown_fields().empty()) {
@@ -397,27 +399,21 @@ int Target::ByteSize() const {
           this->length());
     }
     
-  }
-  // repeated uint32 bias_indices_l = 4;
-  {
-    int data_size = 0;
-    for (int i = 0; i < this->bias_indices_l_size(); i++) {
-      data_size += ::google::protobuf::internal::WireFormatLite::
-        UInt32Size(this->bias_indices_l(i));
+    // required bytes bias_indices_l = 4;
+    if (has_bias_indices_l()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::BytesSize(
+          this->bias_indices_l());
     }
-    total_size += 1 * this->bias_indices_l_size() + data_size;
-  }
-  
-  // repeated uint32 bias_indices_r = 5;
-  {
-    int data_size = 0;
-    for (int i = 0; i < this->bias_indices_r_size(); i++) {
-      data_size += ::google::protobuf::internal::WireFormatLite::
-        UInt32Size(this->bias_indices_r(i));
+    
+    // required bytes bias_indices_r = 5;
+    if (has_bias_indices_r()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::BytesSize(
+          this->bias_indices_r());
     }
-    total_size += 1 * this->bias_indices_r_size() + data_size;
+    
   }
-  
   if (!unknown_fields().empty()) {
     total_size +=
       ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
@@ -443,8 +439,6 @@ void Target::MergeFrom(const ::google::protobuf::Message& from) {
 
 void Target::MergeFrom(const Target& from) {
   GOOGLE_CHECK_NE(&from, this);
-  bias_indices_l_.MergeFrom(from.bias_indices_l_);
-  bias_indices_r_.MergeFrom(from.bias_indices_r_);
   if (from._has_bits_[0 / 32] & (0xffu << (0 % 32))) {
     if (from.has_name()) {
       set_name(from.name());
@@ -454,6 +448,12 @@ void Target::MergeFrom(const Target& from) {
     }
     if (from.has_length()) {
       set_length(from.length());
+    }
+    if (from.has_bias_indices_l()) {
+      set_bias_indices_l(from.bias_indices_l());
+    }
+    if (from.has_bias_indices_r()) {
+      set_bias_indices_r(from.bias_indices_r());
     }
   }
   mutable_unknown_fields()->MergeFrom(from.unknown_fields());
@@ -472,7 +472,7 @@ void Target::CopyFrom(const Target& from) {
 }
 
 bool Target::IsInitialized() const {
-  if ((_has_bits_[0] & 0x00000006) != 0x00000006) return false;
+  if ((_has_bits_[0] & 0x0000001e) != 0x0000001e) return false;
   
   return true;
 }
@@ -482,8 +482,8 @@ void Target::Swap(Target* other) {
     std::swap(name_, other->name_);
     std::swap(id_, other->id_);
     std::swap(length_, other->length_);
-    bias_indices_l_.Swap(&other->bias_indices_l_);
-    bias_indices_r_.Swap(&other->bias_indices_r_);
+    std::swap(bias_indices_l_, other->bias_indices_l_);
+    std::swap(bias_indices_r_, other->bias_indices_r_);
     std::swap(_has_bits_[0], other->_has_bits_[0]);
     _unknown_fields_.Swap(&other->_unknown_fields_);
     std::swap(_cached_size_, other->_cached_size_);

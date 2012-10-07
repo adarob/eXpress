@@ -121,7 +121,7 @@ double Target::log_likelihood(const FragHit& frag, bool with_pseudo) const {
   return ll;
 }
 
-double Target::est_effective_length(FLD* fld, bool with_bias) const {
+double Target::est_effective_length(const FLD* fld, bool with_bias) const {
   if (!fld) {
     fld = (_libs->curr_lib()).fld;
   }
