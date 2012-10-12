@@ -166,7 +166,7 @@ void BiasBoss::normalize_expectations() {
 
 void BiasBoss::update_observed(const FragHit& hit, double normalized_mass)
 {
-  assert (hit.pair_status() != PAIRED || hit.length() > WINDOW);
+  assert (hit.pair_status() != PAIRED || (int)hit.length() > WINDOW);
 
   const Sequence& t_seq_fwd = hit.target()->seq(0);
   const Sequence& t_seq_rev = hit.target()->seq(1);

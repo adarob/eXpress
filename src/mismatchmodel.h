@@ -61,7 +61,7 @@ class MismatchTable {
    * MismatchTable constructor initializes the model parameters using the
    * specified (non-logged) pseudo-counts.
    * @param alpha a double containing the non-logged pseudo-counts for parameter
-   *        initialization
+   *        initialization.
    */
   MismatchTable(double alpha);
   /**

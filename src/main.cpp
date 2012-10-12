@@ -56,6 +56,8 @@ size_t burn_in = 100000;
 size_t burn_out = 5000000;
 bool burned_out = false;
 
+size_t max_indel_size = 10;
+
 size_t stop_at = 0;
 
 // file location parameters

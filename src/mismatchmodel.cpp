@@ -11,6 +11,7 @@
 #include "targets.h"
 #include "fragments.h"
 #include "sequence.h"
+#include <boost/math/distributions/geometric.hpp>
 #include <iostream>
 #include <fstream>
 
@@ -19,10 +20,19 @@ using namespace std;
 MismatchTable::MismatchTable(double alpha)
     : _first_read_mm(MAX_READ_LEN, FrequencyMatrix<double>(16, 4, alpha)),
       _second_read_mm(MAX_READ_LEN, FrequencyMatrix<double>(16, 4, alpha)),
-      _insert_params(1, MAX_READ_LEN, alpha),
-      _delete_params(1, MAX_READ_LEN, alpha),
+      _insert_params(1, max_indel_size + 1, LOG_0),
+      _delete_params(1, max_indel_size + 1, LOG_0),
       _max_len(0),
       _active(false){
+  // Set indel priors
+  double indel_p = 1. - pow(EPSILON/2, 1/((double)max_indel_size + 1.));
+  boost::math::geometric geom(indel_p);
+  for(size_t i = 0 ; i <= max_indel_size; ++i) {
+    _insert_params.increment(i, log(alpha * boost::math::pdf(geom, i)));
+    _delete_params.increment(i, log(alpha * boost::math::pdf(geom, i)));
+  }
+  assert(approx_eq(sexp(_insert_params.sum(0)), alpha));
+  assert(approx_eq(sexp(_delete_params.sum(0)), alpha));
 }
 
 void MismatchTable::get_indices(const FragHit& f,
@@ -123,9 +133,9 @@ double MismatchTable::log_likelihood(const FragHit& f) const {
     
     while (i < read_l.seq.length()) {
       if (del != read_l.deletes.end() && del->pos == i) {
-        ll += _delete_params(del->len);
-        j += del->len;
         del_len = del->len;
+        ll += _delete_params(del_len);
+        j += del_len;
         del++;
       } else if (ins != read_l.inserts.end() && ins->pos == i) {
         ll += _insert_params(ins->len);
@@ -183,9 +193,9 @@ double MismatchTable::log_likelihood(const FragHit& f) const {
 
     while (i < r_len) {
       if (del != read_r.deletes.begin() - 1 && del->pos == r_len - i) {
-        ll += _delete_params(del->len);
-        j += del->len;
         del_len = del->len;
+        ll += _delete_params(del_len);
+        j += del_len;
         del--;
       } else if (ins != read_r.inserts.begin() - 1
                  && ins->pos + ins->len == r_len - i) {
@@ -217,7 +227,7 @@ double MismatchTable::log_likelihood(const FragHit& f) const {
           ll += trans_prob;
         } else {
           size_t ref = t_seq_rev[j];
-          size_t index = prev + ref;;
+          size_t index = prev + ref;
           ll += right_mm[i](index, cur);
         }
         i++;
@@ -231,6 +241,10 @@ double MismatchTable::log_likelihood(const FragHit& f) const {
 }
 
 void MismatchTable::update(const FragHit& f, double p, double mass) {
+  if (mass == LOG_0) {
+    return;
+  }
+
   Target& targ = *f.target();
   Sequence& t_seq_fwd = targ.seq(0);
   Sequence& t_seq_rev = targ.seq(1);
@@ -266,7 +280,7 @@ void MismatchTable::update(const FragHit& f, double p, double mass) {
         ins++;
       } else {
         if (del_len > 0) {
-           _delete_params.increment(0, mass);
+          _delete_params.increment(0, mass);
         }
         del_len = 0;
         _insert_params.increment(0, mass);

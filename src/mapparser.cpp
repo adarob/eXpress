@@ -267,6 +267,11 @@ bool BAMParser::map_end_from_alignment(BamTools::BamAlignment& a) {
   }
 
   bool is_paired = a.IsPaired();
+
+  if (is_paired && !a.IsProperPair()) {
+    return false;
+  }
+
   bool is_reversed = a.IsReverseStrand();
   bool is_mate_reversed = a.IsMateReverseStrand();
   if (is_paired && (!a.IsMateMapped() || a.RefID != a.MateRefID ||
@@ -283,7 +288,7 @@ bool BAMParser::map_end_from_alignment(BamTools::BamAlignment& a) {
   if ((direction == RF && left_first) || (direction == FR && !left_first)) {
     return false;
   }
-
+    
   r.name = a.Name;
   r.reversed = is_reversed;
   r.first = a.IsFirstMate();
@@ -293,6 +298,18 @@ bool BAMParser::map_end_from_alignment(BamTools::BamAlignment& a) {
   r.seq.set(a.QueryBases, is_reversed);
   r.bam = a;
   r.right = r.left + cigar_length(a.CigarData, r.inserts, r.deletes);
+  
+  foreach (Indel& indel, r.inserts) {
+    if (indel.len > max_indel_size) {
+      return false;
+    }
+  }
+  foreach (Indel& indel, r.deletes) {
+    if (indel.len > max_indel_size) {
+      return false;
+    }
+  }
+  
   return true;
 }
 
@@ -398,7 +415,7 @@ bool SAMParser::map_end_from_line(char* line) {
           goto stop;
         }
         paired = sam_flag & 0x1;
-        if (paired && (sam_flag & 0x8)) {
+        if (paired && (!(sam_flag & 0x2) || sam_flag & 0x8)) {
           goto stop;
         }
         r.reversed = sam_flag & 0x10;
@@ -436,6 +453,16 @@ bool SAMParser::map_end_from_line(char* line) {
       }
       case 5: {
         r.right = r.left + cigar_length(p, r.inserts, r.deletes);
+        foreach (Indel& indel, r.inserts) {
+          if (indel.len > max_indel_size) {
+            goto stop;
+          }
+        }
+        foreach (Indel& indel, r.deletes) {
+          if (indel.len > max_indel_size) {
+            goto stop;
+          }
+        }
         break;
       }
       case 6: {

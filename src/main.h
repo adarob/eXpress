@@ -39,6 +39,10 @@ extern bool burned_out;
  */
 extern bool edit_detect;
 /**
+ * A global size_t for the maximum allowed indel size.
+ */
+extern size_t max_indel_size;
+/**
  * An enum for the allowed directions of reads.
  *  BOTH - either direction is acceptable.
  *  FR - The first (or only read if single-end) must be mapped to the forward
@@ -71,7 +75,7 @@ const double LOG_0 = HUGE_VAL;
 /**
  * A global double specifying the default epsilon value to be used in approx_eq.
  */
-const double EPSILON = 0.0001;
+const double EPSILON = 0.000001;
 
 /**
  * Global function that determines if two doubles are within some epsilon of
@@ -83,7 +87,7 @@ const double EPSILON = 0.0001;
  * @return True iff a and b are within eps of each other.
  */
 inline bool approx_eq(double a, double b, double eps=EPSILON) {
-  return fabs(a-b) < eps;
+  return fabs(a-b) <= eps;
 }
 
 /**
