@@ -139,12 +139,12 @@ AlphaMap* parse_priors(string in_file) {
  * @return True iff there was an error.
  */
 bool parse_options(int ac, char ** av) {
-  po::options_description generic("Allowed options");
-  generic.add_options()
+  po::options_description standard("Standard Options");
+  standard.add_options()
   ("help,h", "produce help message")
-  ("output-dir,o", po::value<string>(&output_dir)->default_value("."),
+  ("output-dir,o", po::value<string>(&output_dir)->default_value(output_dir),
    "write all output files to this directory")
-  ("num-threads,p", po::value<size_t>(&num_threads)->default_value(2),
+  ("num-threads,p", po::value<size_t>(&num_threads)->default_value(num_threads),
    "number of threads (>= 2)")
   ("frag-len-mean,m", po::value<int>(&def_fl_mean)->default_value(def_fl_mean),
    "prior estimate for average fragment length")
@@ -167,25 +167,36 @@ bool parse_options(int ac, char ** av) {
   ("calc-covar", "calculate and output covariance matrix")
   ("no-update-check", "disables automatic check for update via web")
   ;
+  
+  po::options_description advanced("Advanced Options");
+  advanced.add_options()
+  ("forget-param,f", po::value<double>(&ff_param)->default_value(ff_param),
+   "sets the 'forgetting factor' parameter (0.5 < c <= 1)")
+  ("max-indel-size",
+   po::value<size_t>(&max_indel_size)->default_value(max_indel_size),
+   "sets the maximum allowed indel size, affecting geometric indel prior")
+  ("expr-alpha", po::value<double>(&expr_alpha)->default_value(expr_alpha),
+   "sets the strength of the prior, per bp")
+  ("stop-at", po::value<size_t>(&stop_at)->default_value(stop_at),
+   "sets the number of fragments to process, disabled with 0")
+  ("no-bias-correct", "disables bias correction")
+  ("no-error-model", "disables error modelling")
+  ("burn-out", po::value<size_t>(&burn_out)->default_value(burn_out),
+   "sets number of fragments after which to stop updating auxiliary parameters")
+  ;
 
   string prior_file = "";
 
-  po::options_description hidden("Hidden options");
+  po::options_description hidden("Experimental/Debug Options");
   hidden.add_options()
   ("preprocess-spark","")
   ("edit-detect","")
-  ("no-bias-correct","")
-  ("no-error-model","")
   ("single-round", "")
   ("output-running-rounds", "")
   ("output-running-reads", "")
   ("batch-mode","")
   ("both","")
-  ("burn-out", po::value<size_t>(&burn_out)->default_value(burn_out), "")
   ("prior-params", po::value<string>(&prior_file)->default_value(""), "")
-  ("forget-param,f", po::value<double>(&ff_param)->default_value(ff_param), "")
-  ("expr-alpha", po::value<double>(&expr_alpha)->default_value(expr_alpha), "")
-  ("stop-at", po::value<size_t>(&stop_at)->default_value(0), "")
   ("sam-file", po::value<string>(&in_map_file_names)->default_value(""), "")
   ("fasta-file", po::value<string>(&fasta_file_name)->default_value(""), "")
   ("num-neighbors", po::value<size_t>(&num_neighbors)->default_value(0), "")
@@ -195,7 +206,7 @@ bool parse_options(int ac, char ** av) {
   positional.add("fasta-file",1).add("sam-file",1);
 
   po::options_description cmdline_options;
-  cmdline_options.add(generic).add(hidden);
+  cmdline_options.add(standard).add(advanced).add(hidden);
 
   bool error = false;
   po::variables_map vm;
@@ -225,11 +236,12 @@ bool parse_options(int ac, char ** av) {
          << "-----------------------------\n"
          << "File Usage:  express [options] <target_seqs.fa> <hits.(sam/bam)>\n"
          << "Piped Usage: bowtie [options] -S <index> <reads.fq> | express "
-         << "[options] <target_seqs.fa>\n"
+         << "[options] <target_seqs.fa>\n\n"
          << "Required arguments:\n"
-         << " <target_seqs.fa>       target sequence file in fasta format\n"
-         << " <hits.(sam/bam)>       read alignment file in SAM or BAM format\n"
-         << generic;
+         << " <target_seqs.fa>     target sequence file in fasta format\n"
+         << " <hits.(sam/bam)>     read alignment file in SAM or BAM format\n\n"
+         << standard
+         << advanced;
     return 1;
   }
 
