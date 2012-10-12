@@ -11,7 +11,6 @@
 #include "targets.h"
 #include "fragments.h"
 #include "sequence.h"
-#include <boost/math/distributions/geometric.hpp>
 #include <iostream>
 #include <fstream>
 
@@ -26,10 +25,11 @@ MismatchTable::MismatchTable(double alpha)
       _active(false){
   // Set indel priors
   double indel_p = 1. - pow(EPSILON/2, 1/((double)max_indel_size + 1.));
-  boost::math::geometric geom(indel_p);
+  double pm = indel_p;
   for(size_t i = 0 ; i <= max_indel_size; ++i) {
-    _insert_params.increment(i, log(alpha * boost::math::pdf(geom, i)));
-    _delete_params.increment(i, log(alpha * boost::math::pdf(geom, i)));
+    _insert_params.increment(i, log(alpha * pm));
+    _delete_params.increment(i, log(alpha * pm));
+    pm *= (1 - indel_p);
   }
   assert(approx_eq(sexp(_insert_params.sum(0)), alpha));
   assert(approx_eq(sexp(_delete_params.sum(0)), alpha));
