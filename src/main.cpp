@@ -28,13 +28,6 @@
 #include "threadsafety.h"
 #include "robertsfilter.h"
 #include "library.h"
-#include "proto/alignments.pb.h"
-#include "proto/targets.pb.h"
-
-
-#include <boost/archive/iterators/base64_from_binary.hpp>
-#include <boost/archive/iterators/transform_width.hpp>
-#include <boost/archive/iterators/ostream_iterator.hpp>
 
 #ifndef WIN32
   #include "update_check.h"
@@ -43,9 +36,6 @@
 using namespace std;
 namespace po = boost::program_options;
 namespace fs = boost::filesystem;
-
-// DOC
-bool preprocess_spark;
 
 // the forgetting factor parameter controls the growth of the fragment mass
 double ff_param = 0.85;
@@ -189,7 +179,6 @@ bool parse_options(int ac, char ** av) {
 
   po::options_description hidden("Experimental/Debug Options");
   hidden.add_options()
-  ("preprocess-spark","")
   ("edit-detect","")
   ("single-round", "")
   ("output-running-rounds", "")
@@ -258,7 +247,6 @@ bool parse_options(int ac, char ** av) {
     direction = RF;
   }
 
-  preprocess_spark = vm.count("preprocess-spark");
   edit_detect = vm.count("edit-detect");
   calc_covar = vm.count("calc-covar");
   bias_correct = !(vm.count("no-bias-correct"));
@@ -770,167 +758,6 @@ int estimation_main() {
   return 0;
 }
 
-inline string base64_encode(const string& to_encode) {
-  using namespace boost::archive::iterators;
-  typedef base64_from_binary<transform_width<string::const_iterator,6,8> > it_base64_t;
-  unsigned int writePaddChars = (3-to_encode.length()%3)%3;
-  string base64(it_base64_t(to_encode.begin()), it_base64_t(to_encode.end()));
-  base64.append(writePaddChars,'=');
-  return base64;
-}
-
-int preprocess_main() {
-  Librarian libs(1);
-  Library& lib = libs[0];
-  lib.in_file_name = in_map_file_names;
-  lib.out_file_name = "";
-  lib.bias_table = NULL;
-  MapParser map_parser(&lib, false);
-  lib.map_parser = &map_parser;
-  lib.fld = new FLD(fld_alpha, def_fl_max, def_fl_mean, def_fl_stddev);
-  MarkovModel bias_model(3, 21, 21, 0);
-  MismatchTable mismatch_table(mm_alpha);
-  TargetTable targ_table(fasta_file_name, 0, expr_alpha,
-                         expr_alpha_map, &libs);
-  lib.targ_table = &targ_table;
-  
-  cout << "Converting targets to Protocol Buffers...\n";
-  fstream targ_out((in_map_file_names + ".targ.pb").c_str(),
-                   ios::out | ios::trunc);
-  string out_buff;
-  proto::Target target_proto;
-  for (TargID id = 0; id < targ_table.size(); ++id) {
-    target_proto.Clear();
-    Target& targ = *targ_table.get_targ(id);
-    target_proto.set_name(targ.name());
-    target_proto.set_id((unsigned int)targ.id());
-    target_proto.set_length((unsigned int)targ.length());
-
-    vector<char> bias_indices_l = bias_model.get_indices(targ.seq(0));
-    target_proto.set_bias_indices_l(string(bias_indices_l.begin(),
-                                           bias_indices_l.end()));
-    
-    vector<char> bias_indices_r = bias_model.get_indices(targ.seq(1));
-    target_proto.set_bias_indices_r(string(bias_indices_r.begin(),
-                                           bias_indices_r.end()));
-
-    target_proto.SerializeToString(&out_buff);
-    targ_out << base64_encode(out_buff) << endl;
-  }
-  targ_out.close();
-  
-  cout << "Converting fragment alignments to Protocol Buffers..\n";
-  fstream frag_out((in_map_file_names + ".frag.pb").c_str(),
-                   ios::out | ios::trunc);
-
-  size_t num_frags = 0;
-  cout << setiosflags(ios::left);
-  Fragment* frag;
-  
-  ParseThreadSafety pts(10);
-  boost::thread parse(&MapParser::threaded_parse, &map_parser, &pts,
-                      stop_at, 0);
-  RobertsFilter frags_seen;
-  proto::Fragment frag_proto;
-  while(true) {
-    frag_proto.Clear();
-
-    // Pop next parsed fragment and set mass
-    frag = pts.proc_in.pop();
-    
-    if (!frag) {
-      break;
-    }
-    
-    // Test that we have not already seen this fragment
-    if (frags_seen.test_and_push(frag->name())) {
-      cerr << "ERROR: Alignments are not properly sorted. Read '"
-           << frag->name() << "' has alignments which are non-consecutive.\n";
-      exit(1);
-    }
-    
-    frag_proto.set_paired(frag->paired());
-    string first_l_serial;
-    string first_r_serial;
-    for (size_t i = 0; i < frag->num_hits(); ++i) {
-      FragHit& fh = *(*frag)[i];
-      proto::FragmentAlignment& align_proto = *frag_proto.add_alignments();
-      align_proto.set_target_id((unsigned int)fh.target_id());
-      align_proto.set_length((unsigned int)fh.length());
-      
-      vector<char> left_mm_indices;
-      vector<char> right_mm_indices;
-      
-      mismatch_table.get_indices(fh, left_mm_indices, right_mm_indices);
-      
-      ReadHit* read_l = fh.left_read();
-      if (read_l) {
-        proto::ReadAlignment& read_proto = *align_proto.mutable_read_l();
-        read_proto.set_first(read_l->first);
-        read_proto.set_error_indices(string(left_mm_indices.begin(),
-                                            left_mm_indices.end()));
-        vector<char> bias_indices;
-        size_t start_pos = bias_model.get_indices(fh.target()->seq(0),
-                                                    (int)read_l->left,
-                                                    bias_indices);
-        read_proto.set_bias_start_pos((unsigned int)start_pos);
-        read_proto.set_bias_indices(string(bias_indices.begin(),
-                                           bias_indices.end()));
-        if (i == 0) {
-          read_proto.SerializeToString(&first_l_serial);
-        } else {
-          string serial;
-          read_proto.SerializeToString(&serial);
-          if (serial == first_l_serial) {
-            read_proto.Clear();
-          }
-        }
-      }
-      ReadHit* read_r = fh.right_read();
-      if (read_r) {
-        proto::ReadAlignment& read_proto = *align_proto.mutable_read_r();
-        read_proto.set_first(read_r->first);
-        read_proto.set_error_indices(string(right_mm_indices.begin(),
-                                            right_mm_indices.end()));
-        vector<char> bias_indices;
-        size_t start_pos = bias_model.get_indices(fh.target()->seq(1),
-                                                  (int)(fh.target()->length()
-                                                        - read_r->right),
-                                                  bias_indices);
-        read_proto.set_bias_start_pos((unsigned int)start_pos);
-        read_proto.set_bias_indices(string(bias_indices.begin(),
-                                           bias_indices.end()));
-
-        if (i == 0) {
-          read_proto.SerializeToString(&first_r_serial);
-        } else {
-          string serial;
-          read_proto.SerializeToString(&serial);
-          if (serial == first_r_serial) {
-            read_proto.Clear();
-          }
-        }
-      }
-    }
-    frag_proto.SerializeToString(&out_buff);
-    frag_out << base64_encode(out_buff) << endl;
-
-    pts.proc_out.push(frag);
-
-    num_frags++;
-
-    // Output progress
-    if (num_frags % 1000000 == 0) {
-      cout << "Fragments Processed: " << setw(9) << num_frags << endl;
-    }
-  }
-  frag_out.close();
-  
-  parse.join();
-
-  return 0;
-}
-
 int main (int argc, char ** argv)
 {
 
@@ -939,12 +766,6 @@ int main (int argc, char ** argv)
   if (parse_ret) {
     return parse_ret;
   }
-  
-  if (preprocess_spark) {
-    return preprocess_main();
-  }
-  return estimation_main();
 
-  
-  return 0;
+  return estimation_main();
 }

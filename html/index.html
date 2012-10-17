@@ -161,6 +161,14 @@
         <div class="corner-content-1col-top"></div>                        
         <div class="content-1col-nobox">
           <h1>News</h1>
+          <h2>10.15.2012 &bull; eXpress 1.2.1 released</h2>
+          <p>This release includes changes to the available options as well as patches for the bugs listed below.
+   		  <ul>
+   		<li>Made some previously hidden options available as "Advanced Options". See the <a href="manual#usage">Manual</a> for more details.</li>
+		  <li>Fixed a rare issue affecting indels whereby indels were not properly being penalized in alignment likelihoods. Added a maximum allowed indel size along with geometrically distributed prior on indel length probabilities to correct this issue. See <tt>--max-indel-size</tt> argument in the <a href="manual#usage">Manual</a> for more details.</li>
+   		<li>Fixed a bug leading to a SegFault when using single-end reads.</li>
+   		</ul></p>
+   		  
           <h2>09.27.2012 &bull; eXpress 1.2.0 released</h2>
           <p>This maintenance release includes major refactoring and patches for the bugs listed below.
    		  <ul>

@@ -24,11 +24,20 @@
    </BuildAction>
    <TestAction
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
-      selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.GDB"
+      selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       shouldUseLaunchSchemeArgsEnv = "YES"
       buildConfiguration = "Debug">
       <Testables>
       </Testables>
+      <MacroExpansion>
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "0A5C7607136F2E850095365C"
+            BuildableName = "express"
+            BlueprintName = "express"
+            ReferencedContainer = "container:express.xcodeproj">
+         </BuildableReference>
+      </MacroExpansion>
    </TestAction>
    <LaunchAction
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
@@ -51,7 +60,7 @@
       <CommandLineArguments>
          <CommandLineArgument
             argument = "--frag-len-mean 250 --frag-len-stddev 50 -B 5 -o $(SRCROOT)/sample_data3/out $(SRCROOT)/sample_data3/hox_ucsc.fa $(SRCROOT)/sample_data3/hits_1M.sam,$(SRCROOT)/sample_data3/hits_1M.sam_2"
-            isEnabled = "NO">
+            isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
             argument = "--preprocess-spark /Users/adarob/downloads/Multi-Fasta-NiRa.fa /Users/adarob/downloads/NiRa-FR.bam"

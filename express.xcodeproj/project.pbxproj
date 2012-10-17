@@ -20,9 +20,26 @@
 		0A60597713A1753B00B5C9BA /* libboost_system.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A60597613A1753B00B5C9BA /* libboost_system.a */; };
 		0A63748614CF83A500D79987 /* sequence.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0A63748514CF83A500D79987 /* sequence.cpp */; };
 		0A9F0E1014CF64FF00379DC6 /* markovmodel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0A9F0E0F14CF64FF00379DC6 /* markovmodel.cpp */; };
-		0AC8DF451616653A009C4080 /* libprotobuf.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0AC8DF441616653A009C4080 /* libprotobuf.a */; };
-		0AC8DF4916167845009C4080 /* alignments.pb.cc in Sources */ = {isa = PBXBuildFile; fileRef = 0AC8DF4716167845009C4080 /* alignments.pb.cc */; };
-		0AC8DF4C161678DA009C4080 /* targets.pb.cc in Sources */ = {isa = PBXBuildFile; fileRef = 0AC8DF4A161678DA009C4080 /* targets.pb.cc */; };
+		0AC83E53162C2DCF00DE4074 /* express-spark.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0AC83E52162C2DCF00DE4074 /* express-spark.cpp */; };
+		0AC83E56162C31D600DE4074 /* alignments.pb.cc in Sources */ = {isa = PBXBuildFile; fileRef = 0AC8DF4716167845009C4080 /* alignments.pb.cc */; };
+		0AC83E57162C31D600DE4074 /* targets.pb.cc in Sources */ = {isa = PBXBuildFile; fileRef = 0AC8DF4A161678DA009C4080 /* targets.pb.cc */; };
+		0AC83E5D162C31D600DE4074 /* biascorrection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0A5C762A136F2EF10095365C /* biascorrection.cpp */; };
+		0AC83E5F162C31D600DE4074 /* bundles.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0ACBB2F0143EA2DD001322D2 /* bundles.cpp */; };
+		0AC83E61162C31D600DE4074 /* fld.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0A5C762C136F2EF10095365C /* fld.cpp */; };
+		0AC83E64162C31D600DE4074 /* fragments.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0A5C762E136F2EF10095365C /* fragments.cpp */; };
+		0AC83E68162C31D600DE4074 /* mapparser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0AD5968813FF20C700EEBDD7 /* mapparser.cpp */; };
+		0AC83E6A162C31D600DE4074 /* mismatchmodel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0A5C7634136F2EF10095365C /* mismatchmodel.cpp */; };
+		0AC83E6D162C31D600DE4074 /* markovmodel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0A9F0E0F14CF64FF00379DC6 /* markovmodel.cpp */; };
+		0AC83E6E162C31D600DE4074 /* robertsfilter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0ADA18F615508175008020B2 /* robertsfilter.cpp */; };
+		0AC83E71162C31D600DE4074 /* sequence.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0A63748514CF83A500D79987 /* sequence.cpp */; };
+		0AC83E73162C31D600DE4074 /* targets.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0A5C7636136F2EF10095365C /* targets.cpp */; };
+		0AC83E75162C31D600DE4074 /* threadsafety.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0A04E7BF1540B87200D9A162 /* threadsafety.cpp */; };
+		0AC83E76162C326700DE4074 /* libbamtools.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0ADF037C140C66D500D16BBE /* libbamtools.a */; };
+		0AC83E77162C326C00DE4074 /* libboost_thread-mt.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A60597213A170A400B5C9BA /* libboost_thread-mt.a */; };
+		0AC83E79162C327200DE4074 /* libboost_filesystem.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A60597413A170AD00B5C9BA /* libboost_filesystem.a */; };
+		0AC83E7A162C327400DE4074 /* libboost_program_options.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A2D58901405F128008891E7 /* libboost_program_options.a */; };
+		0AC83E7B162C327700DE4074 /* libboost_system.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A60597613A1753B00B5C9BA /* libboost_system.a */; };
+		0AC83E7E162C34C200DE4074 /* libprotobuf.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0AC83E7D162C34C200DE4074 /* libprotobuf.a */; };
 		0ACBB2F2143EA2DD001322D2 /* bundles.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0ACBB2F0143EA2DD001322D2 /* bundles.cpp */; };
 		0AD5968913FF20C700EEBDD7 /* mapparser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0AD5968813FF20C700EEBDD7 /* mapparser.cpp */; };
 		0ADA18F715508175008020B2 /* robertsfilter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0ADA18F615508175008020B2 /* robertsfilter.cpp */; };
@@ -31,6 +48,15 @@
 
 /* Begin PBXCopyFilesBuildPhase section */
 		0A5C7606136F2E850095365C /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+		0AC83E46162C293000DE4074 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = /usr/share/man/man1/;
@@ -68,7 +94,9 @@
 		0A9F0E1114CF650D00379DC6 /* markovmodel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = markovmodel.h; sourceTree = "<group>"; };
 		0AA3D63614D106B800448167 /* threadsafety.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = threadsafety.h; sourceTree = "<group>"; };
 		0AB8C58F155EE921007D6E6F /* library.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = library.h; sourceTree = "<group>"; };
-		0AC8DF441616653A009C4080 /* libprotobuf.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libprotobuf.a; path = ../../../../../../../opt/local/lib/libprotobuf.a; sourceTree = "<group>"; };
+		0AC83E48162C293000DE4074 /* express-spark */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "express-spark"; sourceTree = BUILT_PRODUCTS_DIR; };
+		0AC83E52162C2DCF00DE4074 /* express-spark.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = "express-spark.cpp"; sourceTree = "<group>"; };
+		0AC83E7D162C34C200DE4074 /* libprotobuf.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libprotobuf.a; path = ../../../../../../opt/local/lib/libprotobuf.a; sourceTree = "<group>"; };
 		0AC8DF4716167845009C4080 /* alignments.pb.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = alignments.pb.cc; path = proto/alignments.pb.cc; sourceTree = "<group>"; };
 		0AC8DF4816167845009C4080 /* alignments.pb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = alignments.pb.h; path = proto/alignments.pb.h; sourceTree = "<group>"; };
 		0AC8DF4A161678DA009C4080 /* targets.pb.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = targets.pb.cc; path = proto/targets.pb.cc; sourceTree = "<group>"; };
@@ -93,7 +121,19 @@
 				0A60597713A1753B00B5C9BA /* libboost_system.a in Frameworks */,
 				0A2D58911405F128008891E7 /* libboost_program_options.a in Frameworks */,
 				0ADF037D140C66D500D16BBE /* libbamtools.a in Frameworks */,
-				0AC8DF451616653A009C4080 /* libprotobuf.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		0AC83E45162C293000DE4074 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0AC83E77162C326C00DE4074 /* libboost_thread-mt.a in Frameworks */,
+				0AC83E76162C326700DE4074 /* libbamtools.a in Frameworks */,
+				0AC83E7A162C327400DE4074 /* libboost_program_options.a in Frameworks */,
+				0AC83E79162C327200DE4074 /* libboost_filesystem.a in Frameworks */,
+				0AC83E7B162C327700DE4074 /* libboost_system.a in Frameworks */,
+				0AC83E7E162C34C200DE4074 /* libprotobuf.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -103,6 +143,7 @@
 		0A5C75FD136F2E850095365C = {
 			isa = PBXGroup;
 			children = (
+				0AC83E7D162C34C200DE4074 /* libprotobuf.a */,
 				0ADF037C140C66D500D16BBE /* libbamtools.a */,
 				0A2D58901405F128008891E7 /* libboost_program_options.a */,
 				0A60597613A1753B00B5C9BA /* libboost_system.a */,
@@ -117,6 +158,7 @@
 			isa = PBXGroup;
 			children = (
 				0A5C7608136F2E850095365C /* express */,
+				0AC83E48162C293000DE4074 /* express-spark */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -124,7 +166,7 @@
 		0A5C7629136F2EF10095365C /* src */ = {
 			isa = PBXGroup;
 			children = (
-				0AC8DF441616653A009C4080 /* libprotobuf.a */,
+				0AC83E52162C2DCF00DE4074 /* express-spark.cpp */,
 				0AC8DF46161677F2009C4080 /* proto */,
 				0AB8C58F155EE921007D6E6F /* library.h */,
 				0AEC98C914414B5100DE2C43 /* config.h */,
@@ -189,6 +231,23 @@
 			productReference = 0A5C7608136F2E850095365C /* express */;
 			productType = "com.apple.product-type.tool";
 		};
+		0AC83E47162C293000DE4074 /* express-spark */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 0AC83E51162C293000DE4074 /* Build configuration list for PBXNativeTarget "express-spark" */;
+			buildPhases = (
+				0AC83E44162C293000DE4074 /* Sources */,
+				0AC83E45162C293000DE4074 /* Frameworks */,
+				0AC83E46162C293000DE4074 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "express-spark";
+			productName = "express-spark";
+			productReference = 0AC83E48162C293000DE4074 /* express-spark */;
+			productType = "com.apple.product-type.tool";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -210,6 +269,7 @@
 			projectRoot = "";
 			targets = (
 				0A5C7607136F2E850095365C /* express */,
+				0AC83E47162C293000DE4074 /* express-spark */,
 			);
 		};
 /* End PBXProject section */
@@ -231,8 +291,27 @@
 				0A63748614CF83A500D79987 /* sequence.cpp in Sources */,
 				0A04E7C01540B87200D9A162 /* threadsafety.cpp in Sources */,
 				0ADA18F715508175008020B2 /* robertsfilter.cpp in Sources */,
-				0AC8DF4916167845009C4080 /* alignments.pb.cc in Sources */,
-				0AC8DF4C161678DA009C4080 /* targets.pb.cc in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		0AC83E44162C293000DE4074 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0AC83E56162C31D600DE4074 /* alignments.pb.cc in Sources */,
+				0AC83E57162C31D600DE4074 /* targets.pb.cc in Sources */,
+				0AC83E5D162C31D600DE4074 /* biascorrection.cpp in Sources */,
+				0AC83E5F162C31D600DE4074 /* bundles.cpp in Sources */,
+				0AC83E61162C31D600DE4074 /* fld.cpp in Sources */,
+				0AC83E64162C31D600DE4074 /* fragments.cpp in Sources */,
+				0AC83E68162C31D600DE4074 /* mapparser.cpp in Sources */,
+				0AC83E6A162C31D600DE4074 /* mismatchmodel.cpp in Sources */,
+				0AC83E6D162C31D600DE4074 /* markovmodel.cpp in Sources */,
+				0AC83E6E162C31D600DE4074 /* robertsfilter.cpp in Sources */,
+				0AC83E71162C31D600DE4074 /* sequence.cpp in Sources */,
+				0AC83E73162C31D600DE4074 /* targets.cpp in Sources */,
+				0AC83E75162C31D600DE4074 /* threadsafety.cpp in Sources */,
+				0AC83E53162C2DCF00DE4074 /* express-spark.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -251,6 +330,19 @@
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					"\"$(SRCROOT)/bamtools/include\"",
+					/usr/local/include,
+					/opt/local/include,
+					"$(SRCROOT)/src",
+				);
+				LIBRARY_SEARCH_PATHS = (
+					/opt/local/lib,
+					/usr/local/lib,
+					"\"$(SRCROOT)/bamtools/lib\"",
+					"\"$(SRCROOT)\"",
+					/usr/local/lib/bamtools,
+				);
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
@@ -266,6 +358,19 @@
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					"\"$(SRCROOT)/bamtools/include\"",
+					/usr/local/include,
+					/opt/local/include,
+					"$(SRCROOT)/src",
+				);
+				LIBRARY_SEARCH_PATHS = (
+					/opt/local/lib,
+					/usr/local/lib,
+					"\"$(SRCROOT)/bamtools/lib\"",
+					"\"$(SRCROOT)\"",
+					/usr/local/lib/bamtools,
+				);
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
@@ -322,6 +427,62 @@
 			};
 			name = Release;
 		};
+		0AC83E4F162C293000DE4074 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				LIBRARY_SEARCH_PATHS = (
+					/opt/local/lib,
+					/usr/local/lib,
+					"\"$(SRCROOT)/bamtools/lib\"",
+					"\"$(SRCROOT)\"",
+					/usr/local/lib/bamtools,
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		0AC83E50162C293000DE4074 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				LIBRARY_SEARCH_PATHS = (
+					/opt/local/lib,
+					/usr/local/lib,
+					"\"$(SRCROOT)/bamtools/lib\"",
+					"\"$(SRCROOT)\"",
+					/usr/local/lib/bamtools,
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -342,6 +503,14 @@
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
+		};
+		0AC83E51162C293000DE4074 /* Build configuration list for PBXNativeTarget "express-spark" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				0AC83E4F162C293000DE4074 /* Debug */,
+				0AC83E50162C293000DE4074 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
 		};
 /* End XCConfigurationList section */
 	};

@@ -52,6 +52,7 @@ cp README html/downloads/express-$VERSION/$SRC/README
 cp LICENSE html/downloads/express-$VERSION/$SRC/LICENSE
 cp -r sample_data html/downloads/express-$VERSION/$SRC/sample_data
 cp html/doc/express-doc.pdf html/downloads/express-$VERSION/$SRC
+cp CMakeLists.txt html/downloads/express-$VERSION/$SRC
 
 find . -name '*.DS_Store' -type f -delete
 
