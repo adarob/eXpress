@@ -400,7 +400,7 @@ void MismatchTable::update(const FragHit& f, double p, double mass) {
         } else {
           size_t ref = t_seq_rev[j];
           size_t index = prev + ref;
-          right_mm[i].increment(index, mass+p);
+          right_mm[i].increment(index, cur, mass+p);
         }
 
         i++;
