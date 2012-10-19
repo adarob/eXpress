@@ -151,7 +151,7 @@ FrequencyMatrix<T>::FrequencyMatrix(size_t m, size_t n, T alpha, bool logged)
 
 template <class T>
 T FrequencyMatrix<T>::operator()(size_t i, size_t j, bool normalized) const {
-  assert(i < _M && j < _N);
+  assert(i*_N+j < _M*_N);
   if (_fixed || !normalized) {
       return _array[i*_N+j];
   }
