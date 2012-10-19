@@ -265,6 +265,11 @@ bool parse_options(int ac, char ** av) {
          << "alignments.";
     return 1;
   }
+  if ((output_align_prob || output_align_samp) && remaining_rounds == 0) {
+    cerr << "WARNING: It is recommended that at least one additional round "
+         << "be used when outputting alignment probabilities or sampled "
+         << "alignments. Use the '-B' or '-O' option to enable.";
+  }
 
   // We have 1 processing thread and 1 parsing thread always, so we should not
   // count these as additional threads.
@@ -275,7 +280,11 @@ bool parse_options(int ac, char ** av) {
   if (num_threads > 0) {
     num_threads -= edit_detect;
   }
-  if (remaining_rounds > 0 && in_map_file_names != "") {
+  if (remaining_rounds && in_map_file_names != "") {
+    cerr << "ERROR: Cannot process multiple rounds from streaming input.";
+    return 1;
+  }
+  if (remaining_rounds) {
     last_round = false;
   }
   if (prior_file != "") {
