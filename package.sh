@@ -48,7 +48,7 @@ cp LICENSE html/downloads/express-$VERSION/$WIN/LICENSE
 cp -r sample_data html/downloads/express-$VERSION/$WIN/sample_data
 #src
 cp src html/downloads/express-$VERSION/$SRC
-rm /html/downloads/express-$VERSION/$SRC/src/express-spark.cpp
+rm /html/downloads/express-$VERSION/$SRC/src/*spark*
 cp README html/downloads/express-$VERSION/$SRC/README
 cp LICENSE html/downloads/express-$VERSION/$SRC/LICENSE
 cp -r sample_data html/downloads/express-$VERSION/$SRC/sample_data
