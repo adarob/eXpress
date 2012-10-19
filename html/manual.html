@@ -123,10 +123,10 @@
         <li><a href="#">Download<!--[if IE 7]><!--></a><!--<![endif]-->
           <!--[if lte IE 6]><table><tr><td><![endif]-->
             <ul>
-              <li><a href=downloads/express-1.2.0/express-1.2.0-macosx_x86_64.tgz onClick="_gaq.push(['_trackEvent', 'Downloads', 'Mac', 'Manual']);" target="_blank">Mac OS X (64-bit)</a></li>
-              <li><a href=downloads/express-1.2.0/express-1.2.0-linux_x86_64.tgz onClick="_gaq.push(['_trackEvent', 'Downloads', 'Linux', 'Manual']);" target="_blank">Linux (64-bit)</a></li>
-              <li><a href=downloads/express-1.2.0/express-1.2.0-win32_x86_64.zip onClick="_gaq.push(['_trackEvent', 'Downloads', 'Windows', 'Manual']);" target="_blank">Windows (64-bit)</a></li>
-              <li><a href=downloads/express-1.2.0/express-1.2.0-src.tgz onClick="_gaq.push(['_trackEvent', 'Downloads', 'Source', 'Manual']);" target="_blank">Source Code</a></li>
+              <li><a href=downloads/express-1.2.1/express-1.2.1-macosx_x86_64.tgz onClick="_gaq.push(['_trackEvent', 'Downloads', 'Mac', 'Manual']);" target="_blank">Mac OS X (64-bit)</a></li>
+              <li><a href=downloads/express-1.2.1/express-1.2.1-linux_x86_64.tgz onClick="_gaq.push(['_trackEvent', 'Downloads', 'Linux', 'Manual']);" target="_blank">Linux (64-bit)</a></li>
+              <li><a href=downloads/express-1.2.1/express-1.2.1-win32_x86_64.zip onClick="_gaq.push(['_trackEvent', 'Downloads', 'Windows', 'Manual']);" target="_blank">Windows (64-bit)</a></li>
+              <li><a href=downloads/express-1.2.1/express-1.2.1-src.tgz onClick="_gaq.push(['_trackEvent', 'Downloads', 'Source', 'Manual']);" target="_blank">Source Code</a></li>
               <li><a href="downloads" onClick="_gaq.push(['_trackEvent', 'Downloads', 'Previous','Manual']);">Previous Versions</a></li>
             </ul>
           <!--[if lte IE 6]></td></tr></table></a><![endif]-->
@@ -184,7 +184,7 @@
 		  <td VALIGN=top>A comma-separated list of filenames for reads aligned to the target sequences in <a href="http://samtools.sourceforge.net"> 
 		  SAM format</a>. See <a href="#sam">Input Files</a> for more details.</td></tr> 
 		  
-		  <tr><td VALIGN=top><b>General Options:</b></td><td VALIGN=top></td></tr>
+		  <tr><td VALIGN=top><b>Standard Options:</b></td><td VALIGN=top></td></tr>
 		  
 		  <tr><td VALIGN=top nowrap><tt>-h/--help</tt> </td>
 		  <td VALIGN=top>Prints the help message and exits</td></tr> 
@@ -205,7 +205,7 @@
 	 	  <tr><td VALIGN=top nowrap> 
 		  <tt>-O/--additional-online &lt;int&gt;</tt> 
 		  </td><td VALIGN=top> 
-		  Specifies the number of additional online EM rounds to perform on the data after the initial online round.  Can improve accuracy at the cost of time.
+		  Specifies the number of additional online EM rounds to perform on the data after the initial online round.  Can improve accuracy at the cost of time. The default is 0.85.
 		  </td></tr> 
 
 		  
@@ -246,18 +246,62 @@
 		  </td></tr>
 		  
 		  <tr><td VALIGN=top nowrap> 
-		  <tt>--calc-covar</tt> 
-		  </td><td VALIGN=top> 
-		  With this option, eXpress calculates the covariance between targets and outputs them for use in differential expression analysis. This calculation requires slightly more time and memory.
-		  </td></tr>
-		  
-		  <tr><td VALIGN=top nowrap> 
 		  <tt>--no-update-check</tt> 
 		  </td><td VALIGN=top> 
 		  With this option, eXpress will not ping our server to see if a newer version is available.
 		  </td></tr>
 		  
-  		  </table></p>
+		  <tr><td VALIGN=top><b>Advanced Options:</b></td><td VALIGN=top></td></tr>
+
+		  <tr><td VALIGN=top nowrap> 
+		  <tt>--calc-covar</tt> 
+		  </td><td VALIGN=top> 
+		  With this option, eXpress calculates the covariance between targets and outputs them for use in differential expression analysis. This calculation requires slightly more time and memory.
+		  </td></tr>
+
+		  <tr><td VALIGN=top nowrap> 
+		  <tt>-f/--forget-param &lt;float&gt;</tt> 
+		  </td><td VALIGN=top> 
+		  A parameter specifying the rate at which the prior is "forgotten" by increasing the mass of fragments during online processing. Larger numbers (max of 1) mean a slower rate, which decreases convergence but improves stability. Smaller numbers (minumum of 0.5) increase the rate, which may lead to faster convergence but can also lead to instability.
+		  </td></tr> 
+
+		  <tr><td VALIGN=top nowrap> 
+		  <tt>--max-indel-size &lt;int&gt;</tt> 
+		  </td><td VALIGN=top> 
+		  A parameter specifying the maximum allowed size of a single indel. Alignments with larger indels will be ignored. A geometric prior for indel length is fit so that all but 10e-6 of the probability mass lies within the allowed region. The default is 10.
+		  </td></tr> 
+
+		  <tr><td VALIGN=top nowrap> 
+		  <tt>--expr-alpha &lt;float&gt;</tt> 
+		  </td><td VALIGN=top> 
+		  A parameter specifying the weight of uniform the target abundance prior, in pseudo-counts per bp. The default is 0.01.
+		  </td></tr> 
+		  
+		  <tr><td VALIGN=top nowrap> 
+		  <tt>--stop-at &lt;int&gt;</tt> 
+		  </td><td VALIGN=top> 
+		  A parameter specifying the number of fragments to process before quitting.
+		  </td></tr> 
+		  
+		  <tr><td VALIGN=top nowrap> 
+		  <tt>--burn-out &lt;int&gt;</tt> 
+		  </td><td VALIGN=top> 
+		  A parameter specifying the number of fragments after which to stop learning the auxiliary parameters (fragment length, bias, error).
+		  </td></tr> 
+		  
+		  <tr><td VALIGN=top nowrap> 
+		  <tt>--no-bias-correct</tt> 
+		  </td><td VALIGN=top> 
+		  With this option, eXpress will not measure and account for sequence-specific biases. Will lead to a slight initial increase in speed at the expense of accuracy.
+		  </td></tr>
+
+		  <tr><td VALIGN=top nowrap> 
+		  <tt>--no-bias-correct</tt> 
+		  </td><td VALIGN=top> 
+		  With this option, eXpress will not measure and account for errors in alignments. Will lead to an increase in speed, but may greatly decrease accuracy.
+		  </td></tr>	  
+
+		  </table></p>
 		
 		<p>&rarr; <a href="#top">Back to top.</a></p>
 		          </div> 

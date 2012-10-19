@@ -56,7 +56,7 @@ string fasta_file_name = "";
 string in_map_file_names = "";
 
 // intial pseudo-count parameters (non-logged)
-double expr_alpha = .1;
+double expr_alpha = .01;
 double fld_alpha = 1;
 double bias_alpha = 1;
 double mm_alpha = 1;
@@ -144,7 +144,8 @@ bool parse_options(int ac, char ** av) {
   ("additional-batch,B",
    po::value<size_t>(&remaining_rounds)->default_value(remaining_rounds),
    "number of additional batch EM rounds after initial online round")
-  ("additional-online,O", po::value<size_t>(&remaining_rounds),
+  ("additional-online,O",
+   po::value<size_t>(&remaining_rounds)->default_value(remaining_rounds),
    "number of additional online EM rounds after initial online round")
   ("output-align-prob",
    "output alignments (sam/bam) with probabilistic assignments")
@@ -154,12 +155,12 @@ bool parse_options(int ac, char ** av) {
    "accept only forward->reverse alignments (second-stranded protocols)")
   ("rf-stranded",
    "accept only reverse->forward alignments (first-stranded protocols)")
-  ("calc-covar", "calculate and output covariance matrix")
   ("no-update-check", "disables automatic check for update via web")
   ;
   
   po::options_description advanced("Advanced Options");
   advanced.add_options()
+  ("calc-covar", "calculate and output covariance matrix")
   ("forget-param,f", po::value<double>(&ff_param)->default_value(ff_param),
    "sets the 'forgetting factor' parameter (0.5 < c <= 1)")
   ("max-indel-size",
@@ -169,10 +170,10 @@ bool parse_options(int ac, char ** av) {
    "sets the strength of the prior, per bp")
   ("stop-at", po::value<size_t>(&stop_at)->default_value(stop_at),
    "sets the number of fragments to process, disabled with 0")
-  ("no-bias-correct", "disables bias correction")
-  ("no-error-model", "disables error modelling")
   ("burn-out", po::value<size_t>(&burn_out)->default_value(burn_out),
    "sets number of fragments after which to stop updating auxiliary parameters")
+  ("no-bias-correct", "disables bias correction")
+  ("no-error-model", "disables error modelling")
   ;
 
   string prior_file = "";

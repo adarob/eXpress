@@ -90,9 +90,10 @@ class MarkovModel {
    * position is not used in the likelihood computation.
    * @param seq the sequence to find the indices for.
    * @param left the position where the window should begin in the sequence.
-   * @return A vector of indices into the parameter tables that would be used
-   *         in a likelihood calculation.
-   DOC
+   * @param indices a vector to fill with indices into the parameter tables that
+   *        would be used in a likelihood calculation.
+   * @return The starting position in the sequence to align with the first
+   *         index.
    */
   size_t get_indices(const Sequence& seq, int left, std::vector<char>& indices);
   /**

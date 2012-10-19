@@ -36,7 +36,6 @@
 		0AC83E75162C31D600DE4074 /* threadsafety.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0A04E7BF1540B87200D9A162 /* threadsafety.cpp */; };
 		0AC83E76162C326700DE4074 /* libbamtools.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0ADF037C140C66D500D16BBE /* libbamtools.a */; };
 		0AC83E77162C326C00DE4074 /* libboost_thread-mt.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A60597213A170A400B5C9BA /* libboost_thread-mt.a */; };
-		0AC83E79162C327200DE4074 /* libboost_filesystem.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A60597413A170AD00B5C9BA /* libboost_filesystem.a */; };
 		0AC83E7A162C327400DE4074 /* libboost_program_options.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A2D58901405F128008891E7 /* libboost_program_options.a */; };
 		0AC83E7B162C327700DE4074 /* libboost_system.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A60597613A1753B00B5C9BA /* libboost_system.a */; };
 		0AC83E7E162C34C200DE4074 /* libprotobuf.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0AC83E7D162C34C200DE4074 /* libprotobuf.a */; };
@@ -131,7 +130,6 @@
 				0AC83E77162C326C00DE4074 /* libboost_thread-mt.a in Frameworks */,
 				0AC83E76162C326700DE4074 /* libbamtools.a in Frameworks */,
 				0AC83E7A162C327400DE4074 /* libboost_program_options.a in Frameworks */,
-				0AC83E79162C327200DE4074 /* libboost_filesystem.a in Frameworks */,
 				0AC83E7B162C327700DE4074 /* libboost_system.a in Frameworks */,
 				0AC83E7E162C34C200DE4074 /* libprotobuf.a in Frameworks */,
 			);

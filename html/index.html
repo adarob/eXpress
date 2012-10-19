@@ -129,10 +129,10 @@
         <li><a href="#">Download<!--[if IE 7]><!--></a><!--<![endif]-->
           <!--[if lte IE 6]><table><tr><td><![endif]-->
             <ul>
-              <li><a href=downloads/express-1.2.0/express-1.2.0-macosx_x86_64.tgz onClick="_gaq.push(['_trackEvent', 'Downloads', 'Mac', 'home-menu']);" target="_blank">Mac OS X (64-bit)</a></li>
-              <li><a href=downloads/express-1.2.0/express-1.2.0-linux_x86_64.tgz onClick="_gaq.push(['_trackEvent', 'Downloads', 'Linux', 'home-menu']);" target="_blank">Linux (64-bit)</a></li>
-              <li><a href=downloads/express-1.2.0/express-1.2.0-win32_x86_64.zip onClick="_gaq.push(['_trackEvent', 'Downloads', 'Windows', 'home-menu']);" target="_blank">Windows (64-bit)</a></li>
-              <li><a href=downloads/express-1.2.0/express-1.2.0-src.tgz onClick="_gaq.push(['_trackEvent', 'Downloads', 'Source', 'home-menu']);" target="_blank">Source Code</a></li>
+              <li><a href=downloads/express-1.2.1/express-1.2.1-macosx_x86_64.tgz onClick="_gaq.push(['_trackEvent', 'Downloads', 'Mac', 'home-menu']);" target="_blank">Mac OS X (64-bit)</a></li>
+              <li><a href=downloads/express-1.2.1/express-1.2.1-linux_x86_64.tgz onClick="_gaq.push(['_trackEvent', 'Downloads', 'Linux', 'home-menu']);" target="_blank">Linux (64-bit)</a></li>
+              <li><a href=downloads/express-1.2.1/express-1.2.1-win32_x86_64.zip onClick="_gaq.push(['_trackEvent', 'Downloads', 'Windows', 'home-menu']);" target="_blank">Windows (64-bit)</a></li>
+              <li><a href=downloads/express-1.2.1/express-1.2.1-src.tgz onClick="_gaq.push(['_trackEvent', 'Downloads', 'Source', 'home-menu']);" target="_blank">Source Code</a></li>
               <li><a href="downloads" onClick="_gaq.push(['_trackEvent', 'Downloads', 'Previous','home-menu']);">Previous Versions</a></li>
             </ul>
           <!--[if lte IE 6]></td></tr></table></a><![endif]-->
@@ -166,7 +166,9 @@
    		  <ul>
    		<li>Made some previously hidden options available as "Advanced Options". See the <a href="manual#usage">Manual</a> for more details.</li>
 		  <li>Fixed a rare issue affecting indels whereby indels were not properly being penalized in alignment likelihoods. Added a maximum allowed indel size along with geometrically distributed prior on indel length probabilities to correct this issue. See <tt>--max-indel-size</tt> argument in the <a href="manual#usage">Manual</a> for more details.</li>
-   		<li>Fixed a bug leading to a SegFault when using single-end reads.</li>
+   		<li>Fixed a bug leading to incorrect learning of mismatch parameters (introduced in 1.2.0).</li>
+   		<li>Fixed a bug leading to a segfault when using single-end reads (introduced in 1.2.0).</li>
+   		<li>Added missing CMake configuration file to source tarball.</li>
    		</ul></p>
    		  
           <h2>09.27.2012 &bull; eXpress 1.2.0 released</h2>
@@ -291,11 +293,11 @@
         <div class="subcontent-box">
           <h1>Download</h1>                    
           <h5>Current Release</h5>
-          <p>eXpress 1.2.0
-          <br />&rarr; <a href="downloads/express-1.2.0/express-1.2.0-macosx_x86_64.tgz" onClick="_gaq.push(['_trackEvent', 'Downloads', 'Mac', 'home-side']);" target="_blank">Mac OS X (64-bit) Binary</a>
-          <br />&rarr; <a href="downloads/express-1.2.0/express-1.2.0-linux_x86_64.tgz" onClick="_gaq.push(['_trackEvent', 'Downloads', 'Linux', 'home-side']);" target="_blank">Linux (64-bit) Binary</a>
-          <br />&rarr; <a href="downloads/express-1.2.0/express-1.2.0-win32_x86_64.zip" onClick="_gaq.push(['_trackEvent', 'Downloads', 'Windows', 'home-side']);" target="_blank">Windows (64-bit) Binary</a>
-          <br />&rarr; <a href="downloads/express-1.2.0/express-1.2.0-src.tgz" onClick="_gaq.push(['_trackEvent', 'Downloads', 'Source', 'home-side']); " target="_blank">Source</a>
+          <p>eXpress 1.2.1
+          <br />&rarr; <a href="downloads/express-1.2.1/express-1.2.1-macosx_x86_64.tgz" onClick="_gaq.push(['_trackEvent', 'Downloads', 'Mac', 'home-side']);" target="_blank">Mac OS X (64-bit) Binary</a>
+          <br />&rarr; <a href="downloads/express-1.2.1/express-1.2.1-linux_x86_64.tgz" onClick="_gaq.push(['_trackEvent', 'Downloads', 'Linux', 'home-side']);" target="_blank">Linux (64-bit) Binary</a>
+          <br />&rarr; <a href="downloads/express-1.2.1/express-1.2.1-win32_x86_64.zip" onClick="_gaq.push(['_trackEvent', 'Downloads', 'Windows', 'home-side']);" target="_blank">Windows (64-bit) Binary</a>
+          <br />&rarr; <a href="downloads/express-1.2.1/express-1.2.1-src.tgz" onClick="_gaq.push(['_trackEvent', 'Downloads', 'Source', 'home-side']); " target="_blank">Source</a>
           <h5>Previous Versions</h5>
           <p>&rarr; <a href="downloads" onClick="_gaq.push(['_trackEvent', 'Downloads', 'Previous','home-side']);">View All</a>
 

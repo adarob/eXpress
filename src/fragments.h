@@ -475,7 +475,10 @@ public:
    * are aligned to.
    */
   void sort_hits();
-  //DOC
+  /**
+   * An accessor that returns true iff the Fragment has paired alignments.
+   * @return True iff the Fragment has paired alignments.
+   */
   bool paired() const {
     if (_frag_hits.empty()) {
       return false;
