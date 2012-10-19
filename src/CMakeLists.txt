@@ -3,7 +3,10 @@ file(GLOB sources *.cpp)
 file(GLOB headers *.h)
 
 file(GLOB to_remove express-spark.cpp)
-list(REMOVE_ITEM sources ${to_remove})
+list(LENGTH to_remove len)
+if (len)
+  list(REMOVE_ITEM sources ${to_remove})
+endif(len)
 
 add_executable(express ${sources} ${headers})
 
