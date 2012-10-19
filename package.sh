@@ -1,6 +1,6 @@
 #!/bin/bash
 
-VERSION=1.2.0
+VERSION=1.2.1
 MAC=express-$VERSION-macosx_x86_64
 LINUX=express-$VERSION-linux_x86_64
 WIN=express-$VERSION-win32_x86_64
@@ -47,7 +47,8 @@ cp README html/downloads/express-$VERSION/$WIN/README
 cp LICENSE html/downloads/express-$VERSION/$WIN/LICENSE
 cp -r sample_data html/downloads/express-$VERSION/$WIN/sample_data
 #src
-cp -r src html/downloads/express-$VERSION/$SRC/src
+cp src html/downloads/express-$VERSION/$SRC
+rm /html/downloads/express-$VERSION/$SRC/src/express-spark.cpp
 cp README html/downloads/express-$VERSION/$SRC/README
 cp LICENSE html/downloads/express-$VERSION/$SRC/LICENSE
 cp -r sample_data html/downloads/express-$VERSION/$SRC/sample_data
