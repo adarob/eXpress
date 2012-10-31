@@ -112,6 +112,15 @@ class Tree:
 
   def is_leaf(self):
     return len(self.children) == 0
+  
+  def leaves(self):
+    if self.is_leaf():
+      return [self.id]
+    
+    leaves = []
+    for child in self.children:
+      leaves += child.leaves()
+    return leaves
 
   def to_string(self):
     s = ''
@@ -139,6 +148,9 @@ class Forest:
       num_leaves += node.is_leaf()
     s = '%d, %d\n' % (num_leaves, len(self.nodes)) + s
     return s
+  
+  def __len__(self):
+    return len(self.nodes)
 
 # destructive for M
 def build_forest(M):
@@ -152,6 +164,42 @@ def build_forest(M):
     M.merge(i,j)
   return F
   
-M = initialize_matrix('/home/adarob/experiments/express/simulation/hg19_ucsc_err_flip/hits.bam')
-F = build_forest(M)
+def build_forest2(infile):
+  import pysam
+  samfile = pysam.Samfile(infile)
+  
+  trees = [i for i in xrange(samfile.nreferences)]
+  F = Forest(samfile.nreferences)
+  
+  curr_qname = ''
+  trees_to_merge = set([]) 
+  n = 0
+  for read in samfile:
+    if read.qname != curr_qname:
+      n += 1
+      if n % 100000 == 0:
+        print n
+      if len(trees_to_merge) > 1:
+        id = len(F)
+        F.add_node(id, trees_to_merge)
+        for leaf in F.nodes[-1].leaves():
+          trees[leaf] = id 
+      trees_to_merge = set([])
+      curr_qname = read.qname
+
+    if read.is_unmapped:
+      continue
+
+    if not read.is_paired:
+      trees_to_merge.add(trees[read.tid])
+      continue
+
+    if read.is_proper_pair and read.is_reverse:
+      trees_to_merge.add(trees[read.tid])
+      continue
+  return F
+
+#M = initialize_matrix('/home/adarob/experiments/express/simulation/hg19_ucsc_err_flip/hits.bam')
+#F = build_forest(M)
+F = build_forest2('/home/adarob/experiments/express/simulation/hg19_ucsc_err_flip/hits.bam')
 file('forest_flip.out','w').write(F.to_string())
