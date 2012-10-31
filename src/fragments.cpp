@@ -19,7 +19,7 @@ Fragment::~Fragment() {
   for (size_t i = 0; i < num_hits(); i++) {
     delete _frag_hits[i];
   }
-    
+
   for (size_t i = 0; i < _open_mates.size(); i++) {
     delete _open_mates[i];
   }
@@ -32,19 +32,19 @@ bool Fragment::add_map_end(FragHit* h)
   } else if (_name != h->name) {
         return false;
   }
-    
+
   if (h->mate_l >= 0) {
         add_open_mate(h);
   } else {  // single-end fragment
     _frag_hits.push_back(h);
   }
-    
+
   return true;
 }
 
 void Fragment::add_open_mate(FragHit* new_p) {
   bool found = false;
-    
+
   FragHit& nm = *new_p;
   for( vector<FragHit*>::iterator it = _open_mates.begin();
       it != _open_mates.end(); ++it) {
@@ -69,7 +69,7 @@ void Fragment::add_open_mate(FragHit* new_p) {
         nm.inserts_l = om.inserts_l;
         nm.deletes_l = om.deletes_l;
       }
-            
+       
       assert(nm.left_first == om.left_first);
       found = true;
       delete *it;
@@ -78,7 +78,7 @@ void Fragment::add_open_mate(FragHit* new_p) {
       break;
     }
   }
-    
+
   if (!found) {
     _open_mates.push_back(&nm);
   }

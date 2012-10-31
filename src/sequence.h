@@ -200,7 +200,7 @@ class SequenceFwd: public Sequence
    * A private size_t storing the number of nucleotides in the sequence.
    */
   size_t _len;
-    
+
  public:
   /**
    * Dummy SequenceFwd constructor.
@@ -243,7 +243,7 @@ class SequenceFwd: public Sequence
  * The SequenceRev class implements the Sequence abstract class for accessing
  * the reverse sequence. Documentation is only provided for methods not
  * documented in the abstract Sequence class and SequenceFwd class. This class
- * acts by storing a pointer to a SequenceFwd object and reverse complementing 
+ * acts by storing a pointer to a SequenceFwd object and reverse complementing
  * the input and output appropriately.
  *  @author    Adam Roberts
  *  @date      2012
@@ -255,7 +255,7 @@ class SequenceRev: public Sequence {
    * complement of.
    */
   SequenceFwd* _seq;
-    
+
  public:
   SequenceRev() {}
   SequenceRev(SequenceFwd& seq) : _seq(&seq) {}

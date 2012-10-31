@@ -76,7 +76,7 @@ struct FragHit {
    * The first ("left") read sequence (according to SAM flag).
    */
   SequenceFwd seq_l;
-    
+
   /**
    * The second ("right") read sequence (according to SAM flag).
    */
@@ -181,15 +181,11 @@ struct FragHit {
     }
     return LEFT_ONLY;
   }
-  
-  //DOC
-  double targ_rho;
-  double const_likelihood;
 };
 
 /**
  * The Fragment class stores information for all alignments of a single fragment.
- * By design, only paired-end mappings of paired-end reads will be accepted. 
+ * By design, only paired-end mappings of paired-end reads will be accepted.
  * All mappings of single-end reads will be accepted.
  *  @author    Adam Roberts
  *  @date      2011
@@ -211,11 +207,6 @@ class Fragment {
    * A private string for the SAM "Query Template Name" (fragment name).
    */
   std::string _name;
-  /**
-   * A private double for the mass of the Fragment as determined by the
-   * forgetting factor during processing.
-   */
-  double _mass;
   /**
    * A private pointer to the global variables associated with the library
    * this fragment is from.
@@ -276,18 +267,7 @@ public:
    * @return A randomly sampled FragHit.
    */
   const FragHit* sample_hit() const;
-  /**
-   * Mutator for the mass of the fragment according to the forgetting factor.
-   * @param m a double representing the value to set to the mass to.
-   */
-  void mass(double m) { _mass = m; }
-  /**
-   * An accessor for the mass of the fragment according to the forgetting
-   * factor.
-   * @return The mass of the fragment.
-   */
-  double mass() const { return _mass; }
-  /**
+   /**
    * A member function that sorts the FragHits by the TargID of the targets they
    * are aligned to.
    */

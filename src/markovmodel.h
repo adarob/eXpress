@@ -47,7 +47,7 @@ class MarkovModel {
    * probabilities indices.
    */
   size_t _bitclear;
-    
+
  public:
   /**
    * MarkovModel Constructor.

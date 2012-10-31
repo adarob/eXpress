@@ -29,9 +29,9 @@ FLD::FLD(double alpha, size_t max_val, size_t mean, size_t std_dev)
       _min(max_val) {
   assert(KERNEL.size() % 2 == 1);
   boost::math::normal norm(mean, std_dev);
-    
+
   double tot = log(alpha*max_val);
-  
+
   // Set to prior distribution
   for (size_t i = 0; i <= max_val; ++i) {
     double norm_mass = boost::math::cdf(norm,i+0.5) -
@@ -60,16 +60,16 @@ size_t FLD::min_val() const {
 
 void FLD::add_val(size_t len, double mass) {
   assert(!isnan(mass));
-  
+
   if (len > max_val()) {
       len = max_val();
   }
   if (len < _min) {
     _min = len;
   }
-    
+
   size_t offset = len - KERNEL.size()/2;
-    
+
   for (size_t i = 0; i < KERNEL.size(); i++) {
     if (offset > 0 && offset <= max_val()) {
       double k_mass = mass + KERNEL[i];
@@ -96,7 +96,7 @@ vector<double> FLD::cmf() const {
     cdf[i] = cum - _tot_mass;
   }
   assert(approx_eq(cum, _tot_mass));
-    
+
   return cdf;
 }
 

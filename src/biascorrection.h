@@ -41,7 +41,7 @@ class SeqWeightTable {
    * targets.
    */
   MarkovModel _expected;
-    
+
 public:
   /**
    * SeqWeightTable Constructor.
@@ -107,7 +107,7 @@ public:
 
 /**
  * The BiasBoss class keeps track of sequence-specific and positional bias.
- * It allows for the bias associated with a given fragment end to be calculated, and 
+ * It allows for the bias associated with a given fragment end to be calculated, and
  * for the bias parameters to be updated based on additional observations.  All stored
  * and returned values are in log space.
  *  @author    Adam Roberts
@@ -126,7 +126,7 @@ class BiasBoss
    * parameters (logged).
    */
   SeqWeightTable _3_seq_bias;
-    
+
 public:
   /**
    * BiasBoss Constructor.

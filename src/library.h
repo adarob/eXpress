@@ -11,6 +11,8 @@
 
 #include <vector>
 
+class RangeRhoForest;
+
 /**
  * The Library struct holds pointers to the global parameter tables for a set of
  * reads from the same library preparation.
@@ -19,7 +21,7 @@
  *  @copyright Artistic License 2.0
  */
 struct Library {
-  /** 
+  /**
    * Path to the input file. Empty if streamed.
    */
   std::string in_file_name;
@@ -27,6 +29,8 @@ struct Library {
    * Path to the out file. Empty if alignments are not to be output.
    */
   std::string out_file_name;
+  // DOC
+  RangeRhoForest* rho_forest;
   /**
    * A pointer to the MapParser for parsing the input alignment file for this
    * library.
@@ -45,10 +49,10 @@ struct Library {
   /**
    * A pointer to the BiasBoss containing the learned bias distribution for this
    * library.
-   */  
+   */
   BiasBoss* bias_table;
   /**
-   * A pointer to the TargetTable containing the target parameters (abundance, 
+   * A pointer to the TargetTable containing the target parameters (abundance,
    * effective length) for this library.
    */
   TargetTable* targ_table;
@@ -82,7 +86,7 @@ class Librarian
    * The index of the library currently being processed.
    */
   size_t _curr;
-    
+
 public:
   /**
    * Librarian Constructor.

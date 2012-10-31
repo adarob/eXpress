@@ -17,7 +17,7 @@ class Target;
 typedef size_t TargID;
 typedef boost::unordered_map<size_t, float> CovarMap;
 
-/** 
+/**
  * The CovarTable is a sparse matrix for storing and updating pairwise
  * covariances between targets.
  *  @author    Adam Roberts
@@ -65,7 +65,7 @@ public:
 
 class BundleTable;
 
-/** 
+/**
  * The Bundle class keeps track of a group of targets that have shared ambiguous
  * (multi-mapped) reads.
  *  @author    Adam Roberts
@@ -82,7 +82,7 @@ class Bundle {
    * to targets in the bundle.
    */
   size_t _counts;
-  
+
   friend class BundleTable;
 
 public:
@@ -118,7 +118,7 @@ public:
 
 typedef boost::unordered_set<Bundle*> BundleSet;
 
-/** 
+/**
  * The BundleTable class keeps track of the Bundle objects for a given run. It
  * has the ability to create, delete, and merge bundles.
  *  @author    Adam Roberts
@@ -130,7 +130,7 @@ class BundleTable {
    * A private unordered_set to store all of the bundles.
    */
   BundleSet _bundles;
-    
+
 public:
   /**
    * BundleTable Constructor.

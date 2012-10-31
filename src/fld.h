@@ -37,7 +37,7 @@ class FLD {
    * A private int that stores the minimum observed length.
    */
   size_t _min;
-    
+
 public:
   /**
    * FLD Constructor.

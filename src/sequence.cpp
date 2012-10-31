@@ -117,18 +117,18 @@ void SequenceFwd::calc_p_vals(vector<double>& p_vals) const {
       if (nuc == ref_nuc) {
         continue;
       }
-            
+       
       double obs_n = sexp(_obs_seq(i,nuc,false));
       max_obs = max(max_obs,obs_n);
     }
-        
+   
     double p_val = 0;
-        
+   
     for (size_t nuc = 0; nuc < NUM_NUCS; ++nuc) {
       if (nuc == ref_nuc) {
         continue;
       }
-            
+       
       double exp_p = sexp(_exp_seq(i, nuc));
       normal norm(N*exp_p, sqrt(N*exp_p*(1-exp_p)));
       p_val += log(cdf(norm, max_obs));
@@ -160,26 +160,26 @@ void SequenceFwd::calc_p_vals(vector<double>& p_vals) const
 
         size_t ref_nuc = get_ref(i);
         double p_val = LOG_0;
-        
+   
         vector<double> cdfs(4);
         for (size_t nuc = 0; nuc < NUM_NUCS; ++nuc)
         {
             if (nuc == ref_nuc)
                 continue;
-            
+       
             double p = sexp(_exp_seq(i,nuc));
             double obs_n = sexp(_obs_seq(i,nuc,false));
             normal norm (N*p, sqrt(N*p*(1-p)));
             cdfs[nuc] = cdf(norm, obs_n);
         }
-        
+   
         for (size_t nuc1 = 0; nuc1 < NUM_NUCS; ++nuc1)
         {
             if (nuc1 == ref_nuc)
                 continue;
 
             double term = log(1-cdfs[nuc1]);
-            
+       
             for(size_t nuc2 = 0; nuc2 < NUM_NUCS; ++nuc2)
             {
                 if (nuc2 == nuc1 || nuc2 == ref_nuc)
@@ -188,7 +188,7 @@ void SequenceFwd::calc_p_vals(vector<double>& p_vals) const
             }
             p_val = log_add(p_val, term);
         }
-        
+   
         p_vals[i] = sexp(p_val);
     }
 }
@@ -204,7 +204,7 @@ void SequenceFwd::calc_p_vals(vector<double>& p_vals) const
     {
         if (_obs_seq.sum(i)==LOG_0)
             continue;
-        
+   
         double S = 0;
         for (size_t nuc = 0; nuc < NUM_NUCS; ++nuc)
         {
@@ -212,7 +212,7 @@ void SequenceFwd::calc_p_vals(vector<double>& p_vals) const
             exp_n = sexp(_exp_seq(i,nuc,false));
             S += (obs_n-exp_n)*(obs_n-exp_n)/exp_n;
         }
-        
+   
         p_vals[i] -= boost::math::cdf(chisq,S);
     }
 }

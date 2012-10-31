@@ -22,7 +22,8 @@ class TargetTable;
 struct FragHit;
 struct Library;
 
-typedef boost::unordered_map<std::string, size_t> TransIndex;
+typedef size_t TargID;
+typedef boost::unordered_map<std::string, TargID> TransIndex;
 
 /**
  * The Parser class is an abstract class for implementing a SAMParser or
@@ -46,7 +47,7 @@ class Parser {
    * A private pointer to the current fragment mapping being parsed.
    */
   FragHit* _frag_buff;
-  
+
  public:
   /**
    * Dummy destructor.
@@ -99,7 +100,7 @@ class Writer {
    * (true) or all output with their respective posterior probabilities (false).
    */
   bool _sample;
-    
+
  public:
   /**
    * Dummy destructor.
@@ -133,14 +134,17 @@ class BAMParser : public Parser {
    * @return True if the mapping is valid and false otherwise
    */
   bool map_end_from_alignment(BamTools::BamAlignment& alignment);
-    
+  // DOC
+  std::vector<TargID> _id_map;
+
  public:
   /**
    * BAMParser constructor sets the reader.
    * @param reader a pointer to the BamReader object that will directly parse
    *        the BAM file.
    */
-  BAMParser(BamTools::BamReader* reader);
+  BAMParser(BamTools::BamReader* reader,
+            const std::vector<TargID>* id_map = NULL);
   /**
    * An accessor for the header string.
    * @return The header string.
@@ -184,14 +188,14 @@ class SAMParser : public Parser
    * @return True if the mapping is valid and false otherwise
    */
   bool map_end_from_line(char* line);
-  
+
 public:
   /**
    * SAMParser constructor removes the header and parses the first line to
    * start the first Fragment.
    * @param in the input stream in SAM format, which may be a file or stdin.
    */
-  SAMParser(std::istream* in);
+  SAMParser(std::istream* in, const std::vector<TargID>* id_map = NULL);
   /**
    * An accessor for the header string.
    * @return The header string.
@@ -225,7 +229,7 @@ class BAMWriter : public Writer {
    * the BAM file. Automatically deleted with BAMWriter object.
    */
   boost::scoped_ptr<BamTools::BamWriter> _writer;
-    
+
  public:
   /**
    * BAMWriter constructor stores a pointer to the BamTools::BamWriter object
@@ -233,7 +237,7 @@ class BAMWriter : public Writer {
    * @param writer pointer to the BamTools::BamWriter objected assocaited with
    *        the output BAM file.
    * @param sample specifies if a single alignment should be sampled based on
-   *        posteriors (true) or all output with their respective posterior 
+   *        posteriors (true) or all output with their respective posterior
    *        probabilities (false).
    */
   BAMWriter(BamTools::BamWriter* writer, bool sample);
@@ -254,7 +258,7 @@ class BAMWriter : public Writer {
 /**
  * The SAMWriter class writes Fragment objects back to file in SAM format with
  * per-mapping probabilistic assignments, or by sampling a single mapping based
- * on assignment probabilities. 
+ * on assignment probabilities.
  *  @author    Adam Roberts
  *  @date      2011
  *  @copyright Artistic License 2.0
@@ -265,7 +269,7 @@ class SAMWriter : public Writer {
    * written in SAM format. Deleted with the SAMWriter object.
    */
   boost::scoped_ptr<std::ostream> _out;
-  
+
  public:
   /**
    * SAMWriter constructor stores a pointer to the output stream.
@@ -321,7 +325,7 @@ class MapParser
    * processing.
    */
   bool _write_active;
-    
+
  public:
   /**
    * MapParser constructor determines what format the input is in and

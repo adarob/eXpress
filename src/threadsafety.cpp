@@ -21,7 +21,7 @@ Fragment* ThreadSafeFragQueue::pop(bool block) {
     }
         _cond.wait(lock);
   }
-    
+
   _cond.notify_all();
   Fragment* res = _queue.front();
   _queue.pop();
@@ -33,7 +33,7 @@ void ThreadSafeFragQueue::push(Fragment* frag) {
   while (_queue.size() == _max_size) {
     _cond.wait(lock);
   }
-    
+
   _cond.notify_all();
   return _queue.push(frag);
 }

@@ -12,6 +12,7 @@
 #include "targets.h"
 #include "threadsafety.h"
 #include "library.h"
+#include "rhotree.h"
 
 using namespace std;
 
@@ -92,20 +93,24 @@ size_t cigar_length(vector<BamTools::CigarOp>& cigar_vec,
 
 MapParser::MapParser(Library* lib, bool write_active)
     : _lib(lib), _write_active(write_active) {
-
   string in_file = lib->in_file_name;
   string out_file = lib->out_file_name;
   bool is_sam = false;
+
+  const vector<TargID>* id_map = NULL;
+  if (lib->rho_forest) {
+    id_map = lib->rho_forest->target_to_leaf_map();
+  }
   if (in_file.size() == 0) {
     cout << "No alignment file specified. Expecting streaming input on stdin...\n\n";
-    _parser.reset(new SAMParser(&cin));
+    _parser.reset(new SAMParser(&cin, id_map));
     is_sam = true;
   } else {
     cout << "Attempting to read '" << in_file << "' in BAM format...\n";
     BamTools::BamReader* reader = new BamTools::BamReader();
     if (reader->Open(in_file)) {
       cout << "Parsing BAM header...\n";
-      _parser.reset(new BAMParser(reader));
+      _parser.reset(new BAMParser(reader, id_map));
       if (out_file.size()) {
         out_file += ".bam";
         BamTools::BamWriter* writer = new BamTools::BamWriter();
@@ -127,7 +132,7 @@ MapParser::MapParser(Library* lib, bool write_active)
         cerr << "ERROR: Unable to open input SAM file '" << in_file << "'.\n";
         exit(1);
       }
-      _parser.reset(new SAMParser(ifs));
+      _parser.reset(new SAMParser(ifs, id_map));
       is_sam = true;
     }
   }
@@ -152,9 +157,9 @@ void MapParser::threaded_parse(ParseThreadSafety* thread_safety_p,
   bool fragments_remain = true;
   size_t n = 0;
   size_t still_out = 0;
-    
+
   TargetTable& targ_table = *(_lib->targ_table);
-    
+
   while (!stop_at || n < stop_at) {
     Fragment* frag = NULL;
     while (fragments_remain) {
@@ -177,7 +182,7 @@ void MapParser::threaded_parse(ParseThreadSafety* thread_safety_p,
       }
       m.targ = t;
       assert(t->id() == m.targ_id);
-      
+ 
       // Add num_neighbors targets on either side to the neighbors list.
       // Used for experimental feature.
       for (TargID j = 1; j <= num_neighbors;  j++) {
@@ -201,14 +206,14 @@ void MapParser::threaded_parse(ParseThreadSafety* thread_safety_p,
     if (!frag) {
       break;
     }
-    
+    frag->sort_hits();
     pts.proc_in.push(frag);
     n++;
     still_out++;
   }
-    
+
   pts.proc_in.push(NULL);
-    
+
   while (still_out) {
     boost::scoped_ptr<Fragment> done_frag(pts.proc_out.pop(true));
     if (_writer && _write_active) {
@@ -218,15 +223,26 @@ void MapParser::threaded_parse(ParseThreadSafety* thread_safety_p,
   }
 }
 
-BAMParser::BAMParser(BamTools::BamReader* reader) : _reader(reader) {
+BAMParser::BAMParser(BamTools::BamReader* reader, const vector<TargID>* id_map)
+    : _reader(reader) {
   BamTools::BamAlignment a;
-    
+
+  if (id_map) {
+    _id_map = *id_map;
+  } else {
+    _id_map = vector<TargID>(_reader->GetReferenceCount());
+    for (TargID i = 0; i < _id_map.size(); ++i) {
+      _id_map[i] = i;
+    }
+  }
+      
   size_t index = 0;
   foreach(const BamTools::RefData& ref, _reader->GetReferenceData()) {
-    _targ_index[ref.RefName] = index++;
+    TargID id = index++;
+    _targ_index[ref.RefName] = _id_map[id];
     _targ_lengths[ref.RefName] = ref.RefLength;
   }
-    
+      
   // Get first valid FragHit
   _frag_buff = new FragHit();
   do {
@@ -239,7 +255,7 @@ BAMParser::BAMParser(BamTools::BamReader* reader) : _reader(reader) {
 
 bool BAMParser::next_fragment(Fragment& nf) {
   nf.add_map_end(_frag_buff);
-    
+
   BamTools::BamAlignment a;
   _frag_buff = new FragHit();
 
@@ -257,26 +273,26 @@ bool BAMParser::next_fragment(Fragment& nf) {
 
 bool BAMParser::map_end_from_alignment(BamTools::BamAlignment& a) {
   FragHit& f = *_frag_buff;
-    
+
   if (!a.IsMapped()) {
     return false;
   }
-    
+
   if (a.IsPaired() && (!a.IsMateMapped() || a.RefID != a.MateRefID ||
                        a.IsReverseStrand() == a.IsMateReverseStrand())) {
     return false;
   }
-  
+
   f.left_first = (!a.IsPaired() && !a.IsReverseStrand()) ||
                  (a.IsFirstMate() && !a.IsReverseStrand())||
                  (a.IsSecondMate() && a.IsReverseStrand());
-    
+
   if ((direction == RF && f.left_first) || (direction == FR && !f.left_first)) {
     return false;
   }
- 
+
   f.name = a.Name;
-  f.targ_id = a.RefID;
+  f.targ_id = _id_map[a.RefID];
   f.left = a.Position;
   f.mate_l = a.MatePosition;
 
@@ -289,13 +305,13 @@ bool BAMParser::map_end_from_alignment(BamTools::BamAlignment& a) {
     f.bam_l = a;
     f.right = f.left + cigar_length(a.CigarData, f.inserts_l, f.deletes_l);
   }
-    
+
   return true;
 }
 
 void BAMParser::reset() {
   _reader->Rewind();
-    
+
   // Get first valid FragHit
   BamTools::BamAlignment a;
   _frag_buff = new FragHit();
@@ -305,13 +321,13 @@ void BAMParser::reset() {
 }
 
 
-SAMParser::SAMParser(istream* in) {
+SAMParser::SAMParser(istream* in, const vector<TargID>* id_map) {
   _in = in;
-  
+
   char line_buff[BUFF_SIZE];
   _frag_buff = new FragHit();
   _header = "";
-  
+
   // Parse header
   size_t index = 0;
   while(_in->good()) {
@@ -321,19 +337,23 @@ SAMParser::SAMParser(istream* in) {
     }
     _header += line_buff;
     _header += "\n";
-    
+
     string str(line_buff);
     size_t idx = str.find("SN:");
     if (idx!=string::npos) {
       string name = str.substr(idx+3);
       name = name.substr(0,name.find_first_of("\n\t "));
       if (_targ_index.find(name) == _targ_index.end()) {
-        _targ_index[name] = index++;
+        TargID id = index++;
+        if (id_map) {
+          id = id_map->at(id);
+        }
+        _targ_index[name] = id;
       } else {
         cerr << "Warning: Target '" << str
              << "' appears twice in the SAM index.\n";
       }
-      
+ 
       idx = str.find("LN:");
       if (idx != string::npos) {
         string len = str.substr(idx+3);
@@ -342,7 +362,7 @@ SAMParser::SAMParser(istream* in) {
       }
     }
   }
-  
+
   // Load first aligned read
   while(!map_end_from_line(line_buff)) {
     if (!_in->good()) {
@@ -355,10 +375,10 @@ SAMParser::SAMParser(istream* in) {
 
 bool SAMParser::next_fragment(Fragment& nf) {
   nf.add_map_end(_frag_buff);
-  
+
   _frag_buff = new FragHit();
   char line_buff[BUFF_SIZE];
-  
+
   while(_in->good()) {
     _in->getline (line_buff, BUFF_SIZE-1, '\n');
     if (!map_end_from_line(line_buff)) {
@@ -369,7 +389,7 @@ bool SAMParser::next_fragment(Fragment& nf) {
     }
     _frag_buff = new FragHit();
   }
-  
+
   return _in->good();
 }
 
@@ -379,7 +399,7 @@ bool SAMParser::map_end_from_line(char* line) {
   char *p = strtok(line, "\t");
   int sam_flag=0;
   bool paired=0;
-  
+
   int i = 0;
   while (p && i <= 9) {
     switch(i++) {
@@ -472,18 +492,18 @@ void SAMParser::reset() {
   // Rewind input file
   _in->clear();
   _in->seekg(0, ios::beg);
-  
+
   // Load first alignment
   char line_buff[BUFF_SIZE];
   _frag_buff = new FragHit();
-  
+
   while(_in->good()) {
     _in->getline(line_buff, BUFF_SIZE-1, '\n');
     if (line_buff[0] != '@') {
       break;
     }
   }
-  
+
   while(!map_end_from_line(line_buff)) {
     _in->getline(line_buff, BUFF_SIZE-1, '\n');
   }

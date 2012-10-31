@@ -14,7 +14,7 @@
 struct FragHit;
 class Target;
 
-/** 
+/**
  * The MismatchTable class is used to store and update mismatch and indel
  * (error) parameters using a first-order Markov model based on nucleotide and
  * position in a read. Also computes likelihoods of mismatches and indels in
