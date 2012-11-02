@@ -105,14 +105,17 @@ def initialize_matrix(infile):
 class Tree:
   def __init__(self, id, *children):
     self.id = id
-    self.children = children
     self.parent = None
-    for child in children:
-      child.parent = self
+    self.set_children(*children)
 
   def is_leaf(self):
     return len(self.children) == 0
   
+  def set_children(self, *children):
+    for child in children:
+      child.parent = self
+    self.children = children
+
   def leaves(self):
     if self.is_leaf():
       return [self.id]
@@ -138,6 +141,9 @@ class Forest:
   
   def add_node(self, id, *child_ids):
     self.nodes.append(Tree(id, *(self.nodes[child_id] for child_id in child_ids)))
+  
+  def insert_node(self, node):
+    self.nodes.append(node)
   
   def to_string(self):
     s = ''
@@ -173,6 +179,7 @@ def build_forest2(infile):
   
   curr_qname = ''
   trees_to_merge = set([]) 
+  leaf_ids = set([])
   n = 0
   for read in samfile:
     if read.qname != curr_qname:
@@ -184,19 +191,27 @@ def build_forest2(infile):
         F.add_node(id, *trees_to_merge)
         for leaf in F.nodes[-1].leaves():
           trees[leaf] = id 
+      elif len(trees_to_merge) == 1:
+        parents = set(F.nodes[leaf_id].parent for leaf_id in leaf_ids) 
+        if len(parents) = 1:
+          parent = F.nodes[leaf_ids[0]].parent
+          if len(leaf_ids) < len(parent.children):
+            u = Tree(len(F), *(F.nodes[leaf_id] for leaf_ids in leaf_ids))
+            F.insert_node(u)
+            new_children = [child for child in p.children if (not child.id in leaf_ids)] + [u]
+            parent.set_children(*new_children)
       trees_to_merge = set([])
+      leaf_ids = set([])
       curr_qname = read.qname
 
     if read.is_unmapped:
       continue
 
-    if not read.is_paired:
+    if (not read.is_paired) or (read.is_proper_pair and read.is_reverse):
       trees_to_merge.add(trees[read.tid])
+      leaf_ids.add(read.tid)
       continue
 
-    if read.is_proper_pair and read.is_reverse:
-      trees_to_merge.add(trees[read.tid])
-      continue
   return F
 
 #M = initialize_matrix('/home/adarob/experiments/express/simulation/hg19_ucsc_err_flip/hits.bam')
