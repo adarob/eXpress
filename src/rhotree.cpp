@@ -28,19 +28,28 @@ Sap Sap::branch(size_t split) {
 
 double RhoTree::similarity_scalar(const Sap& sap) {
   if (sap.size() < _children.size()) {
-    return 0;
+    return LOG_1;
   }
   double c = log(sap.size());
   double tot = sap.total_const_likelihood();
+  if (tot == LOG_0) {
+    return LOG_0;
+  }
   for (size_t i = 0; i < sap.size(); ++i) {
     double p = sap.const_likelihood(i) - tot;
     c += sexp(p)*p;
+    assert(!isnan(c));
   }
+  if (c < 0) {
+    assert(approx_eq(c,0));
+    return LOG_0;
+  }
+  assert(c==0 || !isnan(log(c)));
   return log(c);
 }
 
 RangeRhoForest::RangeRhoForest(string infile_path, double ff_param)
-    : RangeRhoTree(0,0, ff_param) {
+    : RangeRhoTree(0, 0, ff_param) {
   load_from_file(infile_path);
 }
 
@@ -124,7 +133,8 @@ void RangeRhoForest::set_alphas(const vector<double>& target_alphas) {
   SapData params(target_alphas.size());
   assert(target_alphas.size() == num_leaves());
   for (TargID i = 0; i < target_alphas.size(); i++) {
-    LeafID leaf = _target_to_leaf_map[i];
+    //    LeafID leaf = _target_to_leaf_map[i];
+    LeafID leaf = i;
     params.leaf_ids[leaf] = leaf;
     params.rhos[leaf] = target_alphas[i];
     assert(params.rhos[leaf] != LOG_0);
@@ -160,7 +170,7 @@ void RangeRhoForest::process_fragment(const Fragment& frag) {
   if (frag.num_hits() == 1) {
     SapData params(1);
     FragHit& hit = *frag[0];
-    params.leaf_ids[0] = _target_to_leaf_map[hit.targ_id];
+    params.leaf_ids[0] = hit.targ_id;
     params.tree_root = _leaf_to_tree_map[params.leaf_ids[0]];
     params.accum_assignments[1] = 0;
     double mass = next_mass();
@@ -265,8 +275,14 @@ void RangeRhoTree::get_rhos(Sap sap, double rho) const {
 }
 
 void RangeRhoTree::update_rhos(Sap sap) {
+  if (is_leaf()) {
+    return;
+  }
   const double mass = next_mass() + similarity_scalar(sap);
-
+  if (islzero(mass)) {
+    return;
+  }
+  
   for (size_t i = 0; i < _children.size(); ++i) {
     RangeRhoTree& child = *static_cast<RangeRhoTree*>(_children[i]);
     Sap branch_sap = sap.branch(child.right());

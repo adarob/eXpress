@@ -101,6 +101,8 @@ inline double log_add(double x, double y) {
   if (fabs(y) == LOG_0) {
     return x;
   }
+  
+  assert(!std::isnan(x) && !std::isnan(y));
 
   if (y > x) {
     std::swap(x,y);
@@ -129,6 +131,7 @@ inline double log_sub(double x, double y) {
   }
 
   double diff = x+log(1-exp(y-x));
+  assert(!std::isnan(diff));
   return diff;
 }
 /**

@@ -134,7 +134,7 @@ class RhoLeafIterator : public std::iterator<std::forward_iterator_tag,
       }
       parent = &_stack.top();
       parent->curr_child++;
-      if (parent->curr_child == parent->tree->num_children()) {
+      if (parent->curr_child >= parent->tree->num_children()) {
         _stack.pop();
         parent = NULL;
       }
@@ -158,7 +158,9 @@ class RhoLeafIterator : public std::iterator<std::forward_iterator_tag,
   }
   RhoLeafIterator& operator++() {
     prune_used_branches();
-    travel_to_leaf();
+    if (!_stack.empty()) {
+      travel_to_leaf();
+    }
     return *this;
   }
   RhoTree* operator*() {
@@ -216,6 +218,7 @@ public:
   size_t num_leaves() const {
     return _leaf_to_tree_map.size();
   }
+  // TODO: We stop using this map after remapping the targets...need to fix this.
   const std::vector<LeafID>* target_to_leaf_map() const {
     return &_target_to_leaf_map;
   }

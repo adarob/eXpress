@@ -182,7 +182,7 @@ void FrequencyMatrix<T>::increment(size_t i, size_t j, T incr_amt) {
     _array[k] += incr_amt;
     _rowsums[i] += incr_amt;
   }
-//    assert(!std::isnan(_rowsums[i]) && !std::isinf(_rowsums[i]));
+  assert(!std::isnan(_rowsums[i]));
 }
 
 template <class T>

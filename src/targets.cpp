@@ -253,7 +253,7 @@ void project_to_polytope(vector<const Target*> bundle_targ,
     double bound_counts = 0;
     for (size_t i = 0; i < bundle_targ.size(); ++i) {
       const Target& targ = *bundle_targ[i];
-
+      assert(targ.tot_counts() <= bundle_counts);
       if (targ_counts[i] > targ.tot_counts()) {
         targ_counts[i] = targ.tot_counts();
         polytope_bound[i] = true;

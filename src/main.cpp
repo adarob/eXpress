@@ -340,10 +340,13 @@ void process_fragment(Fragment* frag_p) {
 
   size_t num_solvable = 0;
   
+  boost::unordered_set<TargID> targets;
+  
   if (frag.num_hits() > 1) {
     for(size_t i = 0; i < frag.num_hits(); ++i) {
       FragHit& hit = *frag[i];
       Target* t = hit.targ;
+      targets.insert(hit.targ_id);
 
       num_solvable += t->solvable();
       
@@ -380,7 +383,9 @@ void process_fragment(Fragment* frag_p) {
     double p = hit.probability;
     Target* t = hit.targ;
     if (first_round) {
-      t->incr_counts(frag.num_hits()==1);
+      if (i == 0 || frag[i-1]->targ_id != hit.targ_id) {
+        t->incr_counts(targets.size() <= 1);
+      }
       if (!t->solvable() && num_solvable == frag.num_hits()-1) {
         t->solvable(true);
       }
