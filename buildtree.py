@@ -181,7 +181,7 @@ def build_forest2(infile):
         print n
       if len(trees_to_merge) > 1:
         id = len(F)
-        F.add_node(id, trees_to_merge)
+        F.add_node(id, *trees_to_merge)
         for leaf in F.nodes[-1].leaves():
           trees[leaf] = id 
       trees_to_merge = set([])
@@ -202,4 +202,4 @@ def build_forest2(infile):
 #M = initialize_matrix('/home/adarob/experiments/express/simulation/hg19_ucsc_err_flip/hits.bam')
 #F = build_forest(M)
 F = build_forest2('/home/adarob/experiments/express/simulation/hg19_ucsc_err_flip/hits.bam')
-file('forest_flip.out','w').write(F.to_string())
+file('forest_flip2.out','w').write(F.to_string())
