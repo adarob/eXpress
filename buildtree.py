@@ -194,9 +194,9 @@ def build_forest2(infile):
       elif len(trees_to_merge) == 1:
         parents = set(F.nodes[leaf_id].parent for leaf_id in leaf_ids) 
         if len(parents) = 1:
-          parent = F.nodes[leaf_ids[0]].parent
+          parent = parents.pop()
           if len(leaf_ids) < len(parent.children):
-            u = Tree(len(F), *(F.nodes[leaf_id] for leaf_ids in leaf_ids))
+            u = Tree(len(F), *(F.nodes[leaf_id] for leaf_id in leaf_ids))
             F.insert_node(u)
             new_children = [child for child in p.children if (not child.id in leaf_ids)] + [u]
             parent.set_children(*new_children)
