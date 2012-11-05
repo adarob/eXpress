@@ -84,13 +84,15 @@ float Target::get_3_bias(size_t pos) const {
 
 void Target::update_target_bias(BiasBoss* bias_table, FLD* fld) {
   boost::unique_lock<boost::shared_mutex> lock(_mutex);
-  if (!_5_bias) {
-    _5_bias.reset(new std::vector<float>(length(), 0));
-    _3_bias.reset(new std::vector<float>(length(), 0));
+
+  if (bias_table) {
+    if (!_5_bias) {
+      _5_bias.reset(new std::vector<float>(length(), 0));
+      _3_bias.reset(new std::vector<float>(length(), 0));
+    }
+    _avg_bias = bias_table->get_target_bias(*_3_bias, *_5_bias, *this);
+    assert(!isnan(_avg_bias) && !isinf(_avg_bias));
   }
-  
-  _avg_bias = bias_table->get_target_bias(*_3_bias, *_5_bias, *this);
-  assert(!isnan(_avg_bias) && !isinf(_avg_bias));
   _cached_eff_len = est_effective_length(fld, false);
 }
 
