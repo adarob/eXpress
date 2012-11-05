@@ -171,7 +171,10 @@ def build_forest(M):
   return F
   
 def build_forest2(infile):
+  import sys
   import pysam
+
+  sys.setrecursionlimit(10000)
   samfile = pysam.Samfile(infile)
   
   trees = [i for i in xrange(samfile.nreferences)]
@@ -193,12 +196,12 @@ def build_forest2(infile):
           trees[leaf] = id 
       elif len(trees_to_merge) == 1:
         parents = set(F.nodes[leaf_id].parent for leaf_id in leaf_ids) 
-        if len(parents) = 1:
-          parent = F.nodes[leaf_ids[0]].parent
-          if len(leaf_ids) < len(parent.children):
-            u = Tree(len(F), *(F.nodes[leaf_id] for leaf_ids in leaf_ids))
+        if len(parents) == 1:
+          parent = parents.pop()
+          if parent != None and len(leaf_ids) < len(parent.children):
+            u = Tree(len(F), *(F.nodes[leaf_id] for leaf_id in leaf_ids))
             F.insert_node(u)
-            new_children = [child for child in p.children if (not child.id in leaf_ids)] + [u]
+            new_children = [child for child in parent.children if (not child.id in leaf_ids)] + [u]
             parent.set_children(*new_children)
       trees_to_merge = set([])
       leaf_ids = set([])
@@ -216,5 +219,5 @@ def build_forest2(infile):
 
 #M = initialize_matrix('/home/adarob/experiments/express/simulation/hg19_ucsc_err_flip/hits.bam')
 #F = build_forest(M)
-F = build_forest2('/home/adarob/experiments/express/simulation/hg19_ucsc_err_flip/hits.bam')
-file('forest_flip2.out','w').write(F.to_string())
+F = build_forest2('/home/adarob/experiments/express/simulation/hg19_ucsc_err/hits.bam')
+file('forest.out','w').write(F.to_string())
