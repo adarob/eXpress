@@ -8,7 +8,9 @@
 
 /* Begin PBXBuildFile section */
 		0A04E7C01540B87200D9A162 /* threadsafety.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0A04E7BF1540B87200D9A162 /* threadsafety.cpp */; };
-		0A2D58911405F128008891E7 /* libboost_program_options.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A2D58901405F128008891E7 /* libboost_program_options.a */; };
+		0A18CE71163F258A001FBCF6 /* libboost_system-mt.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A18CE70163F258A001FBCF6 /* libboost_system-mt.a */; };
+		0A18CE74163F25BE001FBCF6 /* libboost_filesystem-mt.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A18CE72163F25BE001FBCF6 /* libboost_filesystem-mt.a */; };
+		0A18CE75163F25BE001FBCF6 /* libboost_program_options-mt.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A18CE73163F25BE001FBCF6 /* libboost_program_options-mt.a */; };
 		0A5C7638136F2EF10095365C /* biascorrection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0A5C762A136F2EF10095365C /* biascorrection.cpp */; };
 		0A5C7639136F2EF10095365C /* fld.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0A5C762C136F2EF10095365C /* fld.cpp */; };
 		0A5C763A136F2EF10095365C /* fragments.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0A5C762E136F2EF10095365C /* fragments.cpp */; };
@@ -16,8 +18,6 @@
 		0A5C763D136F2EF10095365C /* mismatchmodel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0A5C7634136F2EF10095365C /* mismatchmodel.cpp */; };
 		0A5C763E136F2EF10095365C /* targets.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0A5C7636136F2EF10095365C /* targets.cpp */; };
 		0A60597313A170A400B5C9BA /* libboost_thread-mt.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A60597213A170A400B5C9BA /* libboost_thread-mt.a */; };
-		0A60597513A170AD00B5C9BA /* libboost_filesystem.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A60597413A170AD00B5C9BA /* libboost_filesystem.a */; };
-		0A60597713A1753B00B5C9BA /* libboost_system.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A60597613A1753B00B5C9BA /* libboost_system.a */; };
 		0A63748614CF83A500D79987 /* sequence.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0A63748514CF83A500D79987 /* sequence.cpp */; };
 		0A9F0E1014CF64FF00379DC6 /* markovmodel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0A9F0E0F14CF64FF00379DC6 /* markovmodel.cpp */; };
 		0AC83E53162C2DCF00DE4074 /* express-spark.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0AC83E52162C2DCF00DE4074 /* express-spark.cpp */; };
@@ -36,8 +36,6 @@
 		0AC83E75162C31D600DE4074 /* threadsafety.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0A04E7BF1540B87200D9A162 /* threadsafety.cpp */; };
 		0AC83E76162C326700DE4074 /* libbamtools.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0ADF037C140C66D500D16BBE /* libbamtools.a */; };
 		0AC83E77162C326C00DE4074 /* libboost_thread-mt.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A60597213A170A400B5C9BA /* libboost_thread-mt.a */; };
-		0AC83E7A162C327400DE4074 /* libboost_program_options.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A2D58901405F128008891E7 /* libboost_program_options.a */; };
-		0AC83E7B162C327700DE4074 /* libboost_system.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A60597613A1753B00B5C9BA /* libboost_system.a */; };
 		0AC83E7E162C34C200DE4074 /* libprotobuf.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0AC83E7D162C34C200DE4074 /* libprotobuf.a */; };
 		0ACBB2F2143EA2DD001322D2 /* bundles.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0ACBB2F0143EA2DD001322D2 /* bundles.cpp */; };
 		0AD5968913FF20C700EEBDD7 /* mapparser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0AD5968813FF20C700EEBDD7 /* mapparser.cpp */; };
@@ -68,7 +66,9 @@
 
 /* Begin PBXFileReference section */
 		0A04E7BF1540B87200D9A162 /* threadsafety.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = threadsafety.cpp; sourceTree = "<group>"; };
-		0A2D58901405F128008891E7 /* libboost_program_options.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libboost_program_options.a; path = ../../../../../../opt/local/lib/libboost_program_options.a; sourceTree = "<group>"; };
+		0A18CE70163F258A001FBCF6 /* libboost_system-mt.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libboost_system-mt.a"; path = "../../../../../../opt/local/lib/libboost_system-mt.a"; sourceTree = "<group>"; };
+		0A18CE72163F25BE001FBCF6 /* libboost_filesystem-mt.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libboost_filesystem-mt.a"; path = "/opt/local/lib/libboost_filesystem-mt.a"; sourceTree = "<absolute>"; };
+		0A18CE73163F25BE001FBCF6 /* libboost_program_options-mt.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libboost_program_options-mt.a"; path = "/opt/local/lib/libboost_program_options-mt.a"; sourceTree = "<absolute>"; };
 		0A4DC487140ACC640091CA28 /* update_check.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = update_check.h; sourceTree = "<group>"; };
 		0A5C7608136F2E850095365C /* express */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = express; sourceTree = BUILT_PRODUCTS_DIR; };
 		0A5C762A136F2EF10095365C /* biascorrection.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = biascorrection.cpp; sourceTree = "<group>"; };
@@ -85,8 +85,6 @@
 		0A5C7636136F2EF10095365C /* targets.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; lineEnding = 0; path = targets.cpp; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.cpp; };
 		0A5C7637136F2EF10095365C /* targets.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = targets.h; sourceTree = "<group>"; };
 		0A60597213A170A400B5C9BA /* libboost_thread-mt.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libboost_thread-mt.a"; path = "../../../../../../opt/local/lib/libboost_thread-mt.a"; sourceTree = "<group>"; };
-		0A60597413A170AD00B5C9BA /* libboost_filesystem.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libboost_filesystem.a; path = ../../../../../../opt/local/lib/libboost_filesystem.a; sourceTree = "<group>"; };
-		0A60597613A1753B00B5C9BA /* libboost_system.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libboost_system.a; path = ../../../../../../opt/local/lib/libboost_system.a; sourceTree = "<group>"; };
 		0A63748414CF81AC00D79987 /* sequence.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sequence.h; sourceTree = "<group>"; };
 		0A63748514CF83A500D79987 /* sequence.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = sequence.cpp; sourceTree = "<group>"; };
 		0A9F0E0F14CF64FF00379DC6 /* markovmodel.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = markovmodel.cpp; sourceTree = "<group>"; };
@@ -116,10 +114,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				0A60597313A170A400B5C9BA /* libboost_thread-mt.a in Frameworks */,
-				0A60597513A170AD00B5C9BA /* libboost_filesystem.a in Frameworks */,
-				0A60597713A1753B00B5C9BA /* libboost_system.a in Frameworks */,
-				0A2D58911405F128008891E7 /* libboost_program_options.a in Frameworks */,
 				0ADF037D140C66D500D16BBE /* libbamtools.a in Frameworks */,
+				0A18CE71163F258A001FBCF6 /* libboost_system-mt.a in Frameworks */,
+				0A18CE74163F25BE001FBCF6 /* libboost_filesystem-mt.a in Frameworks */,
+				0A18CE75163F25BE001FBCF6 /* libboost_program_options-mt.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -129,8 +127,6 @@
 			files = (
 				0AC83E77162C326C00DE4074 /* libboost_thread-mt.a in Frameworks */,
 				0AC83E76162C326700DE4074 /* libbamtools.a in Frameworks */,
-				0AC83E7A162C327400DE4074 /* libboost_program_options.a in Frameworks */,
-				0AC83E7B162C327700DE4074 /* libboost_system.a in Frameworks */,
 				0AC83E7E162C34C200DE4074 /* libprotobuf.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -142,11 +138,11 @@
 			isa = PBXGroup;
 			children = (
 				0AC83E7D162C34C200DE4074 /* libprotobuf.a */,
-				0ADF037C140C66D500D16BBE /* libbamtools.a */,
-				0A2D58901405F128008891E7 /* libboost_program_options.a */,
-				0A60597613A1753B00B5C9BA /* libboost_system.a */,
-				0A60597413A170AD00B5C9BA /* libboost_filesystem.a */,
+				0A18CE73163F25BE001FBCF6 /* libboost_program_options-mt.a */,
+				0A18CE72163F25BE001FBCF6 /* libboost_filesystem-mt.a */,
+				0A18CE70163F258A001FBCF6 /* libboost_system-mt.a */,
 				0A60597213A170A400B5C9BA /* libboost_thread-mt.a */,
+				0ADF037C140C66D500D16BBE /* libbamtools.a */,
 				0A5C7629136F2EF10095365C /* src */,
 				0A5C7609136F2E850095365C /* Products */,
 			);
@@ -509,6 +505,7 @@
 				0AC83E50162C293000DE4074 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

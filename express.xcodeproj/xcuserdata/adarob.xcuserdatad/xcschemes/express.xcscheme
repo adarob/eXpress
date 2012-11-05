@@ -60,15 +60,11 @@
       <CommandLineArguments>
          <CommandLineArgument
             argument = "--frag-len-mean 250 --frag-len-stddev 50 -B 5 -o $(SRCROOT)/sample_data3/out $(SRCROOT)/sample_data3/hox_ucsc.fa $(SRCROOT)/sample_data3/hits_1M.sam,$(SRCROOT)/sample_data3/hits_1M.sam_2"
+            isEnabled = "NO">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "-f 1 -o $(SRCROOT)/sample_data2/out $(SRCROOT)/sample_data2/hg19-ucsc_transcripts.fa $(SRCROOT)/sample_data2/hits.n2e160.clip.bam"
             isEnabled = "YES">
-         </CommandLineArgument>
-         <CommandLineArgument
-            argument = "--preprocess-spark /Users/adarob/downloads/Multi-Fasta-NiRa.fa /Users/adarob/downloads/NiRa-FR.bam"
-            isEnabled = "NO">
-         </CommandLineArgument>
-         <CommandLineArgument
-            argument = "--output-running-reads -o $(SRCROOT)/sample_data2/out $(SRCROOT)/sample_data2/hg19-ucsc_transcripts.fa /Volumes/math.mcb.berkeley.edu/experiments/express/simulation/hg19_ucsc_bias/hits.bam"
-            isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
             argument = "-f 0.65 -o $(SRCROOT)/sample_data3/out --output-running-reads --no-bias-correct $(SRCROOT)/sample_data2/hg19-ucsc_transcripts.fa /Volumes/math.mcb.berkeley.edu/experiments/express/simulation/hg19_ucsc_err/hits.bam"

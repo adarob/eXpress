@@ -73,6 +73,14 @@ const char NUCS[] = {'A','C','G','T'};
  */
 const double LOG_0 = HUGE_VAL;
 /**
+ * A global double representing the log of 1.
+ */
+const double LOG_1 = 0;
+/**
+ * A global double representing the log of 0.25.
+ */
+const double LOG_QUARTER = log(0.25);
+/**
  * A global double specifying the default epsilon value to be used in approx_eq.
  */
 const double EPSILON = 0.000001;

@@ -44,15 +44,19 @@ Target::Target(TargID id, const std::string& name, const std::string& seq,
 
 void Target::add_mass(double p, double v, double mass) {
   _curr_params.mass = log_add(_curr_params.mass, p+mass);
-  _curr_params.mass_var = log_add(_curr_params.mass_var, p+mass*2);
+  double var_update = p+mass*2;
   if (p != 0.0 || v != LOG_0) {
-    _curr_params.mass_var = log_add(_curr_params.mass_var, v+2*mass);
-    _curr_params.var_sum = log_add(_curr_params.var_sum, v+mass);
+    var_update = log_add(var_update, v + 2*mass);
+    _curr_params.var_sum = min(log_add(_curr_params.var_sum, v+mass),
+                               LOG_QUARTER + 2*_curr_params.tot_ambig_mass);
     if (p!=LOG_0) {
       _curr_params.tot_ambig_mass = log_add(_curr_params.tot_ambig_mass, mass);
     }
   }
-
+  
+  _curr_params.mass_var = log_add(_curr_params.mass_var,
+                                  min(mass*2 + LOG_QUARTER, var_update));
+  
   (_libs->curr_lib()).targ_table->update_total_fpb(mass - _cached_eff_len);
 }
 

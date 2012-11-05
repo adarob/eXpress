@@ -13,8 +13,6 @@
 
 using namespace std;
 
-const double LOG_QUARTER = log(0.25);
-
 MarkovModel::MarkovModel(size_t order, size_t window_size,
                          size_t num_pos, double alpha)
     : _order((int)order),

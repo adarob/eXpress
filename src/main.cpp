@@ -371,21 +371,23 @@ void process_fragment(Fragment* frag_p) {
 
   // set of locked targets
   boost::unordered_set<Target*> targ_set;
+  boost::unordered_set<Target*> locked_set;
 
   // calculate marginal likelihoods and lock targets.
   if (frag.num_hits()>1) {
     for (size_t i = 0; i < frag.num_hits(); ++i) {
       const FragHit& m = *frag.hits()[i];
       Target* t = m.target();
-      if (targ_set.count(t) == 0) {
+      if (locked_set.count(t) == 0) {
         t->lock();
-        targ_set.insert(t);
+        locked_set.insert(t);
       }
+      targ_set = locked_set;
       // lock neighbors
       foreach (Target* neighbor, *m.neighbors()) {
-        if (targ_set.count(neighbor) == 0) {
+        if (locked_set.count(neighbor) == 0) {
           neighbor->lock();
-          targ_set.insert(neighbor);
+          locked_set.insert(neighbor);
         }
       }
       likelihoods[i] = t->log_likelihood(m, first_round);
@@ -399,12 +401,12 @@ void process_fragment(Fragment* frag_p) {
   } else {
     Target* t = frag.hits()[0]->target();
     t->lock();
-    targ_set.insert(t);
+    locked_set.insert(t);
     total_likelihood = likelihoods[0];
     foreach (Target* neighbor, *frag.hits()[0]->neighbors()) {
       if (targ_set.count(neighbor) == 0) {
         neighbor->lock();
-        targ_set.insert(neighbor);
+        locked_set.insert(neighbor);
       }
     }
   }
@@ -419,7 +421,7 @@ void process_fragment(Fragment* frag_p) {
 
   // normalize marginal likelihoods
   for (size_t i = 0; i < frag.num_hits(); ++i) {
-    FragHit& m = *frag.hits()[i];
+    FragHit& m = *frag[i];
     Target* t  = m.target();
 
     bundle = lib.targ_table->merge_bundles(bundle, t->bundle());
@@ -441,7 +443,9 @@ void process_fragment(Fragment* frag_p) {
 
     // update parameters
     if (first_round) {
-      t->incr_counts(frag.num_hits()==1);
+      if (i == 0 || frag[i-1]->target_id() != t->id()) {
+        t->incr_counts(targ_set.size() <= 1);
+      }
       if (!t->solvable() && num_solvable == frag.num_hits()-1) {
         t->solvable(true);
       }
@@ -473,7 +477,7 @@ void process_fragment(Fragment* frag_p) {
     }
   }
 
-  foreach (Target* t, targ_set) {
+  foreach (Target* t, locked_set) {
     t->unlock();
   }
 }
@@ -751,7 +755,7 @@ int estimation_main() {
     }
     remaining_rounds--;
     cout << "\nRe-estimating counts with additional round of EM ("
-    << remaining_rounds << " remaining)...\n";
+         << remaining_rounds << " remaining)...\n";
     last_round = (remaining_rounds == 0);
     for (size_t l = 0; l < libs.size(); l++) {
       libs[l].map_parser->write_active(last_round);
