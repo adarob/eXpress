@@ -84,6 +84,11 @@ class Bundle {
    * to targets in the bundle.
    */
   size_t _counts;
+  /**
+   * A private size_t that stores the total mass of observed fragments mapped
+   * to targets in the bundle (logged).
+   */
+  double _mass;
 
   friend class BundleTable;
 
@@ -99,6 +104,12 @@ public:
    * @param incr_amt the amount to increase the counts by.
    */
   void incr_counts(size_t incr_amt=1);
+  /**
+   * A member function that increases the total bundle mass (logged)
+   * by a given amount.
+   * @param incr_amt the amount to increase the mass by (logged).
+   */
+  void incr_mass(double incr_amt);
   /**
    * An accessor for the number of Targets in the bundle.
    * @return The number of Targets in the bundle.
@@ -116,6 +127,12 @@ public:
    * @return The total number of fragments mapped to targets in the bundle.
    */
   size_t counts() const { return _counts; }
+  /**
+   * An accessor for the the total mass of observed fragments mapped to
+   * targets in the bundle (logged).
+   * @return The total mass of fragments mapped to targets in the bundle.
+   */
+  double mass() const { return _mass; }
 };
 
 typedef boost::unordered_set<Bundle*> BundleSet;

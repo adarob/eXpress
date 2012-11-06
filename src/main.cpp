@@ -417,6 +417,7 @@ void process_fragment(Fragment* frag_p) {
   Bundle* bundle = frag.hits()[0]->target()->bundle();
   if (first_round) {
     bundle->incr_counts();
+    bundle->incr_mass(mass_n);
   }
 
   // normalize marginal likelihoods

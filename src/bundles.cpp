@@ -31,12 +31,16 @@ double CovarTable::get(TargID targ1, TargID targ2) {
   }
 }
 
-Bundle::Bundle(Target* targ) : _counts(targ->tot_counts()) {
+Bundle::Bundle(Target* targ) : _counts(targ->tot_counts()), _mass(LOG_0) {
   _targets.push_back(targ);
 }
 
 void Bundle::incr_counts(size_t incr_amt) {
   _counts += incr_amt;
+}
+
+void Bundle::incr_mass(double incr_amt) {
+  _mass = log_add(_mass, incr_amt);
 }
 
 BundleTable::~BundleTable() {
@@ -66,6 +70,7 @@ Bundle* BundleTable::merge(Bundle* b1, Bundle* b2) {
   }
 
   b1->incr_counts(b2->counts());
+  b1->incr_mass(b2->mass());
   _bundles.erase(b2);
   delete b2;
 

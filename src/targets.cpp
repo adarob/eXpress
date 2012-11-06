@@ -44,18 +44,21 @@ Target::Target(TargID id, const std::string& name, const std::string& seq,
 
 void Target::add_mass(double p, double v, double mass) {
   _curr_params.mass = log_add(_curr_params.mass, p+mass);
-  double var_update = p+mass*2;
-  if (p != 0.0 || v != LOG_0) {
-    var_update = log_add(var_update, v + 2*mass);
-    _curr_params.var_sum = min(log_add(_curr_params.var_sum, v+mass),
-                               LOG_QUARTER + 2*_curr_params.tot_ambig_mass);
-    if (p!=LOG_0) {
+  if (p != LOG_1 || v != LOG_0) {
+    if (p != LOG_0) {
       _curr_params.tot_ambig_mass = log_add(_curr_params.tot_ambig_mass, mass);
     }
+    double p_hat = _curr_params.var_sum - _curr_params.tot_ambig_mass;
+    assert(p_hat <= LOG_1);
+    _curr_params.var_sum = min(log_add(_curr_params.var_sum, v+mass),
+                               log_sub(_curr_params.tot_ambig_mass + p_hat
+                                       + log_sub(LOG_1, p_hat), EPSILON));
   }
-  
-  _curr_params.mass_var = log_add(_curr_params.mass_var,
-                                  min(mass*2 + LOG_QUARTER, var_update));
+  double var_update = log_add(p + mass*2, v + 2*mass);
+  _curr_params.mass_var = min(log_add(_curr_params.mass_var, var_update),
+                              log_sub(_curr_params.mass + log_sub(_bundle->mass(),
+                                                                  _curr_params.mass),
+                                      EPSILON));
   
   (_libs->curr_lib()).targ_table->update_total_fpb(mass - _cached_eff_len);
 }
@@ -390,10 +393,7 @@ void TargetTable::output_results(string output_dir, size_t tot_counts,
 
     // Calculate total counts for bundle and bundle-level rho
     // Do not include pseudo-mass because it will screw up multi-round results
-    double l_bundle_mass = LOG_0;
-    for (size_t i = 0; i < bundle_targ.size(); ++i) {
-      l_bundle_mass = log_add(l_bundle_mass, bundle_targ[i]->mass(false));
-    }
+    double l_bundle_mass = bundle->mass();
 
     if (bundle->counts()) {
       double l_bundle_counts = log((double)bundle->counts());
