@@ -195,7 +195,7 @@ int preprocess_main() {
   ostream frag_out(cout.rdbuf());
   
   size_t num_frags = 0;
-  cout << setiosflags(ios::left);
+  cerr << setiosflags(ios::left);
   Fragment* frag;
   
   ParseThreadSafety pts(10);

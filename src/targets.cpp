@@ -170,14 +170,14 @@ TargetTable::TargetTable(const string& targ_fasta_file, bool prob_seqs,
                          double alpha, const AlphaMap* alpha_map,
                          const Librarian* libs)
     :  _libs(libs) {
-  cout << "Loading target sequences";
+  cerr << "Loading target sequences";
   const Library& lib = _libs->curr_lib();
   const TransIndex& targ_index = lib.map_parser->targ_index();
   const TransIndex& targ_lengths = lib.map_parser->targ_lengths();
   if (lib.bias_table) {
-        cout << " and measuring bias background";
+        cerr << " and measuring bias background";
   }
-  cout << "...\n\n";
+  cerr << "...\n\n";
 
   size_t num_targs = targ_index.size();
   _targ_map = vector<Target*>(num_targs, NULL);
@@ -575,7 +575,7 @@ void TargetTable::asynch_bias_update(boost::mutex* mutex) {
         }
         bg_table = new BiasBoss(0);
       }
-      cout << "Synchronized parameter tables.\n";
+      cerr << "Synchronized parameter tables.\n";
     }
 
     if (!edit_detect && burned_out && burned_out_before) {

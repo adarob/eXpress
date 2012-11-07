@@ -99,14 +99,14 @@ MapParser::MapParser(Library* lib, bool write_active)
   string out_file = lib->out_file_name;
   bool is_sam = false;
   if (in_file.size() == 0) {
-    cout << "No alignment file specified. Expecting streaming input on stdin...\n\n";
+    cerr << "No alignment file specified. Expecting streaming input on stdin...\n\n";
     _parser.reset(new SAMParser(&cin));
     is_sam = true;
   } else {
-    cout << "Attempting to read '" << in_file << "' in BAM format...\n";
+    cerr << "Attempting to read '" << in_file << "' in BAM format...\n";
     BamTools::BamReader* reader = new BamTools::BamReader();
     if (reader->Open(in_file)) {
-      cout << "Parsing BAM header...\n";
+      cerr << "Parsing BAM header...\n";
       _parser.reset(new BAMParser(reader));
       if (out_file.size()) {
         out_file += ".bam";
@@ -123,7 +123,7 @@ MapParser::MapParser(Library* lib, bool write_active)
       }
     } else {
       delete reader;
-      cout << "Input is not in BAM format. Trying SAM...\n";
+      cerr << "Input is not in BAM format. Trying SAM...\n";
       ifstream* ifs = new ifstream(in_file.c_str());
       if (!ifs->is_open()) {
         cerr << "ERROR: Unable to open input SAM file '" << in_file << "'.\n";
