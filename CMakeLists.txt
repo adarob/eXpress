@@ -23,6 +23,8 @@ find_package(Boost 1.39
     program_options
     REQUIRED)
 
+find_package(Protobuf)
+
 if(WIN32)
 	set(CMAKE_CXX_FLAGS "/EHsc")
 	set(WIN32_INT 1)
@@ -36,5 +38,9 @@ configure_file (
   "${PROJECT_SOURCE_DIR}/src/config.h"
   )
 
-include_directories(${Boost_INCLUDE_DIRS} "${CMAKE_CURRENT_SOURCE_DIR}/bamtools/include") 
+if (PROTOBUF_FOUND)
+  include_directories(${Boost_INCLUDE_DIRS} ${PROTOBUF_INCLUDE_DIR} "${CMAKE_CURRENT_SOURCE_DIR}/bamtools/include") 
+else (PROTOBUF_FOUND)
+  include_directories(${Boost_INCLUDE_DIRS} "${CMAKE_CURRENT_SOURCE_DIR}/bamtools/include") 
+endif(PROTOBUF_FOUND)
 add_subdirectory(src)
