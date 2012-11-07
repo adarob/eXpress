@@ -55,7 +55,7 @@ Direction direction = BOTH;
  * @param pointer to array of arguments as character arrays.
  * @return True iff there was an error.
  */
-bool parse_options(int ac, const char ** av) {
+bool parse_options(int ac, char ** av) {
   po::options_description standard("Standard Options");
   standard.add_options()
   ("help,h", "produce help message")
@@ -159,7 +159,7 @@ int preprocess_main() {
   lib.bias_table = NULL;
   MapParser map_parser(&lib, false);
   lib.map_parser = &map_parser;
-  lib.fld = new FLD(0, 0, 0, 0);
+  lib.fld = new FLD(0, 0, 0, 1);
   MarkovModel bias_model(3, 21, 21, 0);
   MismatchTable mismatch_table(0);
   TargetTable targ_table(fasta_filename, 0, 0,
@@ -302,7 +302,7 @@ int preprocess_main() {
 }
 
 
-int main(int argc, const char * argv[])
+int main(int argc, char * argv[])
 {
   int parse_ret = parse_options(argc, argv);
   if (parse_ret) {
