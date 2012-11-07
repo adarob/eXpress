@@ -84,6 +84,7 @@ const double LOG_QUARTER = log(0.25);
  * A global double specifying the default epsilon value to be used in approx_eq.
  */
 const double EPSILON = 0.000001;
+const double LOG_EPSILON = log(EPSILON);
 
 /**
  * Global function that determines if two doubles are within some epsilon of
@@ -128,13 +129,15 @@ inline double log_add(double x, double y) {
  * @return a double for the log of exp(x)-exp(y).
  */
 inline double log_sub(double x, double y) {
-  assert(x >= y);
   if (x == y) {
     return LOG_0;
   }
   if (fabs(y) == LOG_0) {
     return x;
   }
+  
+  assert(x > y);
+
 
   double diff = x+log(1-exp(y-x));
   return diff;

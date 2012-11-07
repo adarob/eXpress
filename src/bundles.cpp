@@ -57,11 +57,11 @@ Bundle* BundleTable::create_bundle(Target* targ) {
 
 Bundle* BundleTable::merge(Bundle* b1, Bundle* b2) {
   if (b1==b2) {
-     return b1;
+    return b1;
   }
 
   if (b1->size() < b2->size()) {
-        swap(b1, b2);
+    swap(b1, b2);
   }
 
   foreach(Target* targ, b2->_targets) {

@@ -42,25 +42,26 @@ Target::Target(TargID id, const std::string& name, const std::string& seq,
   _curr_params.mass_var = _cached_eff_len + _alpha;
 }
 
-void Target::add_mass(double p, double v, double mass) {
-  _curr_params.mass = log_add(_curr_params.mass, p+mass);
+void Target::add_mass(double p, double v, double m) {
+  _curr_params.mass = log_add(_curr_params.mass, p+m);
+  double mass_pseudo = mass(true);
   if (p != LOG_1 || v != LOG_0) {
     if (p != LOG_0) {
-      _curr_params.tot_ambig_mass = log_add(_curr_params.tot_ambig_mass, mass);
+      _curr_params.tot_ambig_mass = log_add(_curr_params.tot_ambig_mass, m);
     }
     double p_hat = _curr_params.var_sum - _curr_params.tot_ambig_mass;
-    assert(p_hat <= LOG_1);
-    _curr_params.var_sum = min(log_add(_curr_params.var_sum, v+mass),
+    assert(p_hat == LOG_0 || p_hat <= LOG_1);
+    _curr_params.var_sum = min(log_add(_curr_params.var_sum, v + m),
                                log_sub(_curr_params.tot_ambig_mass + p_hat
-                                       + log_sub(LOG_1, p_hat), EPSILON));
+                                       + log_sub(LOG_1, p_hat), LOG_EPSILON));
+    double var_update = log_add(p + 2*m, v + 2*m);
+    _curr_params.mass_var = min(log_add(_curr_params.mass_var, var_update),
+                                log_sub(mass_pseudo + log_sub(_bundle->mass(),
+                                                              mass_pseudo),
+                                        LOG_EPSILON));
   }
-  double var_update = log_add(p + mass*2, v + 2*mass);
-  _curr_params.mass_var = min(log_add(_curr_params.mass_var, var_update),
-                              log_sub(_curr_params.mass + log_sub(_bundle->mass(),
-                                                                  _curr_params.mass),
-                                      EPSILON));
   
-  (_libs->curr_lib()).targ_table->update_total_fpb(mass - _cached_eff_len);
+  (_libs->curr_lib()).targ_table->update_total_fpb(m - _cached_eff_len);
 }
 
 void Target::round_reset() {

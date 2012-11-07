@@ -63,7 +63,7 @@
             isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "-f 1 -o $(SRCROOT)/sample_data2/out $(SRCROOT)/sample_data2/hg19-ucsc_transcripts.fa $(SRCROOT)/sample_data2/hits.n2e160.clip.bam"
+            argument = "-f 1 --no-bias-correct -o $(SRCROOT)/sample_data2/out $(SRCROOT)/sample_data2/hg19-ucsc_transcripts.fa $(SRCROOT)/sample_data2/hits.n2e160.clip.bam"
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
