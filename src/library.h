@@ -11,7 +11,7 @@
 
 #include <vector>
 
-class RangeRhoForest;
+class RangeTauForest;
 
 /**
  * The Library struct holds pointers to the global parameter tables for a set of
@@ -30,7 +30,7 @@ struct Library {
    */
   std::string out_file_name;
   // DOC
-  RangeRhoForest* rho_forest;
+  RangeTauForest* tau_forest;
   /**
    * A pointer to the MapParser for parsing the input alignment file for this
    * library.

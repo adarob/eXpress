@@ -12,7 +12,7 @@
 #include "targets.h"
 #include "threadsafety.h"
 #include "library.h"
-#include "rhotree.h"
+#include "tautree.h"
 
 using namespace std;
 
@@ -98,8 +98,8 @@ MapParser::MapParser(Library* lib, bool write_active)
   bool is_sam = false;
 
   const vector<TargID>* id_map = NULL;
-  if (lib->rho_forest) {
-    id_map = lib->rho_forest->target_to_leaf_map();
+  if (lib->tau_forest) {
+    id_map = lib->tau_forest->target_to_leaf_map();
   }
   if (in_file.size() == 0) {
     cout << "No alignment file specified. Expecting streaming input on stdin...\n\n";
