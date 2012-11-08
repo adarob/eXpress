@@ -55,7 +55,7 @@ Direction direction = BOTH;
  * @param pointer to array of arguments as character arrays.
  * @return True iff there was an error.
  */
-bool parse_options(int ac, const char ** av) {
+bool parse_options(int ac, char ** av) {
   po::options_description standard("Standard Options");
   standard.add_options()
   ("help,h", "produce help message")
@@ -302,7 +302,7 @@ int preprocess_main() {
 }
 
 
-int main(int argc, const char * argv[])
+int main(int argc, char * argv[])
 {
   int parse_ret = parse_options(argc, argv);
   if (parse_ret) {
