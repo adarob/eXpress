@@ -314,7 +314,7 @@ void output_results(Librarian& libs, size_t tot_counts, int n=-1) {
   string dir = output_dir;
   if (n >= 0) {
     sprintf(buff, "%s/x_%d", output_dir.c_str(), n);
-    cout << "Writing results to " << buff << endl;
+    cerr << "Writing results to " << buff << endl;
     dir = string(buff);
     try {
       fs::create_directories(dir);
@@ -510,13 +510,13 @@ void proc_thread(ParseThreadSafety* pts) {
  * @return The total number of fragments processed.
  */
 size_t threaded_calc_abundances(Librarian& libs) {
-  cout << "Processing input fragment alignments...\n";
+  cerr << "Processing input fragment alignments...\n";
   boost::scoped_ptr<boost::thread> bias_update;
 
   size_t n = 1;
   size_t num_frags = 0;
   double mass_n = 0;
-  cout << setiosflags(ios::left);
+  cerr << setiosflags(ios::left);
 
   // For log-scale output
   size_t i = 1;
@@ -612,7 +612,7 @@ size_t threaded_calc_abundances(Librarian& libs) {
 
         // Output progress
         if (num_frags % 1000000 == 0) {
-          cout << "Fragments Processed (" << lib.in_file_name << "): "
+          cerr << "Fragments Processed (" << lib.in_file_name << "): "
                << setw(9) << num_frags << "\t Number of Bundles: "
                << lib.targ_table->num_bundles() << endl;
         }
@@ -643,7 +643,7 @@ size_t threaded_calc_abundances(Librarian& libs) {
         output_results(libs, n, (int)remaining_rounds);
       }
 
-      cout << remaining_rounds << " remaining rounds." << endl;
+      cerr << remaining_rounds << " remaining rounds." << endl;
       first_round = false;
       last_round = (remaining_rounds==0 && !both);
       for (size_t l = 0; l < libs.size(); l++) {
@@ -656,7 +656,7 @@ size_t threaded_calc_abundances(Librarian& libs) {
     }
   }
 
-  cout << "COMPLETED: Processed " << num_frags
+  cerr << "COMPLETED: Processed " << num_frags
        << " mapped fragments, targets are in "
        << libs[0].targ_table->num_bundles() << " bundles\n";
 
@@ -755,7 +755,7 @@ int estimation_main() {
       output_results(libs, tot_counts, (int)remaining_rounds);
     }
     remaining_rounds--;
-    cout << "\nRe-estimating counts with additional round of EM ("
+    cerr << "\nRe-estimating counts with additional round of EM ("
          << remaining_rounds << " remaining)...\n";
     last_round = (remaining_rounds == 0);
     for (size_t l = 0; l < libs.size(); l++) {
@@ -766,9 +766,9 @@ int estimation_main() {
     targ_table.round_reset();
   }
   
-	cout << "Writing results to file...\n";
+	cerr << "Writing results to file...\n";
   output_results(libs, tot_counts);
-  cout << "Done\n";
+  cerr << "Done\n";
   
   return 0;
 }
