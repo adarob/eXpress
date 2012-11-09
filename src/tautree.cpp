@@ -132,12 +132,16 @@ void RangeTauForest::load_from_file(string infile_path) {
 void RangeTauForest::set_alphas(const vector<double>& target_alphas) {
   SapData params(target_alphas.size());
   assert(target_alphas.size() == num_leaves());
+  
+  double test_total_alpha = LOG_0;
+  
   for (TargID i = 0; i < target_alphas.size(); i++) {
     //    LeafID leaf = _target_to_leaf_map[i];
     LeafID leaf = i;
     params.leaf_ids[leaf] = leaf;
     params.taus[leaf] = target_alphas[i];
     assert(params.taus[leaf] != LOG_0);
+    test_total_alpha = log_add(test_total_alpha, target_alphas[i]);
   }
   for (LeafID i = 0; i < num_leaves(); ++i) {
     assert(params.taus[i] != LOG_0);
@@ -145,6 +149,17 @@ void RangeTauForest::set_alphas(const vector<double>& target_alphas) {
                                             params.taus[i]);
   }
   set_taus(Sap(&params));
+
+  // Sanity check to make sure initial taus match.
+  TauLeafIterator it(this);
+  size_t i = 0;
+  while (*it != NULL) {
+    double alpha_tau = target_alphas[i] - test_total_alpha;
+    double tree_tau = it.tau();
+    assert(approx_eq(alpha_tau, tree_tau));
+    ++i;
+    ++it;
+  }
 }
 
 void RangeTauForest::get_taus(Sap sap, double tau) const {

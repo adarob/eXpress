@@ -326,7 +326,7 @@ void TargetTable::output_results(string output_dir, size_t tot_counts,
       while (*it != NULL) {
         assert(i == (*it)->id() - tree.left());
         bundle_targ[i] = _targ_map[(*it)->id()];
-        const Target& targ = *_targ_map[i];
+        const Target& targ = *bundle_targ[i];
         targ_tau[i] = it.tau();
         targ_counts[i] = sexp(it.tau() + l_bundle_counts);
         requires_projection |= targ_counts[i] > (double)targ.tot_counts() ||
