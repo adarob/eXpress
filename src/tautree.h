@@ -30,6 +30,7 @@ struct SapData {
   std::vector<double> const_likelihoods;
   std::vector<double> accum_const_likelihoods;
   std::vector<double> accum_assignments;
+  SapData() {}
   SapData(size_t size)
       : leaf_ids(size),
         taus(size),
@@ -88,9 +89,9 @@ protected:
   FrequencyMatrix<double> _child_taus;
 
   virtual void add_child(TauTree* child) { _children.push_back(child); }
-  virtual void set_taus(Sap sap) = 0;
   virtual void get_taus(Sap sap, double tau) const = 0;
   virtual void update_taus(Sap sap) = 0;
+  virtual void increment_taus(Sap sap, bool decrement=false) = 0;
   double next_mass() {
     double ret = _mass;
     _n++;
@@ -183,9 +184,10 @@ class RangeTauTree : public TauTree {
   size_t _left;
   size_t _right;
   void add_child(RangeTauTree* child);
-  void set_taus(Sap sap);
+  void initialize_taus();
   virtual void get_taus(Sap sap, double tau) const;
   virtual void update_taus(Sap sap);
+  virtual void increment_taus(Sap sap, bool decrement=false);
  public:
   RangeTauTree(size_t left, size_t right, double ff_param);
   bool is_leaf() const { return _left == _right; }
@@ -206,6 +208,7 @@ class RangeTauForest : public RangeTauTree {
   // leaf-to-tree (id)
   std::vector<TreeID> _leaf_to_tree_map;
   std::vector<size_t> _tree_counts;
+  SapData _alpha_params;
   void load_from_file(std::string infile);
 protected:
   void get_taus(Sap sap, double tau) const;
@@ -213,6 +216,8 @@ protected:
 public:
   RangeTauForest(std::string infile, double ff_param);
   void set_alphas(const std::vector<double>& target_alphas);
+  void add_alphas() { increment_taus(Sap(&_alpha_params)); };
+  void remove_alphas() { increment_taus(Sap(&_alpha_params), true); }
   void process_fragment(const Fragment& frag);
   size_t tree_counts(TreeID t) const { return _tree_counts[t]; }
   size_t num_leaves() const {

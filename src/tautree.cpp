@@ -127,39 +127,26 @@ void RangeTauForest::load_from_file(string infile_path) {
   assert(next_leaf_id == num_leaves);
   _right = num_leaves-1;
   _tree_counts = vector<size_t>(_children.size(), 0);
+  initialize_taus();
 }
 
 void RangeTauForest::set_alphas(const vector<double>& target_alphas) {
-  SapData params(target_alphas.size());
+  _alpha_params = SapData(target_alphas.size());
   assert(target_alphas.size() == num_leaves());
-  
-  double test_total_alpha = LOG_0;
   
   for (TargID i = 0; i < target_alphas.size(); i++) {
     //    LeafID leaf = _target_to_leaf_map[i];
     LeafID leaf = i;
-    params.leaf_ids[leaf] = leaf;
-    params.taus[leaf] = target_alphas[i];
-    assert(params.taus[leaf] != LOG_0);
-    test_total_alpha = log_add(test_total_alpha, target_alphas[i]);
+    _alpha_params.leaf_ids[leaf] = leaf;
+    _alpha_params.taus[leaf] = target_alphas[i];
+    assert(_alpha_params.taus[leaf] != LOG_0);
   }
   for (LeafID i = 0; i < num_leaves(); ++i) {
-    assert(params.taus[i] != LOG_0);
-    params.accum_assignments[i+1] = log_add(params.accum_assignments[i],
-                                            params.taus[i]);
+    assert(_alpha_params.taus[i] != LOG_0);
+    _alpha_params.accum_assignments[i+1] = log_add(_alpha_params.accum_assignments[i],
+                                                   _alpha_params.taus[i]);
   }
-  set_taus(Sap(&params));
-
-  // Sanity check to make sure initial taus match.
-  TauLeafIterator it(this);
-  size_t i = 0;
-  while (*it != NULL) {
-    double alpha_tau = target_alphas[i] - test_total_alpha;
-    double tree_tau = it.tau();
-    assert(approx_eq(alpha_tau, tree_tau));
-    ++i;
-    ++it;
-  }
+  add_alphas();
 }
 
 void RangeTauForest::get_taus(Sap sap, double tau) const {
@@ -252,19 +239,13 @@ void RangeTauTree::add_child(RangeTauTree* child) {
   TauTree::add_child(child);
 }
 
-void RangeTauTree::set_taus(Sap sap) {
+void RangeTauTree::initialize_taus() {
+  if (is_leaf()) {
+    return;
+  }
   _child_taus = FrequencyMatrix<double>(1, _children.size(), LOG_0);
-  for (size_t i = 0; i < _children.size(); ++i) {
-    RangeTauTree& child = *static_cast<RangeTauTree*>(_children[i]);
-    Sap branch_sap = sap.branch(child.right());
-    if (branch_sap.size()) {
-      child.set_taus(branch_sap);
-      _child_taus.increment(i, branch_sap.fraction());
-      assert(!isnan(_child_taus(i)));
-    }
-    if (sap.size() == 0) {
-      break;
-    }
+  foreach (TauTree* child, _children) {
+    static_cast<RangeTauTree*>(child)->initialize_taus();
   }
 }
 
@@ -304,6 +285,27 @@ void RangeTauTree::update_taus(Sap sap) {
     if (branch_sap.size()) {
       child.update_taus(branch_sap);
       _child_taus.increment(i, mass + branch_sap.fraction());
+    }
+    if (sap.size() == 0) {
+      break;
+    }
+  }
+}
+
+void RangeTauTree::increment_taus(Sap sap, bool decrement) {
+  if (is_leaf()) {
+    return;
+  }
+  for (size_t i = 0; i < _children.size(); ++i) {
+    RangeTauTree& child = *static_cast<RangeTauTree*>(_children[i]);
+    Sap branch_sap = sap.branch(child.right());
+    if (branch_sap.size()) {
+      child.increment_taus(branch_sap, decrement);
+      if (decrement) {
+        _child_taus.decrement(i, branch_sap.fraction());
+      } else {
+        _child_taus.increment(i, branch_sap.fraction());
+      }
     }
     if (sap.size() == 0) {
       break;

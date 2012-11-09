@@ -106,6 +106,22 @@ public:
    */
   void increment(size_t k, T incr_amt);
   /**
+   * A member function to decrease the mass of a given position in the matrix.
+   * @param i the distribution (row).
+   * @param j the value (column).
+   * @param incr_amt the amount to decrease the mass by (logged if table is
+   *        logged).
+   */
+  void decrement(size_t i, size_t j, T decr_amt);
+  /**
+   * A member function to decrease the mass of a given position in the flattened
+   * matrix (logged if table is logged). Does nothing if _fixed is true.
+   * @param k the array position.
+   * @param incr_amt the amount to decrease the mass by (logged if table is
+   *        logged).
+   */
+  void decrement(size_t k, T decr_amt);
+  /**
    * An accessor for the row sum (normalizer), (logged if table is logged).
    * @param i the distribution (row).
    * @return The sum (normalizer) for the given distribution (logged if table is
@@ -186,8 +202,31 @@ void FrequencyMatrix<T>::increment(size_t i, size_t j, T incr_amt) {
 }
 
 template <class T>
+void FrequencyMatrix<T>::decrement(size_t i, size_t j, T decr_amt) {
+  if (_fixed) {
+    return;
+  }
+  
+  size_t k = i*_N+j;
+  assert(k < _M*_N);
+  if (_logged) {
+    _array[k] = log_sub(_array[k], decr_amt);
+    _rowsums[i] = log_sub(_rowsums[i], decr_amt);
+  } else {
+    _array[k] -= decr_amt;
+    _rowsums[i] -= decr_amt;
+  }
+  assert(!std::isnan(_rowsums[i]));
+}
+
+template <class T>
 void FrequencyMatrix<T>::increment(size_t k, T incr_amt) {
   increment(0, k, incr_amt);
+}
+
+template <class T>
+void FrequencyMatrix<T>::decrement(size_t k, T decr_amt) {
+  decrement(0, k, decr_amt);
 }
 
 template <class T>

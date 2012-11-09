@@ -303,8 +303,10 @@ void output_results(Librarian& libs, size_t tot_counts, int n=-1) {
     }
   }
   // FIXME: We should probably be averaging the FLD here
+  libs[0].tau_forest->remove_alphas();
   libs[0].targ_table->output_results(dir, tot_counts, libs[0].tau_forest,
                                      libs[0].fld, last_round&edit_detect);
+  libs[0].tau_forest->add_alphas();
 
   for (size_t l = 0; l < libs.size(); l++) {
     if (libs.size() > 1) {
