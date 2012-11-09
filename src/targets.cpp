@@ -317,7 +317,6 @@ void TargetTable::output_results(string output_dir, size_t tot_counts,
     
     if (forest->tree_counts(bundle_id)) {
       vector<double> targ_counts(tree.num_leaves(),0);
-      vector<double> targ_tau(tree.num_leaves(), LOG_0);
       vector<const Target*> bundle_targ(tree.num_leaves(), NULL);
       bool requires_projection = false;
 
@@ -327,8 +326,8 @@ void TargetTable::output_results(string output_dir, size_t tot_counts,
         assert(i == (*it)->id() - tree.left());
         bundle_targ[i] = _targ_map[(*it)->id()];
         const Target& targ = *bundle_targ[i];
-        targ_tau[i] = it.tau();
         targ_counts[i] = sexp(it.tau() + l_bundle_counts);
+        assert(!isnan(targ_counts[i]));
         requires_projection |= targ_counts[i] > (double)targ.tot_counts() ||
                                targ_counts[i] < (double)targ.uniq_counts();
 

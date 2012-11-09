@@ -50,7 +50,7 @@
       </BuildableProductRunnable>
       <CommandLineArguments>
          <CommandLineArgument
-            argument = "--no-bias-correct --stop-at 1000000 --forest-file /Volumes/math.mcb.berkeley.edu/devel/express-tree/forest.out $(SRCROOT)/../express/sample_data2/hg19-ucsc_transcripts.fa /Volumes/math.mcb.berkeley.edu/experiments/express/simulation/hg19_ucsc_err/hits.bam"
+            argument = "--no-bias-correct --stop-at 1000 --forest-file /Volumes/math.mcb.berkeley.edu/devel/express-tree/forest.out $(SRCROOT)/../express/sample_data2/hg19-ucsc_transcripts.fa /Volumes/math.mcb.berkeley.edu/experiments/express/simulation/hg19_ucsc_err/hits.bam"
             isEnabled = "YES">
          </CommandLineArgument>
       </CommandLineArguments>

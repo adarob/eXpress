@@ -126,7 +126,7 @@ inline double log_sub(double x, double y) {
     return x;
   }
   
-  if (x > y) {
+  if (x < y) {
     assert (approx_eq(x, y));
     return LOG_0;
   }

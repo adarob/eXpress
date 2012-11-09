@@ -172,8 +172,16 @@ T FrequencyMatrix<T>::operator()(size_t i, size_t j, bool normalized) const {
       return _array[i*_N+j];
   }
   if (_logged) {
-    return _array[i*_N+j]-_rowsums[i];
+    T num = _array[i*_N+j];
+    if (num == LOG_0) {
+      return LOG_0;
+    }
+    return num-_rowsums[i];
   } else {
+    T num = _array[i*_N+j];
+    if (num == 0) {
+      return 0;
+    }
     return _array[i*_N+j]/_rowsums[i];
   }
 }
