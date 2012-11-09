@@ -72,7 +72,7 @@ const double LOG_1 = 0;
 /**
  * A global double specifying the default epsilon value to be used in approx_eq.
  */
-const double EPSILON = 0.0001;
+const double EPSILON = 0.000001;
 
 /**
  * Global function that determines if two doubles are within some epsilon of
@@ -119,19 +119,19 @@ inline double log_add(double x, double y) {
  * @return a double for the log of exp(x)-exp(y).
  */
 inline double log_sub(double x, double y) {
-
+  if (x == y) {
+    return LOG_0;
+  }
   if (fabs(y) == LOG_0) {
     return x;
   }
   
-  assert(x >= y);
-  
-  if (x == y) {
+  if (x > y) {
+    assert (approx_eq(x, y));
     return LOG_0;
   }
-
+  
   double diff = x+log(1-exp(y-x));
-  assert(!std::isnan(diff));
   return diff;
 }
 /**
