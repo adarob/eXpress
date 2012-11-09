@@ -77,7 +77,7 @@ def initialize_matrix(infile):
   for read in samfile:
     if read.qname != curr_qname:
       n += 1
-      if n % 100000 == 0:
+      if n % 1000000 == 0:
         print n
       if len(curr_targets) > 1:
         curr_targets = list(curr_targets)
@@ -194,7 +194,7 @@ def build_forest2(infile):
         F.add_node(id, *trees_to_merge)
         for leaf in F.nodes[-1].leaves():
           trees[leaf] = id 
-      elif len(trees_to_merge) == 1:
+      elif len(leaf_ids) > 1 and len(trees_to_merge) == 1:
         parents = set(F.nodes[leaf_id].parent for leaf_id in leaf_ids) 
         if len(parents) == 1:
           parent = parents.pop()

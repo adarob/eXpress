@@ -27,6 +27,7 @@ Sap Sap::branch(size_t split) {
 }
 
 double RhoTree::similarity_scalar(const Sap& sap) {
+  return LOG_1;
   if (sap.size() < _children.size()) {
     return LOG_1;
   }
@@ -41,8 +42,11 @@ double RhoTree::similarity_scalar(const Sap& sap) {
     assert(!isnan(c));
   }
   if (c < 0) {
-    assert(approx_eq(c,0));
+    //    assert(approx_eq(c,0));
     return LOG_0;
+  }
+  if (c > 1) {
+    return LOG_1;
   }
   assert(c==0 || !isnan(log(c)));
   return log(c);
