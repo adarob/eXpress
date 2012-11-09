@@ -1,13 +1,13 @@
 /**
- *  rhotree.h
+ *  tautree.h
  *  express
  *
  *  Created by Adam Roberts on 9/17/12.
  *
  **/
 
-#ifndef __express__rhotree__
-#define __express__rhotree__
+#ifndef __express__tautree__
+#define __express__tautree__
 
 #include <stack>
 #include <vector>
@@ -26,13 +26,13 @@ typedef size_t TreeID;
 struct SapData {
   TreeID tree_root;
   std::vector<LeafID> leaf_ids;
-  std::vector<double> rhos;
+  std::vector<double> taus;
   std::vector<double> const_likelihoods;
   std::vector<double> accum_const_likelihoods;
   std::vector<double> accum_assignments;
   SapData(size_t size)
       : leaf_ids(size),
-        rhos(size),
+        taus(size),
         const_likelihoods(size),
         accum_const_likelihoods(size + 1, LOG_0),
         accum_assignments(size + 1, LOG_0) {
@@ -41,7 +41,7 @@ struct SapData {
 
 /**
  * Class used to move data through the tree. Passed down to compute and update
- * rhos and likelihoods.
+ * taus and likelihoods.
  */
 class Sap {
   SapData* _params;
@@ -59,9 +59,9 @@ class Sap {
     assert(i < size());
     return _params->leaf_ids[_l + i];
   }
-  double& rho(size_t i) {
+  double& tau(size_t i) {
     assert(i < size());
-    return _params->rhos[_l + i];
+    return _params->taus[_l + i];
   }
   double const_likelihood(size_t i) const {
     assert(i < size());
@@ -78,19 +78,19 @@ class Sap {
   Sap branch(size_t split);
 };
 
-class RhoTree {
+class TauTree {
   size_t _n;
   double _mass;
 
 protected:
   double _ff_param;
-  std::vector<RhoTree*> _children;
-  FrequencyMatrix<double> _child_rhos;
+  std::vector<TauTree*> _children;
+  FrequencyMatrix<double> _child_taus;
 
-  virtual void add_child(RhoTree* child) { _children.push_back(child); }
-  virtual void set_rhos(Sap sap) = 0;
-  virtual void get_rhos(Sap sap, double rho) const = 0;
-  virtual void update_rhos(Sap sap) = 0;
+  virtual void add_child(TauTree* child) { _children.push_back(child); }
+  virtual void set_taus(Sap sap) = 0;
+  virtual void get_taus(Sap sap, double tau) const = 0;
+  virtual void update_taus(Sap sap) = 0;
   double next_mass() {
     double ret = _mass;
     _n++;
@@ -100,34 +100,34 @@ protected:
   double similarity_scalar(const Sap& sap);
 
 public:
-  friend class RhoLeafIterator;
-  RhoTree(double ff_param)
+  friend class TauLeafIterator;
+  TauTree(double ff_param)
       : _n(0), _mass(0), _ff_param(ff_param) {}
-  virtual ~RhoTree() {
-    foreach(RhoTree* child, _children) {
+  virtual ~TauTree() {
+    foreach(TauTree* child, _children) {
       delete child;
     }
   }
   size_t num_children() const { return _children.size(); }
-  RhoTree* child(TreeID t) const { return _children[t]; };
+  TauTree* child(TreeID t) const { return _children[t]; };
   virtual size_t num_leaves() const = 0;
   virtual bool is_leaf() const = 0;
   virtual LeafID id() const = 0;
 };
 
-struct RhoLeafIteratorData {
-  RhoTree* tree;
+struct TauLeafIteratorData {
+  TauTree* tree;
   size_t curr_child;
-  double rho;
-  RhoLeafIteratorData(RhoTree* t) : tree(t), curr_child(0), rho(0) {}
+  double tau;
+  TauLeafIteratorData(TauTree* t) : tree(t), curr_child(0), tau(0) {}
 };
 
-class RhoLeafIterator : public std::iterator<std::forward_iterator_tag,
-                                             RhoTree> {
-  std::stack<RhoLeafIteratorData> _stack;
+class TauLeafIterator : public std::iterator<std::forward_iterator_tag,
+                                             TauTree> {
+  std::stack<TauLeafIteratorData> _stack;
 
   void prune_used_branches() {
-    RhoLeafIteratorData* parent = NULL;
+    TauLeafIteratorData* parent = NULL;
     while(parent == NULL) {
       if (_stack.empty()) {
         return;
@@ -141,53 +141,53 @@ class RhoLeafIterator : public std::iterator<std::forward_iterator_tag,
     }
   }
   void travel_to_leaf() {
-    RhoLeafIteratorData* parent = &_stack.top();
+    TauLeafIteratorData* parent = &_stack.top();
     while (!parent->tree->is_leaf()) {
-      RhoLeafIteratorData child(parent->tree->_children[parent->curr_child]);
-      child.rho = parent->rho + parent->tree->_child_rhos(parent->curr_child);
+      TauLeafIteratorData child(parent->tree->_children[parent->curr_child]);
+      child.tau = parent->tau + parent->tree->_child_taus(parent->curr_child);
       _stack.push(child);
       parent = &_stack.top();
     }
   }
 
  public:
-  RhoLeafIterator(RhoTree* tree) {
-    RhoLeafIteratorData d(tree);
+  TauLeafIterator(TauTree* tree) {
+    TauLeafIteratorData d(tree);
     _stack.push(d);
     travel_to_leaf();
   }
-  RhoLeafIterator& operator++() {
+  TauLeafIterator& operator++() {
     prune_used_branches();
     if (!_stack.empty()) {
       travel_to_leaf();
     }
     return *this;
   }
-  RhoTree* operator*() {
+  TauTree* operator*() {
     if (_stack.empty()) {
       return NULL;
     }
     return _stack.top().tree;
   }
-  double rho() {
+  double tau() {
     if (_stack.empty()) {
       return LOG_0;
     }
-    return _stack.top().rho;
+    return _stack.top().tau;
   }
 };
 
-class RangeRhoTree : public RhoTree {
+class RangeTauTree : public TauTree {
  protected:
-  friend class RangeRhoForest;
+  friend class RangeTauForest;
   size_t _left;
   size_t _right;
-  void add_child(RangeRhoTree* child);
-  void set_rhos(Sap sap);
-  virtual void get_rhos(Sap sap, double rho) const;
-  virtual void update_rhos(Sap sap);
+  void add_child(RangeTauTree* child);
+  void set_taus(Sap sap);
+  virtual void get_taus(Sap sap, double tau) const;
+  virtual void update_taus(Sap sap);
  public:
-  RangeRhoTree(size_t left, size_t right, double ff_param);
+  RangeTauTree(size_t left, size_t right, double ff_param);
   bool is_leaf() const { return _left == _right; }
   size_t left() const { return _left; }
   size_t right() const { return _right; }
@@ -200,7 +200,7 @@ class RangeRhoTree : public RhoTree {
   }
 };
 
-class RangeRhoForest : public RangeRhoTree {
+class RangeTauForest : public RangeTauTree {
   // target-to-leaf (id)
   std::vector<LeafID> _target_to_leaf_map;
   // leaf-to-tree (id)
@@ -208,10 +208,10 @@ class RangeRhoForest : public RangeRhoTree {
   std::vector<size_t> _tree_counts;
   void load_from_file(std::string infile);
 protected:
-  void get_rhos(Sap sap, double rho) const;
-  void update_rhos(Sap sap);
+  void get_taus(Sap sap, double tau) const;
+  void update_taus(Sap sap);
 public:
-  RangeRhoForest(std::string infile, double ff_param);
+  RangeTauForest(std::string infile, double ff_param);
   void set_alphas(const std::vector<double>& target_alphas);
   void process_fragment(const Fragment& frag);
   size_t tree_counts(TreeID t) const { return _tree_counts[t]; }
@@ -224,4 +224,4 @@ public:
   }
 };
 
-#endif /* defined(__express__rhotree__) */
+#endif /* defined(__express__tautree__) */

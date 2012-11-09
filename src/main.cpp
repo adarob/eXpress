@@ -28,7 +28,7 @@
 #include "threadsafety.h"
 #include "robertsfilter.h"
 #include "library.h"
-#include "rhotree.h"
+#include "tautree.h"
 
 #ifndef WIN32
   #include "update_check.h"
@@ -54,7 +54,7 @@ size_t stop_at = 0;
 string output_dir = ".";
 string fasta_file_name = "";
 string in_map_file_names = "";
-string rho_forest_file_name = "";
+string tau_forest_file_name = "";
 
 // intial pseudo-count parameters (non-logged)
 double expr_alpha = .1;
@@ -162,7 +162,7 @@ bool parse_options(int ac, char ** av) {
 
   po::options_description hidden("Hidden options");
   hidden.add_options()
-  ("forest-file", po::value<string>(&rho_forest_file_name)->default_value(rho_forest_file_name), "")
+  ("forest-file", po::value<string>(&tau_forest_file_name)->default_value(tau_forest_file_name), "")
   ("edit-detect","")
   ("no-bias-correct","")
   ("no-error-model","")
@@ -303,7 +303,7 @@ void output_results(Librarian& libs, size_t tot_counts, int n=-1) {
     }
   }
   // FIXME: We should probably be averaging the FLD here
-  libs[0].targ_table->output_results(dir, tot_counts, libs[0].rho_forest,
+  libs[0].targ_table->output_results(dir, tot_counts, libs[0].tau_forest,
                                      libs[0].fld, last_round&edit_detect);
 
   for (size_t l = 0; l < libs.size(); l++) {
@@ -375,7 +375,7 @@ void process_fragment(Fragment* frag_p) {
       hit.probability = ll;
     }
   }
-  lib.rho_forest->process_fragment(*frag_p);
+  lib.tau_forest->process_fragment(*frag_p);
 
   // update parameters
   for (size_t i = 0; i < frag.num_hits(); ++i) {
@@ -606,8 +606,8 @@ int main (int argc, char ** argv)
 
   
   
-  // Load RhoForest
-  RangeRhoForest forest(rho_forest_file_name,  ff_param);
+  // Load TauForest
+  RangeTauForest forest(tau_forest_file_name,  ff_param);
   
   // Parse input file names and instantiate Libray structs.
   vector<string> file_names;
@@ -634,7 +634,7 @@ int main (int argc, char ** argv)
     }
     libs[i].in_file_name = file_names[i];
     libs[i].out_file_name = out_map_file_name;
-    libs[i].rho_forest = &forest;
+    libs[i].tau_forest = &forest;
     libs[i].map_parser = new MapParser(&libs[i], last_round);
     libs[i].fld = new FLD(fld_alpha, def_fl_max, def_fl_mean, def_fl_stddev);
     libs[i].mismatch_table = (error_model) ? new MismatchTable(mm_alpha):NULL;

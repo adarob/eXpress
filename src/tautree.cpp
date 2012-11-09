@@ -1,12 +1,12 @@
 /**
- *  rhotree.cpp
+ *  tautree.cpp
  *  express
  *
  *  Created by Adam Roberts on 9/17/12.
  *
  **/
 
-#include "rhotree.h"
+#include "tautree.h"
 
 #include "main.h"
 #include "fragments.h"
@@ -26,7 +26,7 @@ Sap Sap::branch(size_t split) {
   return Sap(_params, old_left, _l-1);
 }
 
-double RhoTree::similarity_scalar(const Sap& sap) {
+double TauTree::similarity_scalar(const Sap& sap) {
   return LOG_1;
   if (sap.size() < _children.size()) {
     return LOG_1;
@@ -52,12 +52,12 @@ double RhoTree::similarity_scalar(const Sap& sap) {
   return log(c);
 }
 
-RangeRhoForest::RangeRhoForest(string infile_path, double ff_param)
-    : RangeRhoTree(0, 0, ff_param) {
+RangeTauForest::RangeTauForest(string infile_path, double ff_param)
+    : RangeTauTree(0, 0, ff_param) {
   load_from_file(infile_path);
 }
 
-void RangeRhoForest::load_from_file(string infile_path) {
+void RangeTauForest::load_from_file(string infile_path) {
   ifstream infile (infile_path.c_str());
   string line;
 
@@ -74,7 +74,7 @@ void RangeRhoForest::load_from_file(string infile_path) {
   _target_to_leaf_map = vector<LeafID>(num_leaves, -1);
   _leaf_to_tree_map = vector<TreeID>(num_leaves, -1);
   LeafID next_leaf_id = 0;
-  vector<RangeRhoTree*> nodes(num_nodes, NULL);
+  vector<RangeTauTree*> nodes(num_nodes, NULL);
 
   cout << "Loading hierarchy from '" << infile_path << "' with " << num_nodes
        << " nodes and " << num_leaves << " leaves...\n";
@@ -94,7 +94,7 @@ void RangeRhoForest::load_from_file(string infile_path) {
       child = atoi(edge.substr(split+1).c_str());
       if (child < num_leaves) {
         assert(_target_to_leaf_map[child] == -1);
-        nodes[next_leaf_id] = new RangeRhoTree(next_leaf_id, next_leaf_id,
+        nodes[next_leaf_id] = new RangeTauTree(next_leaf_id, next_leaf_id,
                                                _ff_param);
         _target_to_leaf_map[child] = next_leaf_id;
         _leaf_to_tree_map[next_leaf_id] = _children.size();
@@ -103,7 +103,7 @@ void RangeRhoForest::load_from_file(string infile_path) {
       }
       assert(nodes[child]);
       if (!nodes[parent]) {
-        nodes[parent] = new RangeRhoTree(nodes[child]->left(),
+        nodes[parent] = new RangeTauTree(nodes[child]->left(),
                                          nodes[child]->right(),
                                          _ff_param);
       }
@@ -119,7 +119,7 @@ void RangeRhoForest::load_from_file(string infile_path) {
   
   for(TargID t = 0; t < num_leaves; ++t) {
     if (_target_to_leaf_map[t] == -1) {
-      nodes[next_leaf_id] = new RangeRhoTree(next_leaf_id, next_leaf_id,
+      nodes[next_leaf_id] = new RangeTauTree(next_leaf_id, next_leaf_id,
                                              _ff_param);
       _target_to_leaf_map[t] = next_leaf_id;
       _leaf_to_tree_map[next_leaf_id] = _children.size();
@@ -133,41 +133,56 @@ void RangeRhoForest::load_from_file(string infile_path) {
   _tree_counts = vector<size_t>(_children.size(), 0);
 }
 
-void RangeRhoForest::set_alphas(const vector<double>& target_alphas) {
+void RangeTauForest::set_alphas(const vector<double>& target_alphas) {
   SapData params(target_alphas.size());
   assert(target_alphas.size() == num_leaves());
+  
+  double test_total_alpha = LOG_0;
+  
   for (TargID i = 0; i < target_alphas.size(); i++) {
     //    LeafID leaf = _target_to_leaf_map[i];
     LeafID leaf = i;
     params.leaf_ids[leaf] = leaf;
-    params.rhos[leaf] = target_alphas[i];
-    assert(params.rhos[leaf] != LOG_0);
+    params.taus[leaf] = target_alphas[i];
+    assert(params.taus[leaf] != LOG_0);
+    test_total_alpha = log_add(test_total_alpha, target_alphas[i]);
   }
   for (LeafID i = 0; i < num_leaves(); ++i) {
-    assert(params.rhos[i] != LOG_0);
+    assert(params.taus[i] != LOG_0);
     params.accum_assignments[i+1] = log_add(params.accum_assignments[i],
-                                            params.rhos[i]);
+                                            params.taus[i]);
   }
-  set_rhos(Sap(&params));
+  set_taus(Sap(&params));
+
+  // Sanity check to make sure initial taus match.
+  TauLeafIterator it(this);
+  size_t i = 0;
+  while (*it != NULL) {
+    double alpha_tau = target_alphas[i] - test_total_alpha;
+    double tree_tau = it.tau();
+    assert(approx_eq(alpha_tau, tree_tau));
+    ++i;
+    ++it;
+  }
 }
 
-void RangeRhoForest::get_rhos(Sap sap, double rho) const {
+void RangeTauForest::get_taus(Sap sap, double tau) const {
   TreeID tree = sap.tree_root();
-  static_cast<RangeRhoTree*>(_children[tree])->get_rhos(sap, _child_rhos(tree));
+  static_cast<RangeTauTree*>(_children[tree])->get_taus(sap, _child_taus(tree));
 }
 
-void RangeRhoForest::update_rhos(Sap sap) {
+void RangeTauForest::update_taus(Sap sap) {
   TreeID tree = sap.tree_root();
 
   // Don't compute a scalar here to save time. These should always be valuable.
   double mass = next_mass();
-  // Update the rhos throughout the forest using the computed likelihoods.
+  // Update the taus throughout the forest using the computed likelihoods.
   assert(approx_eq(sap.fraction(), LOG_1));
-  _child_rhos.increment(tree, mass);
-  static_cast<RangeRhoTree*>(_children[tree])->update_rhos(sap);
+  _child_taus.increment(tree, mass);
+  static_cast<RangeTauTree*>(_children[tree])->update_taus(sap);
 }
 
-void RangeRhoForest::process_fragment(const Fragment& frag) {
+void RangeTauForest::process_fragment(const Fragment& frag) {
   // Assume the likelihoods are pre-computed in probability field.
 
   // Everything is much easier and faster when the mapping is unique.
@@ -178,8 +193,8 @@ void RangeRhoForest::process_fragment(const Fragment& frag) {
     params.tree_root = _leaf_to_tree_map[params.leaf_ids[0]];
     params.accum_assignments[1] = 0;
     double mass = next_mass();
-    _child_rhos.increment(params.tree_root, mass);
-    static_cast<RangeRhoTree*>(_children[params.tree_root])->update_rhos(Sap(&params, 0, 0));
+    _child_taus.increment(params.tree_root, mass);
+    static_cast<RangeTauTree*>(_children[params.tree_root])->update_taus(Sap(&params, 0, 0));
     _tree_counts[params.tree_root]++;
     return;
   }
@@ -205,32 +220,32 @@ void RangeRhoForest::process_fragment(const Fragment& frag) {
   }
 
   Sap sap(&params);
-  get_rhos(sap, LOG_1);
+  get_taus(sap, LOG_1);
 
   // Compute the individual and total likelihoods.
   double total_likelihood = LOG_0;
   for (size_t i = 0; i < frag.num_hits(); ++i) {
     total_likelihood = log_add(total_likelihood,
-                               params.const_likelihoods[i] + params.rhos[i]);
+                               params.const_likelihoods[i] + params.taus[i]);
   }
 
   // Accumulate the fractional assignments in the Sap for easy lookup later on.
   for (size_t i = 0; i < frag.num_hits(); ++i) {
-    double frac = params.const_likelihoods[i] + params.rhos[i] -
+    double frac = params.const_likelihoods[i] + params.taus[i] -
                   total_likelihood;
     frag[i]->probability = frac;
     params.accum_assignments[i+1] = log_add(frac, params.accum_assignments[i]);
   }
   
-  update_rhos(sap);
+  update_taus(sap);
   _tree_counts[params.tree_root]++;
 }
 
-RangeRhoTree::RangeRhoTree(size_t left, size_t right, double ff_param)
-    : RhoTree(ff_param), _left(left), _right(right) {
+RangeTauTree::RangeTauTree(size_t left, size_t right, double ff_param)
+    : TauTree(ff_param), _left(left), _right(right) {
 }
 
-void RangeRhoTree::add_child(RangeRhoTree* child) {
+void RangeTauTree::add_child(RangeTauTree* child) {
   if (_children.empty()) {
     _left = child->left();
     _right = child->right();
@@ -238,18 +253,18 @@ void RangeRhoTree::add_child(RangeRhoTree* child) {
     assert(child->left() == _right + 1);
     _right = child->right();
   }
-  RhoTree::add_child(child);
+  TauTree::add_child(child);
 }
 
-void RangeRhoTree::set_rhos(Sap sap) {
-  _child_rhos = FrequencyMatrix<double>(1, _children.size(), LOG_0);
+void RangeTauTree::set_taus(Sap sap) {
+  _child_taus = FrequencyMatrix<double>(1, _children.size(), LOG_0);
   for (size_t i = 0; i < _children.size(); ++i) {
-    RangeRhoTree& child = *static_cast<RangeRhoTree*>(_children[i]);
+    RangeTauTree& child = *static_cast<RangeTauTree*>(_children[i]);
     Sap branch_sap = sap.branch(child.right());
     if (branch_sap.size()) {
-      child.set_rhos(branch_sap);
-      _child_rhos.increment(i, branch_sap.fraction());
-      assert(!isnan(_child_rhos(i)));
+      child.set_taus(branch_sap);
+      _child_taus.increment(i, branch_sap.fraction());
+      assert(!isnan(_child_taus(i)));
     }
     if (sap.size() == 0) {
       break;
@@ -257,20 +272,20 @@ void RangeRhoTree::set_rhos(Sap sap) {
   }
 }
 
-void RangeRhoTree::get_rhos(Sap sap, double rho) const {
-  assert(!isnan(rho));
+void RangeTauTree::get_taus(Sap sap, double tau) const {
+  assert(!isnan(tau));
   if (is_leaf()) {
     for (size_t i = 0; i < sap.size(); ++i) {
-      sap.rho(i) = rho;
+      sap.tau(i) = tau;
     }
     return;
   }
 
   for (size_t i = 0; i < _children.size(); ++i) {
-    RangeRhoTree& child = *static_cast<RangeRhoTree*>(_children[i]);
+    RangeTauTree& child = *static_cast<RangeTauTree*>(_children[i]);
     Sap branch_sap = sap.branch(child.right());
     if (branch_sap.size()) {
-      child.get_rhos(branch_sap, rho + _child_rhos(i));
+      child.get_taus(branch_sap, tau + _child_taus(i));
     }
     if (sap.size() == 0) {
       break;
@@ -278,7 +293,7 @@ void RangeRhoTree::get_rhos(Sap sap, double rho) const {
   }
 }
 
-void RangeRhoTree::update_rhos(Sap sap) {
+void RangeTauTree::update_taus(Sap sap) {
   if (is_leaf()) {
     return;
   }
@@ -288,11 +303,11 @@ void RangeRhoTree::update_rhos(Sap sap) {
   }
   
   for (size_t i = 0; i < _children.size(); ++i) {
-    RangeRhoTree& child = *static_cast<RangeRhoTree*>(_children[i]);
+    RangeTauTree& child = *static_cast<RangeTauTree*>(_children[i]);
     Sap branch_sap = sap.branch(child.right());
     if (branch_sap.size()) {
-      child.update_rhos(branch_sap);
-      _child_rhos.increment(i, mass + branch_sap.fraction());
+      child.update_taus(branch_sap);
+      _child_taus.increment(i, mass + branch_sap.fraction());
     }
     if (sap.size() == 0) {
       break;

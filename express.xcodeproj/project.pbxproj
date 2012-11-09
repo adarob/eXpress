@@ -11,6 +11,7 @@
 		0A18CE7D163F3043001FBCF6 /* libboost_filesystem-mt.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A18CE7A163F3043001FBCF6 /* libboost_filesystem-mt.a */; };
 		0A18CE7F163F3043001FBCF6 /* libboost_system-mt.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A18CE7C163F3043001FBCF6 /* libboost_system-mt.a */; };
 		0A18CE81163F3060001FBCF6 /* libboost_program_options-mt.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A18CE80163F3060001FBCF6 /* libboost_program_options-mt.a */; };
+		0A529445164C74FC00045558 /* tautree.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0A529443164C74FC00045558 /* tautree.cpp */; };
 		0A5C7638136F2EF10095365C /* biascorrection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0A5C762A136F2EF10095365C /* biascorrection.cpp */; };
 		0A5C7639136F2EF10095365C /* fld.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0A5C762C136F2EF10095365C /* fld.cpp */; };
 		0A5C763A136F2EF10095365C /* fragments.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0A5C762E136F2EF10095365C /* fragments.cpp */; };
@@ -19,7 +20,6 @@
 		0A5C763E136F2EF10095365C /* targets.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0A5C7636136F2EF10095365C /* targets.cpp */; };
 		0A60597313A170A400B5C9BA /* libboost_thread-mt.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A60597213A170A400B5C9BA /* libboost_thread-mt.a */; };
 		0A63748614CF83A500D79987 /* sequence.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0A63748514CF83A500D79987 /* sequence.cpp */; };
-		0A86E281160A6D8B00E0DA17 /* rhotree.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0A86E27F160A6D8B00E0DA17 /* rhotree.cpp */; };
 		0A9F0E1014CF64FF00379DC6 /* markovmodel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0A9F0E0F14CF64FF00379DC6 /* markovmodel.cpp */; };
 		0ACBB2F2143EA2DD001322D2 /* bundles.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0ACBB2F0143EA2DD001322D2 /* bundles.cpp */; };
 		0AD5968913FF20C700EEBDD7 /* mapparser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0AD5968813FF20C700EEBDD7 /* mapparser.cpp */; };
@@ -45,6 +45,8 @@
 		0A18CE7C163F3043001FBCF6 /* libboost_system-mt.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libboost_system-mt.a"; path = "../../../../../../opt/local/lib/libboost_system-mt.a"; sourceTree = "<group>"; };
 		0A18CE80163F3060001FBCF6 /* libboost_program_options-mt.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libboost_program_options-mt.a"; path = "../../../../../../opt/local/lib/libboost_program_options-mt.a"; sourceTree = "<group>"; };
 		0A4DC487140ACC640091CA28 /* update_check.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = update_check.h; sourceTree = "<group>"; };
+		0A529443164C74FC00045558 /* tautree.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = tautree.cpp; sourceTree = "<group>"; };
+		0A529444164C74FC00045558 /* tautree.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tautree.h; sourceTree = "<group>"; };
 		0A5C7608136F2E850095365C /* express */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = express; sourceTree = BUILT_PRODUCTS_DIR; };
 		0A5C762A136F2EF10095365C /* biascorrection.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = biascorrection.cpp; sourceTree = "<group>"; };
 		0A5C762B136F2EF10095365C /* biascorrection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = biascorrection.h; sourceTree = "<group>"; };
@@ -62,8 +64,6 @@
 		0A60597213A170A400B5C9BA /* libboost_thread-mt.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libboost_thread-mt.a"; path = "../../../../../../opt/local/lib/libboost_thread-mt.a"; sourceTree = "<group>"; };
 		0A63748414CF81AC00D79987 /* sequence.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sequence.h; sourceTree = "<group>"; };
 		0A63748514CF83A500D79987 /* sequence.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = sequence.cpp; sourceTree = "<group>"; };
-		0A86E27F160A6D8B00E0DA17 /* rhotree.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = rhotree.cpp; sourceTree = "<group>"; };
-		0A86E280160A6D8B00E0DA17 /* rhotree.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = rhotree.h; sourceTree = "<group>"; };
 		0A9F0E0F14CF64FF00379DC6 /* markovmodel.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = markovmodel.cpp; sourceTree = "<group>"; };
 		0A9F0E1114CF650D00379DC6 /* markovmodel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = markovmodel.h; sourceTree = "<group>"; };
 		0AA3D63614D106B800448167 /* threadsafety.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = threadsafety.h; sourceTree = "<group>"; };
@@ -138,12 +138,12 @@
 				0A5C7635136F2EF10095365C /* mismatchmodel.h */,
 				0A9F0E1114CF650D00379DC6 /* markovmodel.h */,
 				0A9F0E0F14CF64FF00379DC6 /* markovmodel.cpp */,
-				0A86E27F160A6D8B00E0DA17 /* rhotree.cpp */,
-				0A86E280160A6D8B00E0DA17 /* rhotree.h */,
 				0ADA18F615508175008020B2 /* robertsfilter.cpp */,
 				0ADA18F315507FF5008020B2 /* robertsfilter.h */,
 				0A63748414CF81AC00D79987 /* sequence.h */,
 				0A63748514CF83A500D79987 /* sequence.cpp */,
+				0A529443164C74FC00045558 /* tautree.cpp */,
+				0A529444164C74FC00045558 /* tautree.h */,
 				0A5C7637136F2EF10095365C /* targets.h */,
 				0A5C7636136F2EF10095365C /* targets.cpp */,
 				0AA3D63614D106B800448167 /* threadsafety.h */,
@@ -214,7 +214,7 @@
 				0A63748614CF83A500D79987 /* sequence.cpp in Sources */,
 				0A04E7C01540B87200D9A162 /* threadsafety.cpp in Sources */,
 				0ADA18F715508175008020B2 /* robertsfilter.cpp in Sources */,
-				0A86E281160A6D8B00E0DA17 /* rhotree.cpp in Sources */,
+				0A529445164C74FC00045558 /* tautree.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

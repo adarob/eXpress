@@ -25,7 +25,7 @@ struct FragHit;
 class BiasBoss;
 class MismatchTable;
 class Librarian;
-class RangeRhoForest;
+class RangeTauForest;
 
 /**
  * The RoundParams struct stores the target parameters unique to a given round
@@ -430,7 +430,7 @@ public:
    DOC
    */
   void output_results(std::string output_dir, size_t tot_counts,
-                      const RangeRhoForest* forest, const FLD* fld,
+                      const RangeTauForest* forest, const FLD* fld,
                       bool output_rdds=false);
   /**
    * A member function to be run asynchronously that continuously updates the

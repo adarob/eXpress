@@ -14,7 +14,7 @@
 #include "mismatchmodel.h"
 #include "mapparser.h"
 #include "library.h"
-#include "rhotree.h"
+#include "tautree.h"
 #include <iostream>
 #include <fstream>
 #include <cassert>
@@ -291,7 +291,7 @@ void project_to_polytope(vector<const Target*> bundle_targ,
 }
 
 void TargetTable::output_results(string output_dir, size_t tot_counts,
-                                 const RangeRhoForest* forest, const FLD* fld,
+                                 const RangeTauForest* forest, const FLD* fld,
                                  bool output_rdds) {
   FILE * expr_file = fopen((output_dir + "/results.xprs").c_str(), "w");
   ofstream varcov_file;
@@ -312,23 +312,23 @@ void TargetTable::output_results(string output_dir, size_t tot_counts,
   double l_tot_counts = log((double)tot_counts);
 
   for (size_t bundle_id = 0; bundle_id < forest->num_children(); ++bundle_id) {
-    RangeRhoTree& tree = *static_cast<RangeRhoTree*>(forest->child(bundle_id));
+    RangeTauTree& tree = *static_cast<RangeTauTree*>(forest->child(bundle_id));
     double l_bundle_counts = log((double)forest->tree_counts(bundle_id));
     
     if (forest->tree_counts(bundle_id)) {
       vector<double> targ_counts(tree.num_leaves(),0);
-      vector<double> targ_rho(tree.num_leaves(), LOG_0);
+      vector<double> targ_tau(tree.num_leaves(), LOG_0);
       vector<const Target*> bundle_targ(tree.num_leaves(), NULL);
       bool requires_projection = false;
 
-      RhoLeafIterator it(&tree);
+      TauLeafIterator it(&tree);
       size_t i = 0;
       while (*it != NULL) {
         assert(i == (*it)->id() - tree.left());
         bundle_targ[i] = _targ_map[(*it)->id()];
-        const Target& targ = *_targ_map[i];
-        targ_rho[i] = it.rho();
-        targ_counts[i] = sexp(it.rho() + l_bundle_counts);
+        const Target& targ = *bundle_targ[i];
+        targ_tau[i] = it.tau();
+        targ_counts[i] = sexp(it.tau() + l_bundle_counts);
         requires_projection |= targ_counts[i] > (double)targ.tot_counts() ||
                                targ_counts[i] < (double)targ.uniq_counts();
 
@@ -341,7 +341,7 @@ void TargetTable::output_results(string output_dir, size_t tot_counts,
                             forest->tree_counts(bundle_id));
       }
        
-      // Calculate individual counts and rhos
+      // Calculate individual counts and taus
       for (size_t i = 0; i < tree.num_leaves(); ++i) {
         const Target& targ = *bundle_targ[i];
         double l_eff_len = targ.est_effective_length(fld);
@@ -446,13 +446,14 @@ void TargetTable::asynch_bias_update(boost::mutex* mutex) {
    
     vector<double> fl_cdf = fld->cmf();
 
-    RhoLeafIterator it(lib.rho_forest);
+    TauLeafIterator it(lib.tau_forest);
     while (*it != NULL) {
-      RhoTree* leaf = *it;
+      TauTree* leaf = *it;
       Target* targ = lib.targ_table->get_targ(leaf->id());
       targ->update_target_bias(bias_table.get(), fld.get());
       if (bg_table) {
-        bg_table->update_expectations(*targ, it.rho(), fl_cdf);
+        assert(false); // These are taus, not rhos!
+        bg_table->update_expectations(*targ, it.tau(), fl_cdf);
       }
       ++it;
       if (!running) {
