@@ -70,7 +70,7 @@ public:
   FrequencyMatrix(size_t m, size_t n, T alpha, bool logged = true);
   /**
    * An accessor for the frequency at a given position in the matrix (logged
-   * if table is logged).
+   * if table is logged). Returns 0 if numerator or denominator are 0.
    * @param i the distribution (row).
    * @param j the value (column).
    * @param normalized a bool specifying whether or not the frequency should be
@@ -81,7 +81,7 @@ public:
   T operator()(size_t i, size_t j, bool normalized=true) const;
   /**
    * An accessor for the frequency at a given position in the flattened matrix
-   * (logged if table is logged).
+   * (logged if table is logged). Returns 0 if numerator or denominator are 0.
    * @param k the array position.
    * @param normalized a bool specifying whether or not the frequency should be
    *        normalized.
@@ -171,18 +171,18 @@ T FrequencyMatrix<T>::operator()(size_t i, size_t j, bool normalized) const {
   if (_fixed || !normalized) {
       return _array[i*_N+j];
   }
+  T num = _array[i*_N+j]
+  T denom = _rowsums[i];
   if (_logged) {
-    T num = _array[i*_N+j];
-    if (num == LOG_0) {
+    if (denom == LOG_0) {
       return LOG_0;
     }
-    return num-_rowsums[i];
+    return num-denom;
   } else {
-    T num = _array[i*_N+j];
-    if (num == 0) {
+    if (denom == 0) {
       return 0;
     }
-    return _array[i*_N+j]/_rowsums[i];
+    return num/denom;
   }
 }
 

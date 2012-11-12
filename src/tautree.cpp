@@ -221,7 +221,7 @@ void RangeTauForest::process_fragment(const Fragment& frag) {
     double frac = params.const_likelihoods[i] + params.taus[i] -
                   total_likelihood;
     frag[i]->probability = frac;
-    params.accum_assignments[i+1] = log_add(frac, params.accum_assignments[i]);
+    params.accum_assignments[i+1] = log_add(params.accum_assignments[i], frac);
   }
   
   update_taus(sap);
@@ -257,6 +257,7 @@ void RangeTauTree::get_taus(Sap sap, double tau) const {
   assert(!isnan(tau));
   if (is_leaf()) {
     for (size_t i = 0; i < sap.size(); ++i) {
+      assert(sap.leaf_id(i) == id());
       sap.tau(i) = tau;
     }
     return;
