@@ -39,26 +39,26 @@ Target::Target(TargID id, const std::string& name, const std::string& seq,
     _end_bias.reset(new std::vector<float>(seq.length(),0));
   }
   _cached_eff_len = est_effective_length(NULL, false);
-  _curr_params.mass_var = _cached_eff_len + _alpha;
+  _init_pseudo_mass = _cached_eff_len + _alpha;
 }
 
 void Target::add_mass(double p, double v, double m) {
   _curr_params.mass = log_add(_curr_params.mass, p+m);
-  double mass_pseudo = mass(true);
+  double mass_with_pseudo = log_add(_ret_params->mass, _init_pseudo_mass);
   if (p != LOG_1 || v != LOG_0) {
     if (p != LOG_0) {
+      _curr_params.ambig_mass = log_add(_curr_params.ambig_mass, p+m);
       _curr_params.tot_ambig_mass = log_add(_curr_params.tot_ambig_mass, m);
     }
-    double p_hat = _curr_params.var_sum - _curr_params.tot_ambig_mass;
+    double p_hat = _curr_params.ambig_mass - _curr_params.tot_ambig_mass;
     assert(p_hat == LOG_0 || p_hat <= LOG_1);
     _curr_params.var_sum = min(log_add(_curr_params.var_sum, v + m),
-                               log_sub(_curr_params.tot_ambig_mass + p_hat
-                                       + log_sub(LOG_1, p_hat), LOG_EPSILON));
+                               _curr_params.tot_ambig_mass + p_hat
+                               + log_sub(LOG_1, p_hat));
     double var_update = log_add(p + 2*m, v + 2*m);
     _curr_params.mass_var = min(log_add(_curr_params.mass_var, var_update),
-                                log_sub(mass_pseudo + log_sub(_bundle->mass(),
-                                                              mass_pseudo),
-                                        LOG_EPSILON));
+                                mass_with_pseudo + log_sub(_bundle->mass(),
+                                                      mass_with_pseudo));
   }
   
   (_libs->curr_lib()).targ_table->update_total_fpb(m - _cached_eff_len);
@@ -81,16 +81,13 @@ double Target::rho() const {
 
 double Target::mass(bool with_pseudo) const {
   if (!with_pseudo) {
-      return _ret_params->mass;
+    return _ret_params->mass;
   }
   return log_add(_ret_params->mass, _alpha+_cached_eff_len+_avg_bias);
 }
 
 double Target::mass_var(bool with_pseudo) const {
-  if (!with_pseudo) {
-      return _ret_params->mass_var;
-  }
-  return log_add(_ret_params->mass_var, 2*(_alpha+_cached_eff_len-2));
+  return _ret_params->mass_var;
 }
 
 double Target::log_likelihood(const FragHit& frag, bool with_pseudo) const {
@@ -394,7 +391,10 @@ void TargetTable::output_results(string output_dir, size_t tot_counts,
 
     // Calculate total counts for bundle and bundle-level rho
     // Do not include pseudo-mass because it will screw up multi-round results
-    double l_bundle_mass = bundle->mass();
+    double l_bundle_mass = LOG_0;
+    foreach (Target* targ, bundle_targ) {
+      l_bundle_mass = log_add(l_bundle_mass, targ->mass(false));
+    }
 
     if (bundle->counts()) {
       double l_bundle_counts = log((double)bundle->counts());
@@ -421,7 +421,9 @@ void TargetTable::output_results(string output_dir, size_t tot_counts,
         double l_eff_len = targ.est_effective_length();
 
         // Calculate count variance
-        double mass_var = targ.mass_var(false);
+        double mass = targ.mass(true);
+        double mass_var = min(targ.mass_var(false),
+                              mass + log_sub(l_bundle_mass, mass));
         double count_alpha = 0;
         double count_beta = 0;
         double count_var = 0;
@@ -429,16 +431,18 @@ void TargetTable::output_results(string output_dir, size_t tot_counts,
         if (targ.tot_counts() != targ.uniq_counts()) {
           double n = targ.tot_counts()-targ.uniq_counts();
           double m = (targ_counts[i] - targ.uniq_counts())/n;
-          double v = sexp(targ.var_sum() - targ.tot_ambig_mass());
-
+          double v = min(sexp(targ.var_sum() - targ.tot_ambig_mass()),
+                         n * m * (1 - m));
           double a = -m*(m*m - m + v)/v;
           double b = (m-1)*(m*m - m + v)/v;
           if (!targ.solvable()) {
             a = 1;
             b = 1;
           }
-
-          if (targ.solvable() && (v == 0 || a < 0 || b < 0)) {
+          
+          assert (a > 0 && b > 0);
+          
+          if (targ.solvable() && v == 0) {
             count_var = mass_var;
           } else {
             count_var = n*a*b*(a+b+n)/((a+b)*(a+b)*(a+b+1));
