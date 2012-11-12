@@ -433,6 +433,8 @@ void TargetTable::output_results(string output_dir, size_t tot_counts,
           double m = (targ_counts[i] - targ.uniq_counts())/n;
           double v = min(sexp(targ.var_sum() - targ.tot_ambig_mass()),
                          n * m * (1 - m) - EPSILON);
+          assert(v >= 0 || m == 0 || m == 1);
+          v = max(v, 0.);
           double a = -m*(m*m - m + v)/v;
           double b = (m-1)*(m*m - m + v)/v;
           if (!targ.solvable()) {
