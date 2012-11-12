@@ -421,7 +421,7 @@ void TargetTable::output_results(string output_dir, size_t tot_counts,
         double l_eff_len = targ.est_effective_length();
 
         // Calculate count variance
-        double mass = targ.mass(true);
+        double mass = targ.mass(false);
         double mass_var = min(targ.mass_var(false),
                               mass + log_sub(l_bundle_mass, mass));
         double count_alpha = 0;
@@ -432,7 +432,7 @@ void TargetTable::output_results(string output_dir, size_t tot_counts,
           double n = targ.tot_counts()-targ.uniq_counts();
           double m = (targ_counts[i] - targ.uniq_counts())/n;
           double v = min(sexp(targ.var_sum() - targ.tot_ambig_mass()),
-                         n * m * (1 - m));
+                         n * m * (1 - m) - EPSILON);
           double a = -m*(m*m - m + v)/v;
           double b = (m-1)*(m*m - m + v)/v;
           if (!targ.solvable()) {

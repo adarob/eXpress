@@ -63,7 +63,7 @@
             isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "-f 1 --no-bias-correct -o $(SRCROOT)/sample_data2/out $(SRCROOT)/sample_data2/hg19-ucsc_transcripts.fa $(SRCROOT)/sample_data2/hits.n2e160.clip.bam"
+            argument = "--stop-at 10000 -f 1 --no-bias-correct --output-running-reads -o $(SRCROOT)/sample_data2/out $(SRCROOT)/sample_data2/hg19-ucsc_transcripts.fa /Volumes/math.mcb.berkeley.edu/experiments/express/simulation/hg19_ucsc_err/hits.bam"
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
