@@ -40,6 +40,8 @@ struct RoundParams {
    * fragment mapping probabilities.
    */
   double mass;
+  // DOC
+  double ambig_mass;
   /**
    * A public double that stores the (logged) total mass of ambiguous fragments
    * mapping to the target.
@@ -57,8 +59,8 @@ struct RoundParams {
   /**
    * RoundParams constructor sets initial values for parameters
    */
-  RoundParams() : mass(LOG_0), tot_ambig_mass(LOG_0), mass_var(LOG_0),
-                  var_sum(LOG_0) {}
+  RoundParams() : mass(LOG_0), ambig_mass(LOG_0), tot_ambig_mass(LOG_0),
+                  mass_var(LOG_0), var_sum(LOG_0) {}
 };
 
 typedef size_t TargID;
@@ -126,6 +128,8 @@ class Target {
    * in the bundle.
    */
   size_t _tot_counts;
+  // DOC
+  double _init_pseudo_mass;
   /**
    * A private pointer to the Bundle this Target is a member of.
    */
@@ -238,7 +242,8 @@ public:
    */
   double mass(bool with_pseudo=true) const;
   /**
-   * An accessor for the total (logged) variance on mass.
+   * DOC
+    An accessor for the total (logged) variance on mass.
    * @param with_pseudo a boolean specifying whether pseudo-counts should be
    *        included in returned variance.
    * @return The total (logged) variance on mass.

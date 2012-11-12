@@ -428,19 +428,18 @@ void process_fragment(Fragment* frag_p) {
     bundle = lib.targ_table->merge_bundles(bundle, t->bundle());
 
     double p = likelihoods[i]-total_likelihood;
-    double v = LOG_0;
-    if (frag.num_hits() > 1) {
-      v = log_add(variances[i] - 2*total_mass,
+    if (targ_set.size() > 1) {
+      double v = log_add(variances[i] - 2*total_mass,
                   total_variance + 2*masses[i] - 4*total_mass);
+      t->add_mass(p, v, mass_n);
+    } else if (i == 0) {
+      t->add_mass(LOG_1, LOG_0, mass_n);
     }
-    assert(!isnan(v));
     assert(!(isnan(p)||isinf(p)));
 
     m.probability(sexp(p));
 
     assert(!isinf(m.probability()));
-
-    t->add_mass(p, v, mass_n);
 
     // update parameters
     if (first_round) {

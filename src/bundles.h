@@ -85,8 +85,8 @@ class Bundle {
    */
   size_t _counts;
   /**
-   * A private size_t that stores the total mass of observed fragments mapped
-   * to targets in the bundle (logged).
+   * A private double that stores the total mass of observed fragments mapped
+   * to targets in the bundle (logged), including the initial pseudo-mass.
    */
   double _mass;
 
@@ -129,7 +129,7 @@ public:
   size_t counts() const { return _counts; }
   /**
    * An accessor for the the total mass of observed fragments mapped to
-   * targets in the bundle (logged).
+   * targets in the bundle (logged), including the initial pseudo-mass.
    * @return The total mass of fragments mapped to targets in the bundle.
    */
   double mass() const { return _mass; }

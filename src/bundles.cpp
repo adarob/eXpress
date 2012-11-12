@@ -31,7 +31,9 @@ double CovarTable::get(TargID targ1, TargID targ2) {
   }
 }
 
-Bundle::Bundle(Target* targ) : _counts(targ->tot_counts()), _mass(LOG_0) {
+Bundle::Bundle(Target* targ)
+    : _counts(targ->tot_counts()),
+      _mass(targ->mass(true)) {
   _targets.push_back(targ);
 }
 
