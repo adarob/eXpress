@@ -171,7 +171,7 @@ T FrequencyMatrix<T>::operator()(size_t i, size_t j, bool normalized) const {
   if (_fixed || !normalized) {
       return _array[i*_N+j];
   }
-  T num = _array[i*_N+j]
+  T num = _array[i*_N+j];
   T denom = _rowsums[i];
   if (_logged) {
     if (denom == LOG_0) {
