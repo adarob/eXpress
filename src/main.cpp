@@ -57,7 +57,7 @@ string in_map_file_names = "";
 string tau_forest_file_name = "";
 
 // intial pseudo-count parameters (non-logged)
-double expr_alpha = .1;
+double expr_alpha = .01;
 double fld_alpha = 1;
 double bias_alpha = 1;
 double mm_alpha = 1;

@@ -27,7 +27,6 @@ Sap Sap::branch(size_t split) {
 }
 
 double TauTree::similarity_scalar(const Sap& sap) {
-  return LOG_1;
   if (sap.size() < _children.size()) {
     return LOG_1;
   }
@@ -279,10 +278,11 @@ void RangeTauTree::update_taus(Sap sap) {
   if (is_leaf()) {
     return;
   }
-  const double mass = next_mass() + similarity_scalar(sap);
-  if (islzero(mass)) {
+  double sim_scalar = similarity_scalar(sap);
+  if (islzero(sim_scalar)) {
     return;
   }
+  const double mass = sim_scalar + next_mass();
   
   for (size_t i = 0; i < _children.size(); ++i) {
     RangeTauTree& child = *static_cast<RangeTauTree*>(_children[i]);
