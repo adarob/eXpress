@@ -280,7 +280,7 @@ bool parse_options(int ac, char ** av) {
   if (num_threads > 0) {
     num_threads -= edit_detect;
   }
-  if (remaining_rounds && in_map_file_names != "") {
+  if (remaining_rounds && in_map_file_names == "") {
     cerr << "ERROR: Cannot process multiple rounds from streaming input.";
     return 1;
   }
