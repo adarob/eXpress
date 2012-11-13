@@ -431,12 +431,18 @@ void TargetTable::output_results(string output_dir, size_t tot_counts,
         if (targ.tot_counts() != targ.uniq_counts()) {
           double n = targ.tot_counts()-targ.uniq_counts();
           double m = (targ_counts[i] - targ.uniq_counts())/n;
-          double v = min(sexp(targ.var_sum() - targ.tot_ambig_mass()),
-                         n * m * (1 - m) - EPSILON);
-          assert(v >= 0 || m == 0 || m == 1);
-          v = max(v, 0.);
+          assert (m >= 0 && m <= 1);
+          m = max(m, EPSILON);
+          m = min(m, 1-EPSILON);
+          double v = INFINITY;
+          if (targ.tot_ambig_mass() != LOG_0) {
+            v = sexp(targ.var_sum() - targ.tot_ambig_mass());
+          }
+          v = min(v, m * (1 - m) - EPSILON/2);
+
           double a = -m*(m*m - m + v)/v;
           double b = (m-1)*(m*m - m + v)/v;
+
           if (!targ.solvable()) {
             a = 1;
             b = 1;
