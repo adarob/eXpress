@@ -471,7 +471,7 @@ void TargetTable::output_results(string output_dir, size_t tot_counts,
         double eff_counts = targ_counts[i] / eff_len * targ.length();
 
         fprintf(expr_file, "" SIZE_T_FMT "\t%s\t" SIZE_T_FMT "\t%f\t" SIZE_T_FMT
-                          "\t" SIZE_T_FMT "\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%c\n",
+                          "\t" SIZE_T_FMT "\t%f\t%f\t%e\t%e\t%f\t%f\t%f\t%c\n",
                bundle_id, targ.name().c_str(), targ.length(), eff_len,
                targ.tot_counts(), targ.uniq_counts(), targ_counts[i],
                eff_counts, count_alpha, count_beta, targ_fpkm, fpkm_lo, fpkm_hi,

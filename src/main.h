@@ -129,16 +129,17 @@ inline double log_add(double x, double y) {
  * @return a double for the log of exp(x)-exp(y).
  */
 inline double log_sub(double x, double y) {
-  if (x == y) {
+  // Have to be careful of numerical issues, so we allow y to be slightly
+  // greater than x.
+  if (x >= y) {
+    assert(approx_eq(x, y));
     return LOG_0;
-  }
+  } else if (x > y) {
+  
   if (fabs(y) == LOG_0) {
     return x;
   }
   
-  assert(x > y);
-
-
   double diff = x+log(1-exp(y-x));
   return diff;
 }
