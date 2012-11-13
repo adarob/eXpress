@@ -131,7 +131,7 @@ inline double log_add(double x, double y) {
 inline double log_sub(double x, double y) {
   // Have to be careful of numerical issues, so we allow y to be slightly
   // greater than x.
-  if (x >= y) {
+  if (x <= y) {
     assert(approx_eq(x, y));
     return LOG_0;
   }
