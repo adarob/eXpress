@@ -46,7 +46,7 @@ void Target::round_reset() {
 double Target::est_effective_length(const FLD* fld, bool with_bias) const {
   double eff_len = LOG_0;
 
-  for(size_t l = fld->min_val(); l <= min(length(), fld->max_val()); l++) {
+  for(size_t l = 1; l <= min(length(), fld->max_val()); l++) {
     eff_len = log_add(eff_len, fld->pmf(l)+log((double)length()-l+1));
   }
 
@@ -200,6 +200,7 @@ vector<double> TargetTable::get_alphas(double alpha,
       alpha = alpha_renorm * alpha_map->find(name)->second;
     }
     target_alphas[i] = log(alpha) + _targ_map[i]->cached_effective_length();
+    assert(target_alphas[i] != LOG_0);
   }
   return target_alphas;
 }
