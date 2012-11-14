@@ -23,7 +23,7 @@
 using namespace std;
 
 Target::Target(TargID id, const std::string& name, const std::string& seq,
-               bool prob_seq)
+               const FLD* fld, bool prob_seq)
    : _id(id),
      _name(name),
      _seq_f(seq, 0, prob_seq),
@@ -32,7 +32,7 @@ Target::Target(TargID id, const std::string& name, const std::string& seq,
      _uniq_counts(0),
      _tot_counts(0),
      _avg_bias(0),
-     _cached_eff_len(log(seq.length())),
+     _cached_eff_len(est_effective_length(fld, false)),
      _solvable(false) {
 }
 
@@ -221,10 +221,11 @@ void TargetTable::add_targ(const string& name, const string& seq, bool prob_seq,
     exit(1);
   }
 
-  Target* targ = new Target(it->second, name, seq, prob_seq);
   const Library& lib = _libs->curr_lib();
+  Target* targ = new Target(it->second, name, seq, lib.fld, prob_seq);
+
   if (lib.bias_table) {
-      (lib.bias_table)->update_expectations(*targ);
+    (lib.bias_table)->update_expectations(*targ);
   }
   _targ_map[targ->id()] = targ;
   targ->bundle(_bundle_table.create_bundle(targ));
@@ -403,7 +404,7 @@ void TargetTable::output_results(string output_dir, size_t tot_counts,
   }
 }
 
-void TargetTable::asynch_bias_update(boost::mutex* mutex) {
+void TargetTable::asynch_bias_update(double expr_alpha, boost::mutex* mutex) {
   BiasBoss* bg_table = NULL;
   boost::scoped_ptr<BiasBoss> bias_table;
   boost::scoped_ptr<FLD> fld;
@@ -422,6 +423,10 @@ void TargetTable::asynch_bias_update(boost::mutex* mutex) {
         fld.reset(new FLD(*(lib.fld)));
       } else {
         *fld = *(lib.fld);
+      }
+      if (expr_alpha > 0) {
+        lib.tau_forest->remove_alphas();
+        lib.tau_forest->set_alphas(get_alphas(expr_alpha, NULL));
       }
       if (lib.bias_table) {
         BiasBoss& lib_bias_table = *(lib.bias_table);

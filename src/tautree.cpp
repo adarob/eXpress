@@ -175,9 +175,10 @@ void RangeTauForest::process_fragment(const Fragment& frag) {
   if (frag.num_hits() == 1) {
     SapData params(1);
     FragHit& hit = *frag[0];
+    hit.probability = LOG_1;
     params.leaf_ids[0] = hit.targ_id;
     params.tree_root = _leaf_to_tree_map[params.leaf_ids[0]];
-    params.accum_assignments[1] = 0;
+    params.accum_assignments[1] = LOG_1;
     double mass = next_mass();
     _child_taus.increment(params.tree_root, mass);
     static_cast<RangeTauTree*>(_children[params.tree_root])->update_taus(Sap(&params, 0, 0));

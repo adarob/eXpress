@@ -399,7 +399,7 @@ void process_fragment(Fragment* frag_p) {
           (lib.fld)->add_val(hit.length(), p + lib.mass_n);
         }
         if (lib.bias_table) {
-          (lib.bias_table)->update_observed(hit, p+lib.mass_n);
+          (lib.bias_table)->update_observed(hit, p + lib.mass_n);
         }
       }
     }
@@ -465,7 +465,9 @@ size_t threaded_calc_abundances(Librarian& libs) {
       while(true) {
         if (lib.n == burn_in) {
           bias_update.reset(new boost::thread(&TargetTable::asynch_bias_update,
-                                              lib.targ_table, &bu_mut));
+                                              lib.targ_table,
+                                              (expr_alpha_map) ? 0 : expr_alpha,
+                                              &bu_mut));
           if (lib.mismatch_table) {
             (lib.mismatch_table)->activate();
           }

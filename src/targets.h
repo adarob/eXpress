@@ -167,7 +167,7 @@ public:
    *        parameter tables (bias_table, mismatch_table, fld).
    */
   Target(TargID id, const std::string& name, const std::string& seq,
-       bool prob_seq);
+         const FLD* fld, bool prob_seq);
   /**
    * An accessor for the target name.
    * @return string containing target name.
@@ -437,8 +437,9 @@ public:
    * background bias values, target bias values, and target effective lengths.
    * @param mutex a pointer to the mutex to be used to protect the global fld
    *        and bias tables during updates.
+   DOC
    */
-  void asynch_bias_update(boost::mutex* mutex);
+  void asynch_bias_update(double expr_alpha, boost::mutex* mutex);
 };
 
 #endif
