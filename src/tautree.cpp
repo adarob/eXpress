@@ -30,18 +30,18 @@ double TauTree::similarity_scalar(const Sap& sap) {
   if (sap.size() < _children.size()) {
     return LOG_1;
   }
-  double c = log(sap.size());
+  double c = 0;
   double tot = sap.total_const_likelihood();
   if (tot == LOG_0) {
     return LOG_0;
   }
   for (size_t i = 0; i < sap.size(); ++i) {
     double p = sap.const_likelihood(i) - tot;
-    c += sexp(p)*p;
+    c += -sexp(p)*p;
     assert(!isnan(c));
   }
+  c = 1 - (c / log(sap.size()));
   if (c < 0) {
-    //    assert(approx_eq(c,0));
     return LOG_0;
   }
   if (c > 1) {
