@@ -38,7 +38,7 @@ FLD::FLD(double alpha, size_t max_val, size_t mean, size_t std_dev)
                        boost::math::cdf(norm,i-0.5);
     double mass = -numeric_limits<double>::max();
     if (norm_mass != 0) {
-      mass = tot + norm_mass;
+      mass = tot + log(norm_mass);
     }
     _hist[i] = mass;
     _sum = log_add(_sum, log((double)i)+mass);
