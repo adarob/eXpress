@@ -430,34 +430,28 @@ void TargetTable::output_results(string output_dir, size_t tot_counts,
 
         if (targ.tot_counts() != targ.uniq_counts()) {
           double n = targ.tot_counts()-targ.uniq_counts();
-          double m = (targ_counts[i] - targ.uniq_counts())/n;
-          assert (m >= 0 && m <= 1);
-          m = max(m, EPSILON);
-          m = min(m, 1-EPSILON);
-          double v = INFINITY;
-          if (targ.tot_ambig_mass() != LOG_0) {
-            v = sexp(targ.var_sum() - targ.tot_ambig_mass());
-          }
-          v = min(v, m * (1 - m) - EPSILON/2);
+          if (targ.solvable()) {
+            double m = (targ_counts[i] - targ.uniq_counts())/n;
+            assert (m >= 0 && m <= 1);
+            m = max(m, EPSILON);
+            m = min(m, 1-EPSILON);
+            double v = INFINITY;
+            if (targ.tot_ambig_mass() != LOG_0) {
+              v = sexp(targ.var_sum() - targ.tot_ambig_mass());
+            }
+            v = min(v, m * (1 - m) - EPSILON/2);
 
-          double a = -m*(m*m - m + v)/v;
-          double b = (m-1)*(m*m - m + v)/v;
-
-          if (!targ.solvable()) {
-            a = 1;
-            b = 1;
-          }
-          
-          assert (a > 0 && b > 0);
-          
-          if (targ.solvable() && v == 0) {
+            count_alpha = -m * (m*m - m + v) / v;
+            count_beta = (m - 1) * (m*m - m + v) / v;
             count_var = mass_var;
+            
+            assert (count_alpha > 0 && count_beta > 0);
+            assert(!isnan(count_var));
           } else {
-            count_var = n*a*b*(a+b+n)/((a+b)*(a+b)*(a+b+1));
+            count_var = n * (n + 2.) / 12.;
+            count_alpha = 1;
+            count_beta = 1;
           }
-          count_alpha = a;
-          count_beta = b;
-          assert(!isnan(count_var) && !isinf(count_var));
         }
 
         double fpkm_std_dev = sexp(0.5*(mass_var + l_var_renorm));
