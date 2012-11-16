@@ -114,6 +114,7 @@ public:
   virtual size_t num_leaves() const = 0;
   virtual bool is_leaf() const = 0;
   virtual LeafID id() const = 0;
+  virtual void renormalize_taus();
 };
 
 struct TauLeafIteratorData {
@@ -221,7 +222,10 @@ public:
   RangeTauForest(std::string infile, double ff_param);
   void set_alphas(const std::vector<double>& target_alphas);
   void add_alphas() { increment_taus(Sap(&_alpha_params)); };
-  void remove_alphas() { increment_taus(Sap(&_alpha_params), true); }
+  void remove_alphas() {
+    increment_taus(Sap(&_alpha_params), true);
+    renormalize_taus();
+  }
   void process_fragment(const Fragment& frag);
   size_t tree_counts(TreeID t) const { return _tree_counts[t]; }
   size_t num_leaves() const {

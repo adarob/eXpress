@@ -57,7 +57,7 @@ public:
   /**
    * Dummy FrequencyMatrix Constructor.
    */
-  FrequencyMatrix(){};
+  FrequencyMatrix();
   /**
    * FrequencyMatrix constructor initializes the matrix values to the given
    * pseudo-counts.
@@ -153,7 +153,12 @@ public:
    * matrix has been fixed (irrevocable).
    */
   bool is_fixed() const { return _fixed; }
+  // DOC
+  void recompute_sums();
 };
+
+template <class T>
+FrequencyMatrix<T>::FrequencyMatrix() : _M(0), _N(0) {}
 
 template <class T>
 FrequencyMatrix<T>::FrequencyMatrix(size_t m, size_t n, T alpha, bool logged)
@@ -287,5 +292,19 @@ void FrequencyMatrix<T>::fix() {
   }
   _fixed = true;
 }
+
+template <class T>
+void FrequencyMatrix<T>::recompute_sums() {
+  if (_logged) {
+    for (size_t i = 0; i < _M; ++i) {
+      _rowsums[i] = LOG_0;
+      for (size_t j = 0; j < _N; ++j) {
+        _rowsums[i] = log_add(_rowsums[i], _array[i*_N+j]);
+      }
+    }
+  }
+}
+
+
 
 #endif

@@ -41,7 +41,7 @@ double TauTree::similarity_scalar(const Sap& sap) {
     assert(!isnan(c));
   }
   c = 1 - (c / log(sap.size()));
-  if (c < 0) {
+  if (c < 0 || approx_eq(c,0)) {
     return LOG_0;
   }
   if (c > 1) {
@@ -49,6 +49,13 @@ double TauTree::similarity_scalar(const Sap& sap) {
   }
   assert(c==0 || !isnan(log(c)));
   return log(c);
+}
+
+void TauTree::renormalize_taus() {
+  _child_taus.recompute_sums();
+  foreach(TauTree* child, _children) {
+    child->renormalize_taus();
+  }
 }
 
 RangeTauForest::RangeTauForest(string infile_path, double ff_param)
