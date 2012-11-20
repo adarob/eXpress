@@ -73,7 +73,7 @@ const double LOG_1 = 0;
  * A global double specifying the default epsilon value to be used in approx_eq.
  */
 const double EPSILON = 0.000001;
-
+const double LOG_EPSILON = log(EPSILON);
 /**
  * Global function that determines if two doubles are within some epsilon of
  * each other.

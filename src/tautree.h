@@ -146,11 +146,7 @@ class TauLeafIterator : public std::iterator<std::forward_iterator_tag,
     TauLeafIteratorData* parent = &_stack.top();
     while (!parent->tree->is_leaf()) {
       TauLeafIteratorData child(parent->tree->_children[parent->curr_child]);
-      if (parent->tree->_child_taus.sum(0) == LOG_0) {
-        child.tau = parent->tau + (LOG_1 - parent->tree->num_children());
-      } else {
-        child.tau = parent->tau + parent->tree->_child_taus(parent->curr_child);
-      }
+      child.tau = parent->tau + parent->tree->_child_taus(parent->curr_child);
       _stack.push(child);
       parent = &_stack.top();
     }

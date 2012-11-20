@@ -33,7 +33,7 @@ double TauTree::similarity_scalar(const Sap& sap) {
   double c = 0;
   double tot = sap.total_const_likelihood();
   if (tot == LOG_0) {
-    return LOG_0;
+    return LOG_EPSILON;
   }
   for (size_t i = 0; i < sap.size(); ++i) {
     double p = sap.const_likelihood(i) - tot;
@@ -42,7 +42,7 @@ double TauTree::similarity_scalar(const Sap& sap) {
   }
   c = 1 - (c / log(sap.size()));
   if (c < 0 || approx_eq(c,0)) {
-    return LOG_0;
+    return LOG_EPSILON;
   }
   if (c > 1) {
     return LOG_1;
