@@ -129,6 +129,10 @@ AlphaMap* parse_priors(string in_file) {
  * @return True iff there was an error.
  */
 bool parse_options(int ac, char ** av) {
+  
+  size_t additional_online = 0;
+  size_t additional_batch = 0;
+  
   po::options_description standard("Standard Options");
   standard.add_options()
   ("help,h", "produce help message")
@@ -142,10 +146,10 @@ bool parse_options(int ac, char ** av) {
    po::value<int>(&def_fl_stddev)->default_value(def_fl_stddev),
    "prior estimate for fragment length std deviation")
   ("additional-batch,B",
-   po::value<size_t>(&remaining_rounds)->default_value(remaining_rounds),
+   po::value<size_t>(&additional_batch)->default_value(additional_batch),
    "number of additional batch EM rounds after initial online round")
   ("additional-online,O",
-   po::value<size_t>(&remaining_rounds)->default_value(remaining_rounds),
+   po::value<size_t>(&additional_online)->default_value(additional_online),
    "number of additional online EM rounds after initial online round")
   ("output-align-prob",
    "output alignments (sam/bam) with probabilistic assignments")
@@ -248,6 +252,7 @@ bool parse_options(int ac, char ** av) {
     direction = RF;
   }
 
+  
   edit_detect = vm.count("edit-detect");
   calc_covar = vm.count("calc-covar");
   bias_correct = !(vm.count("no-bias-correct"));
@@ -257,9 +262,15 @@ bool parse_options(int ac, char ** av) {
   output_running_rounds = vm.count("output-running-rounds");
   output_running_reads = vm.count("output-running-reads");
   batch_mode = vm.count("batch-mode");
+  remaining_rounds = max(additional_online, additional_batch);
   online_additional = vm.count("additional-online");
   both = vm.count("both");
 
+  if (additional_online > 0 && additional_batch > 0) {
+    cerr << "ERROR: Cannot add both online and batch rounds.";
+    return 1;
+  }
+  
   if (output_align_prob && output_align_samp) {
     cerr << "ERROR: Cannot output both alignment probabilties and sampled "
          << "alignments.";
