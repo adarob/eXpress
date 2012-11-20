@@ -45,6 +45,10 @@ void Bundle::incr_mass(double incr_amt) {
   _mass = log_add(_mass, incr_amt);
 }
 
+void Bundle::reset_mass() {
+  _mass = LOG_0;
+}
+
 BundleTable::~BundleTable() {
   foreach(Bundle* bundle, _bundles) {
     delete bundle;
