@@ -262,13 +262,14 @@ bool parse_options(int ac, char ** av) {
   output_running_rounds = vm.count("output-running-rounds");
   output_running_reads = vm.count("output-running-reads");
   batch_mode = vm.count("batch-mode");
-  remaining_rounds = max(additional_online, additional_batch);
-  online_additional = vm.count("additional-online");
   both = vm.count("both");
+  remaining_rounds = max(additional_online, additional_batch);
 
   if (additional_online > 0 && additional_batch > 0) {
     cerr << "ERROR: Cannot add both online and batch rounds.";
     return 1;
+  } else if (additional_online > 0) {
+    online_additional = true;
   }
   
   if (output_align_prob && output_align_samp) {
@@ -428,6 +429,8 @@ void process_fragment(Fragment* frag_p) {
   Bundle* bundle = frag.hits()[0]->target()->bundle();
   if (first_round) {
     bundle->incr_counts();
+  }
+  if (first_round || online_additional) {
     bundle->incr_mass(mass_n);
   }
 

@@ -68,6 +68,7 @@ void Target::round_reset() {
   _last_params = _curr_params;
   _curr_params = RoundParams();
   _ret_params = &_last_params;
+  _init_pseudo_mass = LOG_0;
 }
 
 double Target::rho() const {
@@ -301,8 +302,12 @@ Bundle* TargetTable::merge_bundles(Bundle* b1, Bundle* b2) {
 }
 
 void TargetTable::round_reset() {
+  foreach(Bundle* bundle, _bundle_table.bundles()) {
+    bundle->reset_mass();
+  }
   foreach(Target* targ, _targ_map) {
     targ->round_reset();
+    targ->bundle()->incr_mass(targ->mass(false));
   }
 }
 

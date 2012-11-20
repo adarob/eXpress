@@ -110,6 +110,8 @@ public:
    * @param incr_amt the amount to increase the mass by (logged).
    */
   void incr_mass(double incr_amt);
+  // DOC
+  void reset_mass();
   /**
    * An accessor for the number of Targets in the bundle.
    * @return The number of Targets in the bundle.

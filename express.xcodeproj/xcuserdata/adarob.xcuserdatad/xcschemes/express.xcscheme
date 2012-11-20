@@ -59,7 +59,7 @@
       </BuildableProductRunnable>
       <CommandLineArguments>
          <CommandLineArgument
-            argument = "--frag-len-mean 250 --frag-len-stddev 50 -B 5 -o $(SRCROOT)/sample_data3/out $(SRCROOT)/sample_data3/hox_ucsc.fa $(SRCROOT)/sample_data3/hits_1M.sam,$(SRCROOT)/sample_data3/hits_1M.sam_2"
+            argument = "-O 5 --frag-len-mean 250 --frag-len-stddev 50 -o $(SRCROOT)/sample_data3/out $(SRCROOT)/sample_data3/hox_ucsc.fa $(SRCROOT)/sample_data3/hits_1M.sam,$(SRCROOT)/sample_data3/hits_1M.sam_2"
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
