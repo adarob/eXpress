@@ -30,6 +30,8 @@ class Target;
  *  @copyright Artistic License 2.0
  **/
 class SeqWeightTable {
+  // DOC
+  size_t _order;
   /**
    * A private MarkovModel that stores the observed conditional nucleotide
    * frequencies (logged) in the bias window surrounding the fragment end.
@@ -50,7 +52,8 @@ public:
    * @param alpha a double specifying the strength of the uniform prior
    *        (logged pseudo-counts for each parameter).
    */
-  SeqWeightTable(size_t window_size, double alpha);
+  //DOC
+  SeqWeightTable(size_t window_size, size_t order, double alpha);
   /**
    * A member function that overwrites the "observed" parameters with those from
    * another SeqWeightTable.
@@ -117,6 +120,8 @@ public:
  **/
 class BiasBoss
 {
+  // DOC
+  size_t _order;
   /**
    * A private SeqWeightTable that stores the 5' sequence-specific bias
    * parameters (logged).
@@ -134,7 +139,10 @@ public:
    * @param alpha a double specifying the strength of the uniform prior (logged
    *        pseudo-counts for each parameter).
    */
-  BiasBoss(double alpha);
+  //DOC
+  BiasBoss(size_t order, double alpha);
+  // DOC
+  size_t order() const { return _order; }
   /**
    * A member function that copies the observed parameters from another
    * BiasBoss.

@@ -27,14 +27,11 @@ const int WINDOW = 21;
 const int CENTER = 11;
 // number of bases on either side of center
 const int SURROUND = 10;
-// order of markov model for bias foreground
-const size_t FG_ORDER = 3;
-// order of markov model for bias background
-const size_t BG_ORDER = 3;
 
-SeqWeightTable::SeqWeightTable(size_t window_size, double alpha)
-    : _observed(FG_ORDER, window_size, window_size, alpha),
-      _expected(BG_ORDER, window_size, BG_ORDER+1, 0) {
+SeqWeightTable::SeqWeightTable(size_t window_size, size_t order, double alpha)
+    : _order(order),
+      _observed(order, window_size, window_size, alpha),
+      _expected(order, window_size, order+1, EPSILON) {
 }
 
 void SeqWeightTable::copy_observed(const SeqWeightTable& other) {
@@ -86,11 +83,11 @@ void SeqWeightTable::append_output(ofstream& outfile) const {
 
   outfile << "\tObserved Conditional Probabilities\nPosition\t";
 
-  for (size_t j = 0; j < pow((double)NUM_NUCS, (double)FG_ORDER+1); j++) {
+  for (size_t j = 0; j < pow((double)NUM_NUCS, (double)_order+1); j++) {
     string s = "->";
     s += NUCS[j & 3];
     size_t cond = j >> 2;
-    for (size_t k = 0; k < FG_ORDER; ++k) {
+    for (size_t k = 0; k < _order; ++k) {
       s = NUCS[cond & 3] + s;
       cond = cond >> 2;
     }
@@ -100,7 +97,7 @@ void SeqWeightTable::append_output(ofstream& outfile) const {
 
   for (int i = 0; i < WINDOW; i++) {
     outfile << i-SURROUND << ":\t";
-    for (size_t j = 0; j < pow((double)NUM_NUCS, (double)FG_ORDER+1); j++) {
+    for (size_t j = 0; j < pow((double)NUM_NUCS, (double)_order+1); j++) {
       outfile << scientific << sexp(_observed.transition_prob(i,j>>2,j&3))
               << "\t";
     }
@@ -109,11 +106,11 @@ void SeqWeightTable::append_output(ofstream& outfile) const {
 
   outfile << "\tBackground Conditional Probabilities\nPosition\t";
 
-  for (size_t j = 0; j < pow((double)NUM_NUCS, (double)BG_ORDER+1); j++) {
+  for (size_t j = 0; j < pow((double)NUM_NUCS, (double)_order+1); j++) {
     string s = "->";
     s += NUCS[j & 3];
     size_t cond = j >> 2;
-    for (size_t k = 0; k < BG_ORDER; ++k) {
+    for (size_t k = 0; k < _order; ++k) {
       s = NUCS[cond & 3] + s;
       cond = cond >> 2;
     }
@@ -121,9 +118,9 @@ void SeqWeightTable::append_output(ofstream& outfile) const {
   }
   outfile << endl;
 
-  for (size_t i = 0; i < BG_ORDER+1; i++) {
+  for (size_t i = 0; i < _order+1; i++) {
     outfile << i << ":\t";
-    for (size_t j = 0; j <  pow((double)NUM_NUCS, (double)BG_ORDER+1); j++) {
+    for (size_t j = 0; j <  pow((double)NUM_NUCS, (double)_order+1); j++) {
       outfile << scientific << sexp(_expected.transition_prob(i,j>>2,j&3))
               << "\t";
     }
@@ -131,9 +128,10 @@ void SeqWeightTable::append_output(ofstream& outfile) const {
   }
 }
 
-BiasBoss::BiasBoss(double alpha)
-    : _5_seq_bias(WINDOW, alpha),
-      _3_seq_bias(WINDOW, alpha){
+BiasBoss::BiasBoss(size_t order, double alpha)
+    : _order(order),
+      _5_seq_bias(WINDOW, order, alpha),
+      _3_seq_bias(WINDOW, order, alpha){
 }
 
 void BiasBoss::copy_observations(const BiasBoss& other) {
@@ -152,11 +150,14 @@ void BiasBoss::update_expectations(const Target& targ, double mass,
     return;
   }
 
-  const Sequence& seq_fwd = targ.seq(0);
-  const Sequence& seq_rev = targ.seq(1);
-
-  _5_seq_bias.increment_expected(seq_fwd, mass, fl_cdf);
-  _3_seq_bias.increment_expected(seq_rev, mass, fl_cdf);
+  if (direction != R) {
+    const Sequence& seq_fwd = targ.seq(0);
+    _5_seq_bias.increment_expected(seq_fwd, mass, fl_cdf);
+  }
+  if (direction != F) {
+    const Sequence& seq_rev = targ.seq(1);
+    _3_seq_bias.increment_expected(seq_rev, mass, fl_cdf);
+  }
 }
 
 void BiasBoss::normalize_expectations() {

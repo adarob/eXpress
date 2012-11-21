@@ -584,7 +584,7 @@ void TargetTable::asynch_bias_update(boost::mutex* mutex) {
           bg_table->copy_observations(lib_bias_table);
           bias_table.reset(bg_table);
         }
-        bg_table = new BiasBoss(0);
+        bg_table = new BiasBoss(lib_bias_table.order(), 0);
       }
       cerr << "Synchronized parameter tables.\n";
     }

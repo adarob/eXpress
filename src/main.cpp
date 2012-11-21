@@ -1,3 +1,6 @@
+// DOC TODO:
+// Detect stranded and single-end reads. Disallow others when specified.
+
 /**
  *  main.cpp
  *  express
@@ -27,6 +30,7 @@
 #include "mapparser.h"
 #include "threadsafety.h"
 #include "robertsfilter.h"
+#include "directiondetector.h"
 #include "library.h"
 
 #ifndef WIN32
@@ -60,6 +64,8 @@ double expr_alpha = .01;
 double fld_alpha = 1;
 double bias_alpha = 1;
 double mm_alpha = 1;
+
+size_t bias_model_order = 3;
 
 // fragment length parameters
 int def_fl_max = 800;
@@ -159,6 +165,10 @@ bool parse_options(int ac, char ** av) {
    "accept only forward->reverse alignments (second-stranded protocols)")
   ("rf-stranded",
    "accept only reverse->forward alignments (first-stranded protocols)")
+  ("f-stranded",
+   "accept only forward single-end alignments (second-stranded protocols)")
+  ("r-stranded",
+   "accept only reverse single-end alignments (first-stranded protocols)")
   ("no-update-check", "disables automatic check for update via web")
   ;
   
@@ -194,6 +204,9 @@ bool parse_options(int ac, char ** av) {
   ("sam-file", po::value<string>(&in_map_file_names)->default_value(""), "")
   ("fasta-file", po::value<string>(&fasta_file_name)->default_value(""), "")
   ("num-neighbors", po::value<size_t>(&num_neighbors)->default_value(0), "")
+  ("bias-model-order",
+   po::value<size_t>(&bias_model_order)->default_value(bias_model_order),
+   "sets the order of the Markov chain used to model sequence bias")
   ;
 
   po::positional_options_description positional;
@@ -239,19 +252,28 @@ bool parse_options(int ac, char ** av) {
     return 1;
   }
 
+  size_t stranded_count = 0;
   if (vm.count("fr-stranded")) {
     direction = FR;
+    stranded_count++;
   }
-
   if (vm.count("rf-stranded")) {
-    if (direction != BOTH) {
-      cerr << "ERROR fr-stranded and rf-stranded flags cannot both be "
-           << "specified in the same run.\n";
-      return 1;
-    }
     direction = RF;
+    stranded_count++;
   }
-
+  if (vm.count("f-stranded")) {
+    direction = F;
+    stranded_count++;
+  }
+  if (vm.count("r-stranded")) {
+    direction = R;
+    stranded_count++;
+  }
+  if (stranded_count > 1) {
+    cerr << "ERROR: Multiple strandedness flags cannot be "
+    << "specified in the same run.\n";
+    return 1;
+  }
   
   edit_detect = vm.count("edit-detect");
   calc_covar = vm.count("calc-covar");
@@ -535,8 +557,9 @@ size_t threaded_calc_abundances(Librarian& libs) {
   size_t i = 1;
   size_t j = 6;
 
+  DirectionDetector dir_detector;
   Fragment* frag;
-
+  
   while (true) {
     // Loop through libraries
     for (size_t l = 0; l < libs.size(); l++) {
@@ -577,6 +600,7 @@ size_t threaded_calc_abundances(Librarian& libs) {
         frag = pts.proc_in.pop();
         if (frag) {
           frag->mass(mass_n);
+          dir_detector.add_fragment(frag);
         }
 
         // Test that we have not already seen this fragment
@@ -628,6 +652,7 @@ size_t threaded_calc_abundances(Librarian& libs) {
           cerr << "Fragments Processed (" << lib.in_file_name << "): "
                << setw(9) << num_frags << "\t Number of Bundles: "
                << lib.targ_table->num_bundles() << endl;
+          dir_detector.report_if_improper_direction();
         }
 
         n++;
@@ -724,7 +749,8 @@ int estimation_main() {
     libs[i].map_parser = new MapParser(&libs[i], last_round);
     libs[i].fld = new FLD(fld_alpha, def_fl_max, def_fl_mean, def_fl_stddev);
     libs[i].mismatch_table = (error_model) ? new MismatchTable(mm_alpha):NULL;
-    libs[i].bias_table = (bias_correct) ? new BiasBoss(bias_alpha):NULL;
+    libs[i].bias_table = (bias_correct) ? new BiasBoss(bias_model_order,
+                                                       bias_alpha):NULL;
     
     if (i > 0 &&
         (libs[i].map_parser->targ_index() != libs[i-1].map_parser->targ_index()

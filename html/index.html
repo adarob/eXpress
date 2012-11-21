@@ -162,9 +162,14 @@
         <div class="content-1col-nobox">
           <h1>News</h1>
           <h2>11.19.2012 &bull; eXpress 1.2.2 released</h2>
-          <p>This release addresses an issue affecting the variance, which led to unreasonably large
-         confidence intervals and invalid ambiguous count distribution parameters. These
-         parameters (alpha and beta) will now always be greater than 0.</p>
+          <p>Changes:<ul>
+   		<li>Fixed an issue affecting the variance, which led to unreasonably large confidence intervals and invalid ambiguous count distribution parameters. These
+         parameters (alpha and beta) will now always be greater than 0.</li>
+		  <li>Fixed an in issue making it impossible to enable additional batch rounds using the <tt>-B/--additional-batch</tt> option.</li>
+   		<li>Added the ability to change the order of the Markov chain used to learn the bias model (<tt>--bias-model-order</tt>). The default is 3 but should be reduced to avoid overfitting, which is indicated by unusually small or large effective lengths.</li>
+   		<li>The beta binomial distribution parameters are now reported in scientific notation in results.xprs.</li>
+   		</ul></p> 
+         </p>
          <h2>11.18.2012 &bull; eXpress manuscript now available online</h2>
           <p>The eXpress manuscript will appear in the January issue of Nature Methods. However, an early
           online version is now available on the Nature Methods website:
