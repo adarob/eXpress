@@ -272,6 +272,10 @@ bool BAMParser::map_end_from_alignment(BamTools::BamAlignment& a) {
     return false;
   }
 
+  if (is_paired && (direction == F || direction == R)) {
+    return false;
+  }
+  
   bool is_reversed = a.IsReverseStrand();
   bool is_mate_reversed = a.IsMateReverseStrand();
   if (is_paired && (!a.IsMateMapped() || a.RefID != a.MateRefID ||
@@ -285,13 +289,14 @@ bool BAMParser::map_end_from_alignment(BamTools::BamAlignment& a) {
                     (a.IsFirstMate() && !is_reversed)||
                     (a.IsSecondMate() && is_reversed);
 
-  if ((direction == RF && left_first) || (direction == FR && !left_first)) {
+  if (((direction == RF || direction == R) && left_first) ||
+      ((direction == FR || direction == F) && !left_first)) {
     return false;
   }
     
   r.name = a.Name;
   r.reversed = is_reversed;
-  r.first = a.IsFirstMate();
+  r.first = !is_paired || a.IsFirstMate();
   r.targ_id = a.RefID;
   r.left = a.Position;
   r.mate_l = a.MatePosition;
@@ -415,6 +420,9 @@ bool SAMParser::map_end_from_line(char* line) {
           goto stop;
         }
         paired = sam_flag & 0x1;
+        if (paired && (direction == F || direction == R)) {
+          goto stop;
+        }
         if (paired && (!(sam_flag & 0x2) || sam_flag & 0x8)) {
           goto stop;
         }
@@ -423,11 +431,11 @@ bool SAMParser::map_end_from_line(char* line) {
         if (paired && r.reversed == other_reversed) {
           goto stop;
         }
-        r.first = sam_flag & 0x40;
+        r.first = !paired || sam_flag & 0x40;
         left_first = ((!paired && !r.reversed) || (r.first && !r.reversed) ||
                         (!r.first && r.reversed));
-        if ((direction == RF && left_first) ||
-            (direction == FR && !left_first)) {
+        if (((direction == RF || direction == R) && left_first) ||
+            ((direction == FR || direction == F) && !left_first)) {
   		    goto stop;
         }
         break;

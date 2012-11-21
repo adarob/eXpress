@@ -161,11 +161,17 @@
         <div class="corner-content-1col-top"></div>                        
         <div class="content-1col-nobox">
           <h1>News</h1>
-          <h2>11.19.2012 &bull; eXpress 1.2.2 released</h2>
-          <p>This release addresses an issue affecting the variance, which led to unreasonably large
-         confidence intervals and invalid ambiguous count distribution parameters. These
-         parameters (alpha and beta) will now always be greater than 0.</p>
-         <h2>11.18.2012 &bull; eXpress manuscript now available online</h2>
+          <h2>11.22.2012 &bull; eXpress 1.2.2 released</h2>
+          <p>Changes:<ul>
+   		<li>Fixed an issue affecting the variance, which led to unreasonably large confidence intervals and invalid ambiguous count distribution parameters. These
+         parameters (alpha and beta) will now always be greater than 0.</li>
+		  <li>Fixed an in issue making it impossible to enable additional batch rounds using the <tt>-B/--additional-batch</tt> option.</li>
+		  <li>Added options for single-end strand-specific protocols (<tt>--f-stranded</tt> and <tt>--fr-stranded</tt>). See the <a href="manual.html#usage">Manual</a> for more details.</li>
+		  <li>Added a warning message when a library is likely strand-specific but the proper flag has not been given.</li>
+   		<li>The beta binomial distribution parameters are now reported in scientific notation in results.xprs.</li>
+   		</ul></p> 
+         </p>
+         <h2>11.19.2012 &bull; eXpress manuscript now available online!</h2>
           <p>The eXpress manuscript will appear in the January issue of Nature Methods. However, an early
           online version is now available on the Nature Methods website:
           <ul><p>Roberts A and Pachter L (2012).
@@ -176,7 +182,7 @@
           <h2>10.19.2012 &bull; eXpress 1.2.1 released</h2>
           <p>This release includes changes to the available options as well as patches for the bugs listed below.
    		  <ul>
-   		<li>Made some previously hidden options available as "Advanced Options". See the <a href="manual#usage">Manual</a> for more details.</li>
+   		<li>Made some previously hidden options available as "Advanced Options". See the <a href="manual.html#usage">Manual</a> for more details.</li>
 		  <li>Fixed a rare issue affecting indels whereby indels were not properly being penalized in alignment likelihoods. Added a maximum allowed indel size along with geometrically distributed prior on indel length probabilities to correct this issue. See <tt>--max-indel-size</tt> argument in the <a href="manual#usage">Manual</a> for more details.</li>
    		<li>Fixed a bug leading to incorrect learning of mismatch parameters (introduced in 1.2.0).</li>
    		<li>Fixed a bug leading to a segfault when using single-end reads (introduced in 1.2.0).</li>

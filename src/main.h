@@ -49,8 +49,10 @@ extern size_t max_indel_size;
  *       strand and the second to the reverse.
  *  RF - The first (or only read if single-end) must be mapped to the reverse
  *       strand and the second to the forward.
+ *  F  - The single-end read must be mapped to the forward strand.
+ *  R  - The single-end read must be mapped to the reverse strand.
  */
-enum Direction { BOTH, FR, RF };
+enum Direction { FR, RF, R, F, BOTH };
 /**
  * A global variable specifying which direction(s) is (are) allowed for input
  * fragments.

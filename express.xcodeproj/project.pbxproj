@@ -19,6 +19,7 @@
 		0A5C763E136F2EF10095365C /* targets.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0A5C7636136F2EF10095365C /* targets.cpp */; };
 		0A60597313A170A400B5C9BA /* libboost_thread-mt.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A60597213A170A400B5C9BA /* libboost_thread-mt.a */; };
 		0A63748614CF83A500D79987 /* sequence.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0A63748514CF83A500D79987 /* sequence.cpp */; };
+		0A93C755165D968800571C1C /* directiondetector.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0A93C753165D968800571C1C /* directiondetector.cpp */; };
 		0A9F0E1014CF64FF00379DC6 /* markovmodel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0A9F0E0F14CF64FF00379DC6 /* markovmodel.cpp */; };
 		0AC83E53162C2DCF00DE4074 /* express-spark.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0AC83E52162C2DCF00DE4074 /* express-spark.cpp */; };
 		0AC83E56162C31D600DE4074 /* alignments.pb.cc in Sources */ = {isa = PBXBuildFile; fileRef = 0AC8DF4716167845009C4080 /* alignments.pb.cc */; };
@@ -87,6 +88,8 @@
 		0A60597213A170A400B5C9BA /* libboost_thread-mt.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libboost_thread-mt.a"; path = "../../../../../../opt/local/lib/libboost_thread-mt.a"; sourceTree = "<group>"; };
 		0A63748414CF81AC00D79987 /* sequence.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sequence.h; sourceTree = "<group>"; };
 		0A63748514CF83A500D79987 /* sequence.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = sequence.cpp; sourceTree = "<group>"; };
+		0A93C753165D968800571C1C /* directiondetector.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = directiondetector.cpp; sourceTree = "<group>"; };
+		0A93C754165D968800571C1C /* directiondetector.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = directiondetector.h; sourceTree = "<group>"; };
 		0A9F0E0F14CF64FF00379DC6 /* markovmodel.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = markovmodel.cpp; sourceTree = "<group>"; };
 		0A9F0E1114CF650D00379DC6 /* markovmodel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = markovmodel.h; sourceTree = "<group>"; };
 		0AA3D63614D106B800448167 /* threadsafety.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = threadsafety.h; sourceTree = "<group>"; };
@@ -169,6 +172,8 @@
 				0A5C762B136F2EF10095365C /* biascorrection.h */,
 				0ACBB2F0143EA2DD001322D2 /* bundles.cpp */,
 				0ACBB2F1143EA2DD001322D2 /* bundles.h */,
+				0A93C753165D968800571C1C /* directiondetector.cpp */,
+				0A93C754165D968800571C1C /* directiondetector.h */,
 				0A5C762C136F2EF10095365C /* fld.cpp */,
 				0A5C762D136F2EF10095365C /* fld.h */,
 				0A5C762F136F2EF10095365C /* fragments.h */,
@@ -285,6 +290,7 @@
 				0A63748614CF83A500D79987 /* sequence.cpp in Sources */,
 				0A04E7C01540B87200D9A162 /* threadsafety.cpp in Sources */,
 				0ADA18F715508175008020B2 /* robertsfilter.cpp in Sources */,
+				0A93C755165D968800571C1C /* directiondetector.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -87,7 +87,7 @@ double Target::mass(bool with_pseudo) const {
   return log_add(_ret_params->mass, _alpha+_cached_eff_len+_avg_bias);
 }
 
-double Target::mass_var(bool with_pseudo) const {
+double Target::mass_var() const {
   return _ret_params->mass_var;
 }
 
@@ -427,7 +427,7 @@ void TargetTable::output_results(string output_dir, size_t tot_counts,
 
         // Calculate count variance
         double mass = targ.mass(false);
-        double mass_var = min(targ.mass_var(false),
+        double mass_var = min(targ.mass_var(),
                               mass + log_sub(l_bundle_mass, mass));
         double count_alpha = 0;
         double count_beta = 0;
@@ -584,7 +584,7 @@ void TargetTable::asynch_bias_update(boost::mutex* mutex) {
           bg_table->copy_observations(lib_bias_table);
           bias_table.reset(bg_table);
         }
-        bg_table = new BiasBoss(0);
+        bg_table = new BiasBoss(lib_bias_table.order(), 0);
       }
       cerr << "Synchronized parameter tables.\n";
     }
