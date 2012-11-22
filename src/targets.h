@@ -40,7 +40,10 @@ struct RoundParams {
    * fragment mapping probabilities.
    */
   double mass;
-  // DOC
+  /**
+   * A public double that stores the (logged) assigned ambiguous mass based on
+   * observed fragment mapping probabilities.
+   */
   double ambig_mass;
   /**
    * A public double that stores the (logged) total mass of ambiguous fragments
@@ -128,7 +131,9 @@ class Target {
    * in the bundle.
    */
   size_t _tot_counts;
-  // DOC
+  /**
+   * A private double storing the initial pseudo mass assigned to the target.
+   */
   double _init_pseudo_mass;
   /**
    * A private pointer to the Bundle this Target is a member of.
@@ -242,13 +247,11 @@ public:
    */
   double mass(bool with_pseudo=true) const;
   /**
-   * DOC
-    An accessor for the total (logged) variance on mass.
-   * @param with_pseudo a boolean specifying whether pseudo-counts should be
-   *        included in returned variance.
+   * An accessor for the total (logged) variance on mass. Includes variance
+   * due to the initial pseudo-counts.
    * @return The total (logged) variance on mass.
    */
-  double mass_var(bool with_pseudo=true) const;
+  double mass_var() const;
   /**
    * An accessor for the (logged) weighted sum of the variance on assignments.
    * @return The (logged) weighted sum of the variance on the assignments.

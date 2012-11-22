@@ -1,5 +1,5 @@
 // DOC TODO:
-// Detect stranded and single-end reads. Disallow others when specified.
+// Disallow others when specified.
 
 /**
  *  main.cpp

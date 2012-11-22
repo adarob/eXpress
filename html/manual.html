@@ -236,13 +236,25 @@
 		  <tr><td VALIGN=top nowrap> 
 		  <tt>--fr-stranded</tt> 
 		  </td><td VALIGN=top> 
-		  With this option, eXpress only accepts alignments where the first read is aligned to the forward target sequence and the second read is aligned to the reverse-complemented target sequence.  In directional sequencing, this is equivalent to second-strand only. By default, both orientations are allowed. Mutually exclusive with --rf-stranded.
+		  With this option, eXpress only accepts alignments (single-end or paired) where the first (or only) read is aligned to the forward target sequence and the second read is aligned to the reverse-complemented target sequence.  In directional sequencing, this is equivalent to second-strand only. If all reads are single-end, <tt>--f-stranded</tt> should be used instead. Disabled by default.
 		  </td></tr>
 		  
 		  <tr><td VALIGN=top nowrap> 
 		  <tt>--rf-stranded</tt> 
 		  </td><td VALIGN=top> 
-		  With this option, eXpress only accepts alignments where the first read is aligned to the reverse-completemented target sequence and the second read is aligned to the forward target sequence.  In directional sequencing, this is equivalent to first-strand only. By default, both orientations are allowed.  Mutually exclusive with --fr-stranded.
+		  With this option, eXpress only accepts alignments (single-end or paired) where the first (or only) read is aligned to the reverse-completemented target sequence and the second read is aligned to the forward target sequence.  In directional sequencing, this is equivalent to first-strand only. If all reads are single-end, <tt>--r-stranded</tt> should be used instead. Disabled by default.
+		  </td></tr>
+		  
+		  <tr><td VALIGN=top nowrap> 
+		  <tt>--f-stranded</tt> 
+		  </td><td VALIGN=top> 
+		  With this option, eXpress only accepts single-end alignments to the forward target sequence.  In directional sequencing, this is equivalent to second-strand only. Disabled by default.
+		  </td></tr>
+		  
+		  <tr><td VALIGN=top nowrap> 
+		  <tt>--r-stranded</tt> 
+		  </td><td VALIGN=top> 
+		  With this option, eXpress only accepts single-end alignments to the reverse target sequence.  In directional sequencing, this is equivalent to second-strand only. Disabled by default.
 		  </td></tr>
 		  
 		  <tr><td VALIGN=top nowrap> 

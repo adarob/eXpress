@@ -30,7 +30,10 @@ class Target;
  *  @copyright Artistic License 2.0
  **/
 class SeqWeightTable {
-  // DOC
+  /**
+   * A private size_t specifying the order of the Markov chains used to model
+   * the sequences.
+   */
   size_t _order;
   /**
    * A private MarkovModel that stores the observed conditional nucleotide
@@ -49,10 +52,11 @@ public:
    * SeqWeightTable Constructor.
    * @param window_size an unsigned integer specifying the size of the bias
    *        window surrounding fragment ends.
+   * @param order a size_t specifying the order to use for the Markov chains
+   *        modelling the sequence.
    * @param alpha a double specifying the strength of the uniform prior
    *        (logged pseudo-counts for each parameter).
    */
-  //DOC
   SeqWeightTable(size_t window_size, size_t order, double alpha);
   /**
    * A member function that overwrites the "observed" parameters with those from
@@ -120,7 +124,10 @@ public:
  **/
 class BiasBoss
 {
-  // DOC
+  /**
+   * A private size_t specifying the order of the Markov chains used to model
+   * the sequences.
+   */
   size_t _order;
   /**
    * A private SeqWeightTable that stores the 5' sequence-specific bias
@@ -136,12 +143,16 @@ class BiasBoss
 public:
   /**
    * BiasBoss Constructor.
+   * @param order a size_t specifying the order of the Markov chains used to
+   *        model the sequences.
    * @param alpha a double specifying the strength of the uniform prior (logged
    *        pseudo-counts for each parameter).
    */
-  //DOC
   BiasBoss(size_t order, double alpha);
-  // DOC
+  /**
+   * An accessor for the order of the Markov chains used to model the sequences.
+   * @return The order of the Markov chains used to model the sequences.
+   */
   size_t order() const { return _order; }
   /**
    * A member function that copies the observed parameters from another
