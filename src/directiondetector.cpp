@@ -51,7 +51,7 @@ bool DirectionDetector::report_if_improper_direction() {
   if (num_paired == 0) {
     // Single-end case
     boost::math::binomial binom(num_single, 0.5);
-    double p = boost::math::cdf(binom, min(_num_f, _num_r));
+    double p = 1 - boost::math::cdf(binom, min(_num_f, _num_r));
     if (p < EPSILON) {
       if (_num_f > _num_r && direction != F) {
         cerr << "WARNING: The observed alignments appear disporportionately on "
