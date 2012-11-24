@@ -295,7 +295,7 @@ public:
    * @return A const pointer to the alignment of the first read.
    */
   const ReadHit* first_read() const {
-    if (_read_l && _read_l) {
+    if (_read_l && _read_l->first) {
       return _read_l.get();
     }
     assert(_read_r);
