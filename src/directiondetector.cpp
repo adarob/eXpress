@@ -8,7 +8,6 @@
 
 #include "directiondetector.h"
 
-#include <boost/math/distributions/binomial.hpp>
 #include <iostream>
 #include "fragments.h"
 #include "main.h"
@@ -50,9 +49,9 @@ bool DirectionDetector::report_if_improper_direction() {
   }
   if (num_paired == 0) {
     // Single-end case
-    boost::math::binomial binom(num_single, 0.5);
-    double p = 1 - boost::math::cdf(binom, min(_num_f, _num_r));
-    if (p < EPSILON) {
+    double max_dir = max(_num_f, _num_r);
+    double min_dir = min(_num_f, _num_r);
+    if (min_dir < max_dir / 2) {
       if (_num_f > _num_r && direction != F) {
         cerr << "WARNING: The observed alignments appear disporportionately on "
              << "the forward strand (" << _num_f << " vs. " << _num_r << "). "
@@ -71,9 +70,9 @@ bool DirectionDetector::report_if_improper_direction() {
     // Paired-end case
     size_t fr = _num_f + _num_fr;
     size_t rf = _num_r + _num_rf;
-    boost::math::binomial binom(fr + rf, 0.5);
-    double p = boost::math::cdf(binom, min(fr, rf));
-    if (p < EPSILON) {
+    double max_dir = max(fr, rf);
+    double min_dir = min(fr, rf);
+    if (min_dir < max_dir / 2) {
       if (fr > rf && direction != FR) {
         cerr << "WARNING: The observed alignments appear disporportionately in "
         << "the forward-reverse order (" << fr << " vs. " << rf << "). "
