@@ -8,11 +8,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "src/directiondetector.cpp"
-         timestampString = "375469922.437766"
+         timestampString = "375475003.412271"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "24"
-         endingLineNumber = "24"
+         startingLineNumber = "23"
+         endingLineNumber = "23"
          landmarkName = "DirectionDetector::add_fragment(Fragment* f)"
          landmarkType = "5">
       </FileBreakpoint>
