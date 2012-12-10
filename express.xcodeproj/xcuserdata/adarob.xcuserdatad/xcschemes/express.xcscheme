@@ -60,6 +60,10 @@
       <CommandLineArguments>
          <CommandLineArgument
             argument = "-o /Users/adarob/Dropbox/SeqData/xprs_out_0 /Users/adarob/Dropbox/SeqData/CeWS230_cds_transcripts.fa /Users/adarob/Desktop/Dfp_cdstranstrips_12-2-12_hits.bam"
+            isEnabled = "NO">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "-o /Users/adarob/Downloads/xprs_out /Users/adarob/Downloads/gencodeComp13.unique.formattedForExpress.fa /Users/adarob/Downloads/test.bam"
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
