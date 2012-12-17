@@ -58,6 +58,7 @@ size_t stop_at = 0;
 string output_dir = ".";
 string fasta_file_name = "";
 string in_map_file_names = "";
+string param_file_name = "";
 
 // intial pseudo-count parameters (non-logged)
 double expr_alpha = .01;
@@ -188,6 +189,9 @@ bool parse_options(int ac, char ** av) {
    "sets number of fragments after which to stop updating auxiliary parameters")
   ("no-bias-correct", "disables bias correction")
   ("no-error-model", "disables error modelling")
+  ("aux-param-file",
+   po::value<string>(&param_file_name)->default_value(param_file_name),
+   "path to file containing auxiliary parameters to use instead of learning")
   ;
 
   string prior_file = "";
@@ -252,6 +256,16 @@ bool parse_options(int ac, char ** av) {
     return 1;
   }
 
+  if (param_file_name.size()) {
+    if (vm.count("burn-out")) {
+      cerr << "WARNING: Burn out setting is ignored when auxiliary parameter "
+           << "file is provided.";
+    }
+    burn_in = 0;
+    burn_out = 0;
+    burned_out = true;
+  }
+  
   size_t stranded_count = 0;
   if (vm.count("fr-stranded")) {
     direction = FR;
@@ -744,14 +758,24 @@ int estimation_main() {
       sprintf(out_map_file_name, "%s/hits.%d.samp",
               output_dir.c_str(), (int)i+1);
     }
+    
     libs[i].in_file_name = file_names[i];
     libs[i].out_file_name = out_map_file_name;
     libs[i].map_parser = new MapParser(&libs[i], last_round);
-    libs[i].fld = new FLD(fld_alpha, def_fl_max, def_fl_mean, def_fl_stddev);
-    libs[i].mismatch_table = (error_model) ? new MismatchTable(mm_alpha):NULL;
-    libs[i].bias_table = (bias_correct) ? new BiasBoss(bias_model_order,
-                                                       bias_alpha):NULL;
-    
+
+    if (param_file_name.size()) {
+      libs[i].fld = new FLD(param_file_name);
+      libs[i].mismatch_table = (error_model) ?
+                                              new MismatchTable(param_file_name)
+                                              : NULL;
+      libs[i].bias_table = (bias_correct) ? new BiasBoss(bias_model_order,
+                                                         param_file_name):NULL;
+    } else {
+      libs[i].fld = new FLD(fld_alpha, def_fl_max, def_fl_mean, def_fl_stddev);
+      libs[i].mismatch_table = (error_model) ? new MismatchTable(mm_alpha):NULL;
+      libs[i].bias_table = (bias_correct) ? new BiasBoss(bias_model_order,
+                                                         bias_alpha):NULL;
+    }
     if (i > 0 &&
         (libs[i].map_parser->targ_index() != libs[i-1].map_parser->targ_index()
          || libs[i].map_parser->targ_lengths() !=

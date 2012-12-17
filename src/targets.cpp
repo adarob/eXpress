@@ -118,7 +118,7 @@ double Target::log_likelihood(const FragHit& frag, bool with_pseudo) const {
       ll += _end_bias->at(frag.right() - 1);
     }
   }
-
+  
   if (ps == PAIRED) {
     ll += (lib.fld)->pmf(frag.length());
   }

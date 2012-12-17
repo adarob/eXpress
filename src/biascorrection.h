@@ -17,6 +17,7 @@
 #include "frequencymatrix.h"
 #include "markovmodel.h"
 
+class BiasBoss;
 class FragHit;
 class Target;
 
@@ -46,7 +47,8 @@ class SeqWeightTable {
    * targets.
    */
   MarkovModel _expected;
-
+  // DOC
+  friend class BiasBoss;
 public:
   /**
    * SeqWeightTable Constructor.
@@ -58,6 +60,9 @@ public:
    *        (logged pseudo-counts for each parameter).
    */
   SeqWeightTable(size_t window_size, size_t order, double alpha);
+  //DOC
+  SeqWeightTable(size_t window_size, size_t order, std::string param_file_name,
+                 std::string identifier);
   /**
    * A member function that overwrites the "observed" parameters with those from
    * another SeqWeightTable.
@@ -149,6 +154,9 @@ public:
    *        pseudo-counts for each parameter).
    */
   BiasBoss(size_t order, double alpha);
+  //DOC
+  //TODO: Detect order from file.
+  BiasBoss(size_t order, std::string param_file_name);
   /**
    * An accessor for the order of the Markov chains used to model the sequences.
    * @return The order of the Markov chains used to model the sequences.

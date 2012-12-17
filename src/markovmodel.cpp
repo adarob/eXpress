@@ -85,6 +85,10 @@ void MarkovModel::update(const Sequence& seq, int left, double mass) {
   }
 }
 
+void MarkovModel::update(size_t p, size_t i, size_t j, double mass) {
+  _params[p].increment(i, j, mass);
+}
+
 vector<char> MarkovModel::get_indices(const Sequence& seq) {
   vector<char> indices(seq.length() - _order, -1);
   

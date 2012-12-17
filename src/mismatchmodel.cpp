@@ -19,8 +19,8 @@ using namespace std;
 MismatchTable::MismatchTable(double alpha)
     : _first_read_mm(MAX_READ_LEN, FrequencyMatrix<double>(16, 4, alpha)),
       _second_read_mm(MAX_READ_LEN, FrequencyMatrix<double>(16, 4, alpha)),
-      _insert_params(1, max_indel_size + 1, LOG_0),
-      _delete_params(1, max_indel_size + 1, LOG_0),
+      _insert_params(1, max_indel_size + 1, 0),
+      _delete_params(1, max_indel_size + 1, 0),
       _max_len(0),
       _active(false){
   // Set indel priors
@@ -33,6 +33,128 @@ MismatchTable::MismatchTable(double alpha)
   }
   assert(approx_eq(sexp(_insert_params.sum(0)), alpha));
   assert(approx_eq(sexp(_delete_params.sum(0)), alpha));
+}
+
+MismatchTable::MismatchTable(string param_file_name)
+    : _first_read_mm(MAX_READ_LEN, FrequencyMatrix<double>(16, 4, 0)),
+      _second_read_mm(MAX_READ_LEN, FrequencyMatrix<double>(16, 4, 0)),
+      _insert_params(1, max_indel_size + 1, 0),
+      _delete_params(1, max_indel_size + 1, 0),
+      _max_len(0),
+      _active(true){
+  ifstream infile (param_file_name.c_str());
+  size_t BUFF_SIZE = 99999;
+  char line_buff[BUFF_SIZE];
+  if (!infile.is_open()) {
+    cerr << "ERROR: Unable to open parameter file '" << param_file_name
+         << "'.\n";
+    exit(1);
+  }
+
+  infile.getline (line_buff, BUFF_SIZE, '\n');
+  size_t pos = 0;
+  
+  while (infile.good()) {
+    infile.getline (line_buff, BUFF_SIZE, '\n');
+    if (!strcmp(line_buff, ">First Read Mismatch")) {
+      break;
+    }
+  }
+  
+  infile.getline (line_buff, BUFF_SIZE, '\n');
+  while (infile.good()) {
+    infile.getline (line_buff, BUFF_SIZE, '\n');
+    if (!strcmp(line_buff, ">Second Read Mismatch")) {
+      break;
+    }
+    
+    if (pos >= MAX_READ_LEN) {
+      pos++;
+      continue;
+    }
+    
+    _first_read_mm[pos] = FrequencyMatrix<double>(16, 4, 0);
+    char *p = strtok(line_buff, "\t");
+    for (size_t i = 0; i < 16; ++i) {
+      for(size_t j = 0; j < 4; ++j) {
+        p = strtok(NULL, "\t");
+        _first_read_mm[pos].increment(i, j, log(strtod(p,NULL)));
+      }
+    }
+    pos++;
+  }
+  _max_len = min(pos + 1, MAX_READ_LEN);
+  if (pos >= MAX_READ_LEN) {
+    cerr << "WARNING: First read error distribution of " << pos-1
+         << " bases in '" << param_file_name << "' truncated after "
+         << MAX_READ_LEN << " bases.\n";
+  }
+  
+  pos = 0;
+  infile.getline (line_buff, BUFF_SIZE, '\n');
+  
+  while ( infile.good() ) {
+    infile.getline (line_buff, BUFF_SIZE, '\n');
+    
+    if (!strncmp(line_buff, ">Insertion Length", 17)) {
+      break;
+    }
+    
+    if (pos >= MAX_READ_LEN) {
+      pos++;
+      continue;
+    }
+    
+    _second_read_mm[pos] = FrequencyMatrix<double>(16, 4, 0);
+    char *p = strtok(line_buff, "\t");
+    for (size_t i = 0; i < 16; ++i) {
+      for(size_t j = 0; j < 4; ++j) {
+        p = strtok(NULL, "\t");
+        _second_read_mm[pos].increment(i, j, log(strtod(p,NULL)));
+      }
+    }
+    pos++;
+  }
+  _max_len = max(_max_len, min(pos + 1, MAX_READ_LEN));
+  if (pos >= MAX_READ_LEN) {
+    cerr << "WARNING: Second read error distribution of " << pos-1
+    << " bases in '" << param_file_name << "' truncated after "
+    << MAX_READ_LEN << " bases.\n";
+  }
+  
+  infile.getline (line_buff, BUFF_SIZE, '\n');
+  char *p = strtok(line_buff, "\t");
+  size_t k = 0;
+  do {
+    if (k > max_indel_size) {
+      cerr << "WARNING: Paramater file '" << param_file_name << "' insertion "
+           << "distribution is being truncated at max indel length of "
+           << max_indel_size << ".\n";
+      break;
+    }
+    _insert_params.increment(k, log(strtod(p,NULL)));
+    p = strtok(NULL, "\t");
+    k++;
+
+  } while (p);
+
+  infile.getline (line_buff, BUFF_SIZE, '\n');
+  infile.getline (line_buff, BUFF_SIZE, '\n');
+  p = strtok(line_buff, "\t");
+  k = 0;
+  do {
+    if (k > max_indel_size) {
+      cerr << "WARNING: Paramater file '" << param_file_name << "' deletion "
+           << "distribution is being truncated at max indel length of "
+           << max_indel_size << ".\n";
+      break;
+    }
+    _delete_params.increment(k, log(strtod(p,NULL)));
+    p = strtok(NULL, "\t");
+    k++;
+  } while (p);
+  
+  fix();
 }
 
 void MismatchTable::get_indices(const FragHit& f,
@@ -127,31 +249,31 @@ double MismatchTable::log_likelihood(const FragHit& f) const {
     size_t i = 0;  // read index
     size_t j = read_l.left;  // genomic index
 
-    size_t del_len = 0;
+    bool insertion, deletion;
+    
     vector<Indel>::const_iterator ins = read_l.inserts.begin();
     vector<Indel>::const_iterator del = read_l.deletes.begin();
     
     while (i < read_l.seq.length()) {
+
       if (del != read_l.deletes.end() && del->pos == i) {
-        del_len = del->len;
-        ll += _delete_params(del_len);
-        j += del_len;
+        // Deletion at this position
+        ll += _delete_params(del->len);
+        j += del->len;
         del++;
+        deletion = true;
       } else if (ins != read_l.inserts.end() && ins->pos == i) {
+        // Insertion at this position
         ll += _insert_params(ins->len);
         i += ins->len;
-        if (ins->len > del_len) {
-          ll += (ins->len-del_len)*_delete_params(0);  //FIXME: Assymetric
-        }
-        del_len = 0;
         ins++;
+        insertion = true;
       } else {
-        if (del_len > 0) {
-          ll += _delete_params(0);
-        }
-        del_len = 0;
-        ll += _insert_params(0);
-
+        ll += !insertion * _insert_params(0);
+        ll += !deletion * _delete_params(0);
+        insertion = false;
+        deletion = false;
+        
         size_t cur = read_l.seq[i];
         size_t prev = (i) ? (read_l.seq[i-1] << 2) : 0;
 
@@ -186,34 +308,29 @@ double MismatchTable::log_likelihood(const FragHit& f) const {
     size_t i = 0;
     size_t j = targ.length() - read_r.right;
 
-    size_t del_len = 0;
-
+    bool insertion, deletion;
+    
     vector<Indel>::const_iterator ins = read_r.inserts.end()-1;
     vector<Indel>::const_iterator del = read_r.deletes.end()-1;
 
     while (i < r_len) {
       if (del != read_r.deletes.begin() - 1 && del->pos == r_len - i) {
-        del_len = del->len;
-        ll += _delete_params(del_len);
-        j += del_len;
+        ll += _delete_params(del->len);
+        j += del->len;
         del--;
+        deletion = true;
       } else if (ins != read_r.inserts.begin() - 1
                  && ins->pos + ins->len == r_len - i) {
         ll += _insert_params(ins->len);
-        if (ins->len > del_len) {
-          ll += (ins->len-del_len) * _delete_params(0);
-        }
-        del_len = 0;
-
         i += ins->len;
         ins--;
+        insertion = true;
       } else {
-        if (del_len > 0) {
-          ll += _delete_params(0);
-        }
-        del_len = 0;
-        ll += _insert_params(0);
-
+        ll += !insertion * _insert_params(0);
+        ll += !deletion * _delete_params(0);
+        insertion = false;
+        deletion = false;
+        
         size_t cur = read_r.seq[i];
         size_t prev = (i) ? (read_r.seq[i-1] << 2) : 0;
 
@@ -257,7 +374,8 @@ void MismatchTable::update(const FragHit& f, double p, double mass) {
     size_t i = 0;  // read index
     size_t j = read_l.left;  // genomic index
 
-    size_t del_len = 0;
+    bool insertion, deletion;
+    
     vector<Indel>::const_iterator ins = read_l.inserts.begin();
     vector<Indel>::const_iterator del = read_l.deletes.begin();
 
@@ -268,23 +386,23 @@ void MismatchTable::update(const FragHit& f, double p, double mass) {
       if (del != read_l.deletes.end() && del->pos == i) {
         _delete_params.increment(del->len, mass);
         j += del->len;
-        del_len = del->len;
         del++;
+        deletion = true;
       } else if (ins != read_l.inserts.end() && ins->pos == i) {
         _insert_params.increment(ins->len, mass);
         i += ins->len;
-        if (ins->len > del_len) {
-          _delete_params.increment(0, mass);  //FIXME: Assymetric
-        }
-        del_len = 0;
         ins++;
+        insertion = true;
       } else {
-        if (del_len > 0) {
+        if (!insertion) {
+          _insert_params.increment(0, mass);
+        }
+        if (!deletion) {
           _delete_params.increment(0, mass);
         }
-        del_len = 0;
-        _insert_params.increment(0, mass);
-
+        insertion = false;
+        deletion = false;
+        
         size_t cur = read_l.seq[i];
         size_t prev = (i) ? (read_l.seq[i-1] << 2) : 0;
         // Update the seq parameters only after burn-in (active)
@@ -339,7 +457,8 @@ void MismatchTable::update(const FragHit& f, double p, double mass) {
     size_t i = 0;
     size_t j = targ.length() - read_r.right;
 
-    size_t del_len = 0;
+    bool insertion, deletion;
+    
     vector<Indel>::const_iterator ins = read_r.inserts.end() - 1;
     vector<Indel>::const_iterator del = read_r.deletes.end() - 1;
 
@@ -347,26 +466,25 @@ void MismatchTable::update(const FragHit& f, double p, double mass) {
 
     while (i < r_len) {
       if (del != read_r.deletes.begin()-1 && del->pos == r_len-i ) {
-         _delete_params.increment(del->len, mass);
-         j += del->len;
-         del_len = del->len;
-         del--;
+        _delete_params.increment(del->len, mass);
+        j += del->len;
+        del--;
+        deletion = true;
       } else if (ins != read_r.inserts.begin() - 1 &&
                  ins->pos + ins->len == r_len-i) {
         _insert_params.increment(ins->len, mass);
-        if (ins->len > del_len) {
-          _delete_params.increment(0, mass);
-        }
-        del_len = 0;
-
         i += ins->len;
         ins--;
+        insertion = true;
       } else {
-        if (del_len > 0) {
+        if (!insertion) {
           _delete_params.increment(0, mass);
         }
-        del_len = 0;
-        _insert_params.increment(0, mass);
+        if (!deletion) {
+          _insert_params.increment(0, mass);
+        }
+        insertion = false;
+        deletion = false;
 
         size_t cur = read_r.seq[i];
         size_t prev = (i) ? (read_r.seq[i-1] << 2) : 0;
@@ -433,7 +551,7 @@ void MismatchTable::append_output(ofstream& outfile) const {
 
   outfile << ">First Read Mismatch\n" << col_header;
   for (size_t k = 0; k < _max_len; k++) {
-    outfile << k << ":\t";
+    outfile << k+1 << ":\t";
     for (size_t i = 0; i < 16; i++) {
       for (size_t j = 0; j < 4; j++) {
         if (k || i < 4) {
@@ -445,10 +563,9 @@ void MismatchTable::append_output(ofstream& outfile) const {
     }
     outfile<<endl;
   }
-
   outfile<<">Second Read Mismatch\n" << col_header;
   for (size_t k = 0; k < _max_len; k++) {
-    outfile << k << ":\t";
+    outfile << k+1 << ":\t";
     for (size_t i = 0; i < 16; i++) {
       for (size_t j = 0; j < 4; j++) {
         if (k || i < 4) {
@@ -460,4 +577,14 @@ void MismatchTable::append_output(ofstream& outfile) const {
     }
     outfile<<endl;
   }
+  outfile << ">Insertion Length (0-" << max_indel_size << ")\n";
+  for (size_t i = 0; i <= max_indel_size; i++) {
+    outfile << scientific << sexp(_insert_params(i))<<"\t";
+  }
+  outfile<<endl;
+  outfile << ">Deletion Length (0-" << max_indel_size << ")\n";
+  for (size_t i = 0; i <= max_indel_size; i++) {
+    outfile << scientific << sexp(_delete_params(i))<<"\t";
+  }
+  outfile<<endl;
 }
