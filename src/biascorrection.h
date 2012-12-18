@@ -47,8 +47,6 @@ class SeqWeightTable {
    * targets.
    */
   MarkovModel _expected;
-  // DOC
-  friend class BiasBoss;
 public:
   /**
    * SeqWeightTable Constructor.

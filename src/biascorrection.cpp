@@ -65,7 +65,7 @@ SeqWeightTable::SeqWeightTable(size_t window_size, size_t order,
   for (size_t k = 0; k < (size_t)WINDOW; ++k) {
     infile.getline (line_buff, BUFF_SIZE, '\n');
     char *p = strtok(line_buff, "\t");
-    for (size_t i=0; i < pow(4.0, (double)order); ++i) {
+    for (size_t i=0; i < pow(4.0, (double)min(order, k)); ++i) {
       for (size_t j=0; j < NUM_NUCS; ++j) {
         p = strtok(NULL, "\t");
         _observed.update(k, i, j, log(strtod(p,NULL)));
@@ -79,7 +79,7 @@ SeqWeightTable::SeqWeightTable(size_t window_size, size_t order,
   for (size_t k = 0; k < order+1; ++k) {
     infile.getline (line_buff, BUFF_SIZE, '\n');
     char *p = strtok(line_buff, "\t");
-    for (size_t i=0; i < pow(4.0, (double)order); ++i) {
+    for (size_t i=0; i < pow(4.0, (double)min(order, k)); ++i) {
       for (size_t j=0; j < NUM_NUCS; ++j) {
         p = strtok(NULL, "\t");
         _expected.update(k, i, j, log(strtod(p,NULL)));

@@ -61,7 +61,7 @@ string in_map_file_names = "";
 string param_file_name = "";
 
 // intial pseudo-count parameters (non-logged)
-double expr_alpha = .01;
+double expr_alpha = .005;
 double fld_alpha = 1;
 double bias_alpha = 1;
 double mm_alpha = 1;
@@ -257,10 +257,6 @@ bool parse_options(int ac, char ** av) {
   }
 
   if (param_file_name.size()) {
-    if (vm.count("burn-out")) {
-      cerr << "WARNING: Burn out setting is ignored when auxiliary parameter "
-           << "file is provided.";
-    }
     burn_in = 0;
     burn_out = 0;
     burned_out = true;
@@ -421,11 +417,23 @@ void process_fragment(Fragment* frag_p) {
   boost::unordered_set<Target*> targ_set;
   boost::unordered_set<Target*> locked_set;
 
+  // Update bundles and merge in first loop
+  Bundle* bundle = frag.hits()[0]->target()->bundle();
+  if (first_round) {
+    bundle->incr_counts();
+  }
+  if (first_round || online_additional) {
+    bundle->incr_mass(mass_n);
+  }
+  
   // calculate marginal likelihoods and lock targets.
   if (frag.num_hits()>1) {
     for (size_t i = 0; i < frag.num_hits(); ++i) {
       const FragHit& m = *frag.hits()[i];
       Target* t = m.target();
+      
+      bundle = lib.targ_table->merge_bundles(bundle, t->bundle());
+      
       if (locked_set.count(t) == 0) {
         t->lock();
         locked_set.insert(t);
@@ -461,22 +469,11 @@ void process_fragment(Fragment* frag_p) {
 
   assert(!islzero(total_likelihood));
 
-  // merge bundles
-  Bundle* bundle = frag.hits()[0]->target()->bundle();
-  if (first_round) {
-    bundle->incr_counts();
-  }
-  if (first_round || online_additional) {
-    bundle->incr_mass(mass_n);
-  }
-
   // normalize marginal likelihoods
   for (size_t i = 0; i < frag.num_hits(); ++i) {
     FragHit& m = *frag[i];
     Target* t  = m.target();
-
-    bundle = lib.targ_table->merge_bundles(bundle, t->bundle());
-
+    
     double p = likelihoods[i]-total_likelihood;
     if (targ_set.size() > 1) {
       double v = log_add(variances[i] - 2*total_mass,
@@ -786,8 +783,8 @@ int estimation_main() {
         }
   }
   
-  TargetTable targ_table(fasta_file_name, edit_detect, expr_alpha,
-                         expr_alpha_map, &libs);
+  TargetTable targ_table(fasta_file_name, edit_detect, param_file_name.size(),
+                         expr_alpha, expr_alpha_map, &libs);
   for (size_t i = 0; i < libs.size(); ++i) {
     libs[i].targ_table = &targ_table;
     if (bias_correct) {

@@ -68,7 +68,6 @@ FLD::FLD(double alpha, size_t max_val, size_t mean, size_t std_dev)
   for (size_t i = 0; i <= max_val; ++i) {
     double norm_mass = boost::math::cdf(norm,i+0.5) -
                        boost::math::cdf(norm,i-0.5);
-    // Use float here so that output to the params file will be all non-zero.
     double mass = LOG_EPSILON;
     if (norm_mass != 0) {
       mass = tot + log(norm_mass);

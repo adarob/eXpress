@@ -183,9 +183,11 @@ public:
    *        (non-logged).
    * @param libs a pointer to the struct containing pointers to the global
    *        parameter tables (bias_table, mismatch_table, fld).
+   DOC
    */
   Target(TargID id, const std::string& name, const std::string& seq,
-       bool prob_seq, double alpha, const Librarian* libs);
+         bool prob_seq, double alpha, const Librarian* libs,
+         const BiasBoss* known_bias_boss, const FLD* known_fld);
   /**
    * A member function that locks the target mutex to provide thread safety.
    * The lock should be held by any thread that calls a method of the Target.
@@ -354,7 +356,8 @@ public:
    * @param fld an optional pointer to a different FLD than the global one,
    *        for thread-safety.
    */
-  void update_target_bias(BiasBoss* bias_table = NULL, FLD* fld = NULL);
+  void update_target_bias(const BiasBoss* bias_table = NULL,
+                          const FLD* fld = NULL);
   /**
    * An accessor for the _solvable flag.
    * @return a boolean specifying whether or not the target has a unique
@@ -425,10 +428,11 @@ class TargetTable {
    * @param targ_index the target-to-index map from the alignment file.
    * @param targ_lengths the target-to-length map from the alignment file, for
    *        validation.
+   DOC
    */
   void add_targ(const std::string& name, const std::string& seq, bool prob_seqs,
-                double alpha, const TransIndex& targ_index,
-                const TransIndex& targ_lengths);
+                bool known_aux_params, double alpha,
+                const TransIndex& targ_index, const TransIndex& targ_lengths);
 
 public:
   /**
@@ -443,9 +447,11 @@ public:
    *        proportional weights of pseudo-counts for each target.
    * @param libs a pointer to the struct containing pointers to the global
    *        parameter tables (bias_table, mismatch_table, fld).
+   DOC
    */
-  TargetTable(const std::string& targ_fasta_file, bool prob_seqs, double alpha,
-              const AlphaMap* alpha_map, const Librarian* libs);
+  TargetTable(const std::string& targ_fasta_file, bool prob_seqs,
+              bool known_aux_params, double alpha, const AlphaMap* alpha_map,
+              const Librarian* libs);
   /**
    * TargetTable Destructor. Deletes all of the target objects in the table.
    */

@@ -115,7 +115,6 @@ class MismatchTable {
    * A,C,G,T encoded as 0,1,2,3.
    * @param file stream to append to.
    */
-  //TODO: Add Indels to output.
   void append_output(std::ofstream& outfile) const;
 };
 

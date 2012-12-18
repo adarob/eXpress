@@ -83,7 +83,7 @@ MismatchTable::MismatchTable(string param_file_name)
     }
     pos++;
   }
-  _max_len = min(pos + 1, MAX_READ_LEN);
+  _max_len = min(pos, MAX_READ_LEN);
   if (pos >= MAX_READ_LEN) {
     cerr << "WARNING: First read error distribution of " << pos-1
          << " bases in '" << param_file_name << "' truncated after "
@@ -115,7 +115,7 @@ MismatchTable::MismatchTable(string param_file_name)
     }
     pos++;
   }
-  _max_len = max(_max_len, min(pos + 1, MAX_READ_LEN));
+  _max_len = max(_max_len, min(pos, MAX_READ_LEN));
   if (pos >= MAX_READ_LEN) {
     cerr << "WARNING: Second read error distribution of " << pos-1
     << " bases in '" << param_file_name << "' truncated after "
