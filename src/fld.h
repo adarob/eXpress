@@ -48,6 +48,8 @@ public:
    *        distribution.
    */
   FLD(double alpha, size_t max_val, size_t mean, size_t std_dev);
+  //DOC
+  FLD(std::string param_file_name);
   /**
    * An accessor for the maximum allowed length.
    * @return Max allowed length.

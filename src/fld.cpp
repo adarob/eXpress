@@ -22,6 +22,38 @@ const vector<double> KERNEL = boost::assign::list_of(-2.7725887222397811)
                                                     (-1.3862943611198906)
                                                     (-2.7725887222397811);
 
+FLD::FLD(string param_file_name) {
+  ifstream infile (param_file_name.c_str());
+  size_t BUFF_SIZE = 99999;
+  char line_buff[BUFF_SIZE];
+  
+  if (!infile.is_open()) {
+    cerr << "ERROR: Unable to open paramater file '" << param_file_name
+         << "'.\n";
+    exit(1);
+  }
+  
+  infile.getline (line_buff, BUFF_SIZE, '\n');
+  infile.getline (line_buff, BUFF_SIZE, '\n');
+  char *p = strtok(line_buff, "\t");
+  size_t i = 0;
+  
+  _tot_mass = 0;
+  _sum = 0;
+  do {
+    double val = strtod(p,NULL);
+    _hist.push_back(log(val));
+    _tot_mass += val;
+    _sum += i*val;
+    i++;
+    p = strtok(NULL, "\t");
+  } while (p);
+  
+  _tot_mass = log(_tot_mass);
+  _sum = log(_sum);
+  _min = max_val();;
+}
+
 FLD::FLD(double alpha, size_t max_val, size_t mean, size_t std_dev)
     : _hist(max_val+1),
       _tot_mass(LOG_0),
@@ -36,7 +68,7 @@ FLD::FLD(double alpha, size_t max_val, size_t mean, size_t std_dev)
   for (size_t i = 0; i <= max_val; ++i) {
     double norm_mass = boost::math::cdf(norm,i+0.5) -
                        boost::math::cdf(norm,i-0.5);
-    double mass = -MAX_DOUBLE;
+    double mass = LOG_EPSILON;
     if (norm_mass != 0) {
       mass = tot + log(norm_mass);
     }

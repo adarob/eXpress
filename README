@@ -62,6 +62,9 @@ V.   Acknowledgements:
 VI.  References:
 --------------------------------------------------------------------------------
 
+Roberts A and Pachter L (2012). Streaming fragment assignment for real-time
+analysis of sequencing experiments. Nature Methods.
+
 eXpress builds upon many ideas, including some proposed in the following papers:
 
 Trapnell C, Williams BA, Pertea G, Mortazavi AM, Kwan G, van Baren MJ, 

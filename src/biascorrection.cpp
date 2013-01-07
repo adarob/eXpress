@@ -34,6 +34,61 @@ SeqWeightTable::SeqWeightTable(size_t window_size, size_t order, double alpha)
       _expected(order, window_size, order+1, EPSILON) {
 }
 
+SeqWeightTable::SeqWeightTable(size_t window_size, size_t order,
+                               string param_file_name, string identifier)
+    : _order(order),
+      _observed(order, window_size, window_size, 0),
+      _expected(order, window_size, order+1, 0) {
+        
+  //TODO: Allow for orders and window sizes to be read from param file.
+  
+  ifstream infile (param_file_name.c_str());
+  size_t BUFF_SIZE = 99999;
+  char line_buff[BUFF_SIZE];
+  if (!infile.is_open()) {
+    cerr << "ERROR: Unable to open parameter file '" << param_file_name
+    << "'.\n";
+    exit(1);
+  }
+
+  do {
+    infile.getline (line_buff, BUFF_SIZE, '\n');
+  } while (strncmp(line_buff, identifier.c_str(), identifier.size()));
+  infile.getline (line_buff, BUFF_SIZE, '\n');
+
+  do {
+    infile.getline (line_buff, BUFF_SIZE, '\n');
+  } while (strcmp(line_buff, "\tObserved Conditional Probabilities"));
+  infile.getline (line_buff, BUFF_SIZE, '\n');
+  
+  //FG
+  for (size_t k = 0; k < (size_t)WINDOW; ++k) {
+    infile.getline (line_buff, BUFF_SIZE, '\n');
+    char *p = strtok(line_buff, "\t");
+    for (size_t i=0; i < pow(4.0, (double)min(order, k)); ++i) {
+      for (size_t j=0; j < NUM_NUCS; ++j) {
+        p = strtok(NULL, "\t");
+        _observed.update(k, i, j, log(strtod(p,NULL)));
+      }
+    }
+  }
+  
+  infile.getline (line_buff, BUFF_SIZE, '\n');
+  infile.getline (line_buff, BUFF_SIZE, '\n');
+  //BG
+  for (size_t k = 0; k < order+1; ++k) {
+    infile.getline (line_buff, BUFF_SIZE, '\n');
+    char *p = strtok(line_buff, "\t");
+    for (size_t i=0; i < pow(4.0, (double)min(order, k)); ++i) {
+      for (size_t j=0; j < NUM_NUCS; ++j) {
+        p = strtok(NULL, "\t");
+        _expected.update(k, i, j, log(strtod(p,NULL)));
+      }
+    }
+  }
+}
+
+
 void SeqWeightTable::copy_observed(const SeqWeightTable& other) {
   _observed = other._observed;
 }
@@ -119,7 +174,7 @@ void SeqWeightTable::append_output(ofstream& outfile) const {
   outfile << endl;
 
   for (size_t i = 0; i < _order+1; i++) {
-    outfile << i << ":\t";
+    outfile << i+1 << ":\t";
     for (size_t j = 0; j <  pow((double)NUM_NUCS, (double)_order+1); j++) {
       outfile << scientific << sexp(_expected.transition_prob(i,j>>2,j&3))
               << "\t";
@@ -132,6 +187,12 @@ BiasBoss::BiasBoss(size_t order, double alpha)
     : _order(order),
       _5_seq_bias(WINDOW, order, alpha),
       _3_seq_bias(WINDOW, order, alpha){
+}
+
+BiasBoss::BiasBoss(size_t order, string param_file_name)
+    : _order(order),
+      _5_seq_bias(WINDOW, order, param_file_name, ">5"),
+      _3_seq_bias(WINDOW, order, param_file_name, ">3") {
 }
 
 void BiasBoss::copy_observations(const BiasBoss& other) {

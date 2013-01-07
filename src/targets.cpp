@@ -22,7 +22,8 @@
 using namespace std;
 
 Target::Target(TargID id, const std::string& name, const std::string& seq,
-               bool prob_seq, double alpha, const Librarian* libs)
+               bool prob_seq, double alpha, const Librarian* libs,
+               const BiasBoss* known_bias_boss, const FLD* known_fld)
    : _libs(libs),
      _id(id),
      _name(name),
@@ -38,7 +39,7 @@ Target::Target(TargID id, const std::string& name, const std::string& seq,
     _start_bias.reset(new std::vector<float>(seq.length(),0));
     _end_bias.reset(new std::vector<float>(seq.length(),0));
   }
-  _cached_eff_len = est_effective_length(NULL, false);
+  update_target_bias(known_bias_boss, known_fld);
   _init_pseudo_mass = _cached_eff_len + _alpha;
 }
 
@@ -118,7 +119,7 @@ double Target::log_likelihood(const FragHit& frag, bool with_pseudo) const {
       ll += _end_bias->at(frag.right() - 1);
     }
   }
-
+  
   if (ps == PAIRED) {
     ll += (lib.fld)->pmf(frag.length());
   }
@@ -152,20 +153,21 @@ double Target::cached_effective_length(bool with_bias) const {
   return _cached_eff_len;
 }
 
-void Target::update_target_bias(BiasBoss* bias_table, FLD* fld) {
-  const Library& lib = _libs->curr_lib();
-  if (!bias_table) {
-    bias_table = lib.bias_table;
-    fld = lib.fld;
-  } else {
+void Target::update_target_bias(const BiasBoss* bias_table, const FLD* fld) {
+  if (bias_table) {
     _avg_bias = bias_table->get_target_bias(*_start_bias, *_end_bias, *this);
-    assert(!isnan(_avg_bias) && !isinf(_avg_bias));
+  } else if (_libs->curr_lib().bias_table) {
+    _avg_bias = _libs->curr_lib().bias_table->get_target_bias(*_start_bias,
+                                                              *_end_bias,
+                                                              *this);
   }
+  assert(!isnan(_avg_bias) && !isinf(_avg_bias));
   _cached_eff_len = est_effective_length(fld, false);
 }
 
 TargetTable::TargetTable(const string& targ_fasta_file, bool prob_seqs,
-                         double alpha, const AlphaMap* alpha_map,
+                         bool known_aux_params, double alpha,
+                         const AlphaMap* alpha_map,
                          const Librarian* libs)
     :  _libs(libs) {
   cerr << "Loading target sequences";
@@ -205,7 +207,8 @@ TargetTable::TargetTable(const string& targ_fasta_file, bool prob_seqs,
           if (alpha_map) {
             alpha = alpha_renorm * alpha_map->find(name)->second;
           }
-          add_targ(name, seq, prob_seqs, alpha, targ_index, targ_lengths);
+          add_targ(name, seq, prob_seqs, known_aux_params, alpha, targ_index,
+                   targ_lengths);
         }
         name = line.substr(1,line.find(' ')-1);
         if (target_names.count(name)) {
@@ -229,12 +232,13 @@ TargetTable::TargetTable(const string& targ_fasta_file, bool prob_seqs,
       if (alpha_map) {
         alpha = alpha_renorm * alpha_map->find(name)->second;
       }
-      add_targ(name, seq, prob_seqs, alpha, targ_index, targ_lengths);
+      add_targ(name, seq, prob_seqs, known_aux_params, alpha, targ_index,
+               targ_lengths);
     }
 
     infile.close();
-    if (lib.bias_table) {
-            lib.bias_table->normalize_expectations();
+    if (lib.bias_table && !known_aux_params) {
+      lib.bias_table->normalize_expectations();
     }
   } else {
     cerr << "ERROR: Unable to open MultiFASTA file '" << targ_fasta_file
@@ -265,7 +269,8 @@ TargetTable::~TargetTable() {
 }
 
 void TargetTable::add_targ(const string& name, const string& seq, bool prob_seq,
-                           double alpha, const TransIndex& targ_index,
+                           bool known_aux_params, double alpha,
+                           const TransIndex& targ_index,
                            const TransIndex& targ_lengths) {
   TransIndex::const_iterator it = targ_index.find(name);
   if (it == targ_index.end()) {
@@ -281,10 +286,14 @@ void TargetTable::add_targ(const string& name, const string& seq, bool prob_seq,
     exit(1);
   }
 
-  Target* targ = new Target(it->second, name, seq, prob_seq, alpha, _libs);
   const Library& lib = _libs->curr_lib();
-  if (lib.bias_table) {
-      (lib.bias_table)->update_expectations(*targ);
+  const BiasBoss* known_bias_boss = (known_aux_params) ? lib.bias_table : NULL;
+  const FLD* known_fld = (known_aux_params) ? lib.fld : NULL;
+  
+  Target* targ = new Target(it->second, name, seq, prob_seq, alpha, _libs,
+                            known_bias_boss, known_fld);
+  if (lib.bias_table && !known_aux_params) {
+    (lib.bias_table)->update_expectations(*targ);
   }
   _targ_map[targ->id()] = targ;
   targ->bundle(_bundle_table.create_bundle(targ));
@@ -423,7 +432,10 @@ void TargetTable::output_results(string output_dir, size_t tot_counts,
       // Calculate individual counts and rhos
       for (size_t i = 0; i < bundle_targ.size(); ++i) {
         Target& targ = *bundle_targ[i];
-        double l_eff_len = targ.est_effective_length();
+        if (!burned_out) {
+          targ.update_target_bias();
+        }
+        double l_eff_len = targ.cached_effective_length();
 
         // Calculate count variance
         double mass = targ.mass(false);
@@ -521,7 +533,7 @@ void TargetTable::output_results(string output_dir, size_t tot_counts,
         fprintf(expr_file, "" SIZE_T_FMT "\t%s\t" SIZE_T_FMT "\t%f\t%d\t%d\t%f"
                            "\t%f\t%f\t%f\t%f\t%f\t%f\t%c\n",
                 bundle_id, targ.name().c_str(), targ.length(),
-                sexp(targ.est_effective_length()), 0, 0, 0.0, 0.0, 0.0, 0.0,
+                sexp(targ.cached_effective_length()), 0, 0, 0.0, 0.0, 0.0, 0.0,
                 0.0, 0.0, 0.0, 'T');
 
          if (output_varcov) {
@@ -566,7 +578,7 @@ void TargetTable::asynch_bias_update(boost::mutex* mutex) {
 
   while(running) {
     if (bg_table) {
-       bg_table->normalize_expectations();
+      bg_table->normalize_expectations();
     }
     {
       boost::unique_lock<boost::mutex> lock(*mutex);

@@ -161,12 +161,21 @@
         <div class="corner-content-1col-top"></div>                        
         <div class="content-1col-nobox">
           <h1>News</h1>
-          <h2>11.22.2012 &bull; eXpress 1.2.2 released</h2>
+          <h2>12.XX.2012 &bull; eXpress 1.2.3 released</h2>
+          <p>Changes:<ul>
+   		    <li>Fixed an issue where indel parameters were not properly used in the likelihood.</li>
+   		    <li>Added indel parameters to the params.xprs output file.</li>
+   		    <li>Position indexing in params.xrps is now 1-based.</li>
+   	    	<li>Added the ability to load parameters from a params.xprs file. See XXX for more details.</li>
+   	    	<li>Corrected minor issue that could effect variance bounding.</li>
+   		</ul></p> 
+
+          <h2>11.26.2012 &bull; eXpress 1.2.2 released</h2>
           <p>Changes:<ul>
    		<li>Fixed an issue affecting the variance, which led to unreasonably large confidence intervals and invalid ambiguous count distribution parameters. These
          parameters (alpha and beta) will now always be greater than 0.</li>
 		  <li>Fixed an in issue making it impossible to enable additional batch rounds using the <tt>-B/--additional-batch</tt> option.</li>
-		  <li>Added options for single-end strand-specific protocols (<tt>--f-stranded</tt> and <tt>--fr-stranded</tt>). See the <a href="manual.html#usage">Manual</a> for more details.</li>
+		  <li>Added options for single-end strand-specific protocols (<tt>--f-stranded</tt> and <tt>--r-stranded</tt>). See the <a href="manual.html#usage">Manual</a> for more details.</li>
 		  <li>Added a warning message when a library is likely strand-specific but the proper flag has not been given.</li>
    		<li>The beta binomial distribution parameters are now reported in scientific notation in results.xprs.</li>
    		</ul></p> 

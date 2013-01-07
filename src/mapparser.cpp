@@ -227,6 +227,11 @@ BAMParser::BAMParser(BamTools::BamReader* reader) : _reader(reader) {
 
   size_t index = 0;
   foreach(const BamTools::RefData& ref, _reader->GetReferenceData()) {
+    if (_targ_index.count(ref.RefName)) {
+      cerr << "ERROR: Target '" << ref.RefName
+           << "' appears multiple times in BAM header.";
+      exit(1);
+    }
     _targ_index[ref.RefName] = index++;
     _targ_lengths[ref.RefName] = ref.RefLength;
   }
@@ -352,13 +357,12 @@ SAMParser::SAMParser(istream* in) {
     if (idx!=string::npos) {
       string name = str.substr(idx+3);
       name = name.substr(0,name.find_first_of("\n\t "));
-      if (_targ_index.find(name) == _targ_index.end()) {
-        _targ_index[name] = index++;
-      } else {
-        cerr << "Warning: Target '" << str
-             << "' appears twice in the SAM index.\n";
+      if (_targ_index.count(name)) {
+        cerr << "ERROR: Target '" << str
+             << "' appears multiple times in SAM header.\n";
+        exit(1);
       }
-
+      _targ_index[name] = index++;
       idx = str.find("LN:");
       if (idx != string::npos) {
         string len = str.substr(idx+3);

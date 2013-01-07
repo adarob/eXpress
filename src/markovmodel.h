@@ -83,6 +83,8 @@ class MarkovModel {
    * @param mass the amount to increment the parameters by (logged).
    */
   void update(const Sequence& seq, int left, double mass);
+  //DOC
+  void update(size_t p, size_t i, size_t j, double mass);
   /**
    * A member function that computes and returns the parameter table indices
    * used to compute and update the likelihood for the given sequence at the

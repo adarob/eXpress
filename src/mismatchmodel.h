@@ -64,6 +64,9 @@ class MismatchTable {
    *        initialization.
    */
   MismatchTable(double alpha);
+  //DOC
+  //TODO INDELS
+  MismatchTable(std::string param_file_name);
   /**
    * Mutator to set the _active member variable to allow for log_likelihood
    * calculations. Used to skip calculations before burn-in completes.
