@@ -18,6 +18,7 @@
 #include <fstream>
 #include <cassert>
 #include <stdio.h>
+#include <limits>
 
 using namespace std;
 
@@ -452,7 +453,7 @@ void TargetTable::output_results(string output_dir, size_t tot_counts,
             assert (m >= 0 && m <= 1);
             m = max(m, EPSILON);
             m = min(m, 1-EPSILON);
-            double v = MAX_DOUBLE;
+            double v = numeric_limits<double>::max();
             if (targ.tot_ambig_mass() != LOG_0) {
               v = sexp(targ.var_sum() - targ.tot_ambig_mass());
             }

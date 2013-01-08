@@ -87,7 +87,6 @@ const double LOG_QUARTER = log(0.25);
  */
 const double EPSILON = 0.000001;
 const double LOG_EPSILON = log(EPSILON);
-const double MAX_DOUBLE = std::numeric_limits<double>::max();
 
 /**
  * Global function that determines if two doubles are within some epsilon of

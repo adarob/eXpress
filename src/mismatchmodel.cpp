@@ -249,7 +249,8 @@ double MismatchTable::log_likelihood(const FragHit& f) const {
     size_t i = 0;  // read index
     size_t j = read_l.left;  // genomic index
 
-    bool insertion, deletion;
+    bool insertion = false;
+    bool deletion = false;
     
     vector<Indel>::const_iterator ins = read_l.inserts.begin();
     vector<Indel>::const_iterator del = read_l.deletes.begin();
@@ -308,7 +309,8 @@ double MismatchTable::log_likelihood(const FragHit& f) const {
     size_t i = 0;
     size_t j = targ.length() - read_r.right;
 
-    bool insertion, deletion;
+    bool insertion = false;
+    bool deletion = false;
     
     vector<Indel>::const_iterator ins = read_r.inserts.end()-1;
     vector<Indel>::const_iterator del = read_r.deletes.end()-1;
@@ -374,7 +376,8 @@ void MismatchTable::update(const FragHit& f, double p, double mass) {
     size_t i = 0;  // read index
     size_t j = read_l.left;  // genomic index
 
-    bool insertion, deletion;
+    bool insertion = false;
+    bool deletion = false;
     
     vector<Indel>::const_iterator ins = read_l.inserts.begin();
     vector<Indel>::const_iterator del = read_l.deletes.begin();
@@ -457,7 +460,8 @@ void MismatchTable::update(const FragHit& f, double p, double mass) {
     size_t i = 0;
     size_t j = targ.length() - read_r.right;
 
-    bool insertion, deletion;
+    bool insertion = false;
+    bool deletion = false;
     
     vector<Indel>::const_iterator ins = read_r.inserts.end() - 1;
     vector<Indel>::const_iterator del = read_r.deletes.end() - 1;
