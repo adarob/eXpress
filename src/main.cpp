@@ -313,11 +313,11 @@ bool parse_options(int ac, char ** av) {
     return 1;
   }
   if ((output_align_prob || output_align_samp) && remaining_rounds == 0) {
-    cerr << "WARNING: It is recommended that at least one additional round "
+    cerr << "Warning: It is recommended that at least one additional round "
          << "be used when outputting alignment probabilities or sampled "
          << "alignments. Use the '-B' or '-O' option to enable.";
   }
-
+  
   // We have 1 processing thread and 1 parsing thread always, so we should not
   // count these as additional threads.
   if (num_threads < 2) {

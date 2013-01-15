@@ -123,10 +123,10 @@
         <li><a href="#">Download<!--[if IE 7]><!--></a><!--<![endif]-->
           <!--[if lte IE 6]><table><tr><td><![endif]-->
             <ul>
-              <li><a href=downloads/express-1.2.2/express-1.2.2-macosx_x86_64.tgz onClick="_gaq.push(['_trackEvent', 'Downloads', 'Mac', 'Manual']);" target="_blank">Mac OS X (64-bit)</a></li>
-              <li><a href=downloads/express-1.2.2/express-1.2.2-linux_x86_64.tgz onClick="_gaq.push(['_trackEvent', 'Downloads', 'Linux', 'Manual']);" target="_blank">Linux (64-bit)</a></li>
-              <li><a href=downloads/express-1.2.2/express-1.2.2-win32_x86_64.zip onClick="_gaq.push(['_trackEvent', 'Downloads', 'Windows', 'Manual']);" target="_blank">Windows (64-bit)</a></li>
-              <li><a href=downloads/express-1.2.2/express-1.2.2-src.tgz onClick="_gaq.push(['_trackEvent', 'Downloads', 'Source', 'Manual']);" target="_blank">Source Code</a></li>
+              <li><a href=downloads/express-1.2.3/express-1.2.3-macosx_x86_64.tgz onClick="_gaq.push(['_trackEvent', 'Downloads', 'Mac', 'Manual']);" target="_blank">Mac OS X (64-bit)</a></li>
+              <li><a href=downloads/express-1.2.3/express-1.2.3-linux_x86_64.tgz onClick="_gaq.push(['_trackEvent', 'Downloads', 'Linux', 'Manual']);" target="_blank">Linux (64-bit)</a></li>
+              <li><a href=downloads/express-1.2.3/express-1.2.3-win32_x86_64.zip onClick="_gaq.push(['_trackEvent', 'Downloads', 'Windows', 'Manual']);" target="_blank">Windows (64-bit)</a></li>
+              <li><a href=downloads/express-1.2.3/express-1.2.3-src.tgz onClick="_gaq.push(['_trackEvent', 'Downloads', 'Source', 'Manual']);" target="_blank">Source Code</a></li>
               <li><a href="downloads" onClick="_gaq.push(['_trackEvent', 'Downloads', 'Previous','Manual']);">Previous Versions</a></li>
             </ul>
           <!--[if lte IE 6]></td></tr></table></a><![endif]-->
@@ -266,15 +266,15 @@
 		  <tr><td VALIGN=top><b>Advanced Options:</b></td><td VALIGN=top></td></tr>
 
 		  <tr><td VALIGN=top nowrap> 
-		  <tt>--calc-covar</tt> 
-		  </td><td VALIGN=top> 
-		  With this option, eXpress calculates the covariance between targets and outputs them for use in differential expression analysis. This calculation requires slightly more time and memory.
-		  </td></tr>
-
-		  <tr><td VALIGN=top nowrap> 
 		  <tt>-f/--forget-param &lt;float&gt;</tt> 
 		  </td><td VALIGN=top> 
 		  A parameter specifying the rate at which the prior is "forgotten" by increasing the mass of fragments during online processing. Larger numbers (max of 1) mean a slower rate, which decreases convergence but improves stability. Smaller numbers (minumum of 0.5) increase the rate, which may lead to faster convergence but can also lead to instability.
+		  </td></tr> 
+
+		  <tr><td VALIGN=top nowrap> 
+		  <tt>--library-size &lt;int&gt;</tt> 
+		  </td><td VALIGN=top> 
+		  Specifies the number of fragments in the library to be used in the FPKM calculation. If left unspecified, this number will be computed from the input.
 		  </td></tr> 
 
 		  <tr><td VALIGN=top nowrap> 
@@ -282,6 +282,12 @@
 		  </td><td VALIGN=top> 
 		  A parameter specifying the maximum allowed size of a single indel. Alignments with larger indels will be ignored. A geometric prior for indel length is fit so that all but 10e-6 of the probability mass lies within the allowed region. The default is 10.
 		  </td></tr> 
+
+		  <tr><td VALIGN=top nowrap> 
+		  <tt>--calc-covar</tt> 
+		  </td><td VALIGN=top> 
+		  With this option, eXpress calculates the covariance between targets and outputs them for use in differential expression analysis. This calculation requires slightly more time and memory.
+		  </td></tr>
 
 		  <tr><td VALIGN=top nowrap> 
 		  <tt>--expr-alpha &lt;float&gt;</tt> 
@@ -311,7 +317,13 @@
 		  <tt>--no-bias-correct</tt> 
 		  </td><td VALIGN=top> 
 		  With this option, eXpress will not measure and account for errors in alignments. Will lead to an increase in speed, but may greatly decrease accuracy.
-		  </td></tr>	  
+		  </td></tr>
+		  
+ 		  <tr><td VALIGN=top nowrap> 
+		  <tt>--aux-param-file &lt;string&gt;</tt> 
+		  </td><td VALIGN=top> 
+		  Specifies an auxiliary parameter file output by a different run of eXpress to be used as the auxiliary parameters for this round. Greatly improves speed and should be used when a subset of the targets or fragments are being used in a second estimation.
+		  </td></tr> 
 
 		  </table></p>
 		
