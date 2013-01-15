@@ -84,6 +84,7 @@ bool output_running_rounds = false;
 bool output_running_reads = false;
 size_t num_threads = 2;
 size_t num_neighbors = 0;
+size_t library_size = 0;
 
 // directional parameters
 Direction direction = BOTH;
@@ -145,8 +146,6 @@ bool parse_options(int ac, char ** av) {
   ("help,h", "produce help message")
   ("output-dir,o", po::value<string>(&output_dir)->default_value(output_dir),
    "write all output files to this directory")
-  ("num-threads,p", po::value<size_t>(&num_threads)->default_value(num_threads),
-   "number of threads (>= 2)")
   ("frag-len-mean,m", po::value<int>(&def_fl_mean)->default_value(def_fl_mean),
    "prior estimate for average fragment length")
   ("frag-len-stddev,s",
@@ -175,12 +174,14 @@ bool parse_options(int ac, char ** av) {
   
   po::options_description advanced("Advanced Options");
   advanced.add_options()
-  ("calc-covar", "calculate and output covariance matrix")
   ("forget-param,f", po::value<double>(&ff_param)->default_value(ff_param),
    "sets the 'forgetting factor' parameter (0.5 < c <= 1)")
+  ("library-size", po::value<size_t>(&library_size),
+   "specifies library size for FPKM instead of calculating from alignments")
   ("max-indel-size",
    po::value<size_t>(&max_indel_size)->default_value(max_indel_size),
    "sets the maximum allowed indel size, affecting geometric indel prior")
+  ("calc-covar", "calculate and output covariance matrix")
   ("expr-alpha", po::value<double>(&expr_alpha)->default_value(expr_alpha),
    "sets the strength of the prior, per bp")
   ("stop-at", po::value<size_t>(&stop_at)->default_value(stop_at),
@@ -198,6 +199,8 @@ bool parse_options(int ac, char ** av) {
 
   po::options_description hidden("Experimental/Debug Options");
   hidden.add_options()
+  ("num-threads,p", po::value<size_t>(&num_threads)->default_value(num_threads),
+   "number of threads (>= 2)")
   ("edit-detect","")
   ("single-round", "")
   ("output-running-rounds", "")
@@ -310,11 +313,11 @@ bool parse_options(int ac, char ** av) {
     return 1;
   }
   if ((output_align_prob || output_align_samp) && remaining_rounds == 0) {
-    cerr << "WARNING: It is recommended that at least one additional round "
+    cerr << "Warning: It is recommended that at least one additional round "
          << "be used when outputting alignment probabilities or sampled "
          << "alignments. Use the '-B' or '-O' option to enable.";
   }
-
+  
   // We have 1 processing thread and 1 parsing thread always, so we should not
   // count these as additional threads.
   if (num_threads < 2) {
@@ -795,12 +798,22 @@ int estimation_main() {
   
   if (calc_covar && (double)SSIZE_MAX < num_targ*(num_targ+1)) {
     cerr << "Warning: Your system is unable to represent large enough values "
-    << "for efficiently hashing target pairs.  Covariance calculation "
-    << "will be disabled.\n";
+         << "for efficiently hashing target pairs. Covariance calculation "
+         << "will be disabled.\n";
     calc_covar = false;
   }
   
   size_t tot_counts = threaded_calc_abundances(libs);
+  if (library_size) {
+    tot_counts = library_size;
+  }
+  
+  if (!burned_out && bias_correct && param_file_name == "") {
+    cerr << "Warning: Not enough fragments observed to accurately learn bias "
+         << "paramaters. Either disable bias correction (--no-bias-correct) or "
+         << "provide a file containing auxiliary parameters "
+         << "(--aux-param-file).\n";
+  }
   
   if (both) {
     remaining_rounds = 1;
@@ -823,6 +836,9 @@ int estimation_main() {
       libs[l].map_parser->reset_reader();
     }
     tot_counts = threaded_calc_abundances(libs);
+    if (library_size) {
+      tot_counts = library_size;
+    }
     targ_table.round_reset();
   }
   
