@@ -163,7 +163,7 @@ int preprocess_main() {
   MarkovModel bias_model(3, 21, 21, 0);
   MismatchTable mismatch_table(0);
   TargetTable targ_table(fasta_filename, 0, 0,
-                         NULL, &libs);
+                         NULL, NULL, &libs);
   lib.targ_table = &targ_table;
   
   cerr << "Converting targets to Protocol Buffers...\n";
