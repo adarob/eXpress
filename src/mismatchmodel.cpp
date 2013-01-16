@@ -43,7 +43,7 @@ MismatchTable::MismatchTable(string param_file_name)
       _max_len(0),
       _active(true){
   ifstream infile (param_file_name.c_str());
-  size_t BUFF_SIZE = 99999;
+  const size_t BUFF_SIZE = 99999;
   char line_buff[BUFF_SIZE];
   if (!infile.is_open()) {
     cerr << "ERROR: Unable to open parameter file '" << param_file_name

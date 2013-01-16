@@ -24,7 +24,7 @@ const vector<double> KERNEL = boost::assign::list_of(-2.7725887222397811)
 
 FLD::FLD(string param_file_name) {
   ifstream infile (param_file_name.c_str());
-  size_t BUFF_SIZE = 99999;
+  const size_t BUFF_SIZE = 99999;
   char line_buff[BUFF_SIZE];
   
   if (!infile.is_open()) {
