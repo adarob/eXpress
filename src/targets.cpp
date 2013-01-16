@@ -175,8 +175,8 @@ TargetTable::TargetTable(const string& targ_fasta_file, bool prob_seqs,
   const Library& lib = _libs->curr_lib();
   const TransIndex& targ_index = lib.map_parser->targ_index();
   const TransIndex& targ_lengths = lib.map_parser->targ_lengths();
-  if (lib.bias_table) {
-        cerr << " and measuring bias background";
+  if (lib.bias_table && !known_aux_params) {
+    cerr << " and measuring bias background";
   }
   cerr << "...\n\n";
 
@@ -454,7 +454,7 @@ void TargetTable::output_results(string output_dir, size_t tot_counts,
             m = max(m, EPSILON);
             m = min(m, 1-EPSILON);
             double v = numeric_limits<double>::max();
-            if (targ.tot_ambig_mass() != LOG_0) {
+            if (targ.var_sum() != LOG_0 && targ.tot_ambig_mass() != LOG_0) {
               v = sexp(targ.var_sum() - targ.tot_ambig_mass());
             }
             v = min(v, m * (1 - m) - EPSILON/2);
@@ -463,7 +463,8 @@ void TargetTable::output_results(string output_dir, size_t tot_counts,
             count_beta = (m - 1) * (m*m - m + v) / v;
             count_var = mass_var;
             
-            assert (count_alpha > 0 && count_beta > 0);
+            assert(count_alpha > 0 && count_beta > 0);
+            assert(!isinf(count_alpha) && !isinf(count_beta));
             assert(!isnan(count_var));
           } else {
             count_var = n * (n + 2.) / 12.;
