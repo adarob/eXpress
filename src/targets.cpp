@@ -448,7 +448,11 @@ void TargetTable::output_results(string output_dir, size_t tot_counts,
 
         if (targ.tot_counts() != targ.uniq_counts()) {
           double n = targ.tot_counts()-targ.uniq_counts();
-          if (targ.solvable()) {
+          if (targ_counts[i] == 0) {
+            count_var = n * (n + 2.) / 12.;
+            count_alpha = 0;
+            count_beta = 0;
+          } else if (targ.solvable()) {
             double m = (targ_counts[i] - targ.uniq_counts())/n;
             assert (m >= 0 && m <= 1);
             m = max(m, EPSILON);
