@@ -43,7 +43,7 @@ SeqWeightTable::SeqWeightTable(size_t window_size, size_t order,
   //TODO: Allow for orders and window sizes to be read from param file.
   
   ifstream infile (param_file_name.c_str());
-  size_t BUFF_SIZE = 99999;
+  const size_t BUFF_SIZE = 99999;
   char line_buff[BUFF_SIZE];
   if (!infile.is_open()) {
     cerr << "ERROR: Unable to open parameter file '" << param_file_name
