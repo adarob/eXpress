@@ -157,10 +157,6 @@ double Target::cached_effective_length(bool with_bias) const {
 void Target::update_target_bias(const BiasBoss* bias_table, const FLD* fld) {
   if (bias_table) {
     _avg_bias = bias_table->get_target_bias(*_start_bias, *_end_bias, *this);
-  } else if (_libs->curr_lib().bias_table) {
-    _avg_bias = _libs->curr_lib().bias_table->get_target_bias(*_start_bias,
-                                                              *_end_bias,
-                                                              *this);
   }
   assert(!isnan(_avg_bias) && !isinf(_avg_bias));
   _cached_eff_len = est_effective_length(fld, false);
@@ -433,10 +429,7 @@ void TargetTable::output_results(string output_dir, size_t tot_counts,
       // Calculate individual counts and rhos
       for (size_t i = 0; i < bundle_targ.size(); ++i) {
         Target& targ = *bundle_targ[i];
-        if (!burned_out) {
-          targ.update_target_bias();
-        }
-        double l_eff_len = targ.cached_effective_length();
+        double l_eff_len = targ.est_effective_length();
 
         // Calculate count variance
         double mass = targ.mass(false);

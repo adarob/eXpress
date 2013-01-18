@@ -351,8 +351,8 @@ public:
   /**
    * A member function that causes the target bias to be re-calculated by the
    * _bias_table based on curent parameters.
-   * @param bias_table an optional pointer to a different BiasBoss than the
-   *        global one, for thread-safety.
+   * @param bias_table a pointer to a BiasBoss to use as parameters. Bias not
+   *        updated if NULL.
    * @param fld an optional pointer to a different FLD than the global one,
    *        for thread-safety.
    */
