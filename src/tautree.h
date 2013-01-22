@@ -80,7 +80,8 @@ class Sap {
 };
 
 class TauTree {
-  size_t _n;
+  // logged
+  double _n;
   double _mass;
 
 protected:
@@ -92,18 +93,18 @@ protected:
   virtual void get_taus(Sap sap, double tau) const = 0;
   virtual void update_taus(Sap sap) = 0;
   virtual void increment_taus(Sap sap, bool decrement=false) = 0;
-  double next_mass() {
-    double ret = _mass;
-    _n++;
-    _mass += _ff_param*log((double)_n) - log(pow(_n+1,_ff_param) - 1);
-    return ret;
+  double next_mass(double incr) {
+    double new_n = log_add(_n, incr);
+    _mass += _ff_param*_n - log_sub(_ff_param*new_n, LOG_1);
+    _n = new_n;
+    return _mass;
   }
   double similarity_scalar(const Sap& sap);
 
 public:
   friend class TauLeafIterator;
   TauTree(double ff_param)
-      : _n(0), _mass(0), _ff_param(ff_param) {}
+      : _n(LOG_1), _mass(LOG_1), _ff_param(ff_param) {}
   virtual ~TauTree() {
     foreach(TauTree* child, _children) {
       delete child;

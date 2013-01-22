@@ -35,6 +35,7 @@ double TauTree::similarity_scalar(const Sap& sap) {
   if (tot == LOG_0) {
     return LOG_EPSILON;
   }
+  
   for (size_t i = 0; i < sap.size(); ++i) {
     double p = sap.const_likelihood(i) - tot;
     c += -sexp(p)*p;
@@ -168,7 +169,7 @@ void RangeTauForest::update_taus(Sap sap) {
   TreeID tree = sap.tree_root();
 
   // Don't compute a scalar here to save time. These should always be valuable.
-  double mass = next_mass();
+  double mass = next_mass(LOG_1);
   // Update the taus throughout the forest using the computed likelihoods.
   assert(approx_eq(sap.fraction(), LOG_1));
   _child_taus.increment(tree, mass);
@@ -186,7 +187,7 @@ void RangeTauForest::process_fragment(const Fragment& frag) {
     params.leaf_ids[0] = hit.targ_id;
     params.tree_root = _leaf_to_tree_map[params.leaf_ids[0]];
     params.accum_assignments[1] = LOG_1;
-    double mass = next_mass();
+    double mass = next_mass(LOG_1);
     _child_taus.increment(params.tree_root, mass);
     static_cast<RangeTauTree*>(_children[params.tree_root])->update_taus(Sap(&params, 0, 0));
     _tree_counts[params.tree_root]++;
@@ -290,7 +291,7 @@ void RangeTauTree::update_taus(Sap sap) {
   if (islzero(sim_scalar)) {
     return;
   }
-  const double mass = sim_scalar + next_mass();
+  const double mass = sim_scalar + next_mass(sim_scalar);
   
   for (size_t i = 0; i < _children.size(); ++i) {
     RangeTauTree& child = *static_cast<RangeTauTree*>(_children[i]);
