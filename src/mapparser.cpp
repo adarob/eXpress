@@ -12,6 +12,7 @@
 #include "targets.h"
 #include "threadsafety.h"
 #include "library.h"
+#include <boost/algorithm/string/predicate.hpp>
 
 using namespace std;
 
@@ -300,6 +301,11 @@ bool BAMParser::map_end_from_alignment(BamTools::BamAlignment& a) {
   }
     
   r.name = a.Name;
+  if (boost::algorithm::ends_with(r.name, "\1") ||
+      boost::algorithm::ends_with(r.name, "\2")) {
+    r.name = r.name.substr(r.name.size()-2);
+  }
+
   r.reversed = is_reversed;
   r.first = !is_paired || a.IsFirstMate();
   r.targ_id = a.RefID;
@@ -416,6 +422,10 @@ bool SAMParser::map_end_from_line(char* line) {
     switch(i++) {
       case 0: {
         r.name = p;
+        if (boost::algorithm::ends_with(r.name, "\1") ||
+            boost::algorithm::ends_with(r.name, "\2")) {
+          r.name = r.name.substr(r.name.size()-2);
+        }
         break;
       }
       case 1: {
