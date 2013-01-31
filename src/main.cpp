@@ -72,6 +72,13 @@ size_t def_fl_stddev = 80;
 size_t def_fl_kernel_n = 4;
 double def_fl_kernel_p = 0.5;
 
+// transcript length parameters
+size_t def_tl_mean = 0;
+size_t def_tl_stddev = 0;
+size_t def_tl_kernel_n = 2000;
+double def_tl_kernel_p = 0.5;
+size_t defl_tl_bin_size = 100;
+
 // option parameters
 bool edit_detect = false;
 bool error_model = true;
