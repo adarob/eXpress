@@ -39,8 +39,8 @@ LengthDistribution::LengthDistribution(double alpha, size_t max_val,
                              prior_sigma/(bin_size*bin_size));
 
     for (size_t i = 0; i <= max_val; ++i) {
-      double norm_mass = boost::math::cdf(norm,i+0.5) -
-                         boost::math::cdf(norm,i-0.5);
+      double norm_mass = boost::math::cdf(norm, i+0.5) -
+                         boost::math::cdf(norm, i-0.5);
       double mass = LOG_EPSILON;
       if (norm_mass != 0) {
         mass = tot + log(norm_mass);
@@ -50,7 +50,7 @@ LengthDistribution::LengthDistribution(double alpha, size_t max_val,
       _tot_mass = log_add(_tot_mass, mass);
     }
   } else {
-    _hist = vector<double>(max_val+1, tot - log(max_val));
+    _hist = vector<double>(max_val + 1, tot - log(max_val));
     _hist[0] = LOG_0;
     _sum = _hist[1] + log(max_val * (max_val + 1)) - log(2);
     _tot_mass = tot;

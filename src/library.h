@@ -33,10 +33,14 @@ struct Library {
    */
   MapParser* map_parser;
   /**
-   * A pointer to the LengthDistribution (fragment length distribution) object for this
-   * library.
+   * A pointer to the fragment length distribution object for this library.
    */
   LengthDistribution* fld;
+  /**
+   * A pointer to the (optional) target length distribution object for this
+   * library.
+   */
+  LengthDistribution* tld;
   /**
    * A pointer to the MismatchTable containing the learned error distribution
    * for this library.
@@ -44,7 +48,7 @@ struct Library {
   MismatchTable* mismatch_table;
   /**
    * A pointer to the BiasBoss containing the learned bias distribution for this
-   * library.
+   * library. (optional)
    */
   BiasBoss* bias_table;
   /**

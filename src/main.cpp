@@ -60,6 +60,7 @@ string param_file_name = "";
 // intial pseudo-count parameters (non-logged)
 double expr_alpha = .005;
 double fld_alpha = 1;
+double tld_alpha = 1;
 double bias_alpha = 1;
 double mm_alpha = 1;
 
@@ -72,12 +73,13 @@ size_t def_fl_stddev = 80;
 size_t def_fl_kernel_n = 4;
 double def_fl_kernel_p = 0.5;
 
-// transcript length parameters
+// target length parameters
+bool use_tld = false;
 size_t def_tl_mean = 0;
 size_t def_tl_stddev = 0;
 size_t def_tl_kernel_n = 2000;
 double def_tl_kernel_p = 0.5;
-size_t defl_tl_bin_size = 100;
+size_t def_tl_bin_size = 100;
 
 // option parameters
 bool edit_detect = false;
@@ -207,6 +209,7 @@ bool parse_options(int ac, char ** av) {
   hidden.add_options()
   ("num-threads,p", po::value<size_t>(&num_threads)->default_value(num_threads),
    "number of threads (>= 2)")
+  ("use-tld", "")
   ("edit-detect","")
   ("single-round", "")
   ("output-running-rounds", "")
@@ -294,6 +297,7 @@ bool parse_options(int ac, char ** av) {
     return 1;
   }
   
+  use_tld = vm.count("use-tld");
   edit_detect = vm.count("edit-detect");
   calc_covar = vm.count("calc-covar");
   bias_correct = !(vm.count("no-bias-correct"));
@@ -387,6 +391,9 @@ void output_results(Librarian& libs, size_t tot_counts, int n=-1) {
     }
     ofstream paramfile(buff);
     (libs[l].fld)->append_output(paramfile, "Fragment");
+    if (libs[l].tld) {
+      (libs[l].tld)->append_output(paramfile, "Target");
+    }
     if (libs[l].mismatch_table) {
       (libs[l].mismatch_table)->append_output(paramfile);
     }
@@ -456,6 +463,9 @@ void process_fragment(Fragment* frag_p) {
         }
       }
       likelihoods[i] = t->log_likelihood(m, first_round);
+      if (lib.tld) {
+        likelihoods[i] += lib.tld->pmf(t->length());
+      }
       masses[i] = t->mass();
       variances[i] = t->mass_var();
       total_likelihood = log_add(total_likelihood, likelihoods[i]);
@@ -514,6 +524,9 @@ void process_fragment(Fragment* frag_p) {
         }
         if (lib.bias_table) {
           (lib.bias_table)->update_observed(m, p+lib.mass_n);
+        }
+        if (lib.tld) {
+          (lib.tld)->add_val(t->length(), p + lib.mass_n - t->rho());
         }
       }
     }
@@ -796,8 +809,20 @@ int estimation_main() {
   
   TargetTable targ_table(fasta_file_name, edit_detect, param_file_name.size(),
                          expr_alpha, expr_alpha_map, &libs);
+  size_t max_target_length = 0;
+  for(size_t tid=0; tid < targ_table.size(); tid++) {
+    max_target_length = max(max_target_length,
+                            targ_table.get_targ(tid)->length());
+  }
+  LengthDistribution* tld = (use_tld) ?
+                            new LengthDistribution(tld_alpha, max_target_length,
+                                                   def_tl_mean, def_tl_stddev,
+                                                   def_tl_kernel_n,
+                                                   def_tl_kernel_p,
+                                                   def_tl_bin_size) : NULL;
   for (size_t i = 0; i < libs.size(); ++i) {
     libs[i].targ_table = &targ_table;
+    libs[i].tld = tld;
     if (bias_correct) {
       libs[i].bias_table->copy_expectations(*(libs.curr_lib().bias_table));
     }
