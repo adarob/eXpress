@@ -58,7 +58,17 @@ public:
    *        (logged pseudo-counts for each parameter).
    */
   SeqWeightTable(size_t window_size, size_t order, double alpha);
-  //DOC
+  /**
+   * A second constructor that loads the distribution from a parameter file.
+   * Note that the values should not be modified after using this constructor.
+   * @param window_size an unsigned integer specifying the size of the bias
+   *        window surrounding fragment ends. Must match file.
+   * @param order a size_t specifying the order to use for the Markov chains
+   *        modelling the sequence. Must match file.
+   * @param param_file_name a string specifying the path to the parameter file.
+   * @param identifier a string specifying the header for these parameters in
+   *        the file.
+   */
   SeqWeightTable(size_t window_size, size_t order, std::string param_file_name,
                  std::string identifier);
   /**
@@ -152,8 +162,13 @@ public:
    *        pseudo-counts for each parameter).
    */
   BiasBoss(size_t order, double alpha);
-  //DOC
-  //TODO: Detect order from file.
+  /**
+   * A second constructor that loads the distributions from a parameter file.
+   * Note that the values should not be modified after using this constructor.
+   * @param order a size_t specifying the order to use for the Markov chains
+   *        modelling the sequence. Must match file.
+   * @param param_file_name a string specifying the path to the parameter file.
+   */  //TODO: Detect order from file.
   BiasBoss(size_t order, std::string param_file_name);
   /**
    * An accessor for the order of the Markov chains used to model the sequences.

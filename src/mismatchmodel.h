@@ -64,8 +64,11 @@ class MismatchTable {
    *        initialization.
    */
   MismatchTable(double alpha);
-  //DOC
-  //TODO INDELS
+  /**
+   * A second constructor that loads the distribution from a parameter file.
+   * Note that the values should not be modified after using this constructor.
+   * @param param_file_name a string specifying the path to the parameter file.
+   */
   MismatchTable(std::string param_file_name);
   /**
    * Mutator to set the _active member variable to allow for log_likelihood

@@ -71,12 +71,12 @@
             isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "--frag-len-mean 250 --frag-len-stddev 50 -o $(SRCROOT)/sample_data3/out2 $(SRCROOT)/sample_data3/hox_ucsc.fa $(SRCROOT)/sample_data3/hits_1M.sam"
-            isEnabled = "YES">
+            argument = "--aux-param-file $(SRCROOT)/sample_data3/out2/params.xprs --frag-len-mean 250 --frag-len-stddev 50 -o $(SRCROOT)/sample_data3/out2 $(SRCROOT)/sample_data3/hox_ucsc.fa $(SRCROOT)/sample_data3/hits_1M.sam"
+            isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "--frag-len-mean 250 --frag-len-stddev 50 -o $(SRCROOT)/sample_data3/out $(SRCROOT)/sample_data3/hox_ucsc.fa $(SRCROOT)/sample_data3/hits_1M.sam"
-            isEnabled = "NO">
+            argument = "--frag-len-mean 250 --frag-len-stddev 50 -o $(SRCROOT)/sample_data3/out2 $(SRCROOT)/sample_data3/hox_ucsc.fa $(SRCROOT)/sample_data3/hits_1M.sam"
+            isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
             argument = "-f 0.75 --no-bias-correct --output-running-reads -o $(SRCROOT)/sample_data2/out $(SRCROOT)/sample_data2/hg19-ucsc_transcripts.fa /Volumes/math.mcb.berkeley.edu/experiments/express/simulation/hg19_ucsc_bias_33/hits.bam"

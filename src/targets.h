@@ -183,7 +183,10 @@ public:
    *        (non-logged).
    * @param libs a pointer to the struct containing pointers to the global
    *        parameter tables (bias_table, mismatch_table, fld).
-   DOC
+   * @param known_bias_boss a pointer to bias parameters provided as input, NULL
+   *        if none given.
+   * @param known_fld a pointer to a fragment length distribution provided as
+   *        input, NULL if none given.
    */
   Target(TargID id, const std::string& name, const std::string& seq,
          bool prob_seq, double alpha, const Librarian* libs,
@@ -423,12 +426,13 @@ class TargetTable {
    * @param seq the sequence of the target.
    * @param prob_seqs a bool that specifies if the sequence is to be treated
    *        probablistically, for RDD detection.
+   * @param known_aux_params a bool that is true iff the auxiliary parameters
+   *        (fld, bias) are provided and need not be learned.
    * @param alpha a double that specifies the initial pseudo-counts for each bp
    *        of the target (non-logged).
    * @param targ_index the target-to-index map from the alignment file.
    * @param targ_lengths the target-to-length map from the alignment file, for
    *        validation.
-   DOC
    */
   void add_targ(const std::string& name, const std::string& seq, bool prob_seqs,
                 bool known_aux_params, double alpha,
@@ -441,13 +445,14 @@ public:
    *        which to load targets.
    * @param prob_seqs a bool that specifies if the sequence is to be treated
    *        probablistically, for RDD detection.
+   * @param known_aux_params a bool that is true iff the auxiliary parameters
+   *        (fld, bias) are provided and need not be learned.
    * @param alpha a double that specifies the intial pseudo-counts for each bp
    *        of the targets (non-logged).
    * @param alpha_map an optional pointer to a map object that specifies
    *        proportional weights of pseudo-counts for each target.
    * @param libs a pointer to the struct containing pointers to the global
    *        parameter tables (bias_table, mismatch_table, fld).
-   DOC
    */
   TargetTable(const std::string& targ_fasta_file, bool prob_seqs,
               bool known_aux_params, double alpha, const AlphaMap* alpha_map,

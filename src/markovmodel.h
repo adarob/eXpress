@@ -83,7 +83,13 @@ class MarkovModel {
    * @param mass the amount to increment the parameters by (logged).
    */
   void update(const Sequence& seq, int left, double mass);
-  //DOC
+  /**
+   * Increments the specified transition by the given mass.
+   * @param p the position in the chain to increment.
+   * @param i the index of the previous state.
+   * @param j the index of the transitioned state.
+   * @param mass the amount to increment by (logged).
+   */
   void update(size_t p, size_t i, size_t j, double mass);
   /**
    * A member function that computes and returns the parameter table indices

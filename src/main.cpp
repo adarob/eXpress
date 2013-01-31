@@ -1,6 +1,3 @@
-// DOC TODO:
-// Disallow others when specified.
-
 /**
  *  main.cpp
  *  express
@@ -382,7 +379,7 @@ void output_results(Librarian& libs, size_t tot_counts, int n=-1) {
       sprintf(buff, "%s/params.xprs", dir.c_str());
     }
     ofstream paramfile(buff);
-    (libs[l].fld)->append_output(paramfile, "Length");
+    (libs[l].fld)->append_output(paramfile, "Fragment");
     if (libs[l].mismatch_table) {
       (libs[l].mismatch_table)->append_output(paramfile);
     }
@@ -766,7 +763,7 @@ int estimation_main() {
     libs[i].map_parser = new MapParser(&libs[i], last_round);
 
     if (param_file_name.size()) {
-      libs[i].fld = new LengthDistribution(param_file_name);
+      libs[i].fld = new LengthDistribution(param_file_name, "Fragment");
       libs[i].mismatch_table = (error_model) ?
                                               new MismatchTable(param_file_name)
                                               : NULL;
