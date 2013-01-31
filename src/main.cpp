@@ -23,7 +23,7 @@
 #include "main.h"
 #include "bundles.h"
 #include "targets.h"
-#include "fld.h"
+#include "lengthdistribution.h"
 #include "fragments.h"
 #include "biascorrection.h"
 #include "mismatchmodel.h"
@@ -69,9 +69,11 @@ double mm_alpha = 1;
 size_t bias_model_order = 3;
 
 // fragment length parameters
-int def_fl_max = 800;
-int def_fl_mean = 200;
-int def_fl_stddev = 80;
+size_t def_fl_max = 800;
+size_t def_fl_mean = 200;
+size_t def_fl_stddev = 80;
+size_t def_fl_kernel_n = 4;
+double def_fl_kernel_p = 0.5;
 
 // option parameters
 bool edit_detect = false;
@@ -146,10 +148,10 @@ bool parse_options(int ac, char ** av) {
   ("help,h", "produce help message")
   ("output-dir,o", po::value<string>(&output_dir)->default_value(output_dir),
    "write all output files to this directory")
-  ("frag-len-mean,m", po::value<int>(&def_fl_mean)->default_value(def_fl_mean),
+  ("frag-len-mean,m", po::value<size_t>(&def_fl_mean)->default_value(def_fl_mean),
    "prior estimate for average fragment length")
   ("frag-len-stddev,s",
-   po::value<int>(&def_fl_stddev)->default_value(def_fl_stddev),
+   po::value<size_t>(&def_fl_stddev)->default_value(def_fl_stddev),
    "prior estimate for fragment length std deviation")
   ("additional-batch,B",
    po::value<size_t>(&additional_batch)->default_value(additional_batch),
@@ -380,7 +382,7 @@ void output_results(Librarian& libs, size_t tot_counts, int n=-1) {
       sprintf(buff, "%s/params.xprs", dir.c_str());
     }
     ofstream paramfile(buff);
-    (libs[l].fld)->append_output(paramfile);
+    (libs[l].fld)->append_output(paramfile, "Length");
     if (libs[l].mismatch_table) {
       (libs[l].mismatch_table)->append_output(paramfile);
     }
@@ -764,14 +766,16 @@ int estimation_main() {
     libs[i].map_parser = new MapParser(&libs[i], last_round);
 
     if (param_file_name.size()) {
-      libs[i].fld = new FLD(param_file_name);
+      libs[i].fld = new LengthDistribution(param_file_name);
       libs[i].mismatch_table = (error_model) ?
                                               new MismatchTable(param_file_name)
                                               : NULL;
       libs[i].bias_table = (bias_correct) ? new BiasBoss(bias_model_order,
                                                          param_file_name):NULL;
     } else {
-      libs[i].fld = new FLD(fld_alpha, def_fl_max, def_fl_mean, def_fl_stddev);
+      libs[i].fld = new LengthDistribution(fld_alpha, def_fl_max, def_fl_mean,
+                                           def_fl_stddev, def_fl_kernel_n,
+                                           def_fl_kernel_p);
       libs[i].mismatch_table = (error_model) ? new MismatchTable(mm_alpha):NULL;
       libs[i].bias_table = (bias_correct) ? new BiasBoss(bias_model_order,
                                                          bias_alpha):NULL;

@@ -21,7 +21,7 @@
 #include "bundles.h"
 #include "sequence.h"
 
-class FLD;
+class LengthDistribution;
 class FragHit;
 class BiasBoss;
 class MismatchTable;
@@ -187,7 +187,7 @@ public:
    */
   Target(TargID id, const std::string& name, const std::string& seq,
          bool prob_seq, double alpha, const Librarian* libs,
-         const BiasBoss* known_bias_boss, const FLD* known_fld);
+         const BiasBoss* known_bias_boss, const LengthDistribution* known_fld);
   /**
    * A member function that locks the target mutex to provide thread safety.
    * The lock should be held by any thread that calls a method of the Target.
@@ -332,14 +332,14 @@ public:
   /**
    * A member function that calculates and returns the estimated effective
    * length of the target (logged) using the average bias.
-   * @param fld an optional pointer to a different FLD than the global one, for
+   * @param fld an optional pointer to a different LengthDistribution than the global one, for
    *        thread-safety.
    * @param with_bias a boolean specifying whether or not the average bias
    *        should be included in the return value.
    * @return The estimated effective length of the target calculated as
    *         \f$ \tilde{l} = \bar{bias}\sum_{l=1}^{L(t)} D(l)(L(t) - l + 1) \f$.
    */
-  double est_effective_length(const FLD* fld = NULL, bool with_bias=true) const;
+  double est_effective_length(const LengthDistribution* fld = NULL, bool with_bias=true) const;
   /**
    * An accessor for the most recently estimated effective length (logged) as
    * calculated by the bias updater thread.
@@ -353,11 +353,11 @@ public:
    * _bias_table based on curent parameters.
    * @param bias_table a pointer to a BiasBoss to use as parameters. Bias not
    *        updated if NULL.
-   * @param fld an optional pointer to a different FLD than the global one,
+   * @param fld an optional pointer to a different LengthDistribution than the global one,
    *        for thread-safety.
    */
   void update_target_bias(const BiasBoss* bias_table = NULL,
-                          const FLD* fld = NULL);
+                          const LengthDistribution* fld = NULL);
   /**
    * An accessor for the _solvable flag.
    * @return a boolean specifying whether or not the target has a unique

@@ -13,7 +13,7 @@
 #include <string>
 #include <vector>
 
-#include "fld.h"
+#include "lengthdistribution.h"
 #include "frequencymatrix.h"
 #include "markovmodel.h"
 

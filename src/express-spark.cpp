@@ -159,7 +159,7 @@ int preprocess_main() {
   lib.bias_table = NULL;
   MapParser map_parser(&lib, false);
   lib.map_parser = &map_parser;
-  lib.fld = new FLD(0, 0, 0, 1);
+  lib.fld = new LengthDistribution(0, 0, 0, 1);
   MarkovModel bias_model(3, 21, 21, 0);
   MismatchTable mismatch_table(0);
   TargetTable targ_table(fasta_filename, 0, 0,

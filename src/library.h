@@ -33,10 +33,10 @@ struct Library {
    */
   MapParser* map_parser;
   /**
-   * A pointer to the FLD (fragment length distribution) object for this
+   * A pointer to the LengthDistribution (fragment length distribution) object for this
    * library.
    */
-  FLD* fld;
+  LengthDistribution* fld;
   /**
    * A pointer to the MismatchTable containing the learned error distribution
    * for this library.

@@ -21,7 +21,7 @@ class MapParser;
 class TargetTable;
 class BiasBoss;
 class MismatchTable;
-class FLD;
+class LengthDistribution;
 
 /**
  * A global bool that is true when processing is still occuring.

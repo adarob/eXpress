@@ -8,7 +8,7 @@
 
 #include "main.h"
 #include "targets.h"
-#include "fld.h"
+#include "lengthdistribution.h"
 #include "fragments.h"
 #include "biascorrection.h"
 #include "mismatchmodel.h"
@@ -24,7 +24,7 @@ using namespace std;
 
 Target::Target(TargID id, const std::string& name, const std::string& seq,
                bool prob_seq, double alpha, const Librarian* libs,
-               const BiasBoss* known_bias_boss, const FLD* known_fld)
+               const BiasBoss* known_bias_boss, const LengthDistribution* known_fld)
    : _libs(libs),
      _id(id),
      _name(name),
@@ -129,7 +129,7 @@ double Target::log_likelihood(const FragHit& frag, bool with_pseudo) const {
   return ll;
 }
 
-double Target::est_effective_length(const FLD* fld, bool with_bias) const {
+double Target::est_effective_length(const LengthDistribution* fld, bool with_bias) const {
   if (!fld) {
     fld = (_libs->curr_lib()).fld;
   }
@@ -154,7 +154,7 @@ double Target::cached_effective_length(bool with_bias) const {
   return _cached_eff_len;
 }
 
-void Target::update_target_bias(const BiasBoss* bias_table, const FLD* fld) {
+void Target::update_target_bias(const BiasBoss* bias_table, const LengthDistribution* fld) {
   if (bias_table) {
     _avg_bias = bias_table->get_target_bias(*_start_bias, *_end_bias, *this);
   }
@@ -285,7 +285,7 @@ void TargetTable::add_targ(const string& name, const string& seq, bool prob_seq,
 
   const Library& lib = _libs->curr_lib();
   const BiasBoss* known_bias_boss = (known_aux_params) ? lib.bias_table : NULL;
-  const FLD* known_fld = (known_aux_params) ? lib.fld : NULL;
+  const LengthDistribution* known_fld = (known_aux_params) ? lib.fld : NULL;
   
   Target* targ = new Target(it->second, name, seq, prob_seq, alpha, _libs,
                             known_bias_boss, known_fld);
@@ -569,7 +569,7 @@ void TargetTable::update_total_fpb(double incr_amt) {
 void TargetTable::asynch_bias_update(boost::mutex* mutex) {
   BiasBoss* bg_table = NULL;
   boost::scoped_ptr<BiasBoss> bias_table;
-  boost::scoped_ptr<FLD> fld;
+  boost::scoped_ptr<LengthDistribution> fld;
 
   bool burned_out_before = false;
 
@@ -582,7 +582,7 @@ void TargetTable::asynch_bias_update(boost::mutex* mutex) {
     {
       boost::unique_lock<boost::mutex> lock(*mutex);
       if(!fld) {
-        fld.reset(new FLD(*(lib.fld)));
+        fld.reset(new LengthDistribution(*(lib.fld)));
       } else {
         *fld = *(lib.fld);
       }
