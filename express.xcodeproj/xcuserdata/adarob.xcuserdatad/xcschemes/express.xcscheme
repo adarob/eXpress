@@ -75,7 +75,7 @@
             isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "--frag-len-mean 250 --frag-len-stddev 50 -o $(SRCROOT)/sample_data3/out2 $(SRCROOT)/sample_data3/hox_ucsc.fa $(SRCROOT)/sample_data3/hits_1M.sam"
+            argument = "--use-tld --frag-len-mean 250 --frag-len-stddev 50 -o $(SRCROOT)/sample_data3/out2 $(SRCROOT)/sample_data3/hox_ucsc.fa $(SRCROOT)/sample_data3/hits_1M.sam"
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument

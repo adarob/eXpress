@@ -128,7 +128,7 @@ void LengthDistribution::add_val(size_t len, double mass) {
   size_t offset = len - _kernel.size()/2;
 
   for (size_t i = 0; i < _kernel.size(); i++) {
-    if (offset > 0 && offset <= max_val()) {
+    if (offset > 0 && offset < _hist.size()) {
       double k_mass = mass + _kernel[i];
       _hist[offset] = log_add(_hist[offset], k_mass);
       _sum = log_add(_sum, log((double)offset)+k_mass);
@@ -169,8 +169,8 @@ double LengthDistribution::mean() const {
 string LengthDistribution::to_string() const {
   string s = "";
   char buffer[50];
-  for(size_t i = 0; i <= max_val()*_bin_size; i++) {
-    sprintf(buffer, "%e\t",sexp(pmf(i/_bin_size)/_bin_size));
+  for(size_t i = 0; i <= max_val(); i++) {
+    sprintf(buffer, "%e\t",sexp(pmf(i)));
     s += buffer;
   }
   s.erase(s.length()-1,1);
