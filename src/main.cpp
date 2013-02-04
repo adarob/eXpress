@@ -526,7 +526,9 @@ void process_fragment(Fragment* frag_p) {
           (lib.bias_table)->update_observed(m, p+lib.mass_n);
         }
         if (lib.tld) {
-          (lib.tld)->add_val(t->length(), p + lib.mass_n - t->rho());
+          (lib.tld)->add_val(t->length(),
+                             p + lib.mass_n + t->mass()
+                             - lib.targ_table->total_fpb());
         }
       }
     }

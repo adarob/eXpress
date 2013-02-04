@@ -52,7 +52,12 @@ void Target::add_mass(double p, double v, double m) {
       _curr_params.ambig_mass = log_add(_curr_params.ambig_mass, p+m);
       _curr_params.tot_ambig_mass = log_add(_curr_params.tot_ambig_mass, m);
     }
-    double p_hat = _curr_params.ambig_mass - _curr_params.tot_ambig_mass;
+    double p_hat = _curr_params.ambig_mass;
+    if (_curr_params.tot_ambig_mass != LOG_0) {
+      p_hat -= _curr_params.tot_ambig_mass;
+    } else {
+      assert(p_hat == LOG_0);
+    }
     assert(p_hat == LOG_0 || p_hat <= LOG_1);
     _curr_params.var_sum = min(log_add(_curr_params.var_sum, v + m),
                                _curr_params.tot_ambig_mass + p_hat

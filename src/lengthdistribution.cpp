@@ -169,8 +169,8 @@ double LengthDistribution::mean() const {
 string LengthDistribution::to_string() const {
   string s = "";
   char buffer[50];
-  for(size_t i = 0; i <= max_val(); i++) {
-    sprintf(buffer, "%e\t",sexp(pmf(i)));
+  for(size_t i = 0; i < _hist.size(); i++) {
+    sprintf(buffer, "%e\t",sexp(pmf(i*_bin_size)));
     s += buffer;
   }
   s.erase(s.length()-1,1);
