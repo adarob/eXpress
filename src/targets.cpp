@@ -136,7 +136,7 @@ double Target::log_likelihood(const FragHit& frag, bool with_pseudo) const {
 
 double Target::est_effective_length(const LengthDistribution* fld, bool with_bias) const {
   if (!fld) {
-    fld = (_libs->curr_lib()).fld;
+    fld = (_libs->curr_lib()).fld.get();
   }
 
   double eff_len = LOG_0;
@@ -289,8 +289,10 @@ void TargetTable::add_targ(const string& name, const string& seq, bool prob_seq,
   }
 
   const Library& lib = _libs->curr_lib();
-  const BiasBoss* known_bias_boss = (known_aux_params) ? lib.bias_table : NULL;
-  const LengthDistribution* known_fld = (known_aux_params) ? lib.fld : NULL;
+  const BiasBoss* known_bias_boss = (known_aux_params) ? lib.bias_table.get()
+                                                       : NULL;
+  const LengthDistribution* known_fld = (known_aux_params) ? lib.fld.get()
+                                                           : NULL;
   
   Target* targ = new Target(it->second, name, seq, prob_seq, alpha, _libs,
                             known_bias_boss, known_fld);

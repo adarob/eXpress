@@ -782,22 +782,24 @@ int estimation_main() {
     
     libs[i].in_file_name = file_names[i];
     libs[i].out_file_name = out_map_file_name;
-    libs[i].map_parser = new MapParser(&libs[i], last_round);
+    libs[i].map_parser.reset(new MapParser(&libs[i], last_round));
 
     if (param_file_name.size()) {
-      libs[i].fld = new LengthDistribution(param_file_name, "Fragment");
-      libs[i].mismatch_table = (error_model) ?
+      libs[i].fld.reset(new LengthDistribution(param_file_name, "Fragment"));
+      libs[i].mismatch_table.reset((error_model) ?
                                               new MismatchTable(param_file_name)
-                                              : NULL;
-      libs[i].bias_table = (bias_correct) ? new BiasBoss(bias_model_order,
-                                                         param_file_name):NULL;
+                                              : NULL);
+      libs[i].bias_table.reset((bias_correct) ? new BiasBoss(bias_model_order,
+                                                         param_file_name):NULL);
     } else {
-      libs[i].fld = new LengthDistribution(fld_alpha, def_fl_max, def_fl_mean,
-                                           def_fl_stddev, def_fl_kernel_n,
-                                           def_fl_kernel_p);
-      libs[i].mismatch_table = (error_model) ? new MismatchTable(mm_alpha):NULL;
-      libs[i].bias_table = (bias_correct) ? new BiasBoss(bias_model_order,
-                                                         bias_alpha):NULL;
+      libs[i].fld.reset(new LengthDistribution(fld_alpha, def_fl_max,
+                                               def_fl_mean, def_fl_stddev,
+                                               def_fl_kernel_n,
+                                               def_fl_kernel_p));
+      libs[i].mismatch_table.reset((error_model) ? new MismatchTable(mm_alpha)
+                                                   :NULL);
+      libs[i].bias_table.reset((bias_correct) ? new BiasBoss(bias_model_order,
+                                                    bias_alpha):NULL);
     }
     if (i > 0 &&
         (libs[i].map_parser->targ_index() != libs[i-1].map_parser->targ_index()
@@ -809,12 +811,15 @@ int estimation_main() {
         }
   }
   
-  TargetTable targ_table(fasta_file_name, edit_detect, param_file_name.size(),
-                         expr_alpha, expr_alpha_map, &libs);
+  boost::shared_ptr<TargetTable> targ_table(
+                                  new TargetTable(fasta_file_name, edit_detect,
+                                                  param_file_name.size(),
+                                                  expr_alpha, expr_alpha_map,
+                                                  &libs));
   size_t max_target_length = 0;
-  for(size_t tid=0; tid < targ_table.size(); tid++) {
+  for(size_t tid=0; tid < targ_table->size(); tid++) {
     max_target_length = max(max_target_length,
-                            targ_table.get_targ(tid)->length());
+                            targ_table->get_targ(tid)->length());
   }
   LengthDistribution* tld = (use_tld) ?
                             new LengthDistribution(tld_alpha, max_target_length,
@@ -823,13 +828,13 @@ int estimation_main() {
                                                    def_tl_kernel_p,
                                                    def_tl_bin_size) : NULL;
   for (size_t i = 0; i < libs.size(); ++i) {
-    libs[i].targ_table = &targ_table;
+    libs[i].targ_table = targ_table;
     libs[i].tld = tld;
     if (bias_correct) {
       libs[i].bias_table->copy_expectations(*(libs.curr_lib().bias_table));
     }
   }
-  double num_targ = (double)targ_table.size();
+  double num_targ = (double)targ_table->size();
   
   if (calc_covar && (double)SSIZE_MAX < num_targ*(num_targ+1)) {
     cerr << "Warning: Your system is unable to represent large enough values "
@@ -855,7 +860,7 @@ int estimation_main() {
     online_additional = false;
   }
   
-  targ_table.round_reset();
+  targ_table->round_reset();
   ff_param = 1.0;
   first_round = false;
   while (!last_round) {
@@ -874,7 +879,7 @@ int estimation_main() {
     if (library_size) {
       tot_counts = library_size;
     }
-    targ_table.round_reset();
+    targ_table->round_reset();
   }
   
 	cerr << "Writing results to file...\n";

@@ -17,6 +17,8 @@
 #include <string>
 #include <vector>
 
+#include <iostream>
+
 class Fragment;
 class ParseThreadSafety;
 class TargetTable;
@@ -106,7 +108,7 @@ class Writer {
   /**
    * Dummy destructor.
    */
-  virtual ~Writer(){};
+  virtual ~Writer(){}
   /**
    * A member function that writes all mappings of the fragment to the ouptut
    * file along with their posterior probabilities in the "XP" field.

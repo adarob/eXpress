@@ -481,7 +481,6 @@ public:
    * An accessor for the (logged) total mass per base, including pseudo-counts.
    * @return The (logged) total mass per base, including pseudo-counts.
    */
-
   double total_fpb() const;
   /**
    * a member function that increments the (logged) total mass per base.

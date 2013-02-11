@@ -10,6 +10,7 @@
 #define express_library_h
 
 #include <vector>
+#include "boost/shared_ptr.hpp"
 
 /**
  * The Library struct holds pointers to the global parameter tables for a set of
@@ -31,11 +32,11 @@ struct Library {
    * A pointer to the MapParser for parsing the input alignment file for this
    * library.
    */
-  MapParser* map_parser;
+  boost::shared_ptr<MapParser> map_parser;
   /**
    * A pointer to the fragment length distribution object for this library.
    */
-  LengthDistribution* fld;
+  boost::shared_ptr<LengthDistribution> fld;
   /**
    * A pointer to the (optional) target length distribution object for this
    * library.
@@ -45,17 +46,17 @@ struct Library {
    * A pointer to the MismatchTable containing the learned error distribution
    * for this library.
    */
-  MismatchTable* mismatch_table;
+  boost::shared_ptr<MismatchTable> mismatch_table;
   /**
    * A pointer to the BiasBoss containing the learned bias distribution for this
    * library. (optional)
    */
-  BiasBoss* bias_table;
+  boost::shared_ptr<BiasBoss> bias_table;
   /**
    * A pointer to the TargetTable containing the target parameters (abundance,
    * effective length) for this library.
    */
-  TargetTable* targ_table;
+  boost::shared_ptr<TargetTable> targ_table;
   /**
    * The number of the next read to be processed (starting at 1).
    */
