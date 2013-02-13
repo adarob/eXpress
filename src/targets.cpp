@@ -44,7 +44,8 @@ Target::Target(TargID id, const std::string& name, const std::string& seq,
   _init_pseudo_mass = _cached_eff_len + _alpha;
 }
 
-void Target::add_mass(double p, double v, double m) {
+void Target::add_hit(const FragHit& hit, double v, double m) {
+  double p = hit.params()->posterior;
   _curr_params.mass = log_add(_curr_params.mass, p+m);
   double mass_with_pseudo = log_add(_ret_params->mass, _init_pseudo_mass);
   if (p != LOG_1 || v != LOG_0) {
@@ -67,7 +68,10 @@ void Target::add_mass(double p, double v, double m) {
                                 mass_with_pseudo + log_sub(_bundle->mass(),
                                                       mass_with_pseudo));
   }
-  
+  if (_curr_params.haplotype) {
+    _curr_params.haplotype->update_mass(this, hit.frag_name(),
+                                        hit.params()->align_likelihood, p);
+  }
   (_libs->curr_lib()).targ_table->update_total_fpb(m - _cached_eff_len);
 }
 
@@ -98,24 +102,35 @@ double Target::mass_var() const {
   return _ret_params->mass_var;
 }
 
-double Target::log_likelihood(const FragHit& frag, bool with_pseudo) const {
-  double ll = 0;
+double Target::sample_likelihood(bool with_pseudo,
+                                 const vector<const Target*>* neighbors) const {
+  const Library& lib = _libs->curr_lib();
+
+  double ll = LOG_1;
+  double tot_mass = mass(with_pseudo);
+  double tot_eff_len = cached_effective_length(lib.bias_table);
+  if (neighbors) {
+    foreach (const Target* neighbor, *neighbors) {
+      tot_mass = log_add(tot_mass, neighbor->mass(with_pseudo));
+      tot_eff_len = log_add(tot_eff_len,
+                            neighbor->cached_effective_length(lib.bias_table));
+    }
+  }
+  ll += tot_mass - tot_eff_len;
+  return ll;
+}
+
+double Target::align_likelihood(const FragHit& frag) const {
+
+  const Library& lib = _libs->curr_lib();
+
+  double ll = LOG_1;
 
   const PairStatus ps = frag.pair_status();
-  const Library& lib = _libs->curr_lib();
 
   if (lib.mismatch_table) {
     ll += (lib.mismatch_table)->log_likelihood(frag);
   }
-
-  double tot_mass = mass(with_pseudo);
-  double tot_eff_len = cached_effective_length(lib.bias_table);
-  foreach (const Target* neighbor, *frag.neighbors()) {
-    tot_mass = log_add(tot_mass, neighbor->mass(with_pseudo));
-    tot_eff_len = log_add(tot_eff_len,
-                          neighbor->cached_effective_length(lib.bias_table));
-  }
-  ll += tot_mass - tot_eff_len;
 
   if (lib.bias_table) {
     if (ps != RIGHT_ONLY) {
@@ -134,7 +149,8 @@ double Target::log_likelihood(const FragHit& frag, bool with_pseudo) const {
   return ll;
 }
 
-double Target::est_effective_length(const LengthDistribution* fld, bool with_bias) const {
+double Target::est_effective_length(const LengthDistribution* fld,
+                                    bool with_bias) const {
   if (!fld) {
     fld = (_libs->curr_lib()).fld.get();
   }
@@ -159,13 +175,77 @@ double Target::cached_effective_length(bool with_bias) const {
   return _cached_eff_len;
 }
 
-void Target::update_target_bias(const BiasBoss* bias_table, const LengthDistribution* fld) {
+void Target::update_target_bias(const BiasBoss* bias_table,
+                                const LengthDistribution* fld) {
   if (bias_table) {
     _avg_bias = bias_table->get_target_bias(*_start_bias, *_end_bias, *this);
   }
   assert(!isnan(_avg_bias) && !isinf(_avg_bias));
   _cached_eff_len = est_effective_length(fld, false);
 }
+
+void HaplotypeHandler::commit_buffer() {
+  if (_committed) {
+    return;
+  }
+  
+  if (_align_likelihoods_buff[0] != _align_likelihoods_buff[1]) {
+    _haplo_taus.increment(0, 0, _masses_buff[0]);
+    _haplo_taus.increment(0, 1, _masses_buff[1]);
+  }
+  
+  _align_likelihoods_buff[0] = LOG_0;
+  _align_likelihoods_buff[1] = LOG_0;
+  _masses_buff[0] = LOG_0;
+  _masses_buff[1] = LOG_0;
+  _committed = true;
+}
+
+HaplotypeHandler::HaplotypeHandler(const Target* targ1, const Target* targ2,
+                                  double alpha)
+    : _targets(vector<const Target*>(2)),
+      _haplo_taus(1, 2, alpha),
+      _frag_name_buff(""),
+      _align_likelihoods_buff(vector<double>(2, LOG_0)),
+      _masses_buff(vector<double>(2, LOG_0)),
+      _committed(false) {
+  _targets[0] = targ1;
+  _targets[1] = targ2;
+}
+
+double HaplotypeHandler::get_mass(const Target* targ, bool with_pseudo) {
+  commit_buffer();
+  
+  TargID i = (targ == _targets[1]);
+  assert(_targets[i]->id() == targ->id());
+  
+  double total_mass = log_add(_targets[0]->_ret_params->mass,
+                              _targets[1]->_ret_params->mass);
+  if (with_pseudo){
+    total_mass = log_add(total_mass, _targets[0]->cached_effective_length());
+    total_mass = log_add(total_mass, _targets[1]->cached_effective_length());
+  }
+  
+  return _haplo_taus(0, i) + total_mass;
+}
+
+void HaplotypeHandler::update_mass(const Target* targ, const string& frag_name,
+                                   double align_likelihood, double mass) {
+  if (frag_name != _frag_name_buff) {
+    commit_buffer();
+    _frag_name_buff = frag_name;
+  } else {
+    assert(!_committed);
+  }
+  
+  TargID i = (targ == _targets[1]);
+  assert(_targets[i]->id() == targ->id());
+
+  _align_likelihoods_buff[i] = log_add(_align_likelihoods_buff[i],
+                                       align_likelihood);
+  _masses_buff[i] = log_add(_masses_buff[i], mass);
+}
+
 
 TargetTable::TargetTable(const string& targ_fasta_file, bool prob_seqs,
                          bool known_aux_params, double alpha,

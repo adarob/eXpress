@@ -10,6 +10,7 @@
 #define TRANSCRIPTS_H
 
 #include <boost/scoped_ptr.hpp>
+#include "boost/shared_ptr.hpp"
 #include <boost/thread.hpp>
 #include <boost/unordered_map.hpp>
 #include <iostream>
@@ -26,6 +27,7 @@ class FragHit;
 class BiasBoss;
 class MismatchTable;
 class Librarian;
+class HaplotypeHandler;
 
 /**
  * The RoundParams struct stores the target parameters unique to a given round
@@ -59,6 +61,8 @@ struct RoundParams {
    * the assignments.
    */
   double var_sum;
+  // DOC
+  boost::shared_ptr<HaplotypeHandler> haplotype;
   /**
    * RoundParams constructor sets initial values for parameters
    */
@@ -80,6 +84,7 @@ typedef size_t TargID;
  *  @copyright Artistic License 2.0
  **/
 class Target {
+  friend HaplotypeHandler;
   /**
    * A private pointer to the struct containing pointers to the global
    * parameter tables (bias_table, mismatch_table, fld).
@@ -139,6 +144,8 @@ class Target {
    * A private pointer to the Bundle this Target is a member of.
    */
   Bundle* _bundle;
+  //DOC
+  boost::shared_ptr<HaplotypeHandler> _haplotype;
   /**
    * A private mutex to provide thread-safety for variables with threaded
    * update.
@@ -195,11 +202,11 @@ public:
    * A member function that locks the target mutex to provide thread safety.
    * The lock should be held by any thread that calls a method of the Target.
    */
-  void lock() { _mutex.lock(); }
+  void lock() const { _mutex.lock(); }
   /**
    * A member function that unlocks the target mutex.
    */
-  void unlock() { _mutex.unlock(); }
+  void unlock() const { _mutex.unlock(); }
   /**
    * An accessor for the target name.
    * @return string containing target name.
@@ -231,6 +238,10 @@ public:
       return _seq_r;
     }
     return _seq_f;
+  }
+  // DOC
+  void haplotype(boost::shared_ptr<HaplotypeHandler> hh) {
+    _curr_params.haplotype = hh;
   }
   /**
    * An accessor for the length of the target sequence.
@@ -305,8 +316,9 @@ public:
    *        the probability p.
    * @param mass a double specifying the (logged) mass of the fragment being
    *        mapped.
+   DOC
    */
-  void add_mass(double p, double v, double mass);
+  void add_hit(const FragHit& h, double v, double mass);
   /**
    * A member function that increases the count of fragments mapped to this
    * target.
@@ -321,6 +333,9 @@ public:
     _tot_counts += incr_amt;
     _uniq_counts += incr_amt * uniq;
   }
+  //DOC
+  double sample_likelihood(bool with_pseudo,
+                           const std::vector<const Target*>* neighbors = NULL) const;
   /**
    * A member function that returns (a value proportional to) the log likelihood
    * the given fragment originated from this target.
@@ -330,19 +345,21 @@ public:
    *        included in the calculation.
    * @return A value proportional to the log likelihood the given fragment
    *         originated from this target.
+   DOC
    */
-  double log_likelihood(const FragHit& frag, bool with_pseudo) const;
+  double align_likelihood(const FragHit& frag) const;
   /**
    * A member function that calculates and returns the estimated effective
    * length of the target (logged) using the average bias.
-   * @param fld an optional pointer to a different LengthDistribution than the global one, for
-   *        thread-safety.
+   * @param fld an optional pointer to a different LengthDistribution than the
+   *       global one, for thread-safety.
    * @param with_bias a boolean specifying whether or not the average bias
    *        should be included in the return value.
    * @return The estimated effective length of the target calculated as
    *         \f$ \tilde{l} = \bar{bias}\sum_{l=1}^{L(t)} D(l)(L(t) - l + 1) \f$.
    */
-  double est_effective_length(const LengthDistribution* fld = NULL, bool with_bias=true) const;
+  double est_effective_length(const LengthDistribution* fld = NULL,
+                              bool with_bias=true) const;
   /**
    * An accessor for the most recently estimated effective length (logged) as
    * calculated by the bias updater thread.
@@ -356,8 +373,8 @@ public:
    * _bias_table based on curent parameters.
    * @param bias_table a pointer to a BiasBoss to use as parameters. Bias not
    *        updated if NULL.
-   * @param fld an optional pointer to a different LengthDistribution than the global one,
-   *        for thread-safety.
+   * @param fld an optional pointer to a different LengthDistribution than the
+   *        global one, for thread-safety.
    */
   void update_target_bias(const BiasBoss* bias_table = NULL,
                           const LengthDistribution* fld = NULL);
@@ -373,8 +390,25 @@ public:
    * @param a boolean specifying whether or not the target has a unique solution
    *        for its abundance estimate.
    */
-
   void solvable(bool s) { _solvable = s; }
+};
+
+// DOC
+class HaplotypeHandler {
+  std::vector<const Target*> _targets;
+  FrequencyMatrix<double> _haplo_taus;
+  
+  std::string _frag_name_buff;
+  std::vector<double> _align_likelihoods_buff;
+  std::vector<double> _masses_buff;
+  bool _committed;
+  
+  void commit_buffer();
+ public:
+  HaplotypeHandler(const Target* targ1, const Target* targ2, double alpha);
+  double get_mass(const Target* targ, bool with_pseudo);
+  void update_mass(const Target* targ, const std::string& frag_name,
+                   double align_likelihood, double mass);
 };
 
 typedef std::vector<Target*> TransMap;

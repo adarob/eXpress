@@ -122,6 +122,12 @@ struct ReadHit {
   int mate_l;
 };
 
+struct HitParams {
+  double align_likelihood;
+  double full_likelihood;
+  double posterior;
+};
+
 /**
  * The FragHit struct stores the information for a single fragment alignment.
  *  @author    Adam Roberts
@@ -144,23 +150,18 @@ class FragHit {
    */
   boost::scoped_ptr<ReadHit> _read_r;
   /**
-   * Private double storing the (non-logged) posterior probability of the
-   * mapping after processing. The posteriors of all mappings for a given
-   * Fragment should sum to 1.
-   */
-  double _probability;
-  /**
    * A private vector storing pointers to "neighboring" targets. This is being
    * used for an experimental feature and may be removed without notice.
    */
-  std::vector<Target*> _neighbors;
+  std::vector<const Target*> _neighbors;
+  HitParams _params;
   
 public:
   /**
    * FragHit constructor for single-end read.
    * @param h pointer to the ReadHit struct for the single-end read.
    */
-  FragHit(ReadHit* h) : _target(NULL), _probability(LOG_0){
+  FragHit(ReadHit* h) : _target(NULL) {
     if (h->reversed) {
       _read_r.reset(h);
     } else {
@@ -172,8 +173,7 @@ public:
    * @param l pointer to the ReadHit struct for the upstream (left) read.
    * @param r pointer to the ReadHit struct for the downstream (right) read.
    */
-  FragHit(ReadHit* l, ReadHit* r) : _target(NULL), _read_l(l), _read_r(r),
-                                    _probability(LOG_0) {
+  FragHit(ReadHit* l, ReadHit* r) : _target(NULL), _read_l(l), _read_r(r) {
     assert(!l->reversed);
     assert(r->reversed);
     assert(l->name == r->name);
@@ -181,21 +181,17 @@ public:
     assert(l->left <= r->left);
     assert(l->first != r->first);
   }
-  /**
-   * Access for the (non-logged) probability of the alignment after processing.
-   * @return The probability of this alignment.
-   */
-  double probability() const {
-    return _probability;
+  //DOC
+  std::string frag_name() const {
+    if (_read_l) {
+      return _read_l->name;
+    }
+    assert(_read_r);
+    return _read_r->name;
   }
-  /**
-   * Mutator for the (non-logged) probability of the alignment. To be set when
-   * processing.
-   * @param p the log probability to set.
-   */
-  void probability(double p) {
-    _probability = p;
-  }
+  //DOC
+  HitParams* params() { return &_params; }
+  const HitParams* params() const { return &_params; }
   /**
    * Accessor for a pointer to the Target object the fragment is aligned to.
    * @return A pointer to the Target aligned to.
@@ -215,12 +211,12 @@ public:
    * Experimental.
    * @return A pointer to the vector of neighbors.
    */
-  const std::vector<Target*>* neighbors() const { return &_neighbors; }
+  const std::vector<const Target*>* neighbors() const { return &_neighbors; }
   /**
    * Mutator for a vector of neighbors to the target. Experimental.
    * @param neighbors a vector of neighbors to the target.
    */
-  void neighbors(const std::vector<Target*>& neighbors) {
+  void neighbors(const std::vector<const Target*>& neighbors) {
     _neighbors = neighbors;
   }
   /**

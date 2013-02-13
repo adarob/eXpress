@@ -38,11 +38,6 @@ struct Library {
    */
   boost::shared_ptr<LengthDistribution> fld;
   /**
-   * A pointer to the (optional) target length distribution object for this
-   * library.
-   */
-  LengthDistribution* tld;
-  /**
    * A pointer to the MismatchTable containing the learned error distribution
    * for this library.
    */

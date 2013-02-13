@@ -183,7 +183,7 @@ void MapParser::threaded_parse(ParseThreadSafety* thread_safety_p,
 
       // Add num_neighbors targets on either side to the neighbors list.
       // Used for experimental feature.
-      vector<Target*> neighbors;
+      vector<const Target*> neighbors;
       for (TargID j = 1; j <= num_neighbors;  j++) {
         if (j <= m.target_id()) {
           neighbors.push_back(targ_table.get_targ(m.target_id() - j));
@@ -561,14 +561,14 @@ void BAMWriter::write_fragment(Fragment& f) {
   } else {
     double total = 0;
     foreach(FragHit* hit, f.hits()) {
-      total += hit->probability();
+      total += sexp(hit->params()->posterior);
       PairStatus ps = hit->pair_status();
       if (ps != RIGHT_ONLY) {
-        hit->left_read()->bam.AddTag("XP","f",(float)hit->probability());
+        hit->left_read()->bam.AddTag("XP","f",(float)sexp(hit->params()->posterior));
         _writer->SaveAlignment(hit->left_read()->bam);
       }
       if (ps != LEFT_ONLY) {
-        hit->right_read()->bam.AddTag("XP","f",(float)hit->probability());
+        hit->right_read()->bam.AddTag("XP","f",(float)sexp(hit->params()->posterior));
         _writer->SaveAlignment(hit->right_read()->bam);
       }
     }
@@ -598,15 +598,15 @@ void SAMWriter::write_fragment(Fragment& f) {
   } else {
     double total = 0;
     foreach(const FragHit* hit, f.hits()) {
-      total += hit->probability();
+      total += sexp(hit->params()->posterior);
       PairStatus ps = hit->pair_status();
       if (ps != RIGHT_ONLY) {
-        *_out << hit->left_read()->sam << " XP:f:" << (float)hit->probability()
-              << endl;
+        *_out << hit->left_read()->sam << " XP:f:"
+              << (float)sexp(hit->params()->posterior) << endl;
       }
       if (ps != LEFT_ONLY) {
-        *_out << hit->right_read()->sam << " XP:f:" << (float)hit->probability()
-              << endl;
+        *_out << hit->right_read()->sam << " XP:f:"
+              << (float)sexp(hit->params()->posterior) << endl;
       }
     }
     assert(approx_eq(total, 1.0));

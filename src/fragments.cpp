@@ -74,9 +74,9 @@ void Fragment::add_open_mate(ReadHit* nm) {
 
 const FragHit* Fragment::sample_hit() const {
   vector<double> probs(_frag_hits.size());
-  probs[0] = _frag_hits[0]->probability();
+  probs[0] = sexp(_frag_hits[0]->params()->posterior);
   for (size_t i=1; i < _frag_hits.size(); ++i) {
-    probs[i] = probs[i-1] + _frag_hits[i]->probability();
+    probs[i] = probs[i-1] + sexp(_frag_hits[i]->params()->posterior);
   }
 
   double r = rand()/double(RAND_MAX)*probs.back();

@@ -60,7 +60,6 @@ string param_file_name = "";
 // intial pseudo-count parameters (non-logged)
 double expr_alpha = .005;
 double fld_alpha = 1;
-double tld_alpha = 1;
 double bias_alpha = 1;
 double mm_alpha = 1;
 
@@ -72,14 +71,6 @@ size_t def_fl_mean = 200;
 size_t def_fl_stddev = 80;
 size_t def_fl_kernel_n = 4;
 double def_fl_kernel_p = 0.5;
-
-// target length parameters
-bool use_tld = false;
-size_t def_tl_mean = 0;
-size_t def_tl_stddev = 0;
-size_t def_tl_kernel_n = 2000;
-double def_tl_kernel_p = 0.5;
-size_t def_tl_bin_size = 100;
 
 // option parameters
 bool edit_detect = false;
@@ -209,7 +200,6 @@ bool parse_options(int ac, char ** av) {
   hidden.add_options()
   ("num-threads,p", po::value<size_t>(&num_threads)->default_value(num_threads),
    "number of threads (>= 2)")
-  ("use-tld", "")
   ("edit-detect","")
   ("single-round", "")
   ("output-running-rounds", "")
@@ -297,7 +287,6 @@ bool parse_options(int ac, char ** av) {
     return 1;
   }
   
-  use_tld = vm.count("use-tld");
   edit_detect = vm.count("edit-detect");
   calc_covar = vm.count("calc-covar");
   bias_correct = !(vm.count("no-bias-correct"));
@@ -391,9 +380,6 @@ void output_results(Librarian& libs, size_t tot_counts, int n=-1) {
     }
     ofstream paramfile(buff);
     (libs[l].fld)->append_output(paramfile, "Fragment");
-    if (libs[l].tld) {
-      (libs[l].tld)->append_output(paramfile, "Target");
-    }
     if (libs[l].mismatch_table) {
       (libs[l].mismatch_table)->append_output(paramfile);
     }
@@ -421,7 +407,6 @@ void process_fragment(Fragment* frag_p) {
 
   assert(frag.num_hits());
 
-  vector<double> likelihoods(frag.num_hits(), 0);
   vector<double> masses(frag.num_hits(), 0);
   vector<double> variances(frag.num_hits(), 0);
   double total_likelihood = LOG_0;
@@ -430,8 +415,8 @@ void process_fragment(Fragment* frag_p) {
   size_t num_solvable = 0;
 
   // set of locked targets
-  boost::unordered_set<Target*> targ_set;
-  boost::unordered_set<Target*> locked_set;
+  boost::unordered_set<const Target*> targ_set;
+  boost::unordered_set<const Target*> locked_set;
 
   // Update bundles and merge in first loop
   Bundle* bundle = frag.hits()[0]->target()->bundle();
@@ -445,7 +430,7 @@ void process_fragment(Fragment* frag_p) {
   // calculate marginal likelihoods and lock targets.
   if (frag.num_hits()>1) {
     for (size_t i = 0; i < frag.num_hits(); ++i) {
-      const FragHit& m = *frag.hits()[i];
+      FragHit& m = *frag.hits()[i];
       Target* t = m.target();
       
       bundle = lib.targ_table->merge_bundles(bundle, t->bundle());
@@ -456,29 +441,32 @@ void process_fragment(Fragment* frag_p) {
       }
       targ_set = locked_set;
       // lock neighbors
-      foreach (Target* neighbor, *m.neighbors()) {
+      foreach (const Target* neighbor, *m.neighbors()) {
         if (locked_set.count(neighbor) == 0) {
           neighbor->lock();
           locked_set.insert(neighbor);
         }
       }
-      likelihoods[i] = t->log_likelihood(m, first_round);
-      if (lib.tld) {
-        likelihoods[i] += lib.tld->pmf(t->length());
-      }
+      m.params()->align_likelihood = t->align_likelihood(m);
+      m.params()->full_likelihood = m.params()->align_likelihood +
+                                    t->sample_likelihood(first_round,
+                                                         m.neighbors());
       masses[i] = t->mass();
       variances[i] = t->mass_var();
-      total_likelihood = log_add(total_likelihood, likelihoods[i]);
+      total_likelihood = log_add(total_likelihood, m.params()->full_likelihood);
       total_mass = log_add(total_mass, masses[i]);
       total_variance = log_add(total_variance, variances[i]);
       num_solvable += t->solvable();
     }
   } else {
-    Target* t = frag.hits()[0]->target();
+    FragHit& m = *frag.hits()[0];
+    Target* t = m.target();
     t->lock();
     locked_set.insert(t);
-    total_likelihood = likelihoods[0];
-    foreach (Target* neighbor, *frag.hits()[0]->neighbors()) {
+    total_likelihood = 0;
+    m.params()->align_likelihood = 0;
+    m.params()->full_likelihood = 0;
+    foreach (const Target* neighbor, *frag.hits()[0]->neighbors()) {
       if (targ_set.count(neighbor) == 0) {
         neighbor->lock();
         locked_set.insert(neighbor);
@@ -493,19 +481,16 @@ void process_fragment(Fragment* frag_p) {
     FragHit& m = *frag[i];
     Target* t  = m.target();
     
-    double p = likelihoods[i]-total_likelihood;
+    double p = m.params()->full_likelihood-total_likelihood;
+    m.params()->posterior = p;
     if (targ_set.size() > 1) {
       double v = log_add(variances[i] - 2*total_mass,
                   total_variance + 2*masses[i] - 4*total_mass);
-      t->add_mass(p, v, mass_n);
+      t->add_hit(m, v, mass_n);
     } else if (i == 0) {
-      t->add_mass(LOG_1, LOG_0, mass_n);
+      t->add_hit(m, LOG_0, mass_n);
     }
     assert(!(isnan(p)||isinf(p)));
-
-    m.probability(sexp(p));
-
-    assert(!isinf(m.probability()));
 
     // update parameters
     if (first_round) {
@@ -525,17 +510,12 @@ void process_fragment(Fragment* frag_p) {
         if (lib.bias_table) {
           (lib.bias_table)->update_observed(m, p+lib.mass_n);
         }
-        if (lib.tld) {
-          (lib.tld)->add_val(t->length(),
-                             p + lib.mass_n + t->mass()
-                             - lib.targ_table->total_fpb());
-        }
       }
     }
     if (calc_covar && (last_round || online_additional)) {
       for (size_t j = i+1; j < frag.num_hits(); ++j) {
         const FragHit& m2 = *frag.hits()[j];
-        double p2 = likelihoods[j]-total_likelihood;
+        double p2 = m2.params()->full_likelihood-total_likelihood;
         if (sexp(p2) == 0) {
           continue;
         }
@@ -548,7 +528,7 @@ void process_fragment(Fragment* frag_p) {
     }
   }
 
-  foreach (Target* t, locked_set) {
+  foreach (const Target* t, locked_set) {
     t->unlock();
   }
 }
@@ -821,15 +801,9 @@ int estimation_main() {
     max_target_length = max(max_target_length,
                             targ_table->get_targ(tid)->length());
   }
-  LengthDistribution* tld = (use_tld) ?
-                            new LengthDistribution(tld_alpha, max_target_length,
-                                                   def_tl_mean, def_tl_stddev,
-                                                   def_tl_kernel_n,
-                                                   def_tl_kernel_p,
-                                                   def_tl_bin_size) : NULL;
+
   for (size_t i = 0; i < libs.size(); ++i) {
     libs[i].targ_table = targ_table;
-    libs[i].tld = tld;
     if (bias_correct) {
       libs[i].bias_table->copy_expectations(*(libs.curr_lib().bias_table));
     }
