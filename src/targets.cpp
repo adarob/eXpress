@@ -202,7 +202,7 @@ void HaplotypeHandler::commit_buffer() {
 }
 
 HaplotypeHandler::HaplotypeHandler(const Target* targ1, const Target* targ2,
-                                  double alpha)
+                                  double alpha=1)
     : _targets(vector<const Target*>(2)),
       _haplo_taus(1, 2, alpha),
       _frag_name_buff(""),
@@ -247,10 +247,9 @@ void HaplotypeHandler::update_mass(const Target* targ, const string& frag_name,
 }
 
 
-TargetTable::TargetTable(const string& targ_fasta_file, bool prob_seqs,
-                         bool known_aux_params, double alpha,
-                         const AlphaMap* alpha_map,
-                         const Librarian* libs)
+TargetTable::TargetTable(string targ_fasta_file, string haplotype_file,
+                         bool prob_seqs, bool known_aux_params, double alpha,
+                         const AlphaMap* alpha_map, const Librarian* libs)
     :  _libs(libs) {
   cerr << "Loading target sequences";
   const Library& lib = _libs->curr_lib();
@@ -270,9 +269,9 @@ TargetTable::TargetTable(const string& targ_fasta_file, bool prob_seqs,
   double alpha_renorm = 1.0;
   if (alpha_map) {
     double alpha_total = 0;
-    for(AlphaMap::const_iterator it = alpha_map->begin();
-        it != alpha_map->end(); ++it) {
-            alpha_total += it->second;
+    for (AlphaMap::const_iterator it = alpha_map->begin();
+      it != alpha_map->end(); ++it) {
+        alpha_total += it->second;
     }
     alpha_renorm = (alpha * alpha_map->size())/alpha_total;
   }
@@ -342,6 +341,33 @@ TargetTable::TargetTable(const string& targ_fasta_file, bool prob_seqs,
       exit(1);
     }
   }
+  
+  // Load haplotype information, if provided
+  if (haplotype_file.size()) {
+    infile.open(haplotype_file.c_str());
+    if (infile.is_open()) {
+      while (infile.good()) {
+        getline(infile, line, '\n');
+        size_t split = line.find(",");
+        if (split == string::npos) {
+          cerr << "ERROR: Haplotype file not formatted properly.";
+          exit(1);
+        }
+        Target* targ1 = _targ_map[atoi(line.substr(0, split).c_str())];
+        Target* targ2 = _targ_map[atoi(line.substr(split+1).c_str())];
+        _haplotype_pairs.insert(make_pair(targ1, targ2));
+        
+        if (!alpha_map) {
+          targ1->alpha(alpha/2);
+          targ2->alpha(alpha/2);
+        }
+        boost::shared_ptr<HaplotypeHandler> handler(new HaplotypeHandler(targ1,
+                                                                         targ2));
+        targ1->haplotype(handler);
+        targ2->haplotype(handler);
+      }
+    }
+  }
 }
 
 TargetTable::~TargetTable() {
@@ -401,6 +427,12 @@ void TargetTable::round_reset() {
   foreach(Target* targ, _targ_map) {
     targ->round_reset();
     targ->bundle()->incr_mass(targ->mass(false));
+  }
+  foreach(HaplotypePair hap, _haplotype_pairs) {
+    boost::shared_ptr<HaplotypeHandler> handler(new HaplotypeHandler(hap.first,
+                                                                     hap.second));
+    hap.first->haplotype(handler);
+    hap.second->haplotype(handler);
   }
 }
 

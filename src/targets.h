@@ -84,7 +84,7 @@ typedef size_t TargID;
  *  @copyright Artistic License 2.0
  **/
 class Target {
-  friend HaplotypeHandler;
+  friend class HaplotypeHandler;
   /**
    * A private pointer to the struct containing pointers to the global
    * parameter tables (bias_table, mismatch_table, fld).
@@ -243,6 +243,8 @@ public:
   void haplotype(boost::shared_ptr<HaplotypeHandler> hh) {
     _curr_params.haplotype = hh;
   }
+  //DOC
+  void alpha(double alpha) { _alpha = alpha; }
   /**
    * An accessor for the length of the target sequence.
    * @return The target sequence length.
@@ -411,10 +413,13 @@ class HaplotypeHandler {
                    double align_likelihood, double mass);
 };
 
+
 typedef std::vector<Target*> TransMap;
 typedef boost::unordered_map<std::string, size_t> TransIndex;
 typedef boost::unordered_map<size_t, float> CovarMap;
 typedef boost::unordered_map<std::string, double> AlphaMap;
+typedef std::pair<Target*, Target*> HaplotypePair;
+typedef boost::unordered_set<HaplotypePair> HaplotypeSet;
 
 /**
  * The TargetTable class is used to keep track of the Target objects for a run.
@@ -444,6 +449,8 @@ class TargetTable {
    * though they are negative.
    */
   CovarTable _covar_table;
+  // DOC
+  HaplotypeSet _haplotype_pairs;
   /**
    * A private double that stores the (logged) total mass per base
    * (including pseudo-counts) to allow for rho calculations.
@@ -487,10 +494,11 @@ public:
    *        proportional weights of pseudo-counts for each target.
    * @param libs a pointer to the struct containing pointers to the global
    *        parameter tables (bias_table, mismatch_table, fld).
+   DOC
    */
-  TargetTable(const std::string& targ_fasta_file, bool prob_seqs,
-              bool known_aux_params, double alpha, const AlphaMap* alpha_map,
-              const Librarian* libs);
+  TargetTable(std::string targ_fasta_file, std::string haplotype_file,
+              bool prob_seqs, bool known_aux_params, double alpha,
+              const AlphaMap* alpha_map, const Librarian* libs);
   /**
    * TargetTable Destructor. Deletes all of the target objects in the table.
    */

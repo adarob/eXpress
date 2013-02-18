@@ -56,6 +56,7 @@ string output_dir = ".";
 string fasta_file_name = "";
 string in_map_file_names = "";
 string param_file_name = "";
+string haplotype_file_name = "";
 
 // intial pseudo-count parameters (non-logged)
 double expr_alpha = .005;
@@ -150,6 +151,9 @@ bool parse_options(int ac, char ** av) {
   ("frag-len-stddev,s",
    po::value<size_t>(&def_fl_stddev)->default_value(def_fl_stddev),
    "prior estimate for fragment length std deviation")
+  ("haplotype-file,H",
+   po::value<string>(&haplotype_file_name)->default_value(haplotype_file_name),
+   "path to a file containing haplotype pairs")
   ("additional-batch,B",
    po::value<size_t>(&additional_batch)->default_value(additional_batch),
    "number of additional batch EM rounds after initial online round")
@@ -792,7 +796,9 @@ int estimation_main() {
   }
   
   boost::shared_ptr<TargetTable> targ_table(
-                                  new TargetTable(fasta_file_name, edit_detect,
+                                  new TargetTable(fasta_file_name,
+                                                  haplotype_file_name,
+                                                  edit_detect,
                                                   param_file_name.size(),
                                                   expr_alpha, expr_alpha_map,
                                                   &libs));

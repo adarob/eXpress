@@ -157,23 +157,22 @@ int preprocess_main() {
   lib.in_file_name = in_map_filename;
   lib.out_file_name = "";
   lib.bias_table = NULL;
-  MapParser map_parser(&lib, false);
-  lib.map_parser = &map_parser;
-  lib.fld = new LengthDistribution(0, 0, 0, 1, 2, 0);
+
+  lib.map_parser.reset(new MapParser (&lib, false));
+  lib.fld.reset(new LengthDistribution(0, 0, 0, 1, 2, 0));
   MarkovModel bias_model(3, 21, 21, 0);
   MismatchTable mismatch_table(0);
-  TargetTable targ_table(fasta_filename, 0, 0,
-                         NULL, NULL, &libs);
-  lib.targ_table = &targ_table;
+  lib.targ_table.reset(new TargetTable (fasta_filename, 0, 0, NULL, NULL,
+                                        &libs);
   
   cerr << "Converting targets to Protocol Buffers...\n";
   fstream targ_out(target_output.c_str(),
                    ios::out | ios::trunc);
   string out_buff;
   proto::Target target_proto;
-  for (TargID id = 0; id < targ_table.size(); ++id) {
+  for (TargID id = 0; id < lib.targ_table->size(); ++id) {
     target_proto.Clear();
-    Target& targ = *targ_table.get_targ(id);
+    Target& targ = *lib.targ_table->get_targ(id);
     target_proto.set_name(targ.name());
     target_proto.set_id((unsigned int)targ.id());
     target_proto.set_length((unsigned int)targ.length());
