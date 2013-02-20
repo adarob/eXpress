@@ -353,8 +353,8 @@ TargetTable::TargetTable(string targ_fasta_file, string haplotype_file,
           cerr << "ERROR: Haplotype file not formatted properly.";
           exit(1);
         }
-        Target* targ1 = _targ_map[atoi(line.substr(0, split).c_str())];
-        Target* targ2 = _targ_map[atoi(line.substr(split+1).c_str())];
+        Target* targ1 = _targ_map[targ_index.at(line.substr(0, split))];
+        Target* targ2 = _targ_map[targ_index.at(line.substr(split+1))];
         _haplotype_pairs.insert(make_pair(targ1, targ2));
         
         if (!alpha_map) {

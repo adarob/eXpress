@@ -156,14 +156,13 @@ int preprocess_main() {
   Library& lib = libs[0];
   lib.in_file_name = in_map_filename;
   lib.out_file_name = "";
-  lib.bias_table.reset(NULL);
 
   lib.map_parser.reset(new MapParser (&lib, false));
   lib.fld.reset(new LengthDistribution(0, 0, 0, 1, 2, 0));
   MarkovModel bias_model(3, 21, 21, 0);
   MismatchTable mismatch_table(0);
   lib.targ_table.reset(new TargetTable (fasta_filename, "", 0, 0, NULL, NULL,
-                                        &libs);
+                                        &libs));
   
   cerr << "Converting targets to Protocol Buffers...\n";
   fstream targ_out(target_output.c_str(),
@@ -198,7 +197,7 @@ int preprocess_main() {
   Fragment* frag;
   
   ParseThreadSafety pts(10);
-  boost::thread parse(&MapParser::threaded_parse, &map_parser, &pts,
+  boost::thread parse(&MapParser::threaded_parse, map_parser.get(), &pts,
                       stop_at, 0);
   RobertsFilter frags_seen;
   proto::Fragment frag_proto;
