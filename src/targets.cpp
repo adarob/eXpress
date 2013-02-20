@@ -208,7 +208,7 @@ HaplotypeHandler::HaplotypeHandler(const Target* targ1, const Target* targ2,
       _frag_name_buff(""),
       _align_likelihoods_buff(vector<double>(2, LOG_0)),
       _masses_buff(vector<double>(2, LOG_0)),
-      _committed(false) {
+      _committed(true) {
   _targets[0] = targ1;
   _targets[1] = targ2;
 }
@@ -244,6 +244,8 @@ void HaplotypeHandler::update_mass(const Target* targ, const string& frag_name,
   _align_likelihoods_buff[i] = log_add(_align_likelihoods_buff[i],
                                        align_likelihood);
   _masses_buff[i] = log_add(_masses_buff[i], mass);
+  
+  _committed = false;
 }
 
 

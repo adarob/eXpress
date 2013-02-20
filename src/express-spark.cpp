@@ -197,7 +197,7 @@ int preprocess_main() {
   Fragment* frag;
   
   ParseThreadSafety pts(10);
-  boost::thread parse(&MapParser::threaded_parse, map_parser.get(), &pts,
+  boost::thread parse(&MapParser::threaded_parse, lib.map_parser.get(), &pts,
                       stop_at, 0);
   RobertsFilter frags_seen;
   proto::Fragment frag_proto;
