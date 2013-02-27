@@ -823,6 +823,10 @@ int estimation_main() {
     calc_covar = false;
   }
   
+  if (batch_mode) {
+    targ_table->round_reset();
+  }
+  
   size_t tot_counts = threaded_calc_abundances(libs);
   if (library_size) {
     tot_counts = library_size;
