@@ -844,9 +844,15 @@ int estimation_main() {
     online_additional = false;
   }
   
+  if (remaining_rounds) {
+    targ_table->masses_to_counts();
+  }
+  
   targ_table->round_reset();
   ff_param = 1.0;
+
   first_round = false;
+  
   while (!last_round) {
     if (output_running_rounds) {
       output_results(libs, tot_counts, (int)remaining_rounds);

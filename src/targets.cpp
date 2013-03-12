@@ -481,6 +481,51 @@ void project_to_polytope(vector<Target*> bundle_targ,
   }
 }
 
+void TargetTable::masses_to_counts() {
+  foreach (Bundle* bundle, _bundle_table.bundles()) {
+    
+    const vector<Target*>& bundle_targ = *(bundle->targets());
+
+    // Calculate total counts for bundle and bundle-level rho
+    // Do not include pseudo-mass because it will screw up multi-round results
+    double l_bundle_mass = LOG_0;
+    foreach (Target* targ, bundle_targ) {
+      l_bundle_mass = log_add(l_bundle_mass, targ->mass(false));
+    }
+    
+    if (bundle->counts()) {
+      double l_bundle_counts = log((double)bundle->counts());
+      double l_var_renorm = 2*(l_bundle_counts - l_bundle_mass);
+
+      vector<double> targ_counts(bundle_targ.size(),0);
+      bool requires_projection = false;
+      
+      for (size_t i = 0; i < bundle_targ.size(); ++i) {
+        Target& targ = *bundle_targ[i];
+        double l_targ_frac = targ.mass(false) - l_bundle_mass;
+        targ_counts[i] = sexp(l_targ_frac + l_bundle_counts);
+        requires_projection |= targ_counts[i] > (double)targ.tot_counts() ||
+        targ_counts[i] < (double)targ.uniq_counts();
+      }
+      
+      if (bundle_targ.size() > 1 && requires_projection) {
+        project_to_polytope(bundle_targ, targ_counts, bundle->counts());
+      }
+      
+      // Calculate individual counts and rhos
+      for (size_t i = 0; i < bundle_targ.size(); ++i) {
+        Target& targ = *bundle_targ[i];
+        double mass = targ.mass(false);
+        targ._curr_params.mass = targ_counts[i];
+        targ._curr_params.mass_var = min(targ.mass_var(),
+                                         mass + log_sub(l_bundle_mass, mass))
+                                     + l_var_renorm;
+        targ._curr_params.var_sum = targ.var_sum() + l_var_renorm;
+      }
+    }
+  }
+}
+
 void TargetTable::output_results(string output_dir, size_t tot_counts,
                                  bool output_varcov, bool output_rdds) {
   FILE * expr_file = fopen((output_dir + "/results.xprs").c_str(), "w");

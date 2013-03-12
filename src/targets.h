@@ -28,6 +28,7 @@ class BiasBoss;
 class MismatchTable;
 class Librarian;
 class HaplotypeHandler;
+class TargetTable;
 
 /**
  * The RoundParams struct stores the target parameters unique to a given round
@@ -88,6 +89,7 @@ typedef size_t TargID;
  **/
 class Target {
   friend class HaplotypeHandler;
+  friend class TargetTable;
   /**
    * A private pointer to the struct containing pointers to the global
    * parameter tables (bias_table, mismatch_table, fld).
@@ -583,6 +585,8 @@ public:
    * @return The number of bundles in the partition.
    */
   size_t num_bundles() const { return _bundle_table.size(); }
+  //DOC
+  void masses_to_counts();
   /**
    * A member function that outputs the final expression data in a file called
    * 'results.xprs', (optionally) the variance-covariance matrix in
