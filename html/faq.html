@@ -124,10 +124,10 @@
         <li><a href="#">Download<!--[if IE 7]><!--></a><!--<![endif]-->
           <!--[if lte IE 6]><table><tr><td><![endif]-->
             <ul>
-              <li><a href=downloads/express-1.3.0/express-1.3.0-macosx_x86_64.tgz onClick="_gaq.push(['_trackEvent', 'Downloads', 'Mac', 'FAQ']);" target="_blank">Mac OS X (64-bit)</a></li>
-              <li><a href=downloads/express-1.3.0/express-1.3.0-linux_x86_64.tgz onClick="_gaq.push(['_trackEvent', 'Downloads', 'Linux', 'FAQ']);" target="_blank">Linux (64-bit)</a></li>
-              <li><a href=downloads/express-1.3.0/express-1.3.0-win32_x86_64.zip onClick="_gaq.push(['_trackEvent', 'Downloads', 'Windows', 'FAQ']);" target="_blank">Windows (64-bit)</a></li>
-              <li><a href=downloads/express-1.3.0/express-1.3.0-src.tgz onClick="_gaq.push(['_trackEvent', 'Downloads', 'Source', 'FAQ']);" target="_blank">Source Code</a></li>
+              <li><a href=downloads/express-1.3.1/express-1.3.1-macosx_x86_64.tgz onClick="_gaq.push(['_trackEvent', 'Downloads', 'Mac', 'FAQ']);" target="_blank">Mac OS X (64-bit)</a></li>
+              <li><a href=downloads/express-1.3.1/express-1.3.1-linux_x86_64.tgz onClick="_gaq.push(['_trackEvent', 'Downloads', 'Linux', 'FAQ']);" target="_blank">Linux (64-bit)</a></li>
+              <li><a href=downloads/express-1.3.1/express-1.3.1-win32_x86_64.zip onClick="_gaq.push(['_trackEvent', 'Downloads', 'Windows', 'FAQ']);" target="_blank">Windows (64-bit)</a></li>
+              <li><a href=downloads/express-1.3.1/express-1.3.1-src.tgz onClick="_gaq.push(['_trackEvent', 'Downloads', 'Source', 'FAQ']);" target="_blank">Source Code</a></li>
               <li><a href="downloads" onClick="_gaq.push(['_trackEvent', 'Downloads', 'Previous','FAQ']);">Previous Versions</a></li>
            </ul>
           <!--[if lte IE 6]></td></tr></table></a><![endif]-->
@@ -179,8 +179,12 @@
 	<p>This is most likely because the paired-end reads do not have matching names in your alignment file. eXpress knows that your reads are supposed to be paired-end in this case, but it assumes one end is unmapped and tosses the fragment when the matching reads cannot be found.  See the <a href="manual.html#sam">Manual</a> for details on how to address this issue.</p>
     <p>&rarr; <a href="#top">Back to top.</a></p>
 
+  <h2 id="bwt2">Does eXpress support Bowtie2 mappings?</h2>
+  <p>Yes, however it is highly recommended you limit the length of indels allowed to avoid unlikely mappings to splice variants. For example, we recommend you use the following settings: <tt>-a -X 600 --rdg 6,5 --rfg 6,5 --score-min L,-.6,-.4 --no-discordant --no-mixed</tt></p>
+    <p>&rarr; <a href="#top">Back to top.</a></p>
+
     <h2 id="help">What do I do if I need help and my question isn't answered here?</h2>
-	<p>First, you should check to see if you question is answered in the <a href="manual.html">Manual</a> or <a href="tutorial.html">Tutorial</a>.  If not, you should see if it has been addressed at the <a href=http://seqanswers.com>SeqAnswers</a> forum.  If you still can't find your answer, feel free to contact us at <a mailto:ask.xprs@gmail.com>ask.xprs@gmail.com</a>.  We are busy but will do our best to respond as soon as possible!</p>
+	<p>First, you should check to see if you question is answered in the <a href="manual.html">Manual</a> or <a href="tutorial.html">Tutorial</a>.  If not, you should see if it has been addressed on our <a href="https://groups.google.com/d/forum/express-users">User Forum</a> or the <a href=http://seqanswers.com>SeqAnswers Forum</a>.  If you still can't find your answer, feel free to contact us at <a mailto:ask.xprs@gmail.com>ask.xprs@gmail.com</a>.  We are busy but will do our best to respond as soon as possible!</p>
     <p>&rarr; <a href="#top">Back to top.</a></p>
      </div> 
         <div class="corner-content-1col-bottom"></div>                               
@@ -203,6 +207,7 @@
 			<li><a href="#single">Does eXpress accept both single-end and paired-end read alignments?</a></li>
 			<li><a href="#seppreps">Can I give eXpress a combined set of reads generated in different library preparations or with different read lengths?</a></li>
 			<li><a href="#strip">Why does eXpress say it processed 0 fragments when I gave it a bunch of paired-end reads?</a></li>
+			<li><a href="#bwt2">Does eXpress support Bowtie2 mappings?</a></li>
 			<li><a href="#help">What do I do if I need help and my question isn't answered here?</a></li>
 		  </ul>
 	  </div> 

@@ -122,6 +122,7 @@ struct ReadHit {
   int mate_l;
 };
 
+//DOC
 struct HitParams {
   double align_likelihood;
   double full_likelihood;
@@ -181,7 +182,10 @@ public:
     assert(l->left <= r->left);
     assert(l->first != r->first);
   }
-  //DOC
+  /**
+   * Accessor for the name of the fragment.
+   * @return The name of the fragment.
+   */
   std::string frag_name() const {
     if (_read_l) {
       return _read_l->name;
@@ -189,8 +193,15 @@ public:
     assert(_read_r);
     return _read_r->name;
   }
-  //DOC
+  /**
+   * Accessor for the hit parameters (likelihood, etc.).
+   * @return A pointer to the hit parameters.
+   */
   HitParams* params() { return &_params; }
+  /**
+   * Const accessor for the hit parameters (likelihood, etc.).
+   * @return A const pointer to the hit parameters.
+   */
   const HitParams* params() const { return &_params; }
   /**
    * Accessor for a pointer to the Target object the fragment is aligned to.

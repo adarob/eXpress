@@ -219,8 +219,6 @@ int preprocess_main() {
     }
     
     frag_proto.set_paired(frag->paired());
-    string first_l_serial;
-    string first_r_serial;
     for (size_t i = 0; i < frag->num_hits(); ++i) {
       FragHit& fh = *(*frag)[i];
       proto::FragmentAlignment& align_proto = *frag_proto.add_alignments();
@@ -245,16 +243,8 @@ int preprocess_main() {
         read_proto.set_bias_start_pos((unsigned int)start_pos);
         read_proto.set_bias_indices(string(bias_indices.begin(),
                                            bias_indices.end()));
-        if (i == 0) {
-          read_proto.SerializeToString(&first_l_serial);
-        } else {
-          string serial;
-          read_proto.SerializeToString(&serial);
-          if (serial == first_l_serial) {
-            read_proto.Clear();
-          }
-        }
       }
+
       ReadHit* read_r = fh.right_read();
       if (read_r) {
         proto::ReadAlignment& read_proto = *align_proto.mutable_read_r();
@@ -269,16 +259,6 @@ int preprocess_main() {
         read_proto.set_bias_start_pos((unsigned int)start_pos);
         read_proto.set_bias_indices(string(bias_indices.begin(),
                                            bias_indices.end()));
-        
-        if (i == 0) {
-          read_proto.SerializeToString(&first_r_serial);
-        } else {
-          string serial;
-          read_proto.SerializeToString(&serial);
-          if (serial == first_r_serial) {
-            read_proto.Clear();
-          }
-        }
       }
     }
     frag_proto.SerializeToString(&out_buff);

@@ -79,7 +79,7 @@ bool DirectionDetector::report_if_improper_direction() {
         << "If your library is strand-specific, you should use the "
         << "--fr-stranded option to avoid incorrect results.\n";
         return true;
-      } else if (rf < fr && direction != RF) {
+      } else if (rf > fr && direction != RF) {
         cerr << "WARNING: The observed alignments appear disporportionately in "
         << "the reverse-forward order (" << rf << " vs. " << fr << "). "
         << "If your library is strand-specific, you should use the "
