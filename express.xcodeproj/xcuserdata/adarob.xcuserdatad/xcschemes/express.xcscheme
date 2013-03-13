@@ -63,6 +63,10 @@
             isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
+            argument = "-B 1 /Volumes/math.mcb.berkeley.edu/experiments/express/debug/bray/Homo_sapiens.GRCh37.70.cdna.pc.fa /Volumes/math.mcb.berkeley.edu/experiments/express/debug/bray/s1_HCT20627-Lncap-14.bam"
+            isEnabled = "YES">
+         </CommandLineArgument>
+         <CommandLineArgument
             argument = "--output-running-reads --no-bias-correct -o /Volumes/Scratch/nimmi/out_nb /Volumes/Scratch/nimmi/ensembleTranscripts.fa /Volumes/Scratch/nimmi/hits.bam"
             isEnabled = "NO">
          </CommandLineArgument>
@@ -76,7 +80,7 @@
          </CommandLineArgument>
          <CommandLineArgument
             argument = "-B 2 --frag-len-mean 250 --frag-len-stddev 50 -o $(SRCROOT)/sample_data3/out2 $(SRCROOT)/sample_data3/hox_ucsc.fa $(SRCROOT)/sample_data3/hits_1M.sam"
-            isEnabled = "YES">
+            isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
             argument = "--no-bias-correct -o hap -H /Volumes/math.mcb.berkeley.edu/experiments/ase/t1s1b0/hap.csv /Volumes/math.mcb.berkeley.edu/experiments/ase/t1s1b0/ugt3a2.fa /Volumes/math.mcb.berkeley.edu/experiments/ase/t1s1b0/hits.bam"

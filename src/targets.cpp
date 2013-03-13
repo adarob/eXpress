@@ -423,9 +423,6 @@ Bundle* TargetTable::merge_bundles(Bundle* b1, Bundle* b2) {
 }
 
 void TargetTable::round_reset() {
-  foreach(Bundle* bundle, _bundle_table.bundles()) {
-    bundle->reset_mass();
-  }
   foreach(Target* targ, _targ_map) {
     targ->round_reset();
     targ->bundle()->incr_mass(targ->mass(false));
@@ -523,6 +520,9 @@ void TargetTable::masses_to_counts() {
         targ._curr_params.var_sum = targ.var_sum() + l_var_renorm;
       }
     }
+    
+    bundle->reset_mass();
+    bundle->incr_mass((double) bundle->counts());
   }
 }
 
