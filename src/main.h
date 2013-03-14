@@ -131,6 +131,10 @@ inline double log_add(double x, double y) {
  * @return a double for the log of exp(x)-exp(y).
  */
 inline double log_sub(double x, double y) {
+  if (fabs(y) == LOG_0) {
+    return x;
+  }
+  
   // Have to be careful of numerical issues, so we allow y to be slightly
   // greater than x.
   if (x <= y) {
@@ -138,10 +142,7 @@ inline double log_sub(double x, double y) {
     return LOG_0;
   }
   
-  if (fabs(y) == LOG_0) {
-    return x;
-  }
-  
+
   double diff = x+log(1-exp(y-x));
   return diff;
 }

@@ -63,7 +63,11 @@
             isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "-B 1 /Volumes/math.mcb.berkeley.edu/experiments/express/debug/bray/Homo_sapiens.GRCh37.70.cdna.pc.fa /Volumes/math.mcb.berkeley.edu/experiments/express/debug/bray/s1_HCT20627-Lncap-14.bam"
+            argument = "--no-bias-correct -B 1 --output-running-rounds -o /Volumes/math.mcb.berkeley.edu/experiments/express/debug/bray/xprs_B1 /Volumes/math.mcb.berkeley.edu/experiments/express/debug/bray/Homo_sapiens.GRCh37.70.cdna.pc.fa /Volumes/math.mcb.berkeley.edu/experiments/express/debug/bray/s1_HCT20627-Lncap-14.bam"
+            isEnabled = "NO">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "--no-bias-correct --batch-mode --prior-params /Volumes/math.mcb.berkeley.edu/experiments/express/debug/bray/xprs_2/prior.tab --aux-param-file /Volumes/math.mcb.berkeley.edu/experiments/express/debug/bray/xprs_1/params.xprs -o /Volumes/math.mcb.berkeley.edu/experiments/express/debug/bray/xprs_2 /Volumes/math.mcb.berkeley.edu/experiments/express/debug/bray/Homo_sapiens.GRCh37.70.cdna.pc.fa /Volumes/math.mcb.berkeley.edu/experiments/express/debug/bray/s1_HCT20627-Lncap-14.bam"
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument

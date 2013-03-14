@@ -303,6 +303,10 @@ bool parse_options(int ac, char ** av) {
   both = vm.count("both");
   remaining_rounds = max(additional_online, additional_batch);
 
+  if (batch_mode) {
+    ff_param = 1;
+  }
+  
   if (additional_online > 0 && additional_batch > 0) {
     cerr << "ERROR: Cannot add both online and batch rounds.";
     return 1;
@@ -494,7 +498,6 @@ void process_fragment(Fragment* frag_p) {
     } else if (i == 0) {
       t->add_hit(m, LOG_0, mass_n);
     }
-    assert(!(isnan(p)||isinf(p)));
 
     // update parameters
     if (first_round) {

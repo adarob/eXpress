@@ -267,17 +267,7 @@ TargetTable::TargetTable(string targ_fasta_file, string haplotype_file,
   _total_fpb = log(alpha*num_targs);
 
   boost::unordered_set<string> target_names;
-
-  double alpha_renorm = 1.0;
-  if (alpha_map) {
-    double alpha_total = 0;
-    for (AlphaMap::const_iterator it = alpha_map->begin();
-      it != alpha_map->end(); ++it) {
-        alpha_total += it->second;
-    }
-    alpha_renorm = (alpha * alpha_map->size())/alpha_total;
-  }
-
+      
   ifstream infile (targ_fasta_file.c_str());
   string line;
   string seq = "";
@@ -288,7 +278,7 @@ TargetTable::TargetTable(string targ_fasta_file, string haplotype_file,
       if (line[0] == '>') {
         if (!name.empty()) {
           if (alpha_map) {
-            alpha = alpha_renorm * alpha_map->find(name)->second;
+            alpha = alpha_map->find(name)->second;
           }
           add_targ(name, seq, prob_seqs, known_aux_params, alpha, targ_index,
                    targ_lengths);
@@ -313,7 +303,7 @@ TargetTable::TargetTable(string targ_fasta_file, string haplotype_file,
     }
     if (!name.empty()) {
       if (alpha_map) {
-        alpha = alpha_renorm * alpha_map->find(name)->second;
+        alpha = alpha_map->find(name)->second;
       }
       add_targ(name, seq, prob_seqs, known_aux_params, alpha, targ_index,
                targ_lengths);
@@ -513,7 +503,7 @@ void TargetTable::masses_to_counts() {
       for (size_t i = 0; i < bundle_targ.size(); ++i) {
         Target& targ = *bundle_targ[i];
         double mass = targ.mass(false);
-        targ._curr_params.mass = targ_counts[i];
+        targ._curr_params.mass = log(targ_counts[i]);
         targ._curr_params.mass_var = min(targ.mass_var(),
                                          mass + log_sub(l_bundle_mass, mass))
                                      + l_var_renorm;
@@ -522,7 +512,7 @@ void TargetTable::masses_to_counts() {
     }
     
     bundle->reset_mass();
-    bundle->incr_mass((double) bundle->counts());
+    bundle->incr_mass(log(bundle->counts()));
   }
 }
 
@@ -617,7 +607,7 @@ void TargetTable::output_results(string output_dir, size_t tot_counts,
             m = max(m, EPSILON);
             m = min(m, 1-EPSILON);
             double v = numeric_limits<double>::max();
-            if (targ.var_sum() != LOG_0 && targ.tot_ambig_mass() != LOG_0) {
+            if (sexp(targ.var_sum()) != 0 && targ.tot_ambig_mass() != LOG_0) {
               v = sexp(targ.var_sum() - targ.tot_ambig_mass());
             }
             v = min(v, m * (1 - m) - EPSILON/2);
@@ -647,7 +637,7 @@ void TargetTable::output_results(string output_dir, size_t tot_counts,
         double eff_counts = targ_counts[i] / eff_len * targ.length();
 
         fprintf(expr_file, "" SIZE_T_FMT "\t%s\t" SIZE_T_FMT "\t%f\t" SIZE_T_FMT
-                          "\t" SIZE_T_FMT "\t%f\t%f\t%e\t%e\t%f\t%f\t%f\t%c\n",
+                          "\t" SIZE_T_FMT "\t%f\t%f\t%e\t%e\t%e\t%e\t%e\t%c\n",
                bundle_id, targ.name().c_str(), targ.length(), eff_len,
                targ.tot_counts(), targ.uniq_counts(), targ_counts[i],
                eff_counts, count_alpha, count_beta, targ_fpkm, fpkm_lo, fpkm_hi,
@@ -696,7 +686,7 @@ void TargetTable::output_results(string output_dir, size_t tot_counts,
       for (size_t i = 0; i < bundle_targ.size(); ++i) {
         Target& targ = *bundle_targ[i];
         fprintf(expr_file, "" SIZE_T_FMT "\t%s\t" SIZE_T_FMT "\t%f\t%d\t%d\t%f"
-                           "\t%f\t%f\t%f\t%f\t%f\t%f\t%c\n",
+                           "\t%f\t%f\t%f\t%e\t%e\t%e\t%c\n",
                 bundle_id, targ.name().c_str(), targ.length(),
                 sexp(targ.cached_effective_length()), 0, 0, 0.0, 0.0, 0.0, 0.0,
                 0.0, 0.0, 0.0, 'T');
