@@ -512,7 +512,7 @@ void TargetTable::masses_to_counts() {
     }
     
     bundle->reset_mass();
-    bundle->incr_mass(log(bundle->counts()));
+    bundle->incr_mass(log((double)bundle->counts()));
   }
 }
 

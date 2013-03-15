@@ -50,9 +50,9 @@ LengthDistribution::LengthDistribution(double alpha, size_t max_val,
       _tot_mass = log_add(_tot_mass, mass);
     }
   } else {
-    _hist = vector<double>(max_val + 1, tot - log(max_val));
+    _hist = vector<double>(max_val + 1, tot - log((double)max_val));
     _hist[0] = LOG_0;
-    _sum = _hist[1] + log(max_val * (max_val + 1)) - log(2);
+    _sum = _hist[1] + log((double)(max_val * (max_val + 1))) - log(2.);
     _tot_mass = tot;
   }
 
