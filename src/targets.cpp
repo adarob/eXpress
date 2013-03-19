@@ -19,6 +19,7 @@
 #include <cassert>
 #include <stdio.h>
 #include <limits>
+#include <float.h>
 
 using namespace std;
 
@@ -606,14 +607,19 @@ void TargetTable::output_results(string output_dir, size_t tot_counts,
             assert (m >= 0 && m <= 1);
             m = max(m, EPSILON);
             m = min(m, 1-EPSILON);
+            m = log(m);
             double v = numeric_limits<double>::max();
             if (sexp(targ.var_sum()) != 0 && targ.tot_ambig_mass() != LOG_0) {
-              v = sexp(targ.var_sum() - targ.tot_ambig_mass());
+              v = targ.var_sum() - targ.tot_ambig_mass();
             }
-            v = min(v, m * (1 - m) - EPSILON/2);
+            v = min(v, m + log_sub(log_sub(LOG_1, m), LOG_EPSILON - log(2)));
 
-            count_alpha = -m * (m*m - m + v) / v;
-            count_beta = (m - 1) * (m*m - m + v) / v;
+            count_alpha = m + (log_sub(log_add(m,v), m+m)) - v;
+            count_alpha = sexp(min(LOG_MAX, count_alpha));
+
+            count_beta = log_sub(LOG_1, m) + log_sub(log_add(m,v), m+m)- v;
+            count_beta = sexp(min(LOG_MAX, count_beta));
+            
             count_var = mass_var;
             
             assert(count_alpha > 0 && count_beta > 0);

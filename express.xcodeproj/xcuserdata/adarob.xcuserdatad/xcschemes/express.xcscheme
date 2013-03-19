@@ -63,15 +63,11 @@
             isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "--no-bias-correct -B 1 --output-running-rounds -o /Volumes/math.mcb.berkeley.edu/experiments/express/debug/bray/xprs_B1 /Volumes/math.mcb.berkeley.edu/experiments/express/debug/bray/Homo_sapiens.GRCh37.70.cdna.pc.fa /Volumes/math.mcb.berkeley.edu/experiments/express/debug/bray/s1_HCT20627-Lncap-14.bam"
-            isEnabled = "NO">
-         </CommandLineArgument>
-         <CommandLineArgument
-            argument = "--no-bias-correct --batch-mode --prior-params /Volumes/math.mcb.berkeley.edu/experiments/express/debug/bray/xprs_2/prior.tab --aux-param-file /Volumes/math.mcb.berkeley.edu/experiments/express/debug/bray/xprs_1/params.xprs -o /Volumes/math.mcb.berkeley.edu/experiments/express/debug/bray/xprs_2 /Volumes/math.mcb.berkeley.edu/experiments/express/debug/bray/Homo_sapiens.GRCh37.70.cdna.pc.fa /Volumes/math.mcb.berkeley.edu/experiments/express/debug/bray/s1_HCT20627-Lncap-14.bam"
+            argument = "--no-bias-correct --batch-mode --output-running-rounds --aux-param-file /Volumes/math.mcb.berkeley.edu/experiments/express/debug/bray/for_adam/params.xprs --prior-params /Volumes/math.mcb.berkeley.edu/experiments/express/debug/bray/for_adam/s5_HCT20631-T24-14.fpkm0 -o /Volumes/math.mcb.berkeley.edu/experiments/express/debug/bray/for_adam/xprs_out /Volumes/math.mcb.berkeley.edu/experiments/express/debug/bray/Homo_sapiens.GRCh37.70.cdna.pc.fa /Volumes/math.mcb.berkeley.edu/experiments/express/debug/bray/for_adam/s5_HCT20631-T24-14.bam"
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "--output-running-reads --no-bias-correct -o /Volumes/Scratch/nimmi/out_nb /Volumes/Scratch/nimmi/ensembleTranscripts.fa /Volumes/Scratch/nimmi/hits.bam"
+            argument = "--no-bias-correct --output-align-prob -o /Volumes/math.mcb.berkeley.edu/experiments/express/debug/ivan_out/ /Volumes/scratch/eXpress_9000bp_50.mm9_norandom.fa /Volumes/math.mcb.berkeley.edu/experiments/express/debug/ivan/CompareAlign/Sim_TBP.9000bp.k100_converted.sorted.bam"
             isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
