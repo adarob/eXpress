@@ -31,10 +31,11 @@ void protobuf_AssignDesc_targets_2eproto() {
       "targets.proto");
   GOOGLE_CHECK(file != NULL);
   Target_descriptor_ = file->message_type(0);
-  static const int Target_offsets_[5] = {
+  static const int Target_offsets_[6] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Target, name_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Target, id_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Target, length_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Target, seq_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Target, bias_indices_l_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Target, bias_indices_r_),
   };
@@ -79,10 +80,10 @@ void protobuf_AddDesc_targets_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
   ::google::protobuf::DescriptorPool::InternalAddGeneratedFile(
-    "\n\rtargets.proto\022\005proto\"b\n\006Target\022\014\n\004name"
-    "\030\001 \001(\t\022\n\n\002id\030\002 \002(\r\022\016\n\006length\030\003 \002(\r\022\026\n\016bi"
-    "as_indices_l\030\004 \002(\014\022\026\n\016bias_indices_r\030\005 \002"
-    "(\014", 122);
+    "\n\rtargets.proto\022\005proto\"o\n\006Target\022\014\n\004name"
+    "\030\001 \001(\t\022\n\n\002id\030\002 \002(\r\022\016\n\006length\030\003 \002(\r\022\013\n\003se"
+    "q\030\004 \002(\014\022\026\n\016bias_indices_l\030\005 \002(\014\022\026\n\016bias_"
+    "indices_r\030\006 \002(\014", 135);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "targets.proto", &protobuf_RegisterTypes);
   Target::default_instance_ = new Target();
@@ -104,6 +105,7 @@ struct StaticDescriptorInitializer_targets_2eproto {
 const int Target::kNameFieldNumber;
 const int Target::kIdFieldNumber;
 const int Target::kLengthFieldNumber;
+const int Target::kSeqFieldNumber;
 const int Target::kBiasIndicesLFieldNumber;
 const int Target::kBiasIndicesRFieldNumber;
 #endif  // !_MSC_VER
@@ -127,6 +129,7 @@ void Target::SharedCtor() {
   name_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
   id_ = 0u;
   length_ = 0u;
+  seq_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
   bias_indices_l_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
   bias_indices_r_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
@@ -139,6 +142,9 @@ Target::~Target() {
 void Target::SharedDtor() {
   if (name_ != &::google::protobuf::internal::kEmptyString) {
     delete name_;
+  }
+  if (seq_ != &::google::protobuf::internal::kEmptyString) {
+    delete seq_;
   }
   if (bias_indices_l_ != &::google::protobuf::internal::kEmptyString) {
     delete bias_indices_l_;
@@ -179,6 +185,11 @@ void Target::Clear() {
     }
     id_ = 0u;
     length_ = 0u;
+    if (has_seq()) {
+      if (seq_ != &::google::protobuf::internal::kEmptyString) {
+        seq_->clear();
+      }
+    }
     if (has_bias_indices_l()) {
       if (bias_indices_l_ != &::google::protobuf::internal::kEmptyString) {
         bias_indices_l_->clear();
@@ -244,12 +255,26 @@ bool Target::MergePartialFromCodedStream(
         } else {
           goto handle_uninterpreted;
         }
-        if (input->ExpectTag(34)) goto parse_bias_indices_l;
+        if (input->ExpectTag(34)) goto parse_seq;
         break;
       }
       
-      // required bytes bias_indices_l = 4;
+      // required bytes seq = 4;
       case 4: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
+         parse_seq:
+          DO_(::google::protobuf::internal::WireFormatLite::ReadBytes(
+                input, this->mutable_seq()));
+        } else {
+          goto handle_uninterpreted;
+        }
+        if (input->ExpectTag(42)) goto parse_bias_indices_l;
+        break;
+      }
+      
+      // required bytes bias_indices_l = 5;
+      case 5: {
         if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
             ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
          parse_bias_indices_l:
@@ -258,12 +283,12 @@ bool Target::MergePartialFromCodedStream(
         } else {
           goto handle_uninterpreted;
         }
-        if (input->ExpectTag(42)) goto parse_bias_indices_r;
+        if (input->ExpectTag(50)) goto parse_bias_indices_r;
         break;
       }
       
-      // required bytes bias_indices_r = 5;
-      case 5: {
+      // required bytes bias_indices_r = 6;
+      case 6: {
         if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
             ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
          parse_bias_indices_r:
@@ -313,16 +338,22 @@ void Target::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormatLite::WriteUInt32(3, this->length(), output);
   }
   
-  // required bytes bias_indices_l = 4;
-  if (has_bias_indices_l()) {
+  // required bytes seq = 4;
+  if (has_seq()) {
     ::google::protobuf::internal::WireFormatLite::WriteBytes(
-      4, this->bias_indices_l(), output);
+      4, this->seq(), output);
   }
   
-  // required bytes bias_indices_r = 5;
+  // required bytes bias_indices_l = 5;
+  if (has_bias_indices_l()) {
+    ::google::protobuf::internal::WireFormatLite::WriteBytes(
+      5, this->bias_indices_l(), output);
+  }
+  
+  // required bytes bias_indices_r = 6;
   if (has_bias_indices_r()) {
     ::google::protobuf::internal::WireFormatLite::WriteBytes(
-      5, this->bias_indices_r(), output);
+      6, this->bias_indices_r(), output);
   }
   
   if (!unknown_fields().empty()) {
@@ -353,18 +384,25 @@ void Target::SerializeWithCachedSizes(
     target = ::google::protobuf::internal::WireFormatLite::WriteUInt32ToArray(3, this->length(), target);
   }
   
-  // required bytes bias_indices_l = 4;
+  // required bytes seq = 4;
+  if (has_seq()) {
+    target =
+      ::google::protobuf::internal::WireFormatLite::WriteBytesToArray(
+        4, this->seq(), target);
+  }
+  
+  // required bytes bias_indices_l = 5;
   if (has_bias_indices_l()) {
     target =
       ::google::protobuf::internal::WireFormatLite::WriteBytesToArray(
-        4, this->bias_indices_l(), target);
+        5, this->bias_indices_l(), target);
   }
   
-  // required bytes bias_indices_r = 5;
+  // required bytes bias_indices_r = 6;
   if (has_bias_indices_r()) {
     target =
       ::google::protobuf::internal::WireFormatLite::WriteBytesToArray(
-        5, this->bias_indices_r(), target);
+        6, this->bias_indices_r(), target);
   }
   
   if (!unknown_fields().empty()) {
@@ -399,14 +437,21 @@ int Target::ByteSize() const {
           this->length());
     }
     
-    // required bytes bias_indices_l = 4;
+    // required bytes seq = 4;
+    if (has_seq()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::BytesSize(
+          this->seq());
+    }
+    
+    // required bytes bias_indices_l = 5;
     if (has_bias_indices_l()) {
       total_size += 1 +
         ::google::protobuf::internal::WireFormatLite::BytesSize(
           this->bias_indices_l());
     }
     
-    // required bytes bias_indices_r = 5;
+    // required bytes bias_indices_r = 6;
     if (has_bias_indices_r()) {
       total_size += 1 +
         ::google::protobuf::internal::WireFormatLite::BytesSize(
@@ -449,6 +494,9 @@ void Target::MergeFrom(const Target& from) {
     if (from.has_length()) {
       set_length(from.length());
     }
+    if (from.has_seq()) {
+      set_seq(from.seq());
+    }
     if (from.has_bias_indices_l()) {
       set_bias_indices_l(from.bias_indices_l());
     }
@@ -472,7 +520,7 @@ void Target::CopyFrom(const Target& from) {
 }
 
 bool Target::IsInitialized() const {
-  if ((_has_bits_[0] & 0x0000001e) != 0x0000001e) return false;
+  if ((_has_bits_[0] & 0x0000003e) != 0x0000003e) return false;
   
   return true;
 }
@@ -482,6 +530,7 @@ void Target::Swap(Target* other) {
     std::swap(name_, other->name_);
     std::swap(id_, other->id_);
     std::swap(length_, other->length_);
+    std::swap(seq_, other->seq_);
     std::swap(bias_indices_l_, other->bias_indices_l_);
     std::swap(bias_indices_r_, other->bias_indices_r_);
     std::swap(_has_bits_[0], other->_has_bits_[0]);

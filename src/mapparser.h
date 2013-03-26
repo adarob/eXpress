@@ -20,9 +20,9 @@
 #include <iostream>
 
 class Fragment;
-class ParseThreadSafety;
 class TargetTable;
 class FragHit;
+struct ParseThreadSafety;
 struct ReadHit;
 struct Library;
 

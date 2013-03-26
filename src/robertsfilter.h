@@ -66,7 +66,7 @@ class RobertsFilter {
    * @param global_size the maximum number of keys to store in the global set.
    */
   RobertsFilter(size_t local_size=DEFAULT_LOC_SIZE,
-              size_t global_size=DEFAULT_GLOB_SIZE);
+                size_t global_size=DEFAULT_GLOB_SIZE);
   /**
    * A member function that tests for membership of the key in either set. If
    * not found, the key is added to the local set, possibly pushing the oldest

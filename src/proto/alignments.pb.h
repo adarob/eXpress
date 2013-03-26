@@ -99,21 +99,46 @@ class ReadAlignment : public ::google::protobuf::Message {
   inline bool first() const;
   inline void set_first(bool value);
   
-  // required bytes error_indices = 2;
-  inline bool has_error_indices() const;
-  inline void clear_error_indices();
-  static const int kErrorIndicesFieldNumber = 2;
-  inline const ::std::string& error_indices() const;
-  inline void set_error_indices(const ::std::string& value);
-  inline void set_error_indices(const char* value);
-  inline void set_error_indices(const void* value, size_t size);
-  inline ::std::string* mutable_error_indices();
-  inline ::std::string* release_error_indices();
+  // optional uint32 left_pos = 2;
+  inline bool has_left_pos() const;
+  inline void clear_left_pos();
+  static const int kLeftPosFieldNumber = 2;
+  inline ::google::protobuf::uint32 left_pos() const;
+  inline void set_left_pos(::google::protobuf::uint32 value);
   
-  // required bytes bias_indices = 3;
+  // optional uint32 right_pos = 3;
+  inline bool has_right_pos() const;
+  inline void clear_right_pos();
+  static const int kRightPosFieldNumber = 3;
+  inline ::google::protobuf::uint32 right_pos() const;
+  inline void set_right_pos(::google::protobuf::uint32 value);
+  
+  // optional bytes mismatch_indices = 4;
+  inline bool has_mismatch_indices() const;
+  inline void clear_mismatch_indices();
+  static const int kMismatchIndicesFieldNumber = 4;
+  inline const ::std::string& mismatch_indices() const;
+  inline void set_mismatch_indices(const ::std::string& value);
+  inline void set_mismatch_indices(const char* value);
+  inline void set_mismatch_indices(const void* value, size_t size);
+  inline ::std::string* mutable_mismatch_indices();
+  inline ::std::string* release_mismatch_indices();
+  
+  // optional bytes mismatch_nucs = 5;
+  inline bool has_mismatch_nucs() const;
+  inline void clear_mismatch_nucs();
+  static const int kMismatchNucsFieldNumber = 5;
+  inline const ::std::string& mismatch_nucs() const;
+  inline void set_mismatch_nucs(const ::std::string& value);
+  inline void set_mismatch_nucs(const char* value);
+  inline void set_mismatch_nucs(const void* value, size_t size);
+  inline ::std::string* mutable_mismatch_nucs();
+  inline ::std::string* release_mismatch_nucs();
+  
+  // optional bytes bias_indices = 6;
   inline bool has_bias_indices() const;
   inline void clear_bias_indices();
-  static const int kBiasIndicesFieldNumber = 3;
+  static const int kBiasIndicesFieldNumber = 6;
   inline const ::std::string& bias_indices() const;
   inline void set_bias_indices(const ::std::string& value);
   inline void set_bias_indices(const char* value);
@@ -121,10 +146,10 @@ class ReadAlignment : public ::google::protobuf::Message {
   inline ::std::string* mutable_bias_indices();
   inline ::std::string* release_bias_indices();
   
-  // required uint32 bias_start_pos = 4;
+  // optional uint32 bias_start_pos = 7;
   inline bool has_bias_start_pos() const;
   inline void clear_bias_start_pos();
-  static const int kBiasStartPosFieldNumber = 4;
+  static const int kBiasStartPosFieldNumber = 7;
   inline ::google::protobuf::uint32 bias_start_pos() const;
   inline void set_bias_start_pos(::google::protobuf::uint32 value);
   
@@ -132,8 +157,14 @@ class ReadAlignment : public ::google::protobuf::Message {
  private:
   inline void set_has_first();
   inline void clear_has_first();
-  inline void set_has_error_indices();
-  inline void clear_has_error_indices();
+  inline void set_has_left_pos();
+  inline void clear_has_left_pos();
+  inline void set_has_right_pos();
+  inline void clear_has_right_pos();
+  inline void set_has_mismatch_indices();
+  inline void clear_has_mismatch_indices();
+  inline void set_has_mismatch_nucs();
+  inline void clear_has_mismatch_nucs();
   inline void set_has_bias_indices();
   inline void clear_has_bias_indices();
   inline void set_has_bias_start_pos();
@@ -141,13 +172,16 @@ class ReadAlignment : public ::google::protobuf::Message {
   
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
   
-  ::std::string* error_indices_;
   bool first_;
+  ::google::protobuf::uint32 left_pos_;
+  ::std::string* mismatch_indices_;
+  ::std::string* mismatch_nucs_;
+  ::google::protobuf::uint32 right_pos_;
   ::google::protobuf::uint32 bias_start_pos_;
   ::std::string* bias_indices_;
   
   mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(4 + 31) / 32];
+  ::google::protobuf::uint32 _has_bits_[(7 + 31) / 32];
   
   friend void  protobuf_AddDesc_alignments_2eproto();
   friend void protobuf_AssignDesc_alignments_2eproto();
@@ -408,73 +442,175 @@ inline void ReadAlignment::set_first(bool value) {
   first_ = value;
 }
 
-// required bytes error_indices = 2;
-inline bool ReadAlignment::has_error_indices() const {
+// optional uint32 left_pos = 2;
+inline bool ReadAlignment::has_left_pos() const {
   return (_has_bits_[0] & 0x00000002u) != 0;
 }
-inline void ReadAlignment::set_has_error_indices() {
+inline void ReadAlignment::set_has_left_pos() {
   _has_bits_[0] |= 0x00000002u;
 }
-inline void ReadAlignment::clear_has_error_indices() {
+inline void ReadAlignment::clear_has_left_pos() {
   _has_bits_[0] &= ~0x00000002u;
 }
-inline void ReadAlignment::clear_error_indices() {
-  if (error_indices_ != &::google::protobuf::internal::kEmptyString) {
-    error_indices_->clear();
+inline void ReadAlignment::clear_left_pos() {
+  left_pos_ = 0u;
+  clear_has_left_pos();
+}
+inline ::google::protobuf::uint32 ReadAlignment::left_pos() const {
+  return left_pos_;
+}
+inline void ReadAlignment::set_left_pos(::google::protobuf::uint32 value) {
+  set_has_left_pos();
+  left_pos_ = value;
+}
+
+// optional uint32 right_pos = 3;
+inline bool ReadAlignment::has_right_pos() const {
+  return (_has_bits_[0] & 0x00000004u) != 0;
+}
+inline void ReadAlignment::set_has_right_pos() {
+  _has_bits_[0] |= 0x00000004u;
+}
+inline void ReadAlignment::clear_has_right_pos() {
+  _has_bits_[0] &= ~0x00000004u;
+}
+inline void ReadAlignment::clear_right_pos() {
+  right_pos_ = 0u;
+  clear_has_right_pos();
+}
+inline ::google::protobuf::uint32 ReadAlignment::right_pos() const {
+  return right_pos_;
+}
+inline void ReadAlignment::set_right_pos(::google::protobuf::uint32 value) {
+  set_has_right_pos();
+  right_pos_ = value;
+}
+
+// optional bytes mismatch_indices = 4;
+inline bool ReadAlignment::has_mismatch_indices() const {
+  return (_has_bits_[0] & 0x00000008u) != 0;
+}
+inline void ReadAlignment::set_has_mismatch_indices() {
+  _has_bits_[0] |= 0x00000008u;
+}
+inline void ReadAlignment::clear_has_mismatch_indices() {
+  _has_bits_[0] &= ~0x00000008u;
+}
+inline void ReadAlignment::clear_mismatch_indices() {
+  if (mismatch_indices_ != &::google::protobuf::internal::kEmptyString) {
+    mismatch_indices_->clear();
   }
-  clear_has_error_indices();
+  clear_has_mismatch_indices();
 }
-inline const ::std::string& ReadAlignment::error_indices() const {
-  return *error_indices_;
+inline const ::std::string& ReadAlignment::mismatch_indices() const {
+  return *mismatch_indices_;
 }
-inline void ReadAlignment::set_error_indices(const ::std::string& value) {
-  set_has_error_indices();
-  if (error_indices_ == &::google::protobuf::internal::kEmptyString) {
-    error_indices_ = new ::std::string;
+inline void ReadAlignment::set_mismatch_indices(const ::std::string& value) {
+  set_has_mismatch_indices();
+  if (mismatch_indices_ == &::google::protobuf::internal::kEmptyString) {
+    mismatch_indices_ = new ::std::string;
   }
-  error_indices_->assign(value);
+  mismatch_indices_->assign(value);
 }
-inline void ReadAlignment::set_error_indices(const char* value) {
-  set_has_error_indices();
-  if (error_indices_ == &::google::protobuf::internal::kEmptyString) {
-    error_indices_ = new ::std::string;
+inline void ReadAlignment::set_mismatch_indices(const char* value) {
+  set_has_mismatch_indices();
+  if (mismatch_indices_ == &::google::protobuf::internal::kEmptyString) {
+    mismatch_indices_ = new ::std::string;
   }
-  error_indices_->assign(value);
+  mismatch_indices_->assign(value);
 }
-inline void ReadAlignment::set_error_indices(const void* value, size_t size) {
-  set_has_error_indices();
-  if (error_indices_ == &::google::protobuf::internal::kEmptyString) {
-    error_indices_ = new ::std::string;
+inline void ReadAlignment::set_mismatch_indices(const void* value, size_t size) {
+  set_has_mismatch_indices();
+  if (mismatch_indices_ == &::google::protobuf::internal::kEmptyString) {
+    mismatch_indices_ = new ::std::string;
   }
-  error_indices_->assign(reinterpret_cast<const char*>(value), size);
+  mismatch_indices_->assign(reinterpret_cast<const char*>(value), size);
 }
-inline ::std::string* ReadAlignment::mutable_error_indices() {
-  set_has_error_indices();
-  if (error_indices_ == &::google::protobuf::internal::kEmptyString) {
-    error_indices_ = new ::std::string;
+inline ::std::string* ReadAlignment::mutable_mismatch_indices() {
+  set_has_mismatch_indices();
+  if (mismatch_indices_ == &::google::protobuf::internal::kEmptyString) {
+    mismatch_indices_ = new ::std::string;
   }
-  return error_indices_;
+  return mismatch_indices_;
 }
-inline ::std::string* ReadAlignment::release_error_indices() {
-  clear_has_error_indices();
-  if (error_indices_ == &::google::protobuf::internal::kEmptyString) {
+inline ::std::string* ReadAlignment::release_mismatch_indices() {
+  clear_has_mismatch_indices();
+  if (mismatch_indices_ == &::google::protobuf::internal::kEmptyString) {
     return NULL;
   } else {
-    ::std::string* temp = error_indices_;
-    error_indices_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
+    ::std::string* temp = mismatch_indices_;
+    mismatch_indices_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
     return temp;
   }
 }
 
-// required bytes bias_indices = 3;
+// optional bytes mismatch_nucs = 5;
+inline bool ReadAlignment::has_mismatch_nucs() const {
+  return (_has_bits_[0] & 0x00000010u) != 0;
+}
+inline void ReadAlignment::set_has_mismatch_nucs() {
+  _has_bits_[0] |= 0x00000010u;
+}
+inline void ReadAlignment::clear_has_mismatch_nucs() {
+  _has_bits_[0] &= ~0x00000010u;
+}
+inline void ReadAlignment::clear_mismatch_nucs() {
+  if (mismatch_nucs_ != &::google::protobuf::internal::kEmptyString) {
+    mismatch_nucs_->clear();
+  }
+  clear_has_mismatch_nucs();
+}
+inline const ::std::string& ReadAlignment::mismatch_nucs() const {
+  return *mismatch_nucs_;
+}
+inline void ReadAlignment::set_mismatch_nucs(const ::std::string& value) {
+  set_has_mismatch_nucs();
+  if (mismatch_nucs_ == &::google::protobuf::internal::kEmptyString) {
+    mismatch_nucs_ = new ::std::string;
+  }
+  mismatch_nucs_->assign(value);
+}
+inline void ReadAlignment::set_mismatch_nucs(const char* value) {
+  set_has_mismatch_nucs();
+  if (mismatch_nucs_ == &::google::protobuf::internal::kEmptyString) {
+    mismatch_nucs_ = new ::std::string;
+  }
+  mismatch_nucs_->assign(value);
+}
+inline void ReadAlignment::set_mismatch_nucs(const void* value, size_t size) {
+  set_has_mismatch_nucs();
+  if (mismatch_nucs_ == &::google::protobuf::internal::kEmptyString) {
+    mismatch_nucs_ = new ::std::string;
+  }
+  mismatch_nucs_->assign(reinterpret_cast<const char*>(value), size);
+}
+inline ::std::string* ReadAlignment::mutable_mismatch_nucs() {
+  set_has_mismatch_nucs();
+  if (mismatch_nucs_ == &::google::protobuf::internal::kEmptyString) {
+    mismatch_nucs_ = new ::std::string;
+  }
+  return mismatch_nucs_;
+}
+inline ::std::string* ReadAlignment::release_mismatch_nucs() {
+  clear_has_mismatch_nucs();
+  if (mismatch_nucs_ == &::google::protobuf::internal::kEmptyString) {
+    return NULL;
+  } else {
+    ::std::string* temp = mismatch_nucs_;
+    mismatch_nucs_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
+    return temp;
+  }
+}
+
+// optional bytes bias_indices = 6;
 inline bool ReadAlignment::has_bias_indices() const {
-  return (_has_bits_[0] & 0x00000004u) != 0;
+  return (_has_bits_[0] & 0x00000020u) != 0;
 }
 inline void ReadAlignment::set_has_bias_indices() {
-  _has_bits_[0] |= 0x00000004u;
+  _has_bits_[0] |= 0x00000020u;
 }
 inline void ReadAlignment::clear_has_bias_indices() {
-  _has_bits_[0] &= ~0x00000004u;
+  _has_bits_[0] &= ~0x00000020u;
 }
 inline void ReadAlignment::clear_bias_indices() {
   if (bias_indices_ != &::google::protobuf::internal::kEmptyString) {
@@ -524,15 +660,15 @@ inline ::std::string* ReadAlignment::release_bias_indices() {
   }
 }
 
-// required uint32 bias_start_pos = 4;
+// optional uint32 bias_start_pos = 7;
 inline bool ReadAlignment::has_bias_start_pos() const {
-  return (_has_bits_[0] & 0x00000008u) != 0;
+  return (_has_bits_[0] & 0x00000040u) != 0;
 }
 inline void ReadAlignment::set_has_bias_start_pos() {
-  _has_bits_[0] |= 0x00000008u;
+  _has_bits_[0] |= 0x00000040u;
 }
 inline void ReadAlignment::clear_has_bias_start_pos() {
-  _has_bits_[0] &= ~0x00000008u;
+  _has_bits_[0] &= ~0x00000040u;
 }
 inline void ReadAlignment::clear_bias_start_pos() {
   bias_start_pos_ = 0u;

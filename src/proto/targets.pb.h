@@ -115,10 +115,21 @@ class Target : public ::google::protobuf::Message {
   inline ::google::protobuf::uint32 length() const;
   inline void set_length(::google::protobuf::uint32 value);
   
-  // required bytes bias_indices_l = 4;
+  // required bytes seq = 4;
+  inline bool has_seq() const;
+  inline void clear_seq();
+  static const int kSeqFieldNumber = 4;
+  inline const ::std::string& seq() const;
+  inline void set_seq(const ::std::string& value);
+  inline void set_seq(const char* value);
+  inline void set_seq(const void* value, size_t size);
+  inline ::std::string* mutable_seq();
+  inline ::std::string* release_seq();
+  
+  // required bytes bias_indices_l = 5;
   inline bool has_bias_indices_l() const;
   inline void clear_bias_indices_l();
-  static const int kBiasIndicesLFieldNumber = 4;
+  static const int kBiasIndicesLFieldNumber = 5;
   inline const ::std::string& bias_indices_l() const;
   inline void set_bias_indices_l(const ::std::string& value);
   inline void set_bias_indices_l(const char* value);
@@ -126,10 +137,10 @@ class Target : public ::google::protobuf::Message {
   inline ::std::string* mutable_bias_indices_l();
   inline ::std::string* release_bias_indices_l();
   
-  // required bytes bias_indices_r = 5;
+  // required bytes bias_indices_r = 6;
   inline bool has_bias_indices_r() const;
   inline void clear_bias_indices_r();
-  static const int kBiasIndicesRFieldNumber = 5;
+  static const int kBiasIndicesRFieldNumber = 6;
   inline const ::std::string& bias_indices_r() const;
   inline void set_bias_indices_r(const ::std::string& value);
   inline void set_bias_indices_r(const char* value);
@@ -145,6 +156,8 @@ class Target : public ::google::protobuf::Message {
   inline void clear_has_id();
   inline void set_has_length();
   inline void clear_has_length();
+  inline void set_has_seq();
+  inline void clear_has_seq();
   inline void set_has_bias_indices_l();
   inline void clear_has_bias_indices_l();
   inline void set_has_bias_indices_r();
@@ -155,11 +168,12 @@ class Target : public ::google::protobuf::Message {
   ::std::string* name_;
   ::google::protobuf::uint32 id_;
   ::google::protobuf::uint32 length_;
+  ::std::string* seq_;
   ::std::string* bias_indices_l_;
   ::std::string* bias_indices_r_;
   
   mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(5 + 31) / 32];
+  ::google::protobuf::uint32 _has_bits_[(6 + 31) / 32];
   
   friend void  protobuf_AddDesc_targets_2eproto();
   friend void protobuf_AssignDesc_targets_2eproto();
@@ -277,15 +291,73 @@ inline void Target::set_length(::google::protobuf::uint32 value) {
   length_ = value;
 }
 
-// required bytes bias_indices_l = 4;
-inline bool Target::has_bias_indices_l() const {
+// required bytes seq = 4;
+inline bool Target::has_seq() const {
   return (_has_bits_[0] & 0x00000008u) != 0;
 }
-inline void Target::set_has_bias_indices_l() {
+inline void Target::set_has_seq() {
   _has_bits_[0] |= 0x00000008u;
 }
-inline void Target::clear_has_bias_indices_l() {
+inline void Target::clear_has_seq() {
   _has_bits_[0] &= ~0x00000008u;
+}
+inline void Target::clear_seq() {
+  if (seq_ != &::google::protobuf::internal::kEmptyString) {
+    seq_->clear();
+  }
+  clear_has_seq();
+}
+inline const ::std::string& Target::seq() const {
+  return *seq_;
+}
+inline void Target::set_seq(const ::std::string& value) {
+  set_has_seq();
+  if (seq_ == &::google::protobuf::internal::kEmptyString) {
+    seq_ = new ::std::string;
+  }
+  seq_->assign(value);
+}
+inline void Target::set_seq(const char* value) {
+  set_has_seq();
+  if (seq_ == &::google::protobuf::internal::kEmptyString) {
+    seq_ = new ::std::string;
+  }
+  seq_->assign(value);
+}
+inline void Target::set_seq(const void* value, size_t size) {
+  set_has_seq();
+  if (seq_ == &::google::protobuf::internal::kEmptyString) {
+    seq_ = new ::std::string;
+  }
+  seq_->assign(reinterpret_cast<const char*>(value), size);
+}
+inline ::std::string* Target::mutable_seq() {
+  set_has_seq();
+  if (seq_ == &::google::protobuf::internal::kEmptyString) {
+    seq_ = new ::std::string;
+  }
+  return seq_;
+}
+inline ::std::string* Target::release_seq() {
+  clear_has_seq();
+  if (seq_ == &::google::protobuf::internal::kEmptyString) {
+    return NULL;
+  } else {
+    ::std::string* temp = seq_;
+    seq_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
+    return temp;
+  }
+}
+
+// required bytes bias_indices_l = 5;
+inline bool Target::has_bias_indices_l() const {
+  return (_has_bits_[0] & 0x00000010u) != 0;
+}
+inline void Target::set_has_bias_indices_l() {
+  _has_bits_[0] |= 0x00000010u;
+}
+inline void Target::clear_has_bias_indices_l() {
+  _has_bits_[0] &= ~0x00000010u;
 }
 inline void Target::clear_bias_indices_l() {
   if (bias_indices_l_ != &::google::protobuf::internal::kEmptyString) {
@@ -335,15 +407,15 @@ inline ::std::string* Target::release_bias_indices_l() {
   }
 }
 
-// required bytes bias_indices_r = 5;
+// required bytes bias_indices_r = 6;
 inline bool Target::has_bias_indices_r() const {
-  return (_has_bits_[0] & 0x00000010u) != 0;
+  return (_has_bits_[0] & 0x00000020u) != 0;
 }
 inline void Target::set_has_bias_indices_r() {
-  _has_bits_[0] |= 0x00000010u;
+  _has_bits_[0] |= 0x00000020u;
 }
 inline void Target::clear_has_bias_indices_r() {
-  _has_bits_[0] &= ~0x00000010u;
+  _has_bits_[0] &= ~0x00000020u;
 }
 inline void Target::clear_bias_indices_r() {
   if (bias_indices_r_ != &::google::protobuf::internal::kEmptyString) {

@@ -37,9 +37,12 @@ void protobuf_AssignDesc_alignments_2eproto() {
       "alignments.proto");
   GOOGLE_CHECK(file != NULL);
   ReadAlignment_descriptor_ = file->message_type(0);
-  static const int ReadAlignment_offsets_[4] = {
+  static const int ReadAlignment_offsets_[7] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(ReadAlignment, first_),
-    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(ReadAlignment, error_indices_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(ReadAlignment, left_pos_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(ReadAlignment, right_pos_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(ReadAlignment, mismatch_indices_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(ReadAlignment, mismatch_nucs_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(ReadAlignment, bias_indices_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(ReadAlignment, bias_start_pos_),
   };
@@ -127,15 +130,17 @@ void protobuf_AddDesc_alignments_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
   ::google::protobuf::DescriptorPool::InternalAddGeneratedFile(
-    "\n\020alignments.proto\022\005proto\"c\n\rReadAlignme"
-    "nt\022\r\n\005first\030\001 \002(\010\022\025\n\rerror_indices\030\002 \002(\014"
-    "\022\024\n\014bias_indices\030\003 \002(\014\022\026\n\016bias_start_pos"
-    "\030\004 \002(\r\"\202\001\n\021FragmentAlignment\022\021\n\ttarget_i"
-    "d\030\001 \002(\r\022\016\n\006length\030\002 \001(\r\022$\n\006read_l\030\003 \001(\0132"
-    "\024.proto.ReadAlignment\022$\n\006read_r\030\004 \001(\0132\024."
-    "proto.ReadAlignment\"V\n\010Fragment\022\014\n\004name\030"
-    "\001 \001(\t\022\016\n\006paired\030\002 \002(\010\022,\n\nalignments\030\003 \003("
-    "\0132\030.proto.FragmentAlignment", 347);
+    "\n\020alignments.proto\022\005proto\"\242\001\n\rReadAlignm"
+    "ent\022\r\n\005first\030\001 \002(\010\022\020\n\010left_pos\030\002 \001(\r\022\021\n\t"
+    "right_pos\030\003 \001(\r\022\030\n\020mismatch_indices\030\004 \001("
+    "\014\022\025\n\rmismatch_nucs\030\005 \001(\014\022\024\n\014bias_indices"
+    "\030\006 \001(\014\022\026\n\016bias_start_pos\030\007 \001(\r\"\202\001\n\021Fragm"
+    "entAlignment\022\021\n\ttarget_id\030\001 \002(\r\022\016\n\006lengt"
+    "h\030\002 \001(\r\022$\n\006read_l\030\003 \001(\0132\024.proto.ReadAlig"
+    "nment\022$\n\006read_r\030\004 \001(\0132\024.proto.ReadAlignm"
+    "ent\"V\n\010Fragment\022\014\n\004name\030\001 \001(\t\022\016\n\006paired\030"
+    "\002 \002(\010\022,\n\nalignments\030\003 \003(\0132\030.proto.Fragme"
+    "ntAlignment", 411);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "alignments.proto", &protobuf_RegisterTypes);
   ReadAlignment::default_instance_ = new ReadAlignment();
@@ -159,7 +164,10 @@ struct StaticDescriptorInitializer_alignments_2eproto {
 
 #ifndef _MSC_VER
 const int ReadAlignment::kFirstFieldNumber;
-const int ReadAlignment::kErrorIndicesFieldNumber;
+const int ReadAlignment::kLeftPosFieldNumber;
+const int ReadAlignment::kRightPosFieldNumber;
+const int ReadAlignment::kMismatchIndicesFieldNumber;
+const int ReadAlignment::kMismatchNucsFieldNumber;
 const int ReadAlignment::kBiasIndicesFieldNumber;
 const int ReadAlignment::kBiasStartPosFieldNumber;
 #endif  // !_MSC_VER
@@ -181,7 +189,10 @@ ReadAlignment::ReadAlignment(const ReadAlignment& from)
 void ReadAlignment::SharedCtor() {
   _cached_size_ = 0;
   first_ = false;
-  error_indices_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
+  left_pos_ = 0u;
+  right_pos_ = 0u;
+  mismatch_indices_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
+  mismatch_nucs_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
   bias_indices_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
   bias_start_pos_ = 0u;
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
@@ -192,8 +203,11 @@ ReadAlignment::~ReadAlignment() {
 }
 
 void ReadAlignment::SharedDtor() {
-  if (error_indices_ != &::google::protobuf::internal::kEmptyString) {
-    delete error_indices_;
+  if (mismatch_indices_ != &::google::protobuf::internal::kEmptyString) {
+    delete mismatch_indices_;
+  }
+  if (mismatch_nucs_ != &::google::protobuf::internal::kEmptyString) {
+    delete mismatch_nucs_;
   }
   if (bias_indices_ != &::google::protobuf::internal::kEmptyString) {
     delete bias_indices_;
@@ -225,9 +239,16 @@ ReadAlignment* ReadAlignment::New() const {
 void ReadAlignment::Clear() {
   if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
     first_ = false;
-    if (has_error_indices()) {
-      if (error_indices_ != &::google::protobuf::internal::kEmptyString) {
-        error_indices_->clear();
+    left_pos_ = 0u;
+    right_pos_ = 0u;
+    if (has_mismatch_indices()) {
+      if (mismatch_indices_ != &::google::protobuf::internal::kEmptyString) {
+        mismatch_indices_->clear();
+      }
+    }
+    if (has_mismatch_nucs()) {
+      if (mismatch_nucs_ != &::google::protobuf::internal::kEmptyString) {
+        mismatch_nucs_->clear();
       }
     }
     if (has_bias_indices()) {
@@ -258,26 +279,72 @@ bool ReadAlignment::MergePartialFromCodedStream(
         } else {
           goto handle_uninterpreted;
         }
-        if (input->ExpectTag(18)) goto parse_error_indices;
+        if (input->ExpectTag(16)) goto parse_left_pos;
         break;
       }
       
-      // required bytes error_indices = 2;
+      // optional uint32 left_pos = 2;
       case 2: {
         if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
-            ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
-         parse_error_indices:
-          DO_(::google::protobuf::internal::WireFormatLite::ReadBytes(
-                input, this->mutable_error_indices()));
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_VARINT) {
+         parse_left_pos:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::uint32, ::google::protobuf::internal::WireFormatLite::TYPE_UINT32>(
+                 input, &left_pos_)));
+          set_has_left_pos();
         } else {
           goto handle_uninterpreted;
         }
-        if (input->ExpectTag(26)) goto parse_bias_indices;
+        if (input->ExpectTag(24)) goto parse_right_pos;
         break;
       }
       
-      // required bytes bias_indices = 3;
+      // optional uint32 right_pos = 3;
       case 3: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_VARINT) {
+         parse_right_pos:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::uint32, ::google::protobuf::internal::WireFormatLite::TYPE_UINT32>(
+                 input, &right_pos_)));
+          set_has_right_pos();
+        } else {
+          goto handle_uninterpreted;
+        }
+        if (input->ExpectTag(34)) goto parse_mismatch_indices;
+        break;
+      }
+      
+      // optional bytes mismatch_indices = 4;
+      case 4: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
+         parse_mismatch_indices:
+          DO_(::google::protobuf::internal::WireFormatLite::ReadBytes(
+                input, this->mutable_mismatch_indices()));
+        } else {
+          goto handle_uninterpreted;
+        }
+        if (input->ExpectTag(42)) goto parse_mismatch_nucs;
+        break;
+      }
+      
+      // optional bytes mismatch_nucs = 5;
+      case 5: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
+         parse_mismatch_nucs:
+          DO_(::google::protobuf::internal::WireFormatLite::ReadBytes(
+                input, this->mutable_mismatch_nucs()));
+        } else {
+          goto handle_uninterpreted;
+        }
+        if (input->ExpectTag(50)) goto parse_bias_indices;
+        break;
+      }
+      
+      // optional bytes bias_indices = 6;
+      case 6: {
         if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
             ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
          parse_bias_indices:
@@ -286,12 +353,12 @@ bool ReadAlignment::MergePartialFromCodedStream(
         } else {
           goto handle_uninterpreted;
         }
-        if (input->ExpectTag(32)) goto parse_bias_start_pos;
+        if (input->ExpectTag(56)) goto parse_bias_start_pos;
         break;
       }
       
-      // required uint32 bias_start_pos = 4;
-      case 4: {
+      // optional uint32 bias_start_pos = 7;
+      case 7: {
         if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
             ::google::protobuf::internal::WireFormatLite::WIRETYPE_VARINT) {
          parse_bias_start_pos:
@@ -329,21 +396,37 @@ void ReadAlignment::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormatLite::WriteBool(1, this->first(), output);
   }
   
-  // required bytes error_indices = 2;
-  if (has_error_indices()) {
-    ::google::protobuf::internal::WireFormatLite::WriteBytes(
-      2, this->error_indices(), output);
+  // optional uint32 left_pos = 2;
+  if (has_left_pos()) {
+    ::google::protobuf::internal::WireFormatLite::WriteUInt32(2, this->left_pos(), output);
   }
   
-  // required bytes bias_indices = 3;
+  // optional uint32 right_pos = 3;
+  if (has_right_pos()) {
+    ::google::protobuf::internal::WireFormatLite::WriteUInt32(3, this->right_pos(), output);
+  }
+  
+  // optional bytes mismatch_indices = 4;
+  if (has_mismatch_indices()) {
+    ::google::protobuf::internal::WireFormatLite::WriteBytes(
+      4, this->mismatch_indices(), output);
+  }
+  
+  // optional bytes mismatch_nucs = 5;
+  if (has_mismatch_nucs()) {
+    ::google::protobuf::internal::WireFormatLite::WriteBytes(
+      5, this->mismatch_nucs(), output);
+  }
+  
+  // optional bytes bias_indices = 6;
   if (has_bias_indices()) {
     ::google::protobuf::internal::WireFormatLite::WriteBytes(
-      3, this->bias_indices(), output);
+      6, this->bias_indices(), output);
   }
   
-  // required uint32 bias_start_pos = 4;
+  // optional uint32 bias_start_pos = 7;
   if (has_bias_start_pos()) {
-    ::google::protobuf::internal::WireFormatLite::WriteUInt32(4, this->bias_start_pos(), output);
+    ::google::protobuf::internal::WireFormatLite::WriteUInt32(7, this->bias_start_pos(), output);
   }
   
   if (!unknown_fields().empty()) {
@@ -359,23 +442,40 @@ void ReadAlignment::SerializeWithCachedSizes(
     target = ::google::protobuf::internal::WireFormatLite::WriteBoolToArray(1, this->first(), target);
   }
   
-  // required bytes error_indices = 2;
-  if (has_error_indices()) {
-    target =
-      ::google::protobuf::internal::WireFormatLite::WriteBytesToArray(
-        2, this->error_indices(), target);
+  // optional uint32 left_pos = 2;
+  if (has_left_pos()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteUInt32ToArray(2, this->left_pos(), target);
   }
   
-  // required bytes bias_indices = 3;
+  // optional uint32 right_pos = 3;
+  if (has_right_pos()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteUInt32ToArray(3, this->right_pos(), target);
+  }
+  
+  // optional bytes mismatch_indices = 4;
+  if (has_mismatch_indices()) {
+    target =
+      ::google::protobuf::internal::WireFormatLite::WriteBytesToArray(
+        4, this->mismatch_indices(), target);
+  }
+  
+  // optional bytes mismatch_nucs = 5;
+  if (has_mismatch_nucs()) {
+    target =
+      ::google::protobuf::internal::WireFormatLite::WriteBytesToArray(
+        5, this->mismatch_nucs(), target);
+  }
+  
+  // optional bytes bias_indices = 6;
   if (has_bias_indices()) {
     target =
       ::google::protobuf::internal::WireFormatLite::WriteBytesToArray(
-        3, this->bias_indices(), target);
+        6, this->bias_indices(), target);
   }
   
-  // required uint32 bias_start_pos = 4;
+  // optional uint32 bias_start_pos = 7;
   if (has_bias_start_pos()) {
-    target = ::google::protobuf::internal::WireFormatLite::WriteUInt32ToArray(4, this->bias_start_pos(), target);
+    target = ::google::protobuf::internal::WireFormatLite::WriteUInt32ToArray(7, this->bias_start_pos(), target);
   }
   
   if (!unknown_fields().empty()) {
@@ -394,21 +494,42 @@ int ReadAlignment::ByteSize() const {
       total_size += 1 + 1;
     }
     
-    // required bytes error_indices = 2;
-    if (has_error_indices()) {
+    // optional uint32 left_pos = 2;
+    if (has_left_pos()) {
       total_size += 1 +
-        ::google::protobuf::internal::WireFormatLite::BytesSize(
-          this->error_indices());
+        ::google::protobuf::internal::WireFormatLite::UInt32Size(
+          this->left_pos());
     }
     
-    // required bytes bias_indices = 3;
+    // optional uint32 right_pos = 3;
+    if (has_right_pos()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::UInt32Size(
+          this->right_pos());
+    }
+    
+    // optional bytes mismatch_indices = 4;
+    if (has_mismatch_indices()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::BytesSize(
+          this->mismatch_indices());
+    }
+    
+    // optional bytes mismatch_nucs = 5;
+    if (has_mismatch_nucs()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::BytesSize(
+          this->mismatch_nucs());
+    }
+    
+    // optional bytes bias_indices = 6;
     if (has_bias_indices()) {
       total_size += 1 +
         ::google::protobuf::internal::WireFormatLite::BytesSize(
           this->bias_indices());
     }
     
-    // required uint32 bias_start_pos = 4;
+    // optional uint32 bias_start_pos = 7;
     if (has_bias_start_pos()) {
       total_size += 1 +
         ::google::protobuf::internal::WireFormatLite::UInt32Size(
@@ -445,8 +566,17 @@ void ReadAlignment::MergeFrom(const ReadAlignment& from) {
     if (from.has_first()) {
       set_first(from.first());
     }
-    if (from.has_error_indices()) {
-      set_error_indices(from.error_indices());
+    if (from.has_left_pos()) {
+      set_left_pos(from.left_pos());
+    }
+    if (from.has_right_pos()) {
+      set_right_pos(from.right_pos());
+    }
+    if (from.has_mismatch_indices()) {
+      set_mismatch_indices(from.mismatch_indices());
+    }
+    if (from.has_mismatch_nucs()) {
+      set_mismatch_nucs(from.mismatch_nucs());
     }
     if (from.has_bias_indices()) {
       set_bias_indices(from.bias_indices());
@@ -471,7 +601,7 @@ void ReadAlignment::CopyFrom(const ReadAlignment& from) {
 }
 
 bool ReadAlignment::IsInitialized() const {
-  if ((_has_bits_[0] & 0x0000000f) != 0x0000000f) return false;
+  if ((_has_bits_[0] & 0x00000001) != 0x00000001) return false;
   
   return true;
 }
@@ -479,7 +609,10 @@ bool ReadAlignment::IsInitialized() const {
 void ReadAlignment::Swap(ReadAlignment* other) {
   if (other != this) {
     std::swap(first_, other->first_);
-    std::swap(error_indices_, other->error_indices_);
+    std::swap(left_pos_, other->left_pos_);
+    std::swap(right_pos_, other->right_pos_);
+    std::swap(mismatch_indices_, other->mismatch_indices_);
+    std::swap(mismatch_nucs_, other->mismatch_nucs_);
     std::swap(bias_indices_, other->bias_indices_);
     std::swap(bias_start_pos_, other->bias_start_pos_);
     std::swap(_has_bits_[0], other->_has_bits_[0]);
