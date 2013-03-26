@@ -159,6 +159,8 @@ class Sequence {
    *        p-values at each position.
    */
   virtual void calc_p_vals(std::vector<double>& p_vals) const = 0;
+  // DOC
+  std::string serialize();
 };
 
 /**

@@ -428,12 +428,6 @@ void process_fragment(Fragment* frag_p) {
 
   // Update bundles and merge in first loop
   Bundle* bundle = frag.hits()[0]->target()->bundle();
-  if (first_round) {
-    bundle->incr_counts();
-  }
-  if (first_round || online_additional) {
-    bundle->incr_mass(mass_n);
-  }
   
   // calculate marginal likelihoods and lock targets.
   if (frag.num_hits()>1) {
@@ -482,8 +476,23 @@ void process_fragment(Fragment* frag_p) {
     }
   }
 
-  assert(!islzero(total_likelihood));
+  if (islzero(total_likelihood)){
+    assert(expr_alpha_map);
+    cerr << "Warning: Fragment '" << frag.name() << "' has 0 likelihood of "
+         << "originating from the transcriptome. Skipping.";
+    foreach (const Target* t, locked_set) {
+      t->unlock();
+    }
+    return;
+  }
 
+  if (first_round) {
+    bundle->incr_counts();
+  }
+  if (first_round || online_additional) {
+    bundle->incr_mass(mass_n);
+  }
+  
   // normalize marginal likelihoods
   for (size_t i = 0; i < frag.num_hits(); ++i) {
     FragHit& m = *frag[i];

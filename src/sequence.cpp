@@ -13,6 +13,18 @@
 using namespace std;
 using namespace boost::math;
 
+string Sequence::serialize() {
+  vector<char> seq;
+  for (size_t i = 0; i < length(); i++) {
+    if (i/4 == seq.size()) {
+      seq.push_back(0);
+    }
+    seq.back() += operator[](i) << (2 * (i % 4));
+  }
+  
+  return string(seq.begin(), seq.end());
+}
+
 SequenceFwd::SequenceFwd():  _ref_seq(NULL), _prob(0), _len(0) {}
 
 SequenceFwd::SequenceFwd(const std::string& seq, bool rev, bool prob)

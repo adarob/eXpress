@@ -175,7 +175,7 @@ int preprocess_main() {
     target_proto.set_name(targ.name());
     target_proto.set_id((unsigned int)targ.id());
     target_proto.set_length((unsigned int)targ.length());
-    
+    target_proto.set_seq(targ.seq(0).serialize());
     vector<char> bias_indices_l = bias_model.get_indices(targ.seq(0));
     target_proto.set_bias_indices_l(string(bias_indices_l.begin(),
                                            bias_indices_l.end()));
@@ -226,16 +226,23 @@ int preprocess_main() {
       align_proto.set_length((unsigned int)fh.length());
       
       vector<char> left_mm_indices;
+      vector<char> left_mm_seq;
       vector<char> right_mm_indices;
+      vector<char> right_mm_seq;
       
-      mismatch_table.get_indices(fh, left_mm_indices, right_mm_indices);
+      mismatch_table.get_indices(fh, left_mm_indices, left_mm_seq,
+                                 right_mm_seq, right_mm_indices);
       
       ReadHit* read_l = fh.left_read();
       if (read_l) {
         proto::ReadAlignment& read_proto = *align_proto.mutable_read_l();
         read_proto.set_first(read_l->first);
-        read_proto.set_error_indices(string(left_mm_indices.begin(),
+        read_proto.set_left_pos(read_l->left);
+        read_proto.set_right_pos(read_l->right);
+        read_proto.set_mismatch_indices(string(left_mm_indices.begin(),
                                             left_mm_indices.end()));
+        read_proto.set_mismatch_nucs(string(left_mm_seq.begin(),
+                                            left_mm_seq.end()));
         vector<char> bias_indices;
         size_t start_pos = bias_model.get_indices(fh.target()->seq(0),
                                                   (int)read_l->left,
@@ -249,8 +256,12 @@ int preprocess_main() {
       if (read_r) {
         proto::ReadAlignment& read_proto = *align_proto.mutable_read_r();
         read_proto.set_first(read_r->first);
-        read_proto.set_error_indices(string(right_mm_indices.begin(),
-                                            right_mm_indices.end()));
+        read_proto.set_left_pos(read_r->left);
+        read_proto.set_right_pos(read_r->right);
+        read_proto.set_mismatch_indices(string(right_mm_indices.begin(),
+                                               right_mm_indices.end()));
+        read_proto.set_mismatch_nucs(string(right_mm_seq.begin(),
+                                            right_mm_seq.end()));
         vector<char> bias_indices;
         size_t start_pos = bias_model.get_indices(fh.target()->seq(1),
                                                   (int)(fh.target()->length()

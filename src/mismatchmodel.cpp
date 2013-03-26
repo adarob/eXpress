@@ -159,7 +159,9 @@ MismatchTable::MismatchTable(string param_file_name)
 
 void MismatchTable::get_indices(const FragHit& f,
                            vector<char>& left_indices,
-                           vector<char>& right_indices) const {
+                           vector<char>& left_seq,
+                           vector<char>& right_indices,
+                           vector<char>& right_seq) const {
 
   const Target& targ = *f.target();
   const Sequence& t_seq_fwd = targ.seq(0);
@@ -168,13 +170,21 @@ void MismatchTable::get_indices(const FragHit& f,
   if (f.left_read()) {
     const ReadHit& read_l = *f.left_read();
     
-    left_indices = vector<char>(read_l.seq.length(), 255);
+    left_indices = vector<char>();
+    left_seq = vector<char>();
     
     size_t i = 0;  // read index
     size_t j = read_l.left;  // genomic index
     
     vector<Indel>::const_iterator ins = read_l.inserts.begin();
     vector<Indel>::const_iterator del = read_l.deletes.begin();
+    
+    if (read_l.inserts.size() || read_l.deletes.size()) {
+      cerr << "ERROR: Indels are not currently supported for eXpress-Spark.\n";
+      exit(1);
+    }
+    
+    size_t cur_seq_bit = 0;
     
     while (i < read_l.seq.length()) {
       if (del != read_l.deletes.end() && del->pos == i) {
@@ -185,10 +195,18 @@ void MismatchTable::get_indices(const FragHit& f,
         ins++;
       } else {
         size_t cur = read_l.seq[i];
-        size_t prev = (i) ? (read_l.seq[i-1] << 2) : 0;
+        //size_t prev = (i) ? (read_l.seq[i-1] << 2) : 0;
         size_t ref = t_seq_fwd[j];
-        size_t index = prev + ref;
-        left_indices[i] = (index << 2) + cur;
+        //size_t index = prev + ref;
+        //        left_indices[i] = (index << 2) + cur;
+        if (cur != ref) {
+          left_indices.push_back(i);
+          if (cur_seq_bit / 8 == left_seq.size()) {
+            left_seq.push_back(0);
+          }
+          left_seq.back() += cur << (cur_seq_bit % 8);
+          cur_seq_bit += 2;
+        }
         
         i++;
         j++;
@@ -199,7 +217,8 @@ void MismatchTable::get_indices(const FragHit& f,
   if (f.right_read()) {
     const ReadHit& read_r = *f.right_read();
     
-    right_indices = vector<char>(read_r.seq.length(), 255);
+    right_indices = vector<char>();
+    right_seq = vector<char>();
 
     size_t r_len = read_r.seq.length();
     size_t i = 0;
@@ -207,7 +226,13 @@ void MismatchTable::get_indices(const FragHit& f,
         
     vector<Indel>::const_iterator ins = read_r.inserts.end()-1;
     vector<Indel>::const_iterator del = read_r.deletes.end()-1;
+
+    if (read_r.inserts.size() || read_r.deletes.size()) {
+      cerr << "ERROR: Indels are not currently supported for eXpress-Spark.\n";
+      exit(1);
+    }
     
+    size_t cur_seq_bit = 0;
     while (i < r_len) {
       if (del != read_r.deletes.begin() - 1 && del->pos == r_len - i) {
         j += del->len;
@@ -218,10 +243,19 @@ void MismatchTable::get_indices(const FragHit& f,
         ins--;
       } else {
         size_t cur = read_r.seq[i];
-        size_t prev = (i) ? (read_r.seq[i-1] << 2) : 0;
+        //size_t prev = (i) ? (read_r.seq[i-1] << 2) : 0;
         size_t ref = t_seq_rev[j];
-        size_t index = prev + ref;;
-        right_indices[i] = (index << 2) + cur;
+        //size_t index = prev + ref;;
+        //right_indices[i] = (index << 2) + cur;
+        
+        if (cur != ref) {
+          right_indices.push_back(i);
+          if (cur_seq_bit / 8 == right_seq.size()) {
+            right_seq.push_back(0);
+          }
+          right_seq.back() += cur << (cur_seq_bit % 8);
+          cur_seq_bit += 2;
+        }
         
         i++;
         j++;

@@ -85,10 +85,12 @@ class MismatchTable {
    * @param f the FragHit to find the table indices for.
    * @param left_indices the vector to store the left read's indices in.
    * @param right_indices the vector to store the right read's indices in.
+   DOC
    */
   void get_indices(const FragHit& f,
-                   std::vector<char>& left_indices,
-                   std::vector<char>& right_indices) const;
+                   std::vector<char>& left_indices, std::vector<char>& left_seq,
+                   std::vector<char>& right_indices,
+                   std::vector<char>& right_seq) const;
   /**
    * A member function that returns the log likelihood of mismatches and indels
    * in the mapping given the current error model parematers. Returns 0 if
