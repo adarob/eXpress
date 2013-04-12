@@ -231,7 +231,7 @@ int preprocess_main() {
       vector<char> right_mm_seq;
       
       mismatch_table.get_indices(fh, left_mm_indices, left_mm_seq,
-                                 right_mm_seq, right_mm_indices);
+                                 right_mm_indices, right_mm_seq);
       
       ReadHit* read_l = fh.left_read();
       if (read_l) {
