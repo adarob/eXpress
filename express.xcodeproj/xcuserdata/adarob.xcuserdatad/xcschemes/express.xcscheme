@@ -64,15 +64,15 @@
          </CommandLineArgument>
          <CommandLineArgument
             argument = "--no-bias-correct --batch-mode --output-running-rounds --aux-param-file /Volumes/math.mcb.berkeley.edu/experiments/express/debug/bray/for_adam/params.xprs --prior-params /Volumes/math.mcb.berkeley.edu/experiments/express/debug/bray/for_adam/s5_HCT20631-T24-14.fpkm0 -o /Volumes/math.mcb.berkeley.edu/experiments/express/debug/bray/for_adam/xprs_out /Volumes/math.mcb.berkeley.edu/experiments/express/debug/bray/Homo_sapiens.GRCh37.70.cdna.pc.fa /Volumes/math.mcb.berkeley.edu/experiments/express/debug/bray/for_adam/s5_HCT20631-T24-14.bam"
-            isEnabled = "YES">
+            isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
             argument = "--no-bias-correct --output-align-prob -o /Volumes/math.mcb.berkeley.edu/experiments/express/debug/ivan_out/ /Volumes/scratch/eXpress_9000bp_50.mm9_norandom.fa /Volumes/math.mcb.berkeley.edu/experiments/express/debug/ivan/CompareAlign/Sim_TBP.9000bp.k100_converted.sorted.bam"
             isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "-o /Users/adarob/Downloads/xprs_out /Users/adarob/Downloads/gencodeComp13.unique.formattedForExpress.fa /Users/adarob/Downloads/test.bam"
-            isEnabled = "NO">
+            argument = "--no-bias-correct -o /Users/adarob/Downloads/xprs_test /Users/adarob/Downloads/xprs_test/ppro_allHybERCC.fa /Users/adarob/Downloads/xprs_test/ppro454EM2pproAllHyb.bam"
+            isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
             argument = "--aux-param-file $(SRCROOT)/sample_data3/out2/params.xprs --frag-len-mean 250 --frag-len-stddev 50 -o $(SRCROOT)/sample_data3/out2 $(SRCROOT)/sample_data3/hox_ucsc.fa $(SRCROOT)/sample_data3/hits_1M.sam"
