@@ -238,7 +238,7 @@ int preprocess_main() {
         proto::ReadAlignment& read_proto = *align_proto.mutable_read_l();
         read_proto.set_first(read_l->first);
         read_proto.set_left_pos(read_l->left);
-        read_proto.set_right_pos(read_l->right);
+        read_proto.set_right_pos(read_l->right-1);
         read_proto.set_mismatch_indices(string(left_mm_indices.begin(),
                                             left_mm_indices.end()));
         read_proto.set_mismatch_nucs(string(left_mm_seq.begin(),
@@ -257,7 +257,7 @@ int preprocess_main() {
         proto::ReadAlignment& read_proto = *align_proto.mutable_read_r();
         read_proto.set_first(read_r->first);
         read_proto.set_left_pos(read_r->left);
-        read_proto.set_right_pos(read_r->right);
+        read_proto.set_right_pos(read_r->right-1);
         read_proto.set_mismatch_indices(string(right_mm_indices.begin(),
                                                right_mm_indices.end()));
         read_proto.set_mismatch_nucs(string(right_mm_seq.begin(),

@@ -10,10 +10,11 @@
  */
 
 #include "config.h"
-#include <cmath>
-#include <cassert>
 #include <algorithm>
 #include <boost/foreach.hpp>
+#include <cmath>
+#include <cassert>
+#include <limits>
 
 #define foreach BOOST_FOREACH
 
