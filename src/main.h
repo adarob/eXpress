@@ -13,6 +13,7 @@
 #include <cmath>
 #include <cassert>
 #include <algorithm>
+#include <limits>
 #include <boost/foreach.hpp>
 
 #define foreach BOOST_FOREACH
