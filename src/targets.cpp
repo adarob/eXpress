@@ -341,9 +341,12 @@ TargetTable::TargetTable(string targ_fasta_file, string haplotype_file,
     if (infile.is_open()) {
       while (infile.good()) {
         getline(infile, line, '\n');
+        if (infile.eof()) {
+          break;
+        }
         size_t split = line.find(",");
         if (split == string::npos) {
-          cerr << "ERROR: Haplotype file not formatted properly.";
+          cerr << "ERROR: Haplotype file not formatted properly.\n";
           exit(1);
         }
         Target* targ1 = _targ_map[targ_index.at(line.substr(0, split))];
@@ -655,7 +658,8 @@ void TargetTable::output_results(string output_dir, size_t tot_counts,
                varcov_file << "\t";
              }
              if (i==j) {
-               varcov_file << scientific << count_var;
+               varcov_file << scientific << sexp(get_covar(targ.id(), targ.id())
+                                                 + l_var_renorm);
              } else {
                varcov_file << scientific
                            << -sexp(get_covar(targ.id(), bundle_targ[j]->id())

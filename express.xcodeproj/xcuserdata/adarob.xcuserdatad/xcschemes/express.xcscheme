@@ -71,10 +71,6 @@
             isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "--no-bias-correct -o /Users/adarob/Downloads/xprs_test /Users/adarob/Downloads/xprs_test/ppro_allHybERCC.fa /Users/adarob/Downloads/xprs_test/ppro454EM2pproAllHyb.bam"
-            isEnabled = "YES">
-         </CommandLineArgument>
-         <CommandLineArgument
             argument = "--aux-param-file $(SRCROOT)/sample_data3/out2/params.xprs --frag-len-mean 250 --frag-len-stddev 50 -o $(SRCROOT)/sample_data3/out2 $(SRCROOT)/sample_data3/hox_ucsc.fa $(SRCROOT)/sample_data3/hits_1M.sam"
             isEnabled = "NO">
          </CommandLineArgument>

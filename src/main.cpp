@@ -529,16 +529,15 @@ void process_fragment(Fragment* frag_p) {
       }
     }
     if (calc_covar && (last_round || online_additional)) {
+      double var = 2*mass_n + p + log_sub(LOG_1, p);
+      lib.targ_table->update_covar(m.target_id(), m.target_id(), var);
       for (size_t j = i+1; j < frag.num_hits(); ++j) {
         const FragHit& m2 = *frag.hits()[j];
         double p2 = m2.params()->full_likelihood-total_likelihood;
         if (sexp(p2) == 0) {
           continue;
         }
-        double covar = p + p2;
-        if ((first_round && last_round) || online_additional) {
-          covar += 2*mass_n;
-        }
+        double covar = 2*mass_n + p + p2;
         lib.targ_table->update_covar(m.target_id(), m2.target_id(), covar);
       }
     }
