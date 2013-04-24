@@ -245,7 +245,8 @@ int preprocess_main() {
                                             left_mm_seq.end()));
         vector<char> bias_indices;
         size_t start_pos = bias_model.get_indices(fh.target()->seq(0),
-                                                  (int)read_l->left,
+                                                  (int)read_l->left
+                                                   - 10,
                                                   bias_indices);
         read_proto.set_bias_start_pos((unsigned int)start_pos);
         read_proto.set_bias_indices(string(bias_indices.begin(),
@@ -265,7 +266,7 @@ int preprocess_main() {
         vector<char> bias_indices;
         size_t start_pos = bias_model.get_indices(fh.target()->seq(1),
                                                   (int)(fh.target()->length()
-                                                        - read_r->right),
+                                                  - read_r->right - 10),
                                                   bias_indices);
         read_proto.set_bias_start_pos((unsigned int)start_pos);
         read_proto.set_bias_indices(string(bias_indices.begin(),
