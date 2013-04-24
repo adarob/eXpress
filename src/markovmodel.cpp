@@ -32,9 +32,9 @@ size_t MarkovModel::get_indices(const Sequence& seq, int left, vector<char>& ind
   
   size_t cond = 0;
   
-  if (left < _order) {
+  if (left != 0 && left < _order) {
     i = _order-left;
-    for (j=0; j < min(_order, i); j++) {
+    for (j=0; j < _order; j++) {
       cond = (cond << 2) + seq[j];
     }
   }
@@ -61,9 +61,9 @@ void MarkovModel::update(const Sequence& seq, int left, double mass) {
 
   size_t cond = 0;
   
-  if (left < _order) {
+  if (left != 0 && left < _order) {
     i = _order-left;
-    for (j=0; j < min(_order, i); j++) {
+    for (j=0; j < _order; j++) {
       cond = (cond << 2) + seq[j];
     }
   }
