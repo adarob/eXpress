@@ -63,8 +63,8 @@
             isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "--no-bias-correct --batch-mode --output-running-rounds --aux-param-file /Volumes/math.mcb.berkeley.edu/experiments/express/debug/bray/for_adam/params.xprs --prior-params /Volumes/math.mcb.berkeley.edu/experiments/express/debug/bray/for_adam/s5_HCT20631-T24-14.fpkm0 -o /Volumes/math.mcb.berkeley.edu/experiments/express/debug/bray/for_adam/xprs_out /Volumes/math.mcb.berkeley.edu/experiments/express/debug/bray/Homo_sapiens.GRCh37.70.cdna.pc.fa /Volumes/math.mcb.berkeley.edu/experiments/express/debug/bray/for_adam/s5_HCT20631-T24-14.bam"
-            isEnabled = "NO">
+            argument = "/Users/adarob/Downloads/rsem_sacCerEF4_eaGene2.fa /Users/adarob/Downloads/sacCer.4xprs.tx.bam"
+            isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
             argument = "--no-bias-correct --output-align-prob -o /Volumes/math.mcb.berkeley.edu/experiments/express/debug/ivan_out/ /Volumes/scratch/eXpress_9000bp_50.mm9_norandom.fa /Volumes/math.mcb.berkeley.edu/experiments/express/debug/ivan/CompareAlign/Sim_TBP.9000bp.k100_converted.sorted.bam"

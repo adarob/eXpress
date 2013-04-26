@@ -176,13 +176,6 @@ int preprocess_main() {
     target_proto.set_id((unsigned int)targ.id());
     target_proto.set_length((unsigned int)targ.length());
     target_proto.set_seq(targ.seq(0).serialize());
-    vector<char> bias_indices_l = bias_model.get_indices(targ.seq(0));
-    target_proto.set_bias_indices_l(string(bias_indices_l.begin(),
-                                           bias_indices_l.end()));
-    
-    vector<char> bias_indices_r = bias_model.get_indices(targ.seq(1));
-    target_proto.set_bias_indices_r(string(bias_indices_r.begin(),
-                                           bias_indices_r.end()));
     
     target_proto.SerializeToString(&out_buff);
     targ_out << base64_encode(out_buff) << endl;
@@ -243,14 +236,6 @@ int preprocess_main() {
                                             left_mm_indices.end()));
         read_proto.set_mismatch_nucs(string(left_mm_seq.begin(),
                                             left_mm_seq.end()));
-        vector<char> bias_indices;
-        size_t start_pos = bias_model.get_indices(fh.target()->seq(0),
-                                                  (int)read_l->left
-                                                   - 10,
-                                                  bias_indices);
-        read_proto.set_bias_start_pos((unsigned int)start_pos);
-        read_proto.set_bias_indices(string(bias_indices.begin(),
-                                           bias_indices.end()));
       }
 
       ReadHit* read_r = fh.right_read();
@@ -263,14 +248,6 @@ int preprocess_main() {
                                                right_mm_indices.end()));
         read_proto.set_mismatch_nucs(string(right_mm_seq.begin(),
                                             right_mm_seq.end()));
-        vector<char> bias_indices;
-        size_t start_pos = bias_model.get_indices(fh.target()->seq(1),
-                                                  (int)(fh.target()->length()
-                                                  - read_r->right - 10),
-                                                  bias_indices);
-        read_proto.set_bias_start_pos((unsigned int)start_pos);
-        read_proto.set_bias_indices(string(bias_indices.begin(),
-                                           bias_indices.end()));
       }
     }
     frag_proto.SerializeToString(&out_buff);
