@@ -59,15 +59,7 @@
       </BuildableProductRunnable>
       <CommandLineArguments>
          <CommandLineArgument
-            argument = "-o /Users/adarob/Dropbox/SeqData/xprs_out_0 /Users/adarob/Dropbox/SeqData/CeWS230_cds_transcripts.fa /Users/adarob/Desktop/Dfp_cdstranstrips_12-2-12_hits.bam"
-            isEnabled = "NO">
-         </CommandLineArgument>
-         <CommandLineArgument
             argument = "/Users/adarob/Downloads/rsem_sacCerEF4_eaGene2.fa /Users/adarob/Downloads/sacCer.4xprs.tx.bam"
-            isEnabled = "YES">
-         </CommandLineArgument>
-         <CommandLineArgument
-            argument = "--no-bias-correct --output-align-prob -o /Volumes/math.mcb.berkeley.edu/experiments/express/debug/ivan_out/ /Volumes/scratch/eXpress_9000bp_50.mm9_norandom.fa /Volumes/math.mcb.berkeley.edu/experiments/express/debug/ivan/CompareAlign/Sim_TBP.9000bp.k100_converted.sorted.bam"
             isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
@@ -76,7 +68,7 @@
          </CommandLineArgument>
          <CommandLineArgument
             argument = "-B 2 --frag-len-mean 250 --frag-len-stddev 50 -o $(SRCROOT)/sample_data3/out2 $(SRCROOT)/sample_data3/hox_ucsc.fa $(SRCROOT)/sample_data3/hits_1M.sam"
-            isEnabled = "NO">
+            isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
             argument = "--no-bias-correct -o hap -H /Volumes/math.mcb.berkeley.edu/experiments/ase/t1s1b0/hap.csv /Volumes/math.mcb.berkeley.edu/experiments/ase/t1s1b0/ugt3a2.fa /Volumes/math.mcb.berkeley.edu/experiments/ase/t1s1b0/hits.bam"

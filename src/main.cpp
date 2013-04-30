@@ -30,6 +30,14 @@
 #include "directiondetector.h"
 #include "library.h"
 
+#ifdef PROTO
+  #include "proto/alignments.pb.h"
+  #include "proto/targets.pb.h"
+  #include <boost/archive/iterators/base64_from_binary.hpp>
+  #include <boost/archive/iterators/transform_width.hpp>
+  #include <boost/archive/iterators/ostream_iterator.hpp>
+#endif
+
 #ifndef WIN32
   #include "update_check.h"
 #endif
@@ -99,6 +107,8 @@ bool online_additional = false;
 bool both = false;
 size_t remaining_rounds = 0;
 
+bool spark_pre = false;
+
 typedef boost::unordered_map<string, double> AlphaMap;
 AlphaMap* expr_alpha_map = NULL;
 
@@ -137,7 +147,7 @@ AlphaMap* parse_priors(string in_file) {
  * @return True iff there was an error.
  */
 bool parse_options(int ac, char ** av) {
-  
+
   size_t additional_online = 0;
   size_t additional_batch = 0;
   
@@ -146,6 +156,9 @@ bool parse_options(int ac, char ** av) {
   ("help,h", "produce help message")
   ("output-dir,o", po::value<string>(&output_dir)->default_value(output_dir),
    "write all output files to this directory")
+#ifdef PROTO
+  ("preprocess,D", "run preprocess script for eXpressD")
+#endif
   ("frag-len-mean,m", po::value<size_t>(&def_fl_mean)->default_value(def_fl_mean),
    "prior estimate for average fragment length")
   ("frag-len-stddev,s",
@@ -302,6 +315,7 @@ bool parse_options(int ac, char ** av) {
   batch_mode = vm.count("batch-mode");
   both = vm.count("both");
   remaining_rounds = max(additional_online, additional_batch);
+  spark_pre = vm.count("preprocess");
 
   if (batch_mode) {
     ff_param = 1;
@@ -890,6 +904,146 @@ int estimation_main() {
   return 0;
 }
 
+#ifdef PROTO
+inline string base64_encode(const string& to_encode) {
+  using namespace boost::archive::iterators;
+  typedef base64_from_binary<transform_width<string::const_iterator,6,8> > it_base64_t;
+  unsigned int writePaddChars = (3-to_encode.length()%3)%3;
+  string base64(it_base64_t(to_encode.begin()), it_base64_t(to_encode.end()));
+  base64.append(writePaddChars,'=');
+  return base64;
+}
+
+int preprocess_main() {
+  try {
+    fs::create_directories(output_dir);
+  } catch (fs::filesystem_error& e) {
+      cerr << e.what() << endl;
+  }
+  
+  if (!fs::exists(output_dir)) {
+    cerr << "ERROR: cannot create directory " << output_dir << ".\n";
+    exit(1);
+  }
+  
+  Librarian libs(1);
+  Library& lib = libs[0];
+  lib.in_file_name = in_map_file_names;
+  lib.out_file_name = "";
+  
+  lib.map_parser.reset(new MapParser (&lib, false));
+  lib.fld.reset(new LengthDistribution(0, 0, 0, 1, 2, 0));
+  MarkovModel bias_model(3, 21, 21, 0);
+  MismatchTable mismatch_table(0);
+  lib.targ_table.reset(new TargetTable (fasta_file_name, "", 0, 0, NULL, NULL,
+                                        &libs));
+  
+  cerr << "Converting targets to Protocol Buffers...\n";
+  fstream targ_out((output_dir + "/targets.pb").c_str(),
+                   ios::out | ios::trunc);
+  string out_buff;
+  proto::Target target_proto;
+  for (TargID id = 0; id < lib.targ_table->size(); ++id) {
+    target_proto.Clear();
+    Target& targ = *lib.targ_table->get_targ(id);
+    target_proto.set_name(targ.name());
+    target_proto.set_id((unsigned int)targ.id());
+    target_proto.set_length((unsigned int)targ.length());
+    target_proto.set_seq(targ.seq(0).serialize());
+    
+    target_proto.SerializeToString(&out_buff);
+    targ_out << base64_encode(out_buff) << endl;
+  }
+  targ_out.close();
+  
+  cerr << "Converting fragment alignments to Protocol Buffers..\n";
+  ostream frag_out(cout.rdbuf());
+  
+  size_t num_frags = 0;
+  cerr << setiosflags(ios::left);
+  Fragment* frag;
+  
+  ParseThreadSafety pts(10);
+  boost::thread parse(&MapParser::threaded_parse, lib.map_parser.get(), &pts,
+                      stop_at, 0);
+  RobertsFilter frags_seen;
+  proto::Fragment frag_proto;
+  while(true) {
+    frag_proto.Clear();
+    
+    // Pop next parsed fragment and set mass
+    frag = pts.proc_in.pop();
+    
+    if (!frag) {
+      break;
+    }
+    
+    // Test that we have not already seen this fragment
+    if (frags_seen.test_and_push(frag->name())) {
+      cerr << "ERROR: Alignments are not properly sorted. Read '"
+      << frag->name() << "' has alignments which are non-consecutive.\n";
+      exit(1);
+    }
+    
+    frag_proto.set_paired(frag->paired());
+    for (size_t i = 0; i < frag->num_hits(); ++i) {
+      FragHit& fh = *(*frag)[i];
+      proto::FragmentAlignment& align_proto = *frag_proto.add_alignments();
+      align_proto.set_target_id((unsigned int)fh.target_id());
+      align_proto.set_length((unsigned int)fh.length());
+      
+      vector<char> left_mm_indices;
+      vector<char> left_mm_seq;
+      vector<char> right_mm_indices;
+      vector<char> right_mm_seq;
+      
+      mismatch_table.get_indices(fh, left_mm_indices, left_mm_seq,
+                                 right_mm_indices, right_mm_seq);
+      
+      ReadHit* read_l = fh.left_read();
+      if (read_l) {
+        proto::ReadAlignment& read_proto = *align_proto.mutable_read_l();
+        read_proto.set_first(read_l->first);
+        read_proto.set_left_pos(read_l->left);
+        read_proto.set_right_pos(read_l->right-1);
+        read_proto.set_mismatch_indices(string(left_mm_indices.begin(),
+                                               left_mm_indices.end()));
+        read_proto.set_mismatch_nucs(string(left_mm_seq.begin(),
+                                            left_mm_seq.end()));
+      }
+      
+      ReadHit* read_r = fh.right_read();
+      if (read_r) {
+        proto::ReadAlignment& read_proto = *align_proto.mutable_read_r();
+        read_proto.set_first(read_r->first);
+        read_proto.set_left_pos(read_r->left);
+        read_proto.set_right_pos(read_r->right-1);
+        read_proto.set_mismatch_indices(string(right_mm_indices.begin(),
+                                               right_mm_indices.end()));
+        read_proto.set_mismatch_nucs(string(right_mm_seq.begin(),
+                                            right_mm_seq.end()));
+      }
+    }
+    frag_proto.SerializeToString(&out_buff);
+    frag_out << base64_encode(out_buff) << endl;
+    
+    pts.proc_out.push(frag);
+    
+    num_frags++;
+    
+    // Output progress
+    if (num_frags % 1000000 == 0) {
+      cerr << "Fragments Processed: " << setw(9) << num_frags << endl;
+    }
+  }
+  
+  parse.join();
+  
+  return 0;
+}
+#endif
+
+
 int main (int argc, char ** argv)
 {
 
@@ -898,6 +1052,12 @@ int main (int argc, char ** argv)
   if (parse_ret) {
     return parse_ret;
   }
-
+  
+#ifdef PROTO
+  if (spark_pre) {
+    return preprocess_main();
+  }
+#endif
+  
   return estimation_main();
 }

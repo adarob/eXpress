@@ -33,14 +33,18 @@ else(WIN32)
 	set(WIN32_INT 0)
 endif(WIN32)
 
+if (PROTOBUF_FOUND)
+  include_directories(${Boost_INCLUDE_DIRS} ${PROTOBUF_INCLUDE_DIR} "${CMAKE_CURRENT_SOURCE_DIR}/bamtools/include") 
+	set(PROTO_INT 1)
+else (PROTOBUF_FOUND)
+  include_directories(${Boost_INCLUDE_DIRS} "${CMAKE_CURRENT_SOURCE_DIR}/bamtools/include") 
+	set(PROTO_INT 0)
+endif(PROTOBUF_FOUND)
+
 configure_file (
   "${PROJECT_SOURCE_DIR}/src/config.h.in"
   "${PROJECT_SOURCE_DIR}/src/config.h"
   )
 
-if (PROTOBUF_FOUND)
-  include_directories(${Boost_INCLUDE_DIRS} ${PROTOBUF_INCLUDE_DIR} "${CMAKE_CURRENT_SOURCE_DIR}/bamtools/include") 
-else (PROTOBUF_FOUND)
-  include_directories(${Boost_INCLUDE_DIRS} "${CMAKE_CURRENT_SOURCE_DIR}/bamtools/include") 
-endif(PROTOBUF_FOUND)
+
 add_subdirectory(src)

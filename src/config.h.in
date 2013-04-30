@@ -6,3 +6,7 @@
 #else
 	#define SIZE_T_FMT "%zu"
 #endif
+
+#if @PROTO_INT@
+	#define PROTO
+#endif

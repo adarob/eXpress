@@ -22,7 +22,6 @@
 		0A63748614CF83A500D79987 /* sequence.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0A63748514CF83A500D79987 /* sequence.cpp */; };
 		0A93C755165D968800571C1C /* directiondetector.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0A93C753165D968800571C1C /* directiondetector.cpp */; };
 		0A9F0E1014CF64FF00379DC6 /* markovmodel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0A9F0E0F14CF64FF00379DC6 /* markovmodel.cpp */; };
-		0AC83E53162C2DCF00DE4074 /* express-spark.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0AC83E52162C2DCF00DE4074 /* express-spark.cpp */; };
 		0AC83E56162C31D600DE4074 /* alignments.pb.cc in Sources */ = {isa = PBXBuildFile; fileRef = 0AC8DF4716167845009C4080 /* alignments.pb.cc */; };
 		0AC83E57162C31D600DE4074 /* targets.pb.cc in Sources */ = {isa = PBXBuildFile; fileRef = 0AC8DF4A161678DA009C4080 /* targets.pb.cc */; };
 		0AC83E5D162C31D600DE4074 /* biascorrection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0A5C762A136F2EF10095365C /* biascorrection.cpp */; };
@@ -95,7 +94,6 @@
 		0AA3D63614D106B800448167 /* threadsafety.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = threadsafety.h; sourceTree = "<group>"; };
 		0AB8C58F155EE921007D6E6F /* library.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = library.h; sourceTree = "<group>"; };
 		0AC83E48162C293000DE4074 /* express-spark */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "express-spark"; sourceTree = BUILT_PRODUCTS_DIR; };
-		0AC83E52162C2DCF00DE4074 /* express-spark.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = "express-spark.cpp"; sourceTree = "<group>"; };
 		0AC83E7D162C34C200DE4074 /* libprotobuf.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libprotobuf.a; path = ../../../../../../opt/local/lib/libprotobuf.a; sourceTree = "<group>"; };
 		0AC8DF4716167845009C4080 /* alignments.pb.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = alignments.pb.cc; path = proto/alignments.pb.cc; sourceTree = "<group>"; };
 		0AC8DF4816167845009C4080 /* alignments.pb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = alignments.pb.h; path = proto/alignments.pb.h; sourceTree = "<group>"; };
@@ -163,7 +161,6 @@
 		0A5C7629136F2EF10095365C /* src */ = {
 			isa = PBXGroup;
 			children = (
-				0AC83E52162C2DCF00DE4074 /* express-spark.cpp */,
 				0AC8DF46161677F2009C4080 /* proto */,
 				0AB8C58F155EE921007D6E6F /* library.h */,
 				0AEC98C914414B5100DE2C43 /* config.h */,
@@ -310,7 +307,6 @@
 				0AC83E71162C31D600DE4074 /* sequence.cpp in Sources */,
 				0AC83E73162C31D600DE4074 /* targets.cpp in Sources */,
 				0AC83E75162C31D600DE4074 /* threadsafety.cpp in Sources */,
-				0AC83E53162C2DCF00DE4074 /* express-spark.cpp in Sources */,
 				0A3B50D716B9F4ED00E29239 /* lengthdistribution.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

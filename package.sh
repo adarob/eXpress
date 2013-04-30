@@ -48,9 +48,6 @@ cp LICENSE html/downloads/express-$VERSION/$WIN/LICENSE
 cp -r sample_data html/downloads/express-$VERSION/$WIN/sample_data
 #src
 cp -r src html/downloads/express-$VERSION/$SRC
-rm html/downloads/express-$VERSION/$SRC/src/*spark*
-rm -r html/downloads/express-$VERSION/$SRC/src/proto
-mv html/downloads/express-$VERSION/$SRC/src/CmakeLists_release.txt html/downloads/express-$VERSION/$SRC/src/CMakeLists.txt
 cp README html/downloads/express-$VERSION/$SRC/README
 cp LICENSE html/downloads/express-$VERSION/$SRC/LICENSE
 cp -r sample_data html/downloads/express-$VERSION/$SRC/sample_data
