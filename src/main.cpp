@@ -991,6 +991,12 @@ int preprocess_main() {
     }
     
     frag_proto.set_paired(frag->paired());
+    
+    vector<char> ref_left_mm_indices;
+    vector<char> ref_left_mm_seq;
+    vector<char> ref_right_mm_indices;
+    vector<char> ref_right_mm_seq;
+    
     for (size_t i = 0; i < frag->num_hits(); ++i) {
       FragHit& fh = *(*frag)[i];
       proto::FragmentAlignment& align_proto = *frag_proto.add_alignments();
@@ -1004,16 +1010,26 @@ int preprocess_main() {
       mismatch_table.get_indices(fh, left_mm_indices, left_mm_seq,
                                  right_mm_indices, right_mm_seq);
       
+      if (i == 0) {
+        ref_left_mm_indices = left_mm_indices;
+        ref_left_mm_seq = left_mm_seq;
+        ref_right_mm_indices = right_mm_indices;
+        ref_right_mm_seq = right_mm_seq;
+      }
+      
       ReadHit* read_l = fh.left_read();
       if (read_l) {
         proto::ReadAlignment& read_proto = *align_proto.mutable_read_l();
         read_proto.set_first(read_l->first);
         read_proto.set_left_pos(read_l->left);
         read_proto.set_right_pos(read_l->right-1);
-        read_proto.set_mismatch_indices(string(left_mm_indices.begin(),
-                                               left_mm_indices.end()));
-        read_proto.set_mismatch_nucs(string(left_mm_seq.begin(),
-                                            left_mm_seq.end()));
+        if (i == 0 || left_mm_indices != ref_left_mm_indices ||
+            left_mm_seq != ref_left_mm_seq) {
+          read_proto.set_mismatch_indices(string(left_mm_indices.begin(),
+                                                 left_mm_indices.end()));
+          read_proto.set_mismatch_nucs(string(left_mm_seq.begin(),
+                                              left_mm_seq.end()));
+        }
       }
       
       ReadHit* read_r = fh.right_read();
@@ -1022,10 +1038,13 @@ int preprocess_main() {
         read_proto.set_first(read_r->first);
         read_proto.set_left_pos(read_r->left);
         read_proto.set_right_pos(read_r->right-1);
-        read_proto.set_mismatch_indices(string(right_mm_indices.begin(),
-                                               right_mm_indices.end()));
-        read_proto.set_mismatch_nucs(string(right_mm_seq.begin(),
-                                            right_mm_seq.end()));
+        if (i == 0 || right_mm_indices != ref_left_mm_indices ||
+            right_mm_seq != ref_left_mm_seq) {
+          read_proto.set_mismatch_indices(string(right_mm_indices.begin(),
+                                                 right_mm_indices.end()));
+          read_proto.set_mismatch_nucs(string(right_mm_seq.begin(),
+                                              right_mm_seq.end()));
+        }
       }
     }
     frag_proto.SerializeToString(&out_buff);
