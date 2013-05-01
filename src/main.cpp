@@ -524,21 +524,26 @@ void process_fragment(Fragment* frag_p) {
 
     // update parameters
     if (first_round) {
+      double r = rand()/double(RAND_MAX);
+      
       if (i == 0 || frag[i-1]->target_id() != t->id()) {
         t->incr_counts(targ_set.size() <= 1);
       }
       if (!t->solvable() && num_solvable == frag.num_hits()-1) {
         t->solvable(true);
       }
-      if ((!burned_out || edit_detect) && lib.mismatch_table) {
+      if (edit_detect && lib.mismatch_table) {
         (lib.mismatch_table)->update(m, p, lib.mass_n);
       }
-      if (!burned_out) {
+      if (!burned_out && r < p) {
+        if (lib.mismatch_table && !edit_detect) {
+          (lib.mismatch_table)->update(m, 1.0, lib.mass_n);
+        }
         if (m.pair_status() == PAIRED) {
-          (lib.fld)->add_val(m.length(), p+lib.mass_n);
+          (lib.fld)->add_val(m.length(), lib.mass_n);
         }
         if (lib.bias_table) {
-          (lib.bias_table)->update_observed(m, p+lib.mass_n);
+          (lib.bias_table)->update_observed(m, lib.mass_n);
         }
       }
     }
@@ -990,7 +995,6 @@ int preprocess_main() {
       FragHit& fh = *(*frag)[i];
       proto::FragmentAlignment& align_proto = *frag_proto.add_alignments();
       align_proto.set_target_id((unsigned int)fh.target_id());
-      align_proto.set_length((unsigned int)fh.length());
       
       vector<char> left_mm_indices;
       vector<char> left_mm_seq;
