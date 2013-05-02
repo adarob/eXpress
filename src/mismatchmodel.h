@@ -88,9 +88,12 @@ class MismatchTable {
    DOC
    */
   void get_indices(const FragHit& f,
-                   std::vector<char>& left_indices, std::vector<char>& left_seq,
+                   std::vector<char>& left_indices,
+                   std::vector<char>& left_seq,
+                   std::vector<char>& left_ref,
                    std::vector<char>& right_indices,
-                   std::vector<char>& right_seq) const;
+                   std::vector<char>& right_seq,
+                   std::vector<char>& right_ref) const;
   /**
    * A member function that returns the log likelihood of mismatches and indels
    * in the mapping given the current error model parematers. Returns 0 if

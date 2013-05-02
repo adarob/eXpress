@@ -535,9 +535,9 @@ void process_fragment(Fragment* frag_p) {
       if (edit_detect && lib.mismatch_table) {
         (lib.mismatch_table)->update(m, p, lib.mass_n);
       }
-      if (!burned_out && r < p) {
+      if (!burned_out && r < sexp(p)) {
         if (lib.mismatch_table && !edit_detect) {
-          (lib.mismatch_table)->update(m, 1.0, lib.mass_n);
+          (lib.mismatch_table)->update(m, LOG_1, lib.mass_n);
         }
         if (m.pair_status() == PAIRED) {
           (lib.fld)->add_val(m.length(), lib.mass_n);
@@ -994,8 +994,11 @@ int preprocess_main() {
     
     vector<char> ref_left_mm_indices;
     vector<char> ref_left_mm_seq;
+    vector<char> ref_left_mm_ref;
     vector<char> ref_right_mm_indices;
     vector<char> ref_right_mm_seq;
+    vector<char> ref_right_mm_ref;
+    bool ref_left_first;
     
     for (size_t i = 0; i < frag->num_hits(); ++i) {
       FragHit& fh = *(*frag)[i];
@@ -1004,27 +1007,33 @@ int preprocess_main() {
       
       vector<char> left_mm_indices;
       vector<char> left_mm_seq;
+      vector<char> left_mm_ref;
       vector<char> right_mm_indices;
       vector<char> right_mm_seq;
+      vector<char> right_mm_ref;
       
-      mismatch_table.get_indices(fh, left_mm_indices, left_mm_seq,
-                                 right_mm_indices, right_mm_seq);
+      
+      mismatch_table.get_indices(fh, left_mm_indices, left_mm_seq, left_mm_ref,
+                                 right_mm_indices, right_mm_seq, right_mm_ref);
       
       if (i == 0) {
         ref_left_mm_indices = left_mm_indices;
         ref_left_mm_seq = left_mm_seq;
+        ref_left_mm_ref = left_mm_ref;
         ref_right_mm_indices = right_mm_indices;
         ref_right_mm_seq = right_mm_seq;
+        ref_right_mm_ref = right_mm_ref;
       }
       
       ReadHit* read_l = fh.left_read();
       if (read_l) {
+        if (i==0) { ref_left_first = read_l->first; }
         proto::ReadAlignment& read_proto = *align_proto.mutable_read_l();
         read_proto.set_first(read_l->first);
         read_proto.set_left_pos(read_l->left);
         read_proto.set_right_pos(read_l->right-1);
         if (i == 0 || left_mm_indices != ref_left_mm_indices ||
-            left_mm_seq != ref_left_mm_seq) {
+            left_mm_seq != ref_left_mm_seq || left_mm_ref != ref_left_mm_ref) {
           read_proto.set_mismatch_indices(string(left_mm_indices.begin(),
                                                  left_mm_indices.end()));
           read_proto.set_mismatch_nucs(string(left_mm_seq.begin(),
@@ -1034,12 +1043,15 @@ int preprocess_main() {
       
       ReadHit* read_r = fh.right_read();
       if (read_r) {
+        if (i==0) { ref_left_first = !read_r->first; }
         proto::ReadAlignment& read_proto = *align_proto.mutable_read_r();
         read_proto.set_first(read_r->first);
         read_proto.set_left_pos(read_r->left);
         read_proto.set_right_pos(read_r->right-1);
-        if (i == 0 || right_mm_indices != ref_left_mm_indices ||
-            right_mm_seq != ref_left_mm_seq) {
+        if (i == 0 || read_r->first == ref_left_first ||
+            right_mm_indices != ref_left_mm_indices ||
+            right_mm_seq != ref_left_mm_seq ||
+            right_mm_ref != ref_right_mm_ref) {
           read_proto.set_mismatch_indices(string(right_mm_indices.begin(),
                                                  right_mm_indices.end()));
           read_proto.set_mismatch_nucs(string(right_mm_seq.begin(),

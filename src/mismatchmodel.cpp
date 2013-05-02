@@ -160,8 +160,10 @@ MismatchTable::MismatchTable(string param_file_name)
 void MismatchTable::get_indices(const FragHit& f,
                            vector<char>& left_indices,
                            vector<char>& left_seq,
+                           vector<char>& left_ref,
                            vector<char>& right_indices,
-                           vector<char>& right_seq) const {
+                           vector<char>& right_seq,
+                           vector<char>& right_ref) const {
 
   const Target& targ = *f.target();
   const Sequence& t_seq_fwd = targ.seq(0);
@@ -203,8 +205,10 @@ void MismatchTable::get_indices(const FragHit& f,
           left_indices.push_back(i);
           if (cur_seq_bit / 8 == left_seq.size()) {
             left_seq.push_back(0);
+            left_ref.push_back(0);
           }
           left_seq.back() += cur << (cur_seq_bit % 8);
+          left_ref.back() += ref << (cur_seq_bit % 8);
           cur_seq_bit += 2;
         }
         
@@ -252,8 +256,10 @@ void MismatchTable::get_indices(const FragHit& f,
           right_indices.push_back(i);
           if (cur_seq_bit / 8 == right_seq.size()) {
             right_seq.push_back(0);
+            right_ref.push_back(0);
           }
           right_seq.back() += cur << (cur_seq_bit % 8);
+          right_ref.back() += ref << (cur_seq_bit % 8);
           cur_seq_bit += 2;
         }
         
