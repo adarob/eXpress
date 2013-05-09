@@ -608,6 +608,10 @@ public:
    *        and bias tables during updates.
    */
   void asynch_bias_update(boost::mutex* mutex);
+  //DOC
+  void enable_bundle_threadsafety() { _bundle_table.threadsafe_mode(true); }
+  void disable_bundle_threadsafety() { _bundle_table.threadsafe_mode(false); }
+  void collapse_bundles() { _bundle_table.collapse(); }
 };
 
 #endif

@@ -450,6 +450,7 @@ void process_fragment(Fragment* frag_p) {
       Target* t = m.target();
       
       bundle = lib.targ_table->merge_bundles(bundle, t->bundle());
+      t->bundle(bundle);
       
       if (locked_set.count(t) == 0) {
         t->lock();
@@ -639,6 +640,7 @@ size_t threaded_calc_abundances(Librarian& libs) {
         }
         // Start threads once aux parameters are burned out
         if (burned_out && num_threads && thread_pool.size() == 0) {
+          lib.targ_table->enable_bundle_threadsafety();
           thread_pool = vector<boost::thread*>(num_threads);
           for (size_t k = 0; k < thread_pool.size(); k++) {
             thread_pool[k] = new boost::thread(proc_thread, &pts);
@@ -719,6 +721,9 @@ size_t threaded_calc_abundances(Librarian& libs) {
         t->join();
       }
 
+      lib.targ_table->disable_bundle_threadsafety();
+      lib.targ_table->collapse_bundles();
+      
       if (bias_update) {
         bias_update->join();
         bias_update.reset(NULL);

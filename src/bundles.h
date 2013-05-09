@@ -9,6 +9,7 @@
 #ifndef express_bundles_h
 #define express_bundles_h
 
+#include <boost/thread.hpp>
 #include <boost/unordered_map.hpp>
 #include <boost/unordered_set.hpp>
 #include <vector>
@@ -67,7 +68,6 @@ public:
 class BundleTable;
 
 /**
-
  * The Bundle class keeps track of a group of targets that have shared ambiguous
  * (multi-mapped) reads.
  *  @author    Adam Roberts
@@ -89,7 +89,13 @@ class Bundle {
    * to targets in the bundle (logged), including the initial pseudo-mass.
    */
   double _mass;
-
+  
+  //DOC
+  Bundle* _merged_into;
+  
+  //DOC
+  mutable boost::mutex _mut;
+  
   friend class BundleTable;
 
 public:
@@ -98,6 +104,8 @@ public:
    * @param targ a pointer to the initial Target object in the bundle.
    */
   Bundle(Target* targ);
+  //DOC
+  const Bundle* get_rep() const;
   /**
    * A member function that increases the total bundle observed fragment counts
    * by a given amount.
@@ -112,13 +120,14 @@ public:
   void incr_mass(double incr_amt);
   /**
    * A member function that resets the Bundle mass to (log) 0.
+   * Call is not passed on to _merged_into.
    */
   void reset_mass();
   /**
    * An accessor for the number of Targets in the bundle.
    * @return The number of Targets in the bundle.
    */
-  size_t size() const { return _targets.size(); }
+  size_t size() const;
   /**
    * An accessor for a pointer to the vector of pointers to Targets in the
    * bundle. The returned value does not outlive this.
@@ -130,13 +139,13 @@ public:
    * targets in the bundle.
    * @return The total number of fragments mapped to targets in the bundle.
    */
-  size_t counts() const { return _counts; }
+  size_t counts() const;
   /**
    * An accessor for the the total mass of observed fragments mapped to
    * targets in the bundle (logged), including the initial pseudo-mass.
    * @return The total mass of fragments mapped to targets in the bundle.
    */
-  double mass() const { return _mass; }
+  double mass() const;
 };
 
 typedef boost::unordered_set<Bundle*> BundleSet;
@@ -154,12 +163,19 @@ class BundleTable {
    * A private unordered_set to store all of the bundles.
    */
   BundleSet _bundles;
-
+  //DOC
+  bool _threadsafe_mode;
+  
+  //DOC
+  mutable boost::mutex _mut;
+  
+  //DOC
+  Bundle* get_rep(Bundle* b);
 public:
   /**
    * BundleTable Constructor.
    */
-  BundleTable() {};
+  BundleTable();
   /**
    * BundleTable deconstructor.  Deletes all Bundle objects.
    */
@@ -191,6 +207,11 @@ public:
    * @return A pointer to the merged Bundle object.
    */
   Bundle* merge(Bundle* b1, Bundle* b2);
+  //DOC
+  void collapse();
+  //DOC
+  bool threadsafe_mode() const { return _threadsafe_mode; }
+  void threadsafe_mode(bool mode) { _threadsafe_mode = mode; }
 };
 
 #endif
