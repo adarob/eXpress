@@ -171,6 +171,22 @@ void MapParser::threaded_parse(ParseThreadSafety* thread_safety_p,
     }
     for (size_t i = 0; frag && i < frag->hits().size(); ++i) {
       FragHit& m = *(frag->hits()[i]);
+      
+      if (m.first_read() && m.first_read()->seq.length() > max_read_len) {
+        cerr << "ERROR: Length of first read for fragment '" << m.frag_name()
+             << "' is longer than maximum allowed read length ("
+             << m.first_read()->seq.length() << " vs. " << max_read_len << "). "
+             << "Increase the limit using the '--max-read-len,L' option.\n";
+        exit(1);
+      }
+      if (m.second_read() && m.second_read()->seq.length() > max_read_len) {
+        cerr << "ERROR: Length of second read for fragment '" << m.frag_name()
+             << "' is longer than maximum allowed read length ("
+             << m.second_read()->seq.length() << " vs. " << max_read_len
+             << "). Increase the limit using the '--max-read-len,L' option.\n";
+        exit(1);
+      }
+      
       Target* t = targ_table.get_targ(m.target_id());
       if (!t) {
         cerr << "ERROR: Target sequence at index '" << m.target_id()
@@ -180,7 +196,7 @@ void MapParser::threaded_parse(ParseThreadSafety* thread_safety_p,
       }
       m.target(t);
       assert(t->id() == m.target_id());
-
+      
       // Add num_neighbors targets on either side to the neighbors list.
       // Used for experimental feature.
       vector<const Target*> neighbors;

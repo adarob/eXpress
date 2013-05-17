@@ -55,6 +55,8 @@ size_t burn_in = 100000;
 size_t burn_out = 5000000;
 bool burned_out = false;
 
+size_t max_read_len = 200;
+
 size_t max_indel_size = 10;
 
 size_t stop_at = 0;
@@ -173,6 +175,9 @@ bool parse_options(int ac, char ** av) {
   ("additional-online,O",
    po::value<size_t>(&additional_online)->default_value(additional_online),
    "number of additional online EM rounds after initial online round")
+  ("max-read-len,L",
+   po::value<size_t>(&max_read_len)->default_value(max_read_len),
+   "maximum allowed length of a read")
   ("output-align-prob",
    "output alignments (sam/bam) with probabilistic assignments")
   ("output-align-samp",

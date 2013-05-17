@@ -17,8 +17,8 @@
 using namespace std;
 
 MismatchTable::MismatchTable(double alpha)
-    : _first_read_mm(MAX_READ_LEN, FrequencyMatrix<double>(16, 4, alpha)),
-      _second_read_mm(MAX_READ_LEN, FrequencyMatrix<double>(16, 4, alpha)),
+    : _first_read_mm(max_read_len, FrequencyMatrix<double>(16, 4, alpha)),
+      _second_read_mm(max_read_len, FrequencyMatrix<double>(16, 4, alpha)),
       _insert_params(1, max_indel_size + 1, 0),
       _delete_params(1, max_indel_size + 1, 0),
       _max_len(0),
@@ -36,8 +36,8 @@ MismatchTable::MismatchTable(double alpha)
 }
 
 MismatchTable::MismatchTable(string param_file_name)
-    : _first_read_mm(MAX_READ_LEN, FrequencyMatrix<double>(16, 4, 0)),
-      _second_read_mm(MAX_READ_LEN, FrequencyMatrix<double>(16, 4, 0)),
+    : _first_read_mm(max_read_len, FrequencyMatrix<double>(16, 4, 0)),
+      _second_read_mm(max_read_len, FrequencyMatrix<double>(16, 4, 0)),
       _insert_params(1, max_indel_size + 1, 0),
       _delete_params(1, max_indel_size + 1, 0),
       _max_len(0),
@@ -68,7 +68,7 @@ MismatchTable::MismatchTable(string param_file_name)
       break;
     }
     
-    if (pos >= MAX_READ_LEN) {
+    if (pos >= max_read_len) {
       pos++;
       continue;
     }
@@ -83,11 +83,11 @@ MismatchTable::MismatchTable(string param_file_name)
     }
     pos++;
   }
-  _max_len = min(pos, MAX_READ_LEN);
-  if (pos >= MAX_READ_LEN) {
+  _max_len = min(pos, max_read_len);
+  if (pos >= max_read_len) {
     cerr << "WARNING: First read error distribution of " << pos-1
          << " bases in '" << param_file_name << "' truncated after "
-         << MAX_READ_LEN << " bases.\n";
+         << max_read_len << " bases.\n";
   }
   
   pos = 0;
@@ -100,7 +100,7 @@ MismatchTable::MismatchTable(string param_file_name)
       break;
     }
     
-    if (pos >= MAX_READ_LEN) {
+    if (pos >= max_read_len) {
       pos++;
       continue;
     }
@@ -115,11 +115,11 @@ MismatchTable::MismatchTable(string param_file_name)
     }
     pos++;
   }
-  _max_len = max(_max_len, min(pos, MAX_READ_LEN));
-  if (pos >= MAX_READ_LEN) {
+  _max_len = max(_max_len, min(pos, max_read_len));
+  if (pos >= max_read_len) {
     cerr << "WARNING: Second read error distribution of " << pos-1
     << " bases in '" << param_file_name << "' truncated after "
-    << MAX_READ_LEN << " bases.\n";
+    << max_read_len << " bases.\n";
   }
   
   infile.getline (line_buff, BUFF_SIZE, '\n');
@@ -574,7 +574,7 @@ void MismatchTable::update(const FragHit& f, double p, double mass) {
 }
 
 void MismatchTable::fix() {
-  for (size_t i = 0; i < MAX_READ_LEN; i++) {
+  for (size_t i = 0; i < max_read_len; i++) {
     _first_read_mm[i].fix();
     _second_read_mm[i].fix();
   }
