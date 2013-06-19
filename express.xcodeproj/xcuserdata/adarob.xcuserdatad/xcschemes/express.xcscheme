@@ -59,8 +59,8 @@
       </BuildableProductRunnable>
       <CommandLineArguments>
          <CommandLineArgument
-            argument = "/Users/adarob/Downloads/rsem_sacCerEF4_eaGene2.fa /Users/adarob/Downloads/sacCer.4xprs.tx.bam"
-            isEnabled = "NO">
+            argument = "--max-read-len 2000 --max-indel-size 1000 --no-bias-correct /Users/adarob/Downloads/lorian/allgenomes.mfa /Users/adarob/Downloads/lorian/test2.SAM"
+            isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
             argument = "--aux-param-file $(SRCROOT)/sample_data3/out2/params.xprs --frag-len-mean 250 --frag-len-stddev 50 -o $(SRCROOT)/sample_data3/out2 $(SRCROOT)/sample_data3/hox_ucsc.fa $(SRCROOT)/sample_data3/hits_1M.sam"
@@ -68,7 +68,7 @@
          </CommandLineArgument>
          <CommandLineArgument
             argument = "-B 2 --frag-len-mean 250 --frag-len-stddev 50 -o $(SRCROOT)/sample_data3/out2 $(SRCROOT)/sample_data3/hox_ucsc.fa $(SRCROOT)/sample_data3/hits_1M.sam"
-            isEnabled = "YES">
+            isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
             argument = "--no-bias-correct -o hap -H /Volumes/math.mcb.berkeley.edu/experiments/ase/t1s1b0/hap.csv /Volumes/math.mcb.berkeley.edu/experiments/ase/t1s1b0/ugt3a2.fa /Volumes/math.mcb.berkeley.edu/experiments/ase/t1s1b0/hits.bam"
