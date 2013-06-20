@@ -8,7 +8,7 @@
 
 #include "sequence.h"
 #include <cassert>
-#include <boost/math/distributions/normal.hpp>
+#include <boost/math/distributions/binomial.hpp>
 
 using namespace std;
 using namespace boost::math;
@@ -119,7 +119,7 @@ void SequenceFwd::update_exp(const size_t index, const size_t nuc, float mass) {
 void SequenceFwd::calc_p_vals(vector<double>& p_vals) const {
   p_vals = vector<double>(_len, 1.0);
   for (size_t i = 0; i < _len; ++i) {
-    double N = sexp(_obs_seq.sum(i));
+    double N = round(sexp(_obs_seq.sum(i)));
     if (N==0) {
       continue;
     }
@@ -133,6 +133,8 @@ void SequenceFwd::calc_p_vals(vector<double>& p_vals) const {
       double obs_n = sexp(_obs_seq(i,nuc,false));
       max_obs = max(max_obs,obs_n);
     }
+    
+    max_obs = round(max_obs);
 
     double p_val = 0;
 
@@ -142,8 +144,8 @@ void SequenceFwd::calc_p_vals(vector<double>& p_vals) const {
       }
 
       double exp_p = sexp(_exp_seq(i, nuc));
-      normal norm(N*exp_p, sqrt(N*exp_p*(1-exp_p)));
-      p_val += log(cdf(norm, max_obs));
+      binomial binom(N, exp_p);
+      p_val += log(cdf(binom, max_obs));
     }
     p_vals[i] -= sexp(p_val);
   }
