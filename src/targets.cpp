@@ -529,7 +529,7 @@ void TargetTable::output_results(string output_dir, size_t tot_counts,
       varcov_file.open((output_dir + "/varcov.xprs").c_str());
   }
   if (output_rdds) {
-      rdds_file.open((output_dir + "/  rdds.xprs").c_str());
+      rdds_file.open((output_dir + "/rdds.xprs").c_str());
       rdds_file << "target_id\tposition\tp_value\tref_nuc\tP(A)\tP(C)\tP(G)\t"
                << "P(T)\tobs_A\tobs_C\tobs_G\tobs_T\texp_A\texp_C\texp_G\texp_T"
                << endl;
