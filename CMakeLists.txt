@@ -18,9 +18,10 @@ set(Boost_USE_STATIC_LIBS ON)
 find_package(Boost 1.39
     COMPONENTS
     thread
-	system
-	filesystem
+    system
+    filesystem
     program_options
+    date_time
     REQUIRED)
 
 find_package(Protobuf)
