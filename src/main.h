@@ -10,6 +10,7 @@
  */
 
 #include "config.h"
+#include "logger.h"
 #include <algorithm>
 #include <limits>
 #include <boost/foreach.hpp>
@@ -25,6 +26,7 @@ class BiasBoss;
 class MismatchTable;
 class LengthDistribution;
 
+extern Logger logger;
 /**
  * A global bool that is true when processing is still occuring.
  * This is primarily used to notify the bias update thread to stop running.

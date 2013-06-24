@@ -109,15 +109,12 @@ void check_version(const char* this_version)
     memset(curr_version, 0, sizeof(curr_version));
 	if (get_current_version(curr_version))
 	{
-		if (strcmp(curr_version, this_version)==0)
+		if (strcmp(curr_version, this_version)==0) {
 			fprintf(stderr, "You are using eXpress v%s, which is the most recent release.\n\n", PACKAGE_VERSION);
-		else
-			fprintf(stderr, "Warning: Your version of eXpress is not up-to-date. It is recommended that you upgrade to v%s to benefit from the most recent features and bug fixes (http://bio.math.berkeley.edu/eXpress).\n\n", curr_version);
-		
-	}
-	else
-
-	{
-		fprintf(stderr, "Warning: Could not connect to update server to verify current version. Please check at the eXpress website (http://bio.math.berkeley.edu/eXpress).\n\n");
+		} else {
+			fprintf(stderr, "WARNING: Your version of eXpress is not up-to-date. It is recommended that you upgrade to v%s to benefit from the most recent features and bug fixes (http://bio.math.berkeley.edu/eXpress).\n\n", curr_version);
+    }
+	} else {
+		fprintf(stderr, "WARNING: Could not connect to update server to verify current version. Please check at the eXpress website (http://bio.math.berkeley.edu/eXpress).\n\n");
 	}
 }

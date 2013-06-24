@@ -130,12 +130,10 @@ void SequenceFwd::calc_p_vals(vector<double>& p_vals) const {
         continue;
       }
 
-      double obs_n = sexp(_obs_seq(i,nuc,false));
-      max_obs = max(max_obs,obs_n);
+      double obs_n = round(sexp(_obs_seq(i,nuc,false)));
+      max_obs = max(max_obs, obs_n);
     }
     
-    max_obs = round(max_obs);
-
     double p_val = 0;
 
     for (size_t nuc = 0; nuc < NUM_NUCS; ++nuc) {

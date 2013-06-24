@@ -46,9 +46,8 @@ SeqWeightTable::SeqWeightTable(size_t window_size, size_t order,
   const size_t BUFF_SIZE = 99999;
   char line_buff[BUFF_SIZE];
   if (!infile.is_open()) {
-    cerr << "ERROR: Unable to open parameter file '" << param_file_name
-    << "'.\n";
-    exit(1);
+    logger.severe("Unable to open parameter file '%s'.",
+                  param_file_name.c_str());
   }
 
   do {

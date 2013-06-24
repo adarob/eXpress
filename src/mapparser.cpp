@@ -100,14 +100,15 @@ MapParser::MapParser(Library* lib, bool write_active)
   string out_file = lib->out_file_name;
   bool is_sam = false;
   if (in_file.size() == 0) {
-    cerr << "No alignment file specified. Expecting streaming input on stdin...\n\n";
+    logger.info("No alignment file specified. Expecting streaming input on "
+                "stdin...\n");
     _parser.reset(new SAMParser(&cin));
     is_sam = true;
   } else {
-    cerr << "Attempting to read '" << in_file << "' in BAM format...\n";
+    logger.info("Attempting to read '%s' in BAM format...", in_file.c_str());
     BamTools::BamReader* reader = new BamTools::BamReader();
     if (reader->Open(in_file)) {
-      cerr << "Parsing BAM header...\n";
+      logger.info("Parsing BAM header...");
       _parser.reset(new BAMParser(reader));
       if (out_file.size()) {
         out_file += ".bam";
@@ -117,18 +118,16 @@ MapParser::MapParser(Library* lib, bool write_active)
           bool sample = out_file.substr(out_file.length()-8,4) == "samp";
           _writer.reset(new BAMWriter(writer, sample));
         } else {
-          cerr << "ERROR: Unable to open output BAM file '"
-               << out_file << "'.\n";
-          exit(1);
+          logger.severe("Unable to open output BAM file '%s'.",
+                        out_file.c_str());
         }
       }
     } else {
       delete reader;
-      cerr << "Input is not in BAM format. Trying SAM...\n";
+      logger.info("Input is not in BAM format. Trying SAM...");
       ifstream* ifs = new ifstream(in_file.c_str());
       if (!ifs->is_open()) {
-        cerr << "ERROR: Unable to open input SAM file '" << in_file << "'.\n";
-        exit(1);
+        logger.severe("Unable to open input SAM file '%s'.", in_file.c_str());
       }
       _parser.reset(new SAMParser(ifs));
       is_sam = true;
@@ -139,8 +138,7 @@ MapParser::MapParser(Library* lib, bool write_active)
     out_file += ".sam";
     ofstream* ofs = new ofstream(out_file.c_str());
     if (!ofs->is_open()) {
-      cerr << "ERROR: Unable to open output SAM file '" << out_file << "'.\n" ;
-      exit(1);
+      logger.severe("Unable to open output SAM file '%s'.", out_file.c_str());
     }
     *ofs << _parser->header();
     bool sample = out_file.substr(out_file.length()-8,4) == "samp";
@@ -173,26 +171,25 @@ void MapParser::threaded_parse(ParseThreadSafety* thread_safety_p,
       FragHit& m = *(frag->hits()[i]);
       
       if (m.first_read() && m.first_read()->seq.length() > max_read_len) {
-        cerr << "ERROR: Length of first read for fragment '" << m.frag_name()
-             << "' is longer than maximum allowed read length ("
-             << m.first_read()->seq.length() << " vs. " << max_read_len << "). "
-             << "Increase the limit using the '--max-read-len,L' option.\n";
-        exit(1);
+        logger.severe("Length of first read for fragment '%s' is longer than "
+                      "maximum allowed read length (%d vs. %d). Increase the "
+                      "limit using the '--max-read-len,L' option.",
+                      m.frag_name().c_str(),  m.first_read()->seq.length(),
+                      max_read_len);
       }
       if (m.second_read() && m.second_read()->seq.length() > max_read_len) {
-        cerr << "ERROR: Length of second read for fragment '" << m.frag_name()
-             << "' is longer than maximum allowed read length ("
-             << m.second_read()->seq.length() << " vs. " << max_read_len
-             << "). Increase the limit using the '--max-read-len,L' option.\n";
-        exit(1);
+        logger.severe("Length of second read for fragment '%s' is longer than "
+                      "maximum allowed read length (%d vs. %d). Increase the "
+                      "limit using the '--max-read-len,L' option.",
+                      m.frag_name().c_str(),  m.second_read()->seq.length(),
+                      max_read_len);
       }
       
       Target* t = targ_table.get_targ(m.target_id());
       if (!t) {
-        cerr << "ERROR: Target sequence at index '" << m.target_id()
-             << "' not found. Verify that it is in the SAM/BAM header and "
-             << "FASTA file.\n";
-        exit(1);
+        logger.severe("Target sequence at index '%s' not found. Verify that it "
+                      "is in the SAM/BAM header and FASTA file.",
+                      m.target_id());
       }
       m.target(t);
       assert(t->id() == m.target_id());
@@ -245,9 +242,8 @@ BAMParser::BAMParser(BamTools::BamReader* reader) : _reader(reader) {
   size_t index = 0;
   foreach(const BamTools::RefData& ref, _reader->GetReferenceData()) {
     if (_targ_index.count(ref.RefName)) {
-      cerr << "ERROR: Target '" << ref.RefName
-           << "' appears multiple times in BAM header.";
-      exit(1);
+      logger.severe("Target '%s' appears multiple times in BAM header.",
+                    ref.RefName.c_str());
     }
     _targ_index[ref.RefName] = index++;
     _targ_lengths[ref.RefName] = ref.RefLength;
@@ -257,8 +253,7 @@ BAMParser::BAMParser(BamTools::BamReader* reader) : _reader(reader) {
   _read_buff = new ReadHit();
   do {
     if (!_reader->GetNextAlignment(a)) {
-      cerr << "ERROR: Input BAM file contains no valid alignments.\n";
-      exit(1);
+      logger.severe("Input BAM file contains no valid alignments.");
     }
   } while(!map_end_from_alignment(a));
 }
@@ -380,9 +375,8 @@ SAMParser::SAMParser(istream* in) {
       string name = str.substr(idx+3);
       name = name.substr(0,name.find_first_of("\n\t "));
       if (_targ_index.count(name)) {
-        cerr << "ERROR: Target '" << str
-             << "' appears multiple times in SAM header.\n";
-        exit(1);
+        logger.severe("Target '%s' appears multiple times in SAM header.",
+                      str.c_str());
       }
       _targ_index[name] = index++;
       idx = str.find("LN:");
@@ -397,8 +391,7 @@ SAMParser::SAMParser(istream* in) {
   // Load first aligned read
   while(!map_end_from_line(line_buff)) {
     if (!_in->good()) {
-      cerr << "ERROR: Input SAM file contains no valid alignments.\n";
-      exit(1);
+      logger.severe("Input SAM file contains no valid alignments.");
     }
     _in->getline(line_buff, BUFF_SIZE-1, '\n');
   }
@@ -475,9 +468,8 @@ bool SAMParser::map_end_from_line(char* line) {
           goto stop;
         }
         if (!_targ_index.count(p)) {
-          cerr << "ERROR: Target sequence '" << p << "' not found. Verify that "
-              << "it is in the SAM/BAM header and FASTA file.\n";
-          exit(1);
+          logger.severe("Target sequence '%s' not found. Verify that it is in "
+                        "the SAM/BAM header and FASTA file.", p);
         }
         r.targ_id = _targ_index[p];
         break;

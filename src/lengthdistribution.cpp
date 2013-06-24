@@ -72,9 +72,8 @@ LengthDistribution::LengthDistribution(string param_file_name,
   char line_buff[BUFF_SIZE];
   
   if (!infile.is_open()) {
-    cerr << "ERROR: Unable to open paramater file '" << param_file_name
-    << "'.\n";
-    exit(1);
+    logger.severe("Unable to open paramater file '%s'.",
+                  param_file_name.c_str());
   }
 
   do {

@@ -46,9 +46,8 @@ MismatchTable::MismatchTable(string param_file_name)
   const size_t BUFF_SIZE = 99999;
   char line_buff[BUFF_SIZE];
   if (!infile.is_open()) {
-    cerr << "ERROR: Unable to open parameter file '" << param_file_name
-         << "'.\n";
-    exit(1);
+    logger.severe("Unable to open parameter file '%s'.",
+                  param_file_name.c_str());
   }
 
   infile.getline (line_buff, BUFF_SIZE, '\n');
@@ -85,9 +84,9 @@ MismatchTable::MismatchTable(string param_file_name)
   }
   _max_len = min(pos, max_read_len);
   if (pos >= max_read_len) {
-    cerr << "WARNING: First read error distribution of " << pos-1
-         << " bases in '" << param_file_name << "' truncated after "
-         << max_read_len << " bases.\n";
+    logger.warn("First read error distribution of %d bases in '%s' truncated "
+                "after %d bases.",
+                pos-1, param_file_name.c_str(), max_read_len);
   }
   
   pos = 0;
@@ -117,9 +116,9 @@ MismatchTable::MismatchTable(string param_file_name)
   }
   _max_len = max(_max_len, min(pos, max_read_len));
   if (pos >= max_read_len) {
-    cerr << "WARNING: Second read error distribution of " << pos-1
-    << " bases in '" << param_file_name << "' truncated after "
-    << max_read_len << " bases.\n";
+    logger.warn("Second read error distribution of %d bases in '%s' truncated "
+                "after %d bases.",
+                pos-1, param_file_name.c_str(), max_read_len);
   }
   
   infile.getline (line_buff, BUFF_SIZE, '\n');
@@ -127,9 +126,9 @@ MismatchTable::MismatchTable(string param_file_name)
   size_t k = 0;
   do {
     if (k > max_indel_size) {
-      cerr << "WARNING: Paramater file '" << param_file_name << "' insertion "
-           << "distribution is being truncated at max indel length of "
-           << max_indel_size << ".\n";
+      logger.warn("Paramater file '%s' insertion distribution is being "
+                  "truncated at max indel length of %d.",
+                  param_file_name.c_str(), max_indel_size);
       break;
     }
     _insert_params.increment(k, log(strtod(p,NULL)));
@@ -144,9 +143,9 @@ MismatchTable::MismatchTable(string param_file_name)
   k = 0;
   do {
     if (k > max_indel_size) {
-      cerr << "WARNING: Paramater file '" << param_file_name << "' deletion "
-           << "distribution is being truncated at max indel length of "
-           << max_indel_size << ".\n";
+      logger.warn("Paramater file '%s' deletion distribution is being "
+                  "truncated at max indel length of %d.",
+                  param_file_name.c_str(), max_indel_size);
       break;
     }
     _delete_params.increment(k, log(strtod(p,NULL)));
@@ -182,8 +181,7 @@ void MismatchTable::get_indices(const FragHit& f,
     vector<Indel>::const_iterator del = read_l.deletes.begin();
     
     if (read_l.inserts.size() || read_l.deletes.size()) {
-      cerr << "ERROR: Indels are not currently supported for eXpress-Spark.\n";
-      exit(1);
+      logger.severe("Indels are not currently supported for eXpress-Spark.");
     }
     
     size_t cur_seq_bit = 0;
@@ -232,8 +230,7 @@ void MismatchTable::get_indices(const FragHit& f,
     vector<Indel>::const_iterator del = read_r.deletes.end()-1;
 
     if (read_r.inserts.size() || read_r.deletes.size()) {
-      cerr << "ERROR: Indels are not currently supported for eXpress-Spark.\n";
-      exit(1);
+      logger.severe("Indels are not currently supported for eXpress-Spark.");
     }
     
     size_t cur_seq_bit = 0;

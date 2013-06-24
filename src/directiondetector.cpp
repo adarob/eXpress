@@ -53,16 +53,18 @@ bool DirectionDetector::report_if_improper_direction() {
     double min_dir = min(_num_f, _num_r);
     if (min_dir < max_dir / 2) {
       if (_num_f > _num_r && direction != F) {
-        cerr << "WARNING: The observed alignments appear disporportionately on "
-             << "the forward strand (" << _num_f << " vs. " << _num_r << "). "
-             << "If your library is strand-specific and single-end, you should "
-             << "use the --f-stranded option to avoid incorrect results.\n";
+        logger.warn("The observed alignments appear disporportionately on "
+                    "the forward strand (%d  vs. %d). If your library is "
+                    "strand-specific and single-end, you should use the "
+                    "--f-stranded option to avoid incorrect results.",
+                    _num_f, _num_r);
         return true;
       } else if (_num_f < _num_r && direction != R) {
-        cerr << "WARNING: The observed alignments appear disporportionately on "
-             << "the reverse strand (" << _num_r << " vs. " << _num_f << "). "
-             << "If your library is strand-specific and single-end, you should "
-             << "use the --r-stranded option to avoid incorrect results.\n";
+        logger.warn("The observed alignments appear disporportionately on "
+                    "the reverse strand (%d vs. %d). If your library is "
+                    "strand-specific and single-end, you should use the "
+                    "--r-stranded option to avoid incorrect results.",
+                    _num_r, _num_f);
         return true;
       }
     }
@@ -74,16 +76,16 @@ bool DirectionDetector::report_if_improper_direction() {
     double min_dir = min(fr, rf);
     if (min_dir < max_dir / 2) {
       if (fr > rf && direction != FR) {
-        cerr << "WARNING: The observed alignments appear disporportionately in "
-        << "the forward-reverse order (" << fr << " vs. " << rf << "). "
-        << "If your library is strand-specific, you should use the "
-        << "--fr-stranded option to avoid incorrect results.\n";
+        logger.warn("The observed alignments appear disporportionately in the"
+                    "the forward-reverse order (%d vs %d). If your library is "
+                    "strand-specific, you should use the --fr-stranded option "
+                    "to avoid incorrect results.", fr, rf);
         return true;
       } else if (rf > fr && direction != RF) {
-        cerr << "WARNING: The observed alignments appear disporportionately in "
-        << "the reverse-forward order (" << rf << " vs. " << fr << "). "
-        << "If your library is strand-specific, you should use the "
-        << "--rf-stranded option to avoid incorrect results.\n";
+        logger.warn("The observed alignments appear disporportionately in "
+                    "the reverse-forward order (%d vs. %d). If your library is "
+                    "strand-specific, you should use the --rf-stranded option "
+                    "to avoid incorrect results.", rf, fr);
         return true;
       }
     }

@@ -46,6 +46,8 @@ using namespace std;
 namespace po = boost::program_options;
 namespace fs = boost::filesystem;
 
+Logger logger;
+
 // the forgetting factor parameter controls the growth of the fragment mass
 double ff_param = 0.85;
 
@@ -122,8 +124,7 @@ AlphaMap* expr_alpha_map = NULL;
 AlphaMap* parse_priors(string in_file) {
   ifstream ifs(in_file.c_str());
   if (!ifs.is_open()) {
-    cerr << "ERROR: Unable to open input priors file '" << in_file << "'.\n" ;
-    exit(1);
+    logger.severe("Unable to open input priors file '%s'.", in_file.c_str());
   }
   AlphaMap* alphas = new AlphaMap();
 
@@ -191,6 +192,7 @@ bool parse_options(int ac, char ** av) {
   ("r-stranded",
    "accept only reverse single-end alignments (first-stranded protocols)")
   ("no-update-check", "disables automatic check for update via web")
+  ("logtostderr", "prints all logging messages to stderr")
   ;
   
   po::options_description advanced("Advanced Options");
@@ -249,20 +251,20 @@ bool parse_options(int ac, char ** av) {
     po::store(po::command_line_parser(ac, av).options(cmdline_options)
               .positional(positional).run(), vm);
   } catch (po::error& e) {
-    cerr << "Command-Line Argument Error: "<< e.what() << endl;
+    logger.info("Command-Line Argument Error: %s.", e.what());
     error = true;
   }
   po::notify(vm);
 
   if (ff_param > 1.0 || ff_param < 0.5) {
-    cerr << "Command-Line Argument Error: forget-param/f option must be "
-         << "between 0.5 and 1.0\n\n";
+    logger.info("Command-Line Argument Error: forget-param/f option must be "
+                "between 0.5 and 1.0.");
     error= true;
   }
 
   if (fasta_file_name == "") {
-    cerr << "Command-Line Argument Error: target sequence fasta file "
-         << "required\n\n";
+    logger.info("Command-Line Argument Error: target sequence fasta file "
+                "required.");
     error = true;
   }
 
@@ -304,9 +306,11 @@ bool parse_options(int ac, char ** av) {
     stranded_count++;
   }
   if (stranded_count > 1) {
-    cerr << "ERROR: Multiple strandedness flags cannot be "
-    << "specified in the same run.\n";
-    return 1;
+    logger.severe("Multiple strandedness flags cannot be specified in the same "
+                  "run.");
+  }
+  if (vm.count("logtostderr")) {
+    logger.info_out(&cerr);
   }
   
   edit_detect = vm.count("edit-detect");
@@ -327,21 +331,19 @@ bool parse_options(int ac, char ** av) {
   }
   
   if (additional_online > 0 && additional_batch > 0) {
-    cerr << "ERROR: Cannot add both online and batch rounds.";
-    return 1;
+    logger.severe("Cannot add both online and batch rounds.");
   } else if (additional_online > 0) {
     online_additional = true;
   }
   
   if (output_align_prob && output_align_samp) {
-    cerr << "ERROR: Cannot output both alignment probabilties and sampled "
-         << "alignments.";
-    return 1;
+    logger.severe("Cannot output both alignment probabilties and sampled "
+                  "alignments.");
   }
   if ((output_align_prob || output_align_samp) && remaining_rounds == 0) {
-    cerr << "Warning: It is recommended that at least one additional round "
-         << "be used when outputting alignment probabilities or sampled "
-         << "alignments. Use the '-B' or '-O' option to enable.";
+    logger.warn("It is recommended that at least one additional round "
+                "be used when outputting alignment probabilities or sampled "
+                "alignments. Use the '-B' or '-O' option to enable.");
   }
   
   // We have 1 processing thread and 1 parsing thread always, so we should not
@@ -354,8 +356,7 @@ bool parse_options(int ac, char ** av) {
     num_threads -= edit_detect;
   }
   if (remaining_rounds && in_map_file_names == "") {
-    cerr << "ERROR: Cannot process multiple rounds from streaming input.";
-    return 1;
+    logger.severe("Cannot process multiple rounds from streaming input.");
   }
   if (remaining_rounds) {
     last_round = false;
@@ -387,13 +388,12 @@ void output_results(Librarian& libs, size_t tot_counts, int n=-1) {
   string dir = output_dir;
   if (n >= 0) {
     sprintf(buff, "%s/x_%d", output_dir.c_str(), n);
-    cerr << "Writing results to " << buff << endl;
+    logger.info("Writing results to %s.", buff);
     dir = string(buff);
     try {
       fs::create_directories(dir);
     } catch (fs::filesystem_error& e) {
-            cerr << e.what() << endl;
-            exit(1);
+      logger.severe(e.what());
     }
   }
   libs[0].targ_table->output_results(dir, tot_counts, last_round&calc_covar,
@@ -498,8 +498,8 @@ void process_fragment(Fragment* frag_p) {
 
   if (islzero(total_likelihood)){
     assert(expr_alpha_map);
-    cerr << "Warning: Fragment '" << frag.name() << "' has 0 likelihood of "
-         << "originating from the transcriptome. Skipping.";
+    logger.warn("Fragment '%s' has 0 likelihood of originating from the "
+                "transcriptome. Skipping...", frag.name().c_str());
     foreach (const Target* t, locked_set) {
       t->unlock();
     }
@@ -600,13 +600,12 @@ void proc_thread(ParseThreadSafety* pts) {
  * @return The total number of fragments processed.
  */
 size_t threaded_calc_abundances(Librarian& libs) {
-  cerr << "Processing input fragment alignments...\n";
+  logger.info("Processing input fragment alignments...");
   boost::scoped_ptr<boost::thread> bias_update;
 
   size_t n = 1;
   size_t num_frags = 0;
   double mass_n = 0;
-  cerr << setiosflags(ios::left);
 
   // For log-scale output
   size_t i = 1;
@@ -661,10 +660,9 @@ size_t threaded_calc_abundances(Librarian& libs) {
 
         // Test that we have not already seen this fragment
         if (frag && first_round && frags_seen.test_and_push(frag->name())) {
-          cerr << "ERROR: Alignments are not properly sorted. Read '"
-              << frag->name()
-              << "' has alignments which are non-consecutive.\n";
-          exit(1);
+          logger.severe("Alignments are not properly sorted. Read '%s' has "
+                        "alignments which are non-consecutive.",
+                        frag->name().c_str());
         }
 
         // If multi-threaded and burned out, push to the processing queue
@@ -705,9 +703,9 @@ size_t threaded_calc_abundances(Librarian& libs) {
 
         // Output progress
         if (num_frags % 1000000 == 0) {
-          cerr << "Fragments Processed (" << lib.in_file_name << "): "
-               << setw(9) << num_frags << "\t Number of Bundles: "
-               << lib.targ_table->num_bundles() << endl;
+          logger.info("Fragments Processed (%s): %d\tNumber of Bundles: %d.",
+                      lib.in_file_name.c_str(), num_frags,
+                      lib.targ_table->num_bundles());
           dir_detector.report_if_improper_direction();
         }
 
@@ -740,7 +738,7 @@ size_t threaded_calc_abundances(Librarian& libs) {
         output_results(libs, n, (int)remaining_rounds);
       }
 
-      cerr << remaining_rounds << " remaining rounds." << endl;
+      logger.info("%d remaining rounds.", remaining_rounds);
       first_round = false;
       last_round = (remaining_rounds==0 && !both);
       for (size_t l = 0; l < libs.size(); l++) {
@@ -753,9 +751,8 @@ size_t threaded_calc_abundances(Librarian& libs) {
     }
   }
 
-  cerr << "COMPLETED: Processed " << num_frags
-       << " mapped fragments, targets are in "
-       << libs[0].targ_table->num_bundles() << " bundles\n";
+  logger.info("COMPLETED: Processed %d mapped fragments, targets are in %d "
+              "bundles.", num_frags, libs[0].targ_table->num_bundles());
 
   return num_frags;
 }
@@ -771,13 +768,12 @@ int estimation_main() {
     try {
       fs::create_directories(output_dir);
     } catch (fs::filesystem_error& e) {
-      cerr << e.what() << endl;
+      logger.info(e.what());
     }
   }
   
   if (!fs::exists(output_dir)) {
-    cerr << "ERROR: cannot create directory " << output_dir << ".\n";
-    exit(1);
+    logger.severe("Cannot create directory %s.", output_dir.c_str());
   }
   
   // Parse input file names and instantiate Libray structs.
@@ -829,9 +825,8 @@ int estimation_main() {
         (libs[i].map_parser->targ_index() != libs[i-1].map_parser->targ_index()
          || libs[i].map_parser->targ_lengths() !=
          libs[i-1].map_parser->targ_lengths())) {
-          cerr << "ERROR: Alignment file headers do not match for '"
-          << file_names[i-1] << "' and '" << file_names[i] << "'.";
-          exit(1);
+          logger.severe("Alignment file headers do not match for '%s' and '%s'.",
+                        file_names[i-1].c_str(), file_names[i].c_str());
         }
   }
   
@@ -857,9 +852,9 @@ int estimation_main() {
   double num_targ = (double)targ_table->size();
   
   if (calc_covar && (double)SSIZE_MAX < num_targ*(num_targ+1)) {
-    cerr << "Warning: Your system is unable to represent large enough values "
-         << "for efficiently hashing target pairs. Covariance calculation "
-         << "will be disabled.\n";
+    logger.warn("Your system is unable to represent large enough values for "
+                "efficiently hashing target pairs. Covariance calculation will "
+                "be disabled.");
     calc_covar = false;
   }
   
@@ -873,10 +868,10 @@ int estimation_main() {
   }
   
   if (!burned_out && bias_correct && param_file_name == "") {
-    cerr << "Warning: Not enough fragments observed to accurately learn bias "
-         << "paramaters. Either disable bias correction (--no-bias-correct) or "
-         << "provide a file containing auxiliary parameters "
-         << "(--aux-param-file).\n";
+    logger.warn("Not enough fragments observed to accurately learn bias "
+                "parameters. Either disable bias correction "
+                "(--no-bias-correct) or provide a file containing auxiliary "
+                "parameters (--aux-param-file).");
   }
   
   if (both) {
@@ -898,8 +893,8 @@ int estimation_main() {
       output_results(libs, tot_counts, (int)remaining_rounds);
     }
     remaining_rounds--;
-    cerr << "\nRe-estimating counts with additional round of EM ("
-         << remaining_rounds << " remaining)...\n";
+    logger.info("\nRe-estimating counts with additional round of EM (%d "
+                "remaining)...", remaining_rounds);
     last_round = (remaining_rounds == 0);
     for (size_t l = 0; l < libs.size(); l++) {
       libs[l].map_parser->write_active(last_round);
@@ -912,9 +907,9 @@ int estimation_main() {
     targ_table->round_reset();
   }
   
-	cerr << "Writing results to file...\n";
+	logger.info("Writing results to file...");
   output_results(libs, tot_counts);
-  cerr << "Done\n";
+  logger.info("Done.");
   
   return 0;
 }
@@ -933,12 +928,11 @@ int preprocess_main() {
   try {
     fs::create_directories(output_dir);
   } catch (fs::filesystem_error& e) {
-      cerr << e.what() << endl;
+      logger.info(e.what());
   }
   
   if (!fs::exists(output_dir)) {
-    cerr << "ERROR: cannot create directory " << output_dir << ".\n";
-    exit(1);
+    logger.severe("Cannot create directory %s.", output_dir.c_str());
   }
   
   Librarian libs(1);
@@ -953,7 +947,7 @@ int preprocess_main() {
   lib.targ_table.reset(new TargetTable (fasta_file_name, "", 0, 0, NULL, NULL,
                                         &libs));
   
-  cerr << "Converting targets to Protocol Buffers...\n";
+  logger.info("Converting targets to Protocol Buffers...");
   fstream targ_out((output_dir + "/targets.pb").c_str(),
                    ios::out | ios::trunc);
   string out_buff;
@@ -971,11 +965,10 @@ int preprocess_main() {
   }
   targ_out.close();
   
-  cerr << "Converting fragment alignments to Protocol Buffers..\n";
+  logger.info("Converting fragment alignments to Protocol Buffers...");
   ostream frag_out(cout.rdbuf());
   
   size_t num_frags = 0;
-  cerr << setiosflags(ios::left);
   Fragment* frag;
   
   ParseThreadSafety pts(10);
@@ -995,9 +988,9 @@ int preprocess_main() {
     
     // Test that we have not already seen this fragment
     if (frags_seen.test_and_push(frag->name())) {
-      cerr << "ERROR: Alignments are not properly sorted. Read '"
-      << frag->name() << "' has alignments which are non-consecutive.\n";
-      exit(1);
+      logger.severe("Alignments are not properly sorted. Read '%s' has "
+                    "alignments which are non-consecutive.",
+                    frag->name().c_str());
     }
     
     frag_proto.set_paired(frag->paired());
@@ -1080,7 +1073,7 @@ int preprocess_main() {
     
     // Output progress
     if (num_frags % 1000000 == 0) {
-      cerr << "Fragments Processed: " << setw(9) << num_frags << endl;
+      logger.info("Fragments Processed: %d", num_frags);
     }
   }
   

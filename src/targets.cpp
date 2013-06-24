@@ -254,14 +254,15 @@ TargetTable::TargetTable(string targ_fasta_file, string haplotype_file,
                          bool prob_seqs, bool known_aux_params, double alpha,
                          const AlphaMap* alpha_map, const Librarian* libs)
     :  _libs(libs) {
-  cerr << "Loading target sequences";
+  string info_msg = "Loading target sequences";
   const Library& lib = _libs->curr_lib();
   const TransIndex& targ_index = lib.map_parser->targ_index();
   const TransIndex& targ_lengths = lib.map_parser->targ_lengths();
   if (lib.bias_table && !known_aux_params) {
-    cerr << " and measuring bias background";
+    info_msg += " and measuring bias background";
   }
-  cerr << "...\n\n";
+  info_msg += "...\n";
+  logger.info(info_msg.c_str());
 
   size_t num_targs = targ_index.size();
   _targ_map = vector<Target*>(num_targs, NULL);
@@ -286,15 +287,13 @@ TargetTable::TargetTable(string targ_fasta_file, string haplotype_file,
         }
         name = line.substr(1,line.find(' ')-1);
         if (target_names.count(name)) {
-          cerr << "ERROR: Target '" << name << "' is duplicated in the input "
-               << "FASTA. Ensure all target names are unique and re-map before "
-               << "re-running eXpress\n";
-          exit(1);
+          logger.severe("Target '%s' is duplicated in the input FASTA. Ensure "
+                        "target names are unique and re-map before re-running "
+                        "eXpress.", name.c_str());
         }
         if (alpha_map && !alpha_map->count(name)) {
-          cerr << "ERROR: Target '" << name << "' is was not found in the "
-               << "prior parameter file.\n";
-          exit(1);
+          logger.severe("Target '%s' is was not found in the prior parameter "
+                        "file.", name.c_str());
         }
         target_names.insert(name);
         seq = "";
@@ -315,23 +314,20 @@ TargetTable::TargetTable(string targ_fasta_file, string haplotype_file,
       lib.bias_table->normalize_expectations();
     }
   } else {
-    cerr << "ERROR: Unable to open MultiFASTA file '" << targ_fasta_file
-         << "'.\n" ;
-    exit(1);
+    logger.severe("Unable to open MultiFASTA file '%s'.",
+                  targ_fasta_file.c_str());
   }
 
   if (size() == 0) {
-    cerr << "ERROR: No targets found in MultiFASTA file '" << targ_fasta_file
-         << "'.\n" ;
-    exit(1);
+    logger.severe("No targets found in MultiFASTA file '%s'.",
+                  targ_fasta_file.c_str());
   }
 
   for(TransIndex::const_iterator it = targ_index.begin();
       it != targ_index.end(); ++it) {
     if (!_targ_map[it->second]) {
-      cerr << "ERROR: Sequence for target '" << it->first
-           << "' not found in MultiFasta file '" << targ_fasta_file << "'.\n";
-      exit(1);
+      logger.severe("Sequence for target '%s' not found in MultiFasta file "
+                    "'%s'.", it->first.c_str(), targ_fasta_file.c_str());
     }
   }
   
@@ -346,8 +342,7 @@ TargetTable::TargetTable(string targ_fasta_file, string haplotype_file,
         }
         size_t split = line.find(",");
         if (split == string::npos) {
-          cerr << "ERROR: Haplotype file not formatted properly.\n";
-          exit(1);
+          logger.severe("Haplotype file not formatted properly.");
         }
         Target* targ1 = _targ_map[targ_index.at(line.substr(0, split))];
         Target* targ2 = _targ_map[targ_index.at(line.substr(split+1))];
@@ -378,16 +373,15 @@ void TargetTable::add_targ(const string& name, const string& seq, bool prob_seq,
                            const TransIndex& targ_lengths) {
   TransIndex::const_iterator it = targ_index.find(name);
   if (it == targ_index.end()) {
-    cerr << "Warning: Target '" << name
-         << "' exists in MultiFASTA but not alignment (SAM/BAM) file.\n";
+    logger.warn("Target '%s' exists in MultiFASTA but not alignment "
+                   "(SAM/BAM) file.", name.c_str());
     return;
   }
 
   if (targ_lengths.find(name)->second != seq.length()) {
-    cerr << "ERROR: Target '" << name << "' differs in length between "
-         << "MultiFASTA and alignment (SAM/BAM) files ("<< seq.length()
-         << " vs. " << targ_lengths.find(name)->second << ").\n";
-    exit(1);
+    logger.severe("Target '%s' differs in length between MultiFASTA and "
+                  "alignment (SAM/BAM) files (%d  vs. %d).", name.c_str(),
+                  seq.length(), targ_lengths.find(name)->second);
   }
 
   const Library& lib = _libs->curr_lib();
@@ -763,7 +757,7 @@ void TargetTable::asynch_bias_update(boost::mutex* mutex) {
         }
         bg_table = new BiasBoss(lib_bias_table.order(), 0);
       }
-      cerr << "Synchronized parameter tables.\n";
+      logger.info("Synchronized parameter tables.");
     }
 
     if (!edit_detect && burned_out && burned_out_before) {
