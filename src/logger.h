@@ -12,6 +12,8 @@
 #include <iostream>
 #include <boost/thread.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
+#include <cstdarg>
+#include <cstdio>
 
 namespace pt = boost::posix_time;
 
