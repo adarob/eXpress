@@ -120,7 +120,7 @@ void SequenceFwd::calc_p_vals(vector<double>& p_vals) const {
   p_vals = vector<double>(_len, 1.0);
   for (size_t i = 0; i < _len; ++i) {
     double N = round(sexp(_obs_seq.sum(i)));
-    if (N==0) {
+    if (N<5) {
       continue;
     }
     size_t ref_nuc = get_ref(i);

@@ -26,6 +26,8 @@ find_package(Boost 1.39
 
 find_package(Protobuf)
 
+find_package(GooglePerfTools)
+
 if(WIN32)
 	set(CMAKE_CXX_FLAGS "/EHsc")
 	set(WIN32_INT 1)

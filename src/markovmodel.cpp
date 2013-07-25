@@ -71,13 +71,13 @@ void MarkovModel::update(const Sequence& seq, int left, double mass) {
   while (i < _window_size && j < seq_len) {
     size_t index = min(i, _num_pos-1);
     size_t curr = seq[j];
-    if (seq.prob()) {
-      for (size_t nuc = 0; nuc < NUM_NUCS; nuc++) {
-        _params[index].increment(cond, nuc, seq.get_prob(j, nuc) + mass);
-      }
-    } else {
+    //if (seq.prob()) {
+    //  for (size_t nuc = 0; nuc < NUM_NUCS; nuc++) {
+    //    _params[index].increment(cond, nuc, seq.get_prob(j, nuc) + mass);
+    //  }
+    //} else {
       _params[index].increment(cond, curr, mass);
-    }
+    //}
     cond = (cond << 2) + curr;
     cond &= _bitclear;
     i++;
