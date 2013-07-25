@@ -17,13 +17,21 @@ set(Boost_USE_STATIC_LIBS ON)
 
 find_package(Boost 1.39
     COMPONENTS
-    thread
+	thread
 	system
 	filesystem
-    program_options
+	date_time
+    	program_options
     REQUIRED)
 
 find_package(Protobuf)
+
+find_library(GPERFTOOLS_TCMALLOC_LIB tcmalloc)
+if (GPERFTOOLS_TCMALLOC_LIB)
+   message(STATUS "Found GPERFTOOLS_TCMALLOC: ${GPERFTOOLS_TCMALLOC_LIB}")
+else (GPERFTOOLS_TCMALLOC_LIB)
+   message(STATUS "Did Not Find GPERFTOOLS_TCMALLOC: Install to improve speed.")
+endif(GPERFTOOLS_TCMALLOC_LIB)
 
 if(WIN32)
 	set(CMAKE_CXX_FLAGS "/EHsc")
