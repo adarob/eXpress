@@ -53,7 +53,7 @@ public:
     char buffer[BUFF_SIZE];
     std::va_list arg;
     va_start(arg, msg);
-    std::vsnprintf(buffer, BUFF_SIZE, msg, arg);
+    vsnprintf(buffer, BUFF_SIZE, msg, arg);
     va_end(arg);
     *_info_out << get_time() << " - " << buffer << std::endl;
   }
@@ -63,7 +63,7 @@ public:
     char buffer[BUFF_SIZE];
     std::va_list arg;
     va_start(arg, msg);
-    std::vsnprintf(buffer, BUFF_SIZE, msg, arg);
+    vsnprintf(buffer, BUFF_SIZE, msg, arg);
     va_end(arg);
     *_warn_out << get_time() << " - WARNING: " << buffer << std::endl;
   }
@@ -73,7 +73,7 @@ public:
     char buffer[BUFF_SIZE];
     std::va_list arg;
     va_start(arg, msg);
-    std::vsnprintf(buffer, BUFF_SIZE, msg, arg);
+    vsnprintf(buffer, BUFF_SIZE, msg, arg);
     va_end(arg);
     *_warn_out << get_time() << " - SEVERE: " << buffer << std::endl;
     exit(1);

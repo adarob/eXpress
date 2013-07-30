@@ -501,7 +501,7 @@ void TargetTable::masses_to_counts() {
       for (size_t i = 0; i < bundle_targ.size(); ++i) {
         Target& targ = *bundle_targ[i];
         double mass = targ.mass(false);
-        targ._curr_params.mass = log(targ_counts[i]);
+        targ._curr_params.mass = log((double)targ_counts[i]);
         targ._curr_params.mass_var = min(targ.mass_var(),
                                          mass + log_sub(l_bundle_mass, mass))
                                      + l_var_renorm;
@@ -609,7 +609,7 @@ void TargetTable::output_results(string output_dir, size_t tot_counts,
             if (sexp(targ.var_sum()) != 0 && targ.tot_ambig_mass() != LOG_0) {
               v = targ.var_sum() - targ.tot_ambig_mass();
             }
-            v = min(v, m + log_sub(log_sub(LOG_1, m), LOG_EPSILON - log(2)));
+            v = min(v, m + log_sub(log_sub(LOG_1, m), LOG_EPSILON - log(2.)));
 
             count_alpha = m + (log_sub(log_add(m,v), m+m)) - v;
             count_alpha = sexp(min(LOG_MAX, count_alpha));

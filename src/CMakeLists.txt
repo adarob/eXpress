@@ -7,16 +7,16 @@ endif (PROTOBUF_FOUND)
 
 add_executable(express ${sources} ${headers})
 
-set(LIBRARIES ${Boost_LIBRARIES} ${ZLIB_LIBRARIES} "${CMAKE_CURRENT_SOURCE_DIR}/../bamtools/lib/libbamtools.a")
+set(LIBRARIES ${Boost_LIBRARIES} ${ZLIB_LIBRARIES})
 
 if (GPERFTOOLS_TCMALLOC) 
    set(LIBRARIES ${LIBRARIES} "libtcmalloc_minimal.a")
 endif (GPERFTOOLS_TCMALLOC)
 
 if(WIN32)
-  set(LIBRARIES ${LIBRARIES} "${CMAKE_CURRENT_SOURCE_DIR}/../win_build/zlibd.lib")
+  set(LIBRARIES ${LIBRARIES} "${CMAKE_CURRENT_SOURCE_DIR}/../bamtools/lib/libbamtools.lib" "${CMAKE_CURRENT_SOURCE_DIR}/../win_build/zlibd.lib")
 else(WIN32)
-  set(LIBRARIES ${LIBRARIES} "pthread")
+  set(LIBRARIES ${LIBRARIES} "${CMAKE_CURRENT_SOURCE_DIR}/../bamtools/lib/libbamtools.a" "pthread")
 endif(WIN32)
 
 if (PROTOBUF_FOUND)
