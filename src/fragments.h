@@ -122,7 +122,10 @@ struct ReadHit {
   int mate_l;
 };
 
-//DOC
+/**
+ * The HitParams struct stores likelihood information for a single hit of a
+ * fragment.
+ */
 struct HitParams {
   double align_likelihood;
   double full_likelihood;

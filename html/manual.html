@@ -123,10 +123,10 @@
         <li><a href="#">Download<!--[if IE 7]><!--></a><!--<![endif]-->
           <!--[if lte IE 6]><table><tr><td><![endif]-->
             <ul>
-              <li><a href=downloads/express-1.3.1/express-1.3.1-macosx_x86_64.tgz onClick="_gaq.push(['_trackEvent', 'Downloads', 'Mac', 'Manual']);" target="_blank">Mac OS X (64-bit)</a></li>
-              <li><a href=downloads/express-1.3.1/express-1.3.1-linux_x86_64.tgz onClick="_gaq.push(['_trackEvent', 'Downloads', 'Linux', 'Manual']);" target="_blank">Linux (64-bit)</a></li>
-              <li><a href=downloads/express-1.3.1/express-1.3.1-win32_x86_64.zip onClick="_gaq.push(['_trackEvent', 'Downloads', 'Windows', 'Manual']);" target="_blank">Windows (64-bit)</a></li>
-              <li><a href=downloads/express-1.3.1/express-1.3.1-src.tgz onClick="_gaq.push(['_trackEvent', 'Downloads', 'Source', 'Manual']);" target="_blank">Source Code</a></li>
+              <li><a href=downloads/express-1.4.0/express-1.4.0-macosx_x86_64.tgz onClick="_gaq.push(['_trackEvent', 'Downloads', 'Mac', 'Manual']);" target="_blank">Mac OS X (64-bit)</a></li>
+              <li><a href=downloads/express-1.4.0/express-1.4.0-linux_x86_64.tgz onClick="_gaq.push(['_trackEvent', 'Downloads', 'Linux', 'Manual']);" target="_blank">Linux (64-bit)</a></li>
+              <li><a href=downloads/express-1.4.0/express-1.4.0-win32_x86_64.zip onClick="_gaq.push(['_trackEvent', 'Downloads', 'Windows', 'Manual']);" target="_blank">Windows (64-bit)</a></li>
+              <li><a href=downloads/express-1.4.0/express-1.4.0-src.tgz onClick="_gaq.push(['_trackEvent', 'Downloads', 'Source', 'Manual']);" target="_blank">Source Code</a></li>
               <li><a href="downloads" onClick="_gaq.push(['_trackEvent', 'Downloads', 'Previous','Manual']);">Previous Versions</a></li>
             </ul>
           <!--[if lte IE 6]></td></tr></table></a><![endif]-->
@@ -208,7 +208,6 @@
 		  Specifies the number of additional online EM rounds to perform on the data after the initial online round.  Can improve accuracy at the cost of time.
 		  </td></tr> 
 
-		  
 		  <tr><td VALIGN=top nowrap> 
 		  <tt>-m/--frag-len-mean &lt;int&gt;</tt> 
 		  </td><td VALIGN=top> 
@@ -219,6 +218,12 @@
 		  <tt>-s/--frag-len-stddev &lt;int&gt;</tt> 
 		  </td><td VALIGN=top> 
 		  Specifies the fragment length standard deviation.  While the empirical distribution is estimated from paired-end reads on-the-fly, this value paramaterizes the prior distribution.  If only single-end reads are available, this prior distribution is also used to determine the effective length.  Default is 60.
+		  </td></tr> 
+		  
+		  <tr><td VALIGN=top nowrap> 
+		  <tt>-H/--haplotype-file &lt;string&gt;</tt> 
+		  </td><td VALIGN=top> 
+		  Specifies the location of a comma-separated file of pairs of target IDs (one pair per line) specifying which targets represent multiple haplotypes of a single feature (ie, transcript). Useful for allele-specific expression.
 		  </td></tr> 
 		  
 		  <tr><td VALIGN=top nowrap> 
