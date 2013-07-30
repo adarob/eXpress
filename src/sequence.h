@@ -159,7 +159,10 @@ class Sequence {
    *        p-values at each position.
    */
   virtual void calc_p_vals(std::vector<double>& p_vals) const = 0;
-  // DOC
+  /**
+   * A member function to serialize a string into an array of bytes, with each
+   * nucleotide represented by 2 bits.
+   */
   std::string serialize();
 };
 

@@ -406,20 +406,70 @@ public:
   void solvable(bool s) { _solvable = s; }
 };
 
-// DOC
+/**
+ * The HaplotypeHandler class keeps track of sets of transcripts from different
+ * chromosomes. For these sets, a combined likelihood is computed relative to
+ * targets not in the set, but abundance within the set is calculated
+ * based only on fragments with likelihoods that differ within the set.
+ *
+ * Due to how the fragments are processed in the main thread, likelihoods and
+ * global assigned masses are stored when first computed and then split within
+ * the set (committed) only when it is known that processing of the fragment is
+ * complete.
+ *
+ * @author    Adam Roberts
+ * @date      2013
+ * @copyright Artistic License 2.0
+ **/
 class HaplotypeHandler {
+  /**
+   * Pointers to the targets in the set.
+   */
   std::vector<const Target*> _targets;
+  /**
+   * The taus internal to the set only taking into account fragments that
+   * align with different likelihoods.
+   */
   FrequencyMatrix<double> _haplo_taus;
-  
+  /**
+   * A buffer to hold the name of the current fragment being processed. The
+   * fragment is not split internally until all aligned targets in the set have
+   * their likelihoods calculated in the main thread.
+   */
   std::string _frag_name_buff;
+  /**
+   * A buffer to hold the likelihoods that have been calculated for the current
+   * fragment.
+   */
   std::vector<double> _align_likelihoods_buff;
+  /**
+   * A buffer to hold the masses assigned to the targets in this set for the
+   * current fragment.
+   */
   std::vector<double> _masses_buff;
+  /**
+   * A boolean signalling whether or not the current fragment has been split
+   * within the set.
+   */
   bool _committed;
-  
+  /**
+   * If there is an uncommited fragment in the buffer, causes it to be split
+   * within the set.
+   */
   void commit_buffer();
  public:
+  /**
+   * Constructor for the HaplotypeHandler.
+   */
   HaplotypeHandler(const Target* targ1, const Target* targ2, double alpha);
+  /**
+   * Gets the current relative mass of the given target within the set.
+   */
   double get_mass(const Target* targ, bool with_pseudo);
+  /**
+   * Buffers the mass and likelihood assigned to the given fragment for the
+   * given target.
+   */
   void update_mass(const Target* targ, const std::string& frag_name,
                    double align_likelihood, double mass);
 };
@@ -585,7 +635,9 @@ public:
    * @return The number of bundles in the partition.
    */
   size_t num_bundles() const { return _bundle_table.size(); }
-  //DOC
+  /**
+   * Renormalized masses to be counts and projects when necessary.
+   */
   void masses_to_counts();
   /**
    * A member function that outputs the final expression data in a file called
@@ -608,9 +660,11 @@ public:
    *        and bias tables during updates.
    */
   void asynch_bias_update(boost::mutex* mutex);
-  //DOC
   void enable_bundle_threadsafety() { _bundle_table.threadsafe_mode(true); }
   void disable_bundle_threadsafety() { _bundle_table.threadsafe_mode(false); }
+  /**
+   * Collapses the merge trees in the BundleTable.
+   */
   void collapse_bundles() { _bundle_table.collapse(); }
 };
 

@@ -80,12 +80,18 @@ class MismatchTable {
   /**
    * A member function that computes and returns the parameter table indices
    * used to compute and update the likelihood based on the given FragHit.
-   * Negative values indicate that the position is not used in the likelihood
-   * computation.
+   * Sequence values are compressed to 2 bits per nucleotide.
    * @param f the FragHit to find the table indices for.
-   * @param left_indices the vector to store the left read's indices in.
-   * @param right_indices the vector to store the right read's indices in.
-   DOC
+   * @param left_indices vector to store the left read's mismatched positions.
+   * @param left_seq vector to store the left read's mismatched nucleotides
+   *        (compressed).
+   * @param left_ref vector to store the left read's reference nucleotides
+   *        (compressed) at mismatch positions.
+   * @param right_indices vector to store the right read's mismatched positions.
+   * @param right_seq vector to store the rightt read's mismatched nucleotides
+   *        (compressed).
+   * @param right_ref vector to store the right read's reference nucleotides
+   *        (compressed) at mismatch positions.
    */
   void get_indices(const FragHit& f,
                    std::vector<char>& left_indices,

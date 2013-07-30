@@ -89,11 +89,14 @@ class Bundle {
    * to targets in the bundle (logged), including the initial pseudo-mass.
    */
   double _mass;
-  
-  //DOC
+  /**
+   * A private pointer to the bundle this one was merged into for threadsafe
+   * collapsing. 
+   */
   Bundle* _merged_into;
-  
-  //DOC
+  /**
+   * Mutex for threadafety.
+   */
   mutable boost::mutex _mut;
   
   friend class BundleTable;
@@ -104,7 +107,12 @@ public:
    * @param targ a pointer to the initial Target object in the bundle.
    */
   Bundle(Target* targ);
-  //DOC
+  /**
+   * A private method for returning the root of the merge tree that this bundle
+   * is a node in.
+   * @return A pointer to the bundle at the root of the merge tree for this 
+   *         bundle.
+   */
   const Bundle* get_rep() const;
   /**
    * A member function that increases the total bundle observed fragment counts
@@ -163,13 +171,20 @@ class BundleTable {
    * A private unordered_set to store all of the bundles.
    */
   BundleSet _bundles;
-  //DOC
+  /**
+   * A private boolean specifying if methods needs to be threadsafe.
+   */
   bool _threadsafe_mode;
-  
-  //DOC
+  /**
+   * A private mutex for threadsafety.
+   */
   mutable boost::mutex _mut;
-  
-  //DOC
+  /**
+   * A private method for returning the root of the merge tree that the given
+   * bundle is a node in.
+   * @return A pointer to the bundle at the root of the merge tree for the given
+   *         bundle.
+   */
   Bundle* get_rep(Bundle* b);
 public:
   /**
@@ -207,10 +222,21 @@ public:
    * @return A pointer to the merged Bundle object.
    */
   Bundle* merge(Bundle* b1, Bundle* b2);
-  //DOC
+  /**
+   * Collapses the merge tree so that all targets are placed in the target list
+   * of the root node and all other nodes are deleted.
+   */
   void collapse();
-  //DOC
+  /**
+   * Accessor for whether or not the BundleTable is in threadsafe mode.
+   * @return True if the BundleTable is in threadsafe mode.
+   */
   bool threadsafe_mode() const { return _threadsafe_mode; }
+  /**
+   * Mutator for threadsafe mode.
+   * @param mode bool specifying if threadsafe mode should be enabled (true)
+   *        or disabled (false)
+   */
   void threadsafe_mode(bool mode) { _threadsafe_mode = mode; }
 };
 
