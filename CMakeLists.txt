@@ -3,8 +3,8 @@ cmake_minimum_required (VERSION 2.6)
 project(express)
 
 set(${PROJECT_NAME}_VERSION_MAJOR 1)
-set(${PROJECT_NAME}_VERSION_MINOR 3)
-set(${PROJECT_NAME}_VERSION_PATCH 2)
+set(${PROJECT_NAME}_VERSION_MINOR 4)
+set(${PROJECT_NAME}_VERSION_PATCH 0)
 
 set(CMAKE_CXX_FLAGS "-Wall")
 
@@ -30,7 +30,7 @@ find_library(GPERFTOOLS_TCMALLOC_LIB tcmalloc)
 if (GPERFTOOLS_TCMALLOC_LIB)
    message(STATUS "Found GPERFTOOLS_TCMALLOC: ${GPERFTOOLS_TCMALLOC_LIB}")
 else (GPERFTOOLS_TCMALLOC_LIB)
-   message(STATUS "Did Not Find GPERFTOOLS_TCMALLOC: Install to improve speed.")
+   message(STATUS "Could NOT find GPERFTOOLS_TCMALLOC: Install to improve speed.")
 endif(GPERFTOOLS_TCMALLOC_LIB)
 
 if(WIN32)
