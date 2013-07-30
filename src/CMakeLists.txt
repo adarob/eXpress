@@ -10,7 +10,7 @@ add_executable(express ${sources} ${headers})
 set(LIBRARIES ${Boost_LIBRARIES} ${ZLIB_LIBRARIES} "${CMAKE_CURRENT_SOURCE_DIR}/../bamtools/lib/libbamtools.a")
 
 if (GPERFTOOLS_TCMALLOC) 
-   set(LIBRARIES ${LIBRARIES} "tcmalloc")
+   set(LIBRARIES ${LIBRARIES} "libtcmalloc_minimal.a")
 endif (GPERFTOOLS_TCMALLOC)
 
 if(WIN32)
