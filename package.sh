@@ -1,6 +1,6 @@
 #!/bin/bash
 
-VERSION=1.3.1
+VERSION=1.4.0
 MAC=express-$VERSION-macosx_x86_64
 LINUX=express-$VERSION-linux_x86_64
 WIN=express-$VERSION-win32_x86_64
@@ -52,7 +52,7 @@ cp README html/downloads/express-$VERSION/$SRC/README
 cp LICENSE html/downloads/express-$VERSION/$SRC/LICENSE
 cp -r sample_data html/downloads/express-$VERSION/$SRC/sample_data
 cp html/doc/express-doc.pdf html/downloads/express-$VERSION/$SRC
-cp CMakeLists_release.txt html/downloads/express-$VERSION/$SRC/CMakeLists.txt
+cp CMakeLists.txt html/downloads/express-$VERSION/$SRC/CMakeLists.txt
 
 find . -name '*.DS_Store' -type f -delete
 
