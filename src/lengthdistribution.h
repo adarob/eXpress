@@ -103,6 +103,13 @@ public:
    */
   double pmf(size_t len) const;
   /**
+   * A member function that returns a (logged) cumulative mass for a given
+   * length.
+   * @param len an integer for the length to return the cmf value of.
+   * @return (Logged) cmf value of length.
+   */
+  double cmf(size_t len) const;
+  /**
    * A member function that returns a vector containing the (logged) cumulative
    * mass function *for the bins*.
    * @return (Logged) cmf of bins.

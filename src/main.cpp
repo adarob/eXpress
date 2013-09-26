@@ -479,6 +479,7 @@ void process_fragment(Fragment* frag_p) {
       total_mass = log_add(total_mass, masses[i]);
       total_variance = log_add(total_variance, variances[i]);
       num_solvable += t->solvable();
+      assert(!isnan(total_likelihood));
     }
   } else {
     FragHit& m = *frag.hits()[0];
@@ -639,7 +640,9 @@ size_t threaded_calc_abundances(Librarian& libs) {
           }
         }
         if (lib.n == burn_out) {
-          (lib.mismatch_table)->fix();
+          if (lib.mismatch_table) {
+            (lib.mismatch_table)->fix();
+          };
           burned_out = true;
         }
         // Start threads once aux parameters are burned out

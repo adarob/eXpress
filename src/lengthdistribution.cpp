@@ -145,6 +145,16 @@ double LengthDistribution::pmf(size_t len) const {
   return _hist[len]-_tot_mass;
 }
 
+double LengthDistribution::cmf(size_t len) const {
+  double cum = LOG_0;
+  vector<double> cdf(_hist.size());
+  for (size_t i = 0; i < _hist.size(); ++i) {
+    cum = log_add(cum, _hist[i]);
+    
+  }
+  return cum - _tot_mass;
+}
+
 vector<double> LengthDistribution::cmf() const {
   double cum = LOG_0;
   vector<double> cdf(_hist.size());

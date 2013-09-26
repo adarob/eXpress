@@ -118,6 +118,7 @@ double Target::sample_likelihood(bool with_pseudo,
     }
   }
   ll += tot_mass - tot_eff_len;
+  assert(!isnan(ll));
   return ll;
 }
 
@@ -144,6 +145,10 @@ double Target::align_likelihood(const FragHit& frag) const {
   
   if (ps == PAIRED) {
     ll += (lib.fld)->pmf(frag.length());
+  } else if (ps == LEFT_ONLY && length() - frag.left() < (lib.fld)->max_val()) {
+    ll += (lib.fld)->cmf(length() - frag.left());
+  } else if (ps == RIGHT_ONLY && frag.right() < (lib.fld)->max_val()) {
+    ll += (lib.fld)->cmf(frag.right());
   }
 
   assert(!(isnan(ll)||isinf(ll)));
@@ -158,10 +163,14 @@ double Target::est_effective_length(const LengthDistribution* fld,
 
   double eff_len = LOG_0;
 
-  for(size_t l = fld->min_val(); l <= min(length(), fld->max_val()); l++) {
-    eff_len = log_add(eff_len, fld->pmf(l)+log((double)length()-l+1));
+  if (log(length()) < fld->mean()) {
+    eff_len = log(length());
+  } else {
+    for(size_t l = fld->min_val(); l <= min(length(), fld->max_val()); l++) {
+      eff_len = log_add(eff_len, fld->pmf(l)+log((double)length()-l+1));
+    }
   }
-
+  
   if (with_bias) {
     eff_len += _avg_bias;
   }

@@ -59,7 +59,7 @@
       </BuildableProductRunnable>
       <CommandLineArguments>
          <CommandLineArgument
-            argument = "--logtostderr --max-read-len 2000 --max-indel-size 1000 --no-bias-correct /Users/adarob/Downloads/lorian/allgenomes.mfa /Users/adarob/Downloads/lorian/test2.SAM"
+            argument = "--no-error-model /Users/adarob/Downloads/gencode17.fa /Users/adarob/Downloads/US-1422352.unsorted.bam"
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
