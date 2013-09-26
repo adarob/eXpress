@@ -163,8 +163,9 @@ double Target::est_effective_length(const LengthDistribution* fld,
 
   double eff_len = LOG_0;
 
-  if (log(length()) < fld->mean()) {
-    eff_len = log(length());
+  double log_length = log((double)length());
+  if (log_length < fld->mean()) {
+    eff_len = log_length;
   } else {
     for(size_t l = fld->min_val(); l <= min(length(), fld->max_val()); l++) {
       eff_len = log_add(eff_len, fld->pmf(l)+log((double)length()-l+1));
