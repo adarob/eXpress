@@ -75,7 +75,7 @@ public:
     va_start(arg, msg);
     vsnprintf(buffer, BUFF_SIZE, msg, arg);
     va_end(arg);
-    *_warn_out << get_time() << " - SEVERE: " << buffer << std::endl;
+    *_severe_out << get_time() << " - SEVERE: " << buffer << std::endl;
     exit(1);
   }
 };

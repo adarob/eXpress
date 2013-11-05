@@ -200,41 +200,59 @@ void HaplotypeHandler::commit_buffer() {
     return;
   }
   
-  if (_align_likelihoods_buff[0] != _align_likelihoods_buff[1]) {
-    _haplo_taus.increment(0, 0, _masses_buff[0]);
-    _haplo_taus.increment(0, 1, _masses_buff[1]);
+  bool all_eq = true;
+  foreach (double val, _align_likelihoods_buff) {
+    all_eq &= (val == _align_likelihoods_buff[0]);
+  }
+  if (!all_eq) {
+    for (size_t i = 0; i < _targets.size(); ++i) {
+      _haplo_taus.increment(0, i, _masses_buff[i]);
+    }
   }
   
-  _align_likelihoods_buff[0] = LOG_0;
-  _align_likelihoods_buff[1] = LOG_0;
-  _masses_buff[0] = LOG_0;
-  _masses_buff[1] = LOG_0;
+  for (size_t i = 0; i < _targets.size(); ++i) {
+    _align_likelihoods_buff[i] = LOG_0;
+    _masses_buff[i] = LOG_0;
+  }
   _committed = true;
 }
 
-HaplotypeHandler::HaplotypeHandler(const Target* targ1, const Target* targ2,
-                                  double alpha=1)
-    : _targets(vector<const Target*>(2)),
-      _haplo_taus(1, 2, alpha),
+HaplotypeHandler::HaplotypeHandler(vector<Target*> targets, double alpha=1)
+    : _haplo_taus(1, targets.size(), alpha),
       _frag_name_buff(""),
-      _align_likelihoods_buff(vector<double>(2, LOG_0)),
-      _masses_buff(vector<double>(2, LOG_0)),
+      _align_likelihoods_buff(vector<double>(targets.size(), LOG_0)),
+      _masses_buff(vector<double>(targets.size(), LOG_0)),
       _committed(true) {
-  _targets[0] = targ1;
-  _targets[1] = targ2;
+  
+  boost::shared_ptr<HaplotypeHandler> handler(this);
+  foreach(Target* targ, targets) {
+    _targets.push_back(targ);
+    targ->haplotype(handler);
+  }
+}
+
+size_t HaplotypeHandler::find_target(const Target* targ) {
+  for (size_t i = 0; i < _targets.size(); ++i) {
+    if (_targets[i] == targ) {
+      assert(_targets[i]->id() == targ->id());
+      return i;
+    }
+  }
+  logger.severe("Haplotype target not found.");
+  return SSIZE_MAX;
 }
 
 double HaplotypeHandler::get_mass(const Target* targ, bool with_pseudo) {
   commit_buffer();
   
-  TargID i = (targ == _targets[1]);
-  assert(_targets[i]->id() == targ->id());
+  TargID i = find_target(targ);;
   
-  double total_mass = log_add(_targets[0]->_ret_params->mass,
-                              _targets[1]->_ret_params->mass);
-  if (with_pseudo){
-    total_mass = log_add(total_mass, _targets[0]->cached_effective_length());
-    total_mass = log_add(total_mass, _targets[1]->cached_effective_length());
+  double total_mass = LOG_0;
+  foreach(const Target* targ, _targets) {
+    total_mass = log_add(total_mass, targ->_ret_params->mass);
+    if (with_pseudo){
+      total_mass = log_add(total_mass, targ->cached_effective_length());
+    }
   }
   
   return _haplo_taus(0, i) + total_mass;
@@ -249,8 +267,7 @@ void HaplotypeHandler::update_mass(const Target* targ, const string& frag_name,
     assert(!_committed);
   }
   
-  TargID i = (targ == _targets[1]);
-  assert(_targets[i]->id() == targ->id());
+  TargID i = find_target(targ);
 
   _align_likelihoods_buff[i] = log_add(_align_likelihoods_buff[i],
                                        align_likelihood);
@@ -336,7 +353,7 @@ TargetTable::TargetTable(string targ_fasta_file, string haplotype_file,
   for(TransIndex::const_iterator it = targ_index.begin();
       it != targ_index.end(); ++it) {
     if (!_targ_map[it->second]) {
-      logger.severe("Sequence for target '%s' not found in MultiFasta file "
+      logger.severe("Sequence for target '%s' not found in MultiFASTA file "
                     "'%s'.", it->first.c_str(), targ_fasta_file.c_str());
     }
   }
@@ -345,27 +362,39 @@ TargetTable::TargetTable(string targ_fasta_file, string haplotype_file,
   if (haplotype_file.size()) {
     infile.open(haplotype_file.c_str());
     if (infile.is_open()) {
+      const size_t BUFF_SIZE = 99999;
+      char line_buff[BUFF_SIZE];
       while (infile.good()) {
-        getline(infile, line, '\n');
-        if (infile.eof()) {
-          break;
+        infile.getline (line_buff, BUFF_SIZE, '\n');
+
+        if (strlen(line_buff) == 0) {
+          continue;
         }
-        size_t split = line.find(",");
-        if (split == string::npos) {
-          logger.severe("Haplotype file not formatted properly.");
+        
+        vector<Target*> haplotype_targets;
+        char *p = strtok(line_buff, ",");
+        do {
+          if (targ_index.count(p) == 0) {
+            logger.severe("Haplotype target '%s' does not exist in MultiFASTA "
+                          "or alignment files.", p);
+          }
+          haplotype_targets.push_back(_targ_map[targ_index.at(p)]);
+          p = strtok(NULL, "\t");
+        } while (p);
+
+        if (haplotype_targets.size() < 2) {
+          logger.severe("Haplotype groups must contain at least 2 targets.");
         }
-        Target* targ1 = _targ_map[targ_index.at(line.substr(0, split))];
-        Target* targ2 = _targ_map[targ_index.at(line.substr(split+1))];
-        _haplotype_pairs.insert(make_pair(targ1, targ2));
+
+        _haplotype_groups.insert(haplotype_targets);
         
         if (!alpha_map) {
-          targ1->alpha(alpha/2);
-          targ2->alpha(alpha/2);
+          foreach(Target* targ, haplotype_targets) {
+            targ->alpha(alpha/haplotype_targets.size());
+          }
         }
-        boost::shared_ptr<HaplotypeHandler> handler(new HaplotypeHandler(targ1,
-                                                                         targ2));
-        targ1->haplotype(handler);
-        targ2->haplotype(handler);
+        // Ownership is given to the targets.
+        new HaplotypeHandler(haplotype_targets);
       }
     }
   }
@@ -425,11 +454,9 @@ void TargetTable::round_reset() {
     targ->round_reset();
     targ->bundle()->incr_mass(targ->mass(false));
   }
-  foreach(HaplotypePair hap, _haplotype_pairs) {
-    boost::shared_ptr<HaplotypeHandler> handler(new HaplotypeHandler(hap.first,
-                                                                     hap.second));
-    hap.first->haplotype(handler);
-    hap.second->haplotype(handler);
+  foreach(vector<Target*> hap_group, _haplotype_groups) {
+    // Ownership is given to the targets.
+    new HaplotypeHandler(hap_group);
   }
 }
 

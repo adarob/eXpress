@@ -453,15 +453,21 @@ class HaplotypeHandler {
    */
   bool _committed;
   /**
+   * Looks up the index of the given target pointer in _targets. Dies if not
+   * found.
+   */
+  size_t find_target(const Target* targ);
+  /**
    * If there is an uncommited fragment in the buffer, causes it to be split
    * within the set.
    */
   void commit_buffer();
  public:
   /**
-   * Constructor for the HaplotypeHandler.
+   * Constructor for the HaplotypeHandler. Provides all targets a shared pointer
+   * to this handler, effectively passing ownership to them.
    */
-  HaplotypeHandler(const Target* targ1, const Target* targ2, double alpha);
+  HaplotypeHandler(std::vector<Target*> targets, double alpha);
   /**
    * Gets the current relative mass of the given target within the set.
    */
@@ -479,8 +485,7 @@ typedef std::vector<Target*> TransMap;
 typedef boost::unordered_map<std::string, size_t> TransIndex;
 typedef boost::unordered_map<size_t, float> CovarMap;
 typedef boost::unordered_map<std::string, double> AlphaMap;
-typedef std::pair<Target*, Target*> HaplotypePair;
-typedef boost::unordered_set<HaplotypePair> HaplotypeSet;
+typedef boost::unordered_set<std::vector<Target*> > HaplotypeSet;
 
 /**
  * The TargetTable class is used to keep track of the Target objects for a run.
@@ -511,10 +516,10 @@ class TargetTable {
    */
   CovarTable _covar_table;
   /**
-   * A private set containing pairs of Target pointers that are being considered
-   * alternative haplotypes.
+   * A private set containing groups of Target pointers that are being 
+   * considered alternative haplotypes.
    */
-  HaplotypeSet _haplotype_pairs;
+  HaplotypeSet _haplotype_groups;
   /**
    * A private double that stores the (logged) total mass per base
    * (including pseudo-counts) to allow for rho calculations.
