@@ -1,3 +1,3 @@
 #!/bin/bash
 
-scp -r html/*.html login.math.berkeley.edu:/web/bio/docs/eXpress
+scp -r html/*.html login.math.berkeley.edu:/web/bio/eXpress

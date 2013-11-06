@@ -379,7 +379,7 @@ TargetTable::TargetTable(string targ_fasta_file, string haplotype_file,
                           "or alignment files.", p);
           }
           haplotype_targets.push_back(_targ_map[targ_index.at(p)]);
-          p = strtok(NULL, "\t");
+          p = strtok(NULL, ",");
         } while (p);
 
         if (haplotype_targets.size() < 2) {
