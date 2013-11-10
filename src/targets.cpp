@@ -565,13 +565,13 @@ void TargetTable::output_results(string output_dir, size_t tot_counts,
                << "P(T)\tobs_A\tobs_C\tobs_G\tobs_T\texp_A\texp_C\texp_G\texp_T"
                << endl;
   }
-
   fprintf(expr_file, "bundle_id\ttarget_id\tlength\teff_length\ttot_counts\t"
                      "uniq_counts\test_counts\teff_counts\tambig_distr_alpha\t"
                      "ambig_distr_beta\tfpkm\tfpkm_conf_low\tfpkm_conf_high\t"
-                     "solvable\n");
+                     "solvable\ttpm\n");
 
   double l_bil = log(1000000000.);
+  double l_mil = log(1000000.);
   double l_tot_counts = log((double)tot_counts);
 
   size_t bundle_id = 0;
@@ -672,16 +672,19 @@ void TargetTable::output_results(string output_dir, size_t tot_counts,
         double fpkm_lo = max(0.0,
                              (targ_counts[i] - 2*fpkm_std_dev) * fpkm_constant);
         double fpkm_hi = (targ_counts[i] + 2*fpkm_std_dev) * fpkm_constant;
-
+          
         double eff_len = sexp(l_eff_len);
         double eff_counts = targ_counts[i] / eff_len * targ.length();
+        
+        // these don't sum to 1 million...
+        double tpm = sexp(targ.rho() + l_mil);
 
         fprintf(expr_file, "" SIZE_T_FMT "\t%s\t" SIZE_T_FMT "\t%f\t" SIZE_T_FMT
-                          "\t" SIZE_T_FMT "\t%f\t%f\t%e\t%e\t%e\t%e\t%e\t%c\n",
+                          "\t" SIZE_T_FMT "\t%f\t%f\t%e\t%e\t%e\t%e\t%e\t%c\t%f\n",
                bundle_id, targ.name().c_str(), targ.length(), eff_len,
                targ.tot_counts(), targ.uniq_counts(), targ_counts[i],
                eff_counts, count_alpha, count_beta, targ_fpkm, fpkm_lo, fpkm_hi,
-               (targ.solvable())?'T':'F');
+               (targ.solvable())?'T':'F', tpm);
 
          if (output_varcov) {
            for (size_t j = 0; j < bundle_targ.size(); ++j) {
@@ -727,10 +730,10 @@ void TargetTable::output_results(string output_dir, size_t tot_counts,
       for (size_t i = 0; i < bundle_targ.size(); ++i) {
         Target& targ = *bundle_targ[i];
         fprintf(expr_file, "" SIZE_T_FMT "\t%s\t" SIZE_T_FMT "\t%f\t%d\t%d\t%f"
-                           "\t%f\t%f\t%f\t%e\t%e\t%e\t%c\n",
+                           "\t%f\t%f\t%f\t%e\t%e\t%e\t%c\t%f\n",
                 bundle_id, targ.name().c_str(), targ.length(),
                 sexp(targ.cached_effective_length()), 0, 0, 0.0, 0.0, 0.0, 0.0,
-                0.0, 0.0, 0.0, 'T');
+                0.0, 0.0, 0.0, 'T', 0.0);
 
          if (output_varcov) {
            for (size_t j = 0; j < bundle_targ.size(); ++j) {
