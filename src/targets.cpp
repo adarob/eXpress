@@ -39,9 +39,12 @@ Target::Target(TargID id, const std::string& name, const std::string& seq,
      _solvable(false) {
   if ((_libs->curr_lib()).bias_table) {
     _start_bias.reset(new std::vector<float>(seq.length(),0));
+    _start_bias_buffer.reset(new std::vector<float>(seq.length(),0));
     _end_bias.reset(new std::vector<float>(seq.length(),0));
+    _end_bias_buffer.reset(new std::vector<float>(seq.length(),0));
   }
-  update_target_bias(known_bias_boss, known_fld);
+  update_target_bias_buffer(known_bias_boss, known_fld);
+  swap_bias_parameters();
   _init_pseudo_mass = _cached_eff_len + _alpha;
 }
 
@@ -186,13 +189,21 @@ double Target::cached_effective_length(bool with_bias) const {
   return _cached_eff_len;
 }
 
-void Target::update_target_bias(const BiasBoss* bias_table,
-                                const LengthDistribution* fld) {
+void Target::update_target_bias_buffer(const BiasBoss* bias_table,
+                                       const LengthDistribution* fld) {
   if (bias_table) {
-    _avg_bias = bias_table->get_target_bias(*_start_bias, *_end_bias, *this);
+    _avg_bias_buffer = bias_table->get_target_bias(*_start_bias_buffer,
+                                            *_end_bias_buffer, *this);
   }
   assert(!isnan(_avg_bias) && !isinf(_avg_bias));
-  _cached_eff_len = est_effective_length(fld, false);
+  _cached_eff_len_buffer = est_effective_length(fld, false);
+}
+
+void Target::swap_bias_parameters() {
+  _cached_eff_len = _cached_eff_len_buffer;
+  _avg_bias = _avg_bias_buffer;
+  _start_bias.swap(_start_bias_buffer);
+  _end_bias.swap(_end_bias_buffer);
 }
 
 void HaplotypeHandler::commit_buffer() {
@@ -805,9 +816,10 @@ void TargetTable::asynch_bias_update(boost::mutex* mutex) {
 
     vector<double> fl_cdf = fld->cmf();
 
+    // Buffer results of long computations.
     foreach(Target* targ, _targ_map) {
       targ->lock();
-      targ->update_target_bias(bias_table.get(), fld.get());
+      targ->update_target_bias_buffer(bias_table.get(), fld.get());
       if (bg_table) {
         bg_table->update_expectations(*targ, targ->rho(), fl_cdf);
       }
@@ -815,6 +827,14 @@ void TargetTable::asynch_bias_update(boost::mutex* mutex) {
       if (!running) {
         break;
       }
+    }
+    // Do quick atomic swap
+    foreach(Target* targ, _targ_map) {
+      targ->lock();
+    }
+    foreach(Target* targ, _targ_map) {
+      targ->swap_bias_parameters();
+      targ->unlock();
     }
   }
 

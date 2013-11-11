@@ -59,8 +59,8 @@
       </BuildableProductRunnable>
       <CommandLineArguments>
          <CommandLineArgument
-            argument = "--no-error-model /Users/adarob/Downloads/gencode17.fa /Users/adarob/Downloads/US-1422352.unsorted.bam"
-            isEnabled = "NO">
+            argument = "-o /Users/adarob/Downloads/trunc/out /Users/adarob/Downloads/trunc/trans.fa /Users/adarob/Downloads/trunc/trunc.sam"
+            isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
             argument = "--aux-param-file $(SRCROOT)/sample_data3/out2/params.xprs --frag-len-mean 250 --frag-len-stddev 50 -o $(SRCROOT)/sample_data3/out2 $(SRCROOT)/sample_data3/hox_ucsc.fa $(SRCROOT)/sample_data3/hits_1M.sam"
@@ -68,7 +68,7 @@
          </CommandLineArgument>
          <CommandLineArgument
             argument = "--stop-at 10000 --no-bias-correct --haplotype-file=/Volumes/math.mcb.berkeley.edu/experiments/express/simulation/ugt3a2/haplotypes.csv -o /Volumes/math.mcb.berkeley.edu/experiments/express/simulation/ugt3a2/hap_out  /Volumes/math.mcb.berkeley.edu/experiments/express/simulation/ugt3a2/ugt3a2_hap.fa /Volumes/math.mcb.berkeley.edu/experiments/express/simulation/ugt3a2/hits.hap.bam"
-            isEnabled = "YES">
+            isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
             argument = "-B 2 --frag-len-mean 250 --frag-len-stddev 50 -o $(SRCROOT)/sample_data3/out2 $(SRCROOT)/sample_data3/hox_ucsc.fa $(SRCROOT)/sample_data3/hits_1M.sam"

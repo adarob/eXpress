@@ -160,20 +160,36 @@ class Target {
    */
   boost::scoped_ptr<std::vector<float> > _start_bias;
   /**
+   * Buffers the start bias to allow for atomic updating.
+   */
+  boost::scoped_ptr<std::vector<float> > _start_bias_buffer;
+  /**
    * A scoped pointer to a private float vector storing the (logged) 3' bias
    * at each position.
    */
   boost::scoped_ptr<std::vector<float> > _end_bias;
+  /**
+   * Buffers the end bias to allow for atomic updating.
+   */
+  boost::scoped_ptr<std::vector<float> > _end_bias_buffer;
   /**
    * A private double storing the (logged) product of the average 3' and 5'
    * biases for the target.
    */
   double _avg_bias;
   /**
+   * Buffers the average bias to allow for atomic updating.
+   */
+  double _avg_bias_buffer;
+  /**
    * A private double storing the most recently updated (logged) effective
    * length as calculated by the bias updater thread.
    */
   double _cached_eff_len;
+  /**
+   * Buffers the cached effective length to allow for atomic updating.
+   */
+  double _cached_eff_len_buffer;
   /**
    * A private boolean specifying whether a unique solution exists. True iff
    * a unique read is mapped to the target or all other targets in a mapping
@@ -383,14 +399,20 @@ public:
   double cached_effective_length(bool with_bias=true) const;
   /**
    * A member function that causes the target bias to be re-calculated by the
-   * _bias_table based on curent parameters.
+   * _bias_table based on curent parameters. The results are buffered until
+   * flip_bias_parameters is called to allow for atomic updating.
    * @param bias_table a pointer to a BiasBoss to use as parameters. Bias not
    *        updated if NULL.
    * @param fld an optional pointer to a different LengthDistribution than the
    *        global one, for thread-safety.
    */
-  void update_target_bias(const BiasBoss* bias_table = NULL,
-                          const LengthDistribution* fld = NULL);
+  void update_target_bias_buffer(const BiasBoss* bias_table = NULL,
+                                 const LengthDistribution* fld = NULL);
+  /**
+   * Swaps in the buffered bias parameters for atomic updating. The target
+   * mutex should be held by the caller.
+   */
+  void swap_bias_parameters();
   /**
    * An accessor for the _solvable flag.
    * @return a boolean specifying whether or not the target has a unique

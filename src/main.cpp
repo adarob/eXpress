@@ -449,7 +449,7 @@ void process_fragment(Fragment* frag_p) {
   Bundle* bundle = frag.hits()[0]->target()->bundle();
   
   // calculate marginal likelihoods and lock targets.
-  if (frag.num_hits()>1) {
+  if (frag.num_hits() > 1) {
     for (size_t i = 0; i < frag.num_hits(); ++i) {
       FragHit& m = *frag.hits()[i];
       Target* t = m.target();
