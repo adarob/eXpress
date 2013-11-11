@@ -400,7 +400,7 @@ public:
   /**
    * A member function that causes the target bias to be re-calculated by the
    * _bias_table based on curent parameters. The results are buffered until
-   * flip_bias_parameters is called to allow for atomic updating.
+   * swap_bias_parameters is called to allow for atomic updating.
    * @param bias_table a pointer to a BiasBoss to use as parameters. Bias not
    *        updated if NULL.
    * @param fld an optional pointer to a different LengthDistribution than the
