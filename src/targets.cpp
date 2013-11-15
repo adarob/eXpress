@@ -36,6 +36,7 @@ Target::Target(TargID id, const std::string& name, const std::string& seq,
      _uniq_counts(0),
      _tot_counts(0),
      _avg_bias(0),
+     _avg_bias_buffer(0),
      _solvable(false) {
   if ((_libs->curr_lib()).bias_table) {
     _start_bias.reset(new std::vector<float>(seq.length(),0));
@@ -193,9 +194,9 @@ void Target::update_target_bias_buffer(const BiasBoss* bias_table,
                                        const LengthDistribution* fld) {
   if (bias_table) {
     _avg_bias_buffer = bias_table->get_target_bias(*_start_bias_buffer,
-                                            *_end_bias_buffer, *this);
+                                                   *_end_bias_buffer, *this);
   }
-  assert(!isnan(_avg_bias) && !isinf(_avg_bias));
+  assert(!isnan(_avg_bias_buffer) && !isinf(_avg_bias_buffer));
   _cached_eff_len_buffer = est_effective_length(fld, false);
 }
 
@@ -618,6 +619,9 @@ void TargetTable::output_results(string output_dir, size_t tot_counts,
 
       for (size_t i = 0; i < bundle_targ.size(); ++i) {
         Target& targ = *bundle_targ[i];
+        if (targ.name() == "A00000099980") {
+          cout << "HERE";
+        }
         double l_targ_frac = targ.mass(false) - l_bundle_mass;
         targ_counts[i] = sexp(l_targ_frac + l_bundle_counts);
         requires_projection |= targ_counts[i] > (double)targ.tot_counts() ||

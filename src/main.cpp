@@ -448,8 +448,8 @@ void process_fragment(Fragment* frag_p) {
   // Update bundles and merge in first loop
   Bundle* bundle = frag.hits()[0]->target()->bundle();
   
-  // calculate marginal likelihoods and lock targets.
   if (frag.num_hits() > 1) {
+    // Calculate marginal likelihoods and lock targets.
     for (size_t i = 0; i < frag.num_hits(); ++i) {
       FragHit& m = *frag.hits()[i];
       Target* t = m.target();
@@ -947,8 +947,8 @@ int preprocess_main() {
   lib.fld.reset(new LengthDistribution(0, 0, 0, 1, 2, 0));
   MarkovModel bias_model(3, 21, 21, 0);
   MismatchTable mismatch_table(0);
-  lib.targ_table.reset(new TargetTable (fasta_file_name, "", 0, 0, NULL, NULL,
-                                        &libs));
+  lib.targ_table.reset(new TargetTable(fasta_file_name, "", 0, 0, 0.0, NULL,
+                                       &libs));
   
   logger.info("Converting targets to Protocol Buffers...");
   fstream targ_out((output_dir + "/targets.pb").c_str(),

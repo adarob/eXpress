@@ -19,7 +19,6 @@ typedef size_t TargID;
 typedef boost::unordered_map<size_t, float> CovarMap;
 
 /**
-
  * The CovarTable is a sparse matrix for storing and updating pairwise
  * covariances between targets.
  *  @author    Adam Roberts
