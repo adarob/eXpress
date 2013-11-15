@@ -20,7 +20,7 @@ else(WIN32)
 endif(WIN32)
 
 if (PROTOBUF_FOUND)
-  set(LIBRARIES ${LIBRARIES} ${PROTOBUF_LIBRARIES})
+  set(LIBRARIES ${LIBRARIES} "libprotobuf.a")
 endif(PROTOBUF_FOUND)
 
 target_link_libraries(express ${LIBRARIES})

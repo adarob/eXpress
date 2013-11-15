@@ -619,9 +619,6 @@ void TargetTable::output_results(string output_dir, size_t tot_counts,
 
       for (size_t i = 0; i < bundle_targ.size(); ++i) {
         Target& targ = *bundle_targ[i];
-        if (targ.name() == "A00000099980") {
-          cout << "HERE";
-        }
         double l_targ_frac = targ.mass(false) - l_bundle_mass;
         targ_counts[i] = sexp(l_targ_frac + l_bundle_counts);
         requires_projection |= targ_counts[i] > (double)targ.tot_counts() ||
