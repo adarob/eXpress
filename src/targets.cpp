@@ -620,8 +620,6 @@ void TargetTable::output_results(string output_dir, size_t tot_counts,
 
       // Calculate individual counts and rhos
       for (size_t i = 0; i < bundle_targ.size(); ++i) {
-        targ_index ++;
-        
         Target& targ = *bundle_targ[i];
         double l_eff_len = targ.est_effective_length();
 
@@ -724,10 +722,11 @@ void TargetTable::output_results(string output_dir, size_t tot_counts,
             }
           }
         }
+        targ_index ++;
       }
     } else {
       for (size_t i = 0; i < bundle_targ.size(); ++i) {
-        
+        counts_per_base[targ_index] = 0.0;
         if (output_varcov) {
           for (size_t j = 0; j < bundle_targ.size(); ++j) {
             if (j) {
@@ -737,6 +736,7 @@ void TargetTable::output_results(string output_dir, size_t tot_counts,
           }
           varcov_file << endl;
         }
+        targ_index ++;
       }
     }
   }
@@ -745,6 +745,7 @@ void TargetTable::output_results(string output_dir, size_t tot_counts,
   for (size_t i = 0; i < size(); ++i) {
     cpb_sum += counts_per_base[i];
   }
+  const double l_mil = log(1000000.);
   // Calculate TPMs and output results
   bundle_id = 0;
   targ_index = 0;
@@ -756,11 +757,12 @@ void TargetTable::output_results(string output_dir, size_t tot_counts,
     if (bundle->counts()) {
       for (size_t i = 0; i < bundle_targ.size(); ++i) {
         
-        targ_index ++;
         Target& targ = *bundle_targ[i];
         
-        double trans_frac = counts_per_base[targ_index] / cpb_sum;
-        double tpm = trans_frac * 1e6;
+        double trans_frac = log(counts_per_base[targ_index] / cpb_sum);
+        cout << sexp(trans_frac);
+        cout << '\n';
+        double tpm = sexp(trans_frac + l_mil);
         
         fprintf(expr_file, "" SIZE_T_FMT "\t%s\t" SIZE_T_FMT "\t%f\t" SIZE_T_FMT
                 "\t" SIZE_T_FMT "\t%f\t%f\t%e\t%e\t%e\t%e\t%e\t%c\t%e\n",
@@ -768,16 +770,17 @@ void TargetTable::output_results(string output_dir, size_t tot_counts,
                 targ.tot_counts(), targ.uniq_counts(), targ.est_counts,
                 targ.eff_counts, targ.count_alpha, targ.count_beta, targ.targ_fpkm, targ.fpkm_lo,
                 targ.fpkm_hi, (targ.solvable())?'T':'F', tpm);
+        targ_index ++;
       }
     } else {
       for (size_t i = 0; i < bundle_targ.size(); ++i) {
-        
         Target& targ = *bundle_targ[i];
         fprintf(expr_file, "" SIZE_T_FMT "\t%s\t" SIZE_T_FMT "\t%f\t%d\t%d\t%f"
                 "\t%f\t%f\t%f\t%e\t%e\t%e\t%c\t%f\n",
                 bundle_id, targ.name().c_str(), targ.length(),
                 sexp(targ.cached_effective_length()), 0, 0, 0.0, 0.0, 0.0, 0.0,
                 0.0, 0.0, 0.0, 'T', 0.0);
+        targ_index ++;
       }
     }
   }
