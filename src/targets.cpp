@@ -760,8 +760,6 @@ void TargetTable::output_results(string output_dir, size_t tot_counts,
         Target& targ = *bundle_targ[i];
         
         double trans_frac = log(counts_per_base[targ_index] / cpb_sum);
-        cout << sexp(trans_frac);
-        cout << '\n';
         double tpm = sexp(trans_frac + l_mil);
         
         fprintf(expr_file, "" SIZE_T_FMT "\t%s\t" SIZE_T_FMT "\t%f\t" SIZE_T_FMT
