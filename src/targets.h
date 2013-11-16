@@ -404,6 +404,42 @@ public:
    *        for its abundance estimate.
    */
   void solvable(bool s) { _solvable = s; }
+  /**
+   * A public double storing the target FPKM
+   */
+  double targ_fpkm;
+  /**
+   * A public double storing the standard deviation of the FPKM
+   */
+  double fpkm_std_dev;
+  /**
+   * A public double storing the lower confidence internval of the FPKM
+   */
+  double fpkm_lo;
+  /**
+   * A public double storing the upper confidence interval of the FPKM
+   */
+  double fpkm_hi;
+  /**
+   * A public double storing the count alpha
+   */
+  double count_alpha;
+  /**
+   * A public double storing the count beta
+   */
+  double count_beta;
+  /**
+   * A public double storing the target estimated counts
+   */
+  double est_counts;
+  /**
+   * A public double storing the target effective length
+   */
+  double eff_len;
+  /**
+   * A public double storing the target effective counts
+   */
+  double eff_counts;
 };
 
 /**

@@ -570,11 +570,12 @@ void TargetTable::output_results(string output_dir, size_t tot_counts,
                      "ambig_distr_beta\tfpkm\tfpkm_conf_low\tfpkm_conf_high\t"
                      "solvable\ttpm\n");
 
-  double l_bil = log(1000000000.);
-  double l_mil = log(1000000.);
-  double l_tot_counts = log((double)tot_counts);
+  const double l_bil = log(1000000000.);
+  const double l_tot_counts = log((double)tot_counts);
+  double counts_per_base[size()];
 
   size_t bundle_id = 0;
+  int targ_index = 0;
   foreach (Bundle* bundle, _bundle_table.bundles()) {
     ++bundle_id;
 
@@ -619,6 +620,8 @@ void TargetTable::output_results(string output_dir, size_t tot_counts,
 
       // Calculate individual counts and rhos
       for (size_t i = 0; i < bundle_targ.size(); ++i) {
+        targ_index ++;
+        
         Target& targ = *bundle_targ[i];
         double l_eff_len = targ.est_effective_length();
 
@@ -666,84 +669,115 @@ void TargetTable::output_results(string output_dir, size_t tot_counts,
           }
         }
 
-        double fpkm_std_dev = sexp(0.5*(mass_var + l_var_renorm));
-        double fpkm_constant = sexp(l_bil - l_eff_len - l_tot_counts);
-        double targ_fpkm = targ_counts[i] * fpkm_constant;
-        double fpkm_lo = max(0.0,
-                             (targ_counts[i] - 2*fpkm_std_dev) * fpkm_constant);
-        double fpkm_hi = (targ_counts[i] + 2*fpkm_std_dev) * fpkm_constant;
-          
-        double eff_len = sexp(l_eff_len);
-        double eff_counts = targ_counts[i] / eff_len * targ.length();
+        targ.count_alpha = count_alpha;
+        targ.count_beta = count_beta;
         
-        // these don't sum to 1 million...
-        double tpm = sexp(targ.rho() + l_mil);
+        double fpkm_constant = sexp(l_bil - l_eff_len - l_tot_counts);
+        targ.fpkm_std_dev = sexp(0.5*(mass_var + l_var_renorm));
+        targ.targ_fpkm = targ_counts[i] * fpkm_constant;
+        targ.fpkm_lo = max(0.0,
+                             (targ_counts[i] - 2*targ.fpkm_std_dev) * fpkm_constant);
+        targ.fpkm_hi = (targ_counts[i] + 2*targ.fpkm_std_dev) * fpkm_constant;
+        
+        targ.est_counts = targ_counts[i];
+        targ.eff_len = sexp(l_eff_len);
+        targ.eff_counts = targ_counts[i] / targ.eff_len * targ.length();
+        
+        counts_per_base[targ_index] = targ_counts[i] / targ.eff_len;
 
-        fprintf(expr_file, "" SIZE_T_FMT "\t%s\t" SIZE_T_FMT "\t%f\t" SIZE_T_FMT
-                          "\t" SIZE_T_FMT "\t%f\t%f\t%e\t%e\t%e\t%e\t%e\t%c\t%f\n",
-               bundle_id, targ.name().c_str(), targ.length(), eff_len,
-               targ.tot_counts(), targ.uniq_counts(), targ_counts[i],
-               eff_counts, count_alpha, count_beta, targ_fpkm, fpkm_lo, fpkm_hi,
-               (targ.solvable())?'T':'F', tpm);
-
-         if (output_varcov) {
-           for (size_t j = 0; j < bundle_targ.size(); ++j) {
-             if (j) {
-               varcov_file << "\t";
-             }
-             if (i==j) {
-               varcov_file << scientific << sexp(get_covar(targ.id(), targ.id())
-                                                 + l_var_renorm);
-             } else {
-               varcov_file << scientific
-                           << -sexp(get_covar(targ.id(), bundle_targ[j]->id())
-                                    + l_var_renorm);
-             }
-           }
-           varcov_file << endl;
-         }
-
-
-         if (output_rdds) {
-           const Sequence& targ_seq = targ.seq();
-           vector<double> p_vals;
-           targ_seq.calc_p_vals(p_vals);
-           for (size_t i = 0; i < p_vals.size(); ++i) {
-             if (p_vals[i] < 0.01) {
-                 rdds_file << targ.name() << "\t" << i << "\t" << p_vals[i]
-                          << "\t" << NUCS[targ_seq.get_ref(i)];
-               for (size_t nuc=0; nuc < NUM_NUCS; nuc++) {
-                   rdds_file << "\t" << sexp(targ_seq.get_prob(i,nuc));
-               }
-               for (size_t nuc=0; nuc < NUM_NUCS; nuc++) {
-                   rdds_file << "\t" << sexp(targ_seq.get_obs(i,nuc));
-               }
-               for (size_t nuc=0; nuc < NUM_NUCS; nuc++) {
-                   rdds_file << "\t" << sexp(targ_seq.get_exp(i,nuc));
-               }
-                 rdds_file << endl;
-             }
-           }
-         }
+        if (output_varcov) {
+          for (size_t j = 0; j < bundle_targ.size(); ++j) {
+            if (j) {
+              varcov_file << "\t";
+            }
+            if (i==j) {
+              varcov_file << scientific << sexp(get_covar(targ.id(), targ.id())
+                                               + l_var_renorm);
+            } else {
+              varcov_file << scientific
+                         << -sexp(get_covar(targ.id(), bundle_targ[j]->id())
+                                  + l_var_renorm);
+            }
+          }
+          varcov_file << endl;
+        }
+        
+        
+        if (output_rdds) {
+          const Sequence& targ_seq = targ.seq();
+          vector<double> p_vals;
+          targ_seq.calc_p_vals(p_vals);
+          for (size_t i = 0; i < p_vals.size(); ++i) {
+            if (p_vals[i] < 0.01) {
+              rdds_file << targ.name() << "\t" << i << "\t" << p_vals[i]
+              << "\t" << NUCS[targ_seq.get_ref(i)];
+              for (size_t nuc=0; nuc < NUM_NUCS; nuc++) {
+                rdds_file << "\t" << sexp(targ_seq.get_prob(i,nuc));
+              }
+              for (size_t nuc=0; nuc < NUM_NUCS; nuc++) {
+                rdds_file << "\t" << sexp(targ_seq.get_obs(i,nuc));
+              }
+              for (size_t nuc=0; nuc < NUM_NUCS; nuc++) {
+                rdds_file << "\t" << sexp(targ_seq.get_exp(i,nuc));
+              }
+              rdds_file << endl;
+            }
+          }
+        }
       }
     } else {
       for (size_t i = 0; i < bundle_targ.size(); ++i) {
+        
+        if (output_varcov) {
+          for (size_t j = 0; j < bundle_targ.size(); ++j) {
+            if (j) {
+              varcov_file << "\t";
+            }
+            varcov_file << scientific << 0.0;
+          }
+          varcov_file << endl;
+        }
+      }
+    }
+  }
+  // Calculate total counts per base
+  double cpb_sum = 0.0;
+  for (size_t i = 0; i < size(); ++i) {
+    cpb_sum += counts_per_base[i];
+  }
+  // Calculate TPMs and output results
+  bundle_id = 0;
+  targ_index = 0;
+  foreach (Bundle* bundle, _bundle_table.bundles()) {
+    ++bundle_id;
+    
+    const vector<Target*>& bundle_targ = *(bundle->targets());
+    
+    if (bundle->counts()) {
+      for (size_t i = 0; i < bundle_targ.size(); ++i) {
+        
+        targ_index ++;
+        Target& targ = *bundle_targ[i];
+        
+        double trans_frac = counts_per_base[targ_index] / cpb_sum;
+        double tpm = trans_frac * 1e6;
+        
+        fprintf(expr_file, "" SIZE_T_FMT "\t%s\t" SIZE_T_FMT "\t%f\t" SIZE_T_FMT
+                "\t" SIZE_T_FMT "\t%f\t%f\t%e\t%e\t%e\t%e\t%e\t%c\t%e\n",
+                bundle_id, targ.name().c_str(), targ.length(), targ.eff_len,
+                targ.tot_counts(), targ.uniq_counts(), targ.est_counts,
+                targ.eff_counts, targ.count_alpha, targ.count_beta, targ.targ_fpkm, targ.fpkm_lo,
+                targ.fpkm_hi, (targ.solvable())?'T':'F', tpm);
+      }
+    } else {
+      for (size_t i = 0; i < bundle_targ.size(); ++i) {
+        
         Target& targ = *bundle_targ[i];
         fprintf(expr_file, "" SIZE_T_FMT "\t%s\t" SIZE_T_FMT "\t%f\t%d\t%d\t%f"
-                           "\t%f\t%f\t%f\t%e\t%e\t%e\t%c\t%f\n",
+                "\t%f\t%f\t%f\t%e\t%e\t%e\t%c\t%f\n",
                 bundle_id, targ.name().c_str(), targ.length(),
                 sexp(targ.cached_effective_length()), 0, 0, 0.0, 0.0, 0.0, 0.0,
                 0.0, 0.0, 0.0, 'T', 0.0);
-
-         if (output_varcov) {
-           for (size_t j = 0; j < bundle_targ.size(); ++j) {
-             if (j) {
-               varcov_file << "\t";
-             }
-             varcov_file << scientific << 0.0;
-           }
-           varcov_file << endl;
-         }
       }
     }
   }
