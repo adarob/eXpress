@@ -575,16 +575,16 @@ void TargetTable::output_results(string output_dir, size_t tot_counts,
 
   struct result
   {
-    double fpkm;
-    double fpkm_std_dev;
-    double fpkm_lo;
-    double fpkm_hi;
-    double count_alpha;
-    double count_beta;
-    double est_counts;
-    double eff_len;
-    double eff_counts;
+    double fpkm, fpkm_std_dev, fpkm_lo, fpkm_hi;
+    double count_alpha, count_beta;
+    double est_counts, eff_len, eff_counts;
     double cpb; // counts per base for TPM calculation
+    
+    void set_zeros() {
+      fpkm = fpkm_std_dev = fpkm_lo = fpkm_hi =
+      count_alpha = count_beta = est_counts =
+      eff_len = eff_counts = cpb = 0.0;
+    }
   };
   
   struct result res[size()];
@@ -786,6 +786,7 @@ void TargetTable::output_results(string output_dir, size_t tot_counts,
         double trans_frac = log(res[t_id].cpb / cpb_sum);
         tpm = sexp(trans_frac + l_mil);
       } else {
+        res[targ.id()].set_zeros();
         tpm = 0.0;
       }
       
