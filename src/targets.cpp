@@ -572,10 +572,25 @@ void TargetTable::output_results(string output_dir, size_t tot_counts,
 
   const double l_bil = log(1000000000.);
   const double l_tot_counts = log((double)tot_counts);
-  double counts_per_base[size()];
 
+  struct result
+  {
+    double fpkm;
+    double fpkm_std_dev;
+    double fpkm_lo;
+    double fpkm_hi;
+    double count_alpha;
+    double count_beta;
+    double est_counts;
+    double eff_len;
+    double eff_counts;
+    double cpb; // counts per base for TPM calculation
+  };
+  
+  struct result res[size()];
+  
   size_t bundle_id = 0;
-  int targ_index = 0;
+  int t_id = 0;
   foreach (Bundle* bundle, _bundle_table.bundles()) {
     ++bundle_id;
 
@@ -600,15 +615,15 @@ void TargetTable::output_results(string output_dir, size_t tot_counts,
     }
 
     if (bundle->counts()) {
-      double l_bundle_counts = log((double)bundle->counts());
-      double l_var_renorm = 2*(l_bundle_counts - l_bundle_mass);
+      const double l_bundle_counts = log((double)bundle->counts());
+      const double l_var_renorm = 2*(l_bundle_counts - l_bundle_mass);
 
       vector<double> targ_counts(bundle_targ.size(),0);
       bool requires_projection = false;
 
       for (size_t i = 0; i < bundle_targ.size(); ++i) {
         Target& targ = *bundle_targ[i];
-        double l_targ_frac = targ.mass(false) - l_bundle_mass;
+        const double l_targ_frac = targ.mass(false) - l_bundle_mass;
         targ_counts[i] = sexp(l_targ_frac + l_bundle_counts);
         requires_projection |= targ_counts[i] > (double)targ.tot_counts() ||
                                targ_counts[i] < (double)targ.uniq_counts();
@@ -621,11 +636,11 @@ void TargetTable::output_results(string output_dir, size_t tot_counts,
       // Calculate individual counts and rhos
       for (size_t i = 0; i < bundle_targ.size(); ++i) {
         Target& targ = *bundle_targ[i];
-        double l_eff_len = targ.est_effective_length();
+        const double l_eff_len = targ.est_effective_length();
 
         // Calculate count variance
-        double mass = targ.mass(false);
-        double mass_var = min(targ.mass_var(),
+        const double mass = targ.mass(false);
+        const double mass_var = min(targ.mass_var(),
                               mass + log_sub(l_bundle_mass, mass));
         double count_alpha = 0;
         double count_beta = 0;
@@ -667,21 +682,24 @@ void TargetTable::output_results(string output_dir, size_t tot_counts,
           }
         }
 
-        targ.count_alpha = count_alpha;
-        targ.count_beta = count_beta;
+        // Store results for output
+        res[t_id].count_alpha = count_alpha;
+        res[t_id].count_beta = count_beta;
         
         double fpkm_constant = sexp(l_bil - l_eff_len - l_tot_counts);
-        targ.fpkm_std_dev = sexp(0.5*(mass_var + l_var_renorm));
-        targ.targ_fpkm = targ_counts[i] * fpkm_constant;
-        targ.fpkm_lo = max(0.0,
-                             (targ_counts[i] - 2*targ.fpkm_std_dev) * fpkm_constant);
-        targ.fpkm_hi = (targ_counts[i] + 2*targ.fpkm_std_dev) * fpkm_constant;
+        res[t_id].fpkm_std_dev = sexp(0.5*(mass_var + l_var_renorm));
+        res[t_id].fpkm = targ_counts[i] * fpkm_constant;
+        res[t_id].fpkm_lo = max(0.0,
+                             (targ_counts[i] -
+                              2*res[t_id].fpkm_std_dev) * fpkm_constant);
+        res[t_id].fpkm_hi = (targ_counts[i] +
+                             2*res[t_id].fpkm_std_dev) * fpkm_constant;
         
-        targ.est_counts = targ_counts[i];
-        targ.eff_len = sexp(l_eff_len);
-        targ.eff_counts = targ_counts[i] / targ.eff_len * targ.length();
+        res[t_id].est_counts = targ_counts[i];
+        res[t_id].eff_len = sexp(l_eff_len);
+        res[t_id].eff_counts = targ_counts[i] / res[t_id].eff_len * targ.length();
         
-        counts_per_base[targ_index] = targ_counts[i] / targ.eff_len;
+        res[t_id].cpb = targ_counts[i] / res[t_id].eff_len;
 
         if (output_varcov) {
           for (size_t j = 0; j < bundle_targ.size(); ++j) {
@@ -699,7 +717,6 @@ void TargetTable::output_results(string output_dir, size_t tot_counts,
           }
           varcov_file << endl;
         }
-        
         
         if (output_rdds) {
           const Sequence& targ_seq = targ.seq();
@@ -722,11 +739,22 @@ void TargetTable::output_results(string output_dir, size_t tot_counts,
             }
           }
         }
-        targ_index ++;
+        ++t_id;
       }
     } else {
       for (size_t i = 0; i < bundle_targ.size(); ++i) {
-        counts_per_base[targ_index] = 0.0;
+        
+        res[t_id].fpkm = 0.0;
+        res[t_id].fpkm_std_dev = 0.0;
+        res[t_id].fpkm_lo = 0.0;
+        res[t_id].fpkm_hi = 0.0;
+        res[t_id].count_alpha = 0.0;
+        res[t_id].count_beta = 0.0;
+        res[t_id].est_counts = 0.0;
+        res[t_id].eff_len = 0.0;
+        res[t_id].eff_counts = 0.0;
+        res[t_id].cpb = 0.0;
+        
         if (output_varcov) {
           for (size_t j = 0; j < bundle_targ.size(); ++j) {
             if (j) {
@@ -736,50 +764,47 @@ void TargetTable::output_results(string output_dir, size_t tot_counts,
           }
           varcov_file << endl;
         }
-        targ_index ++;
+        ++t_id;
       }
     }
   }
+  
   // Calculate total counts per base
   double cpb_sum = 0.0;
   for (size_t i = 0; i < size(); ++i) {
-    cpb_sum += counts_per_base[i];
+    cpb_sum += res[i].cpb;
   }
-  const double l_mil = log(1000000.);
+  
   // Calculate TPMs and output results
+  const double l_mil = log(1000000.);
   bundle_id = 0;
-  targ_index = 0;
+  t_id = 0;
   foreach (Bundle* bundle, _bundle_table.bundles()) {
     ++bundle_id;
     
     const vector<Target*>& bundle_targ = *(bundle->targets());
     
-    if (bundle->counts()) {
-      for (size_t i = 0; i < bundle_targ.size(); ++i) {
-        
-        Target& targ = *bundle_targ[i];
-        
-        double trans_frac = log(counts_per_base[targ_index] / cpb_sum);
-        double tpm = sexp(trans_frac + l_mil);
-        
-        fprintf(expr_file, "" SIZE_T_FMT "\t%s\t" SIZE_T_FMT "\t%f\t" SIZE_T_FMT
-                "\t" SIZE_T_FMT "\t%f\t%f\t%e\t%e\t%e\t%e\t%e\t%c\t%e\n",
-                bundle_id, targ.name().c_str(), targ.length(), targ.eff_len,
-                targ.tot_counts(), targ.uniq_counts(), targ.est_counts,
-                targ.eff_counts, targ.count_alpha, targ.count_beta, targ.targ_fpkm, targ.fpkm_lo,
-                targ.fpkm_hi, (targ.solvable())?'T':'F', tpm);
-        targ_index ++;
+    for (size_t i = 0; i < bundle_targ.size(); ++i) {
+      
+      Target& targ = *bundle_targ[i];
+      
+      double tpm;
+      
+      if (bundle->counts()) {
+        double trans_frac = log(res[t_id].cpb / cpb_sum);
+        tpm = sexp(trans_frac + l_mil);
+      } else {
+        tpm = 0.0;
       }
-    } else {
-      for (size_t i = 0; i < bundle_targ.size(); ++i) {
-        Target& targ = *bundle_targ[i];
-        fprintf(expr_file, "" SIZE_T_FMT "\t%s\t" SIZE_T_FMT "\t%f\t%d\t%d\t%f"
-                "\t%f\t%f\t%f\t%e\t%e\t%e\t%c\t%f\n",
-                bundle_id, targ.name().c_str(), targ.length(),
-                sexp(targ.cached_effective_length()), 0, 0, 0.0, 0.0, 0.0, 0.0,
-                0.0, 0.0, 0.0, 'T', 0.0);
-        targ_index ++;
-      }
+      
+      fprintf(expr_file, "" SIZE_T_FMT "\t%s\t" SIZE_T_FMT "\t%f\t" SIZE_T_FMT
+              "\t" SIZE_T_FMT "\t%f\t%f\t%e\t%e\t%e\t%e\t%e\t%c\t%e\n",
+              bundle_id, targ.name().c_str(), targ.length(), res[t_id].eff_len,
+              targ.tot_counts(), targ.uniq_counts(), res[t_id].est_counts,
+              res[t_id].eff_counts, res[t_id].count_alpha, res[t_id].count_beta,
+              res[t_id].fpkm, res[t_id].fpkm_lo, res[t_id].fpkm_hi,
+              (targ.solvable())?'T':'F', tpm);
+      ++t_id;
     }
   }
   fclose(expr_file);
@@ -787,7 +812,7 @@ void TargetTable::output_results(string output_dir, size_t tot_counts,
     varcov_file.close();
   }
   if (output_rdds) {
-      rdds_file.close();
+    rdds_file.close();
   }
 }
 
