@@ -731,6 +731,7 @@ size_t threaded_calc_abundances(Librarian& libs) {
       lib.targ_table->collapse_bundles();
       
       if (bias_update) {
+        logger.info("Waiting for auxiliary parameter update to complete...");
         bias_update->join();
         bias_update.reset(NULL);
       }
@@ -1017,7 +1018,6 @@ int preprocess_main() {
       vector<char> right_mm_indices;
       vector<char> right_mm_seq;
       vector<char> right_mm_ref;
-      
       
       mismatch_table.get_indices(fh, left_mm_indices, left_mm_seq, left_mm_ref,
                                  right_mm_indices, right_mm_seq, right_mm_ref);

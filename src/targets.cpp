@@ -806,7 +806,7 @@ void TargetTable::asynch_bias_update(boost::mutex* mutex) {
         }
         bg_table = new BiasBoss(lib_bias_table.order(), 0);
       }
-      logger.info("Synchronized parameter tables.");
+      logger.info("Synchronized auxiliary parameter tables.");
     }
 
     if (!edit_detect && burned_out && burned_out_before) {
@@ -825,21 +825,21 @@ void TargetTable::asynch_bias_update(boost::mutex* mutex) {
         bg_table->update_expectations(*targ, targ->rho(), fl_cdf);
       }
       targ->unlock();
-      if (!running) {
-        break;
+    }
+    {
+      boost::unique_lock<boost::mutex> lock(*mutex);
+      // Do quick atomic swap
+      foreach(Target* targ, _targ_map) {
+        targ->lock();
       }
-    }
-    // Do quick atomic swap
-    foreach(Target* targ, _targ_map) {
-      targ->lock();
-    }
-    foreach(Target* targ, _targ_map) {
-      targ->swap_bias_parameters();
-      targ->unlock();
+      foreach(Target* targ, _targ_map) {
+        targ->swap_bias_parameters();
+        targ->unlock();
+      }
     }
   }
 
   if (bg_table) {
-     delete bg_table;
+    delete bg_table;
   }
 }
