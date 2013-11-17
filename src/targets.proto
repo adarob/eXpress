@@ -1,0 +1,18 @@
+package proto;
+
+// A Target stores data for a target sequence.
+message Target {
+  // The unique name of the target sequence.
+  optional string name = 1;
+  
+  // A unique id for the target (index in SAM header order).
+  required uint32 id = 2;
+  
+  // The length of the target sequence.
+  required uint32 length = 3;
+  
+  // The nucleotide sequence of the target, represented as 2 bits 
+  // (A=00, C=01, G=10, T=11) packed into bytes. Bit pairs are stored so that later
+  // pairs in the sequence are at more significant positions in the byte.
+  required bytes seq = 4;
+}

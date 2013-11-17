@@ -31,8 +31,8 @@
 #include "library.h"
 
 #ifdef PROTO
-  #include "proto/alignments.pb.h"
-  #include "proto/targets.pb.h"
+  #include PROTO_ALIGNMENT_INCL
+  #include PROTO_TARGET_INCL
   #include <boost/archive/iterators/base64_from_binary.hpp>
   #include <boost/archive/iterators/transform_width.hpp>
   #include <boost/archive/iterators/ostream_iterator.hpp>

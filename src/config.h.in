@@ -9,4 +9,6 @@
 
 #if @PROTO_INT@
 	#define PROTO
+	#define PROTO_ALIGNMENT_INCL "@CMAKE_CURRENT_BINARY_DIR@/src/alignments.pb.h"
+  #define PROTO_TARGET_INCL "@CMAKE_CURRENT_BINARY_DIR@/src/targets.pb.h"
 #endif

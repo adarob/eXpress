@@ -1,11 +1,11 @@
-if (PROTOBUF_FOUND)
-  file(GLOB sources *.cpp proto/*.cc)
-  file(GLOB headers *.h proto/*.h)
-else (PROTOBUF_FOUND)
-	file(GLOB sources *.cpp)
-endif (PROTOBUF_FOUND)
+file(GLOB sources *.cpp)
 
-add_executable(express ${sources} ${headers})
+if (PROTOBUF_FOUND) 
+  file(GLOB ProtoFiles "${CMAKE_CURRENT_SOURCE_DIR}/*.proto")
+  PROTOBUF_GENERATE_CPP(PROTO_SOURCES PROTO_HEADERS ${ProtoFiles})
+endif(PROTOBUF_FOUND)
+
+add_executable(express ${sources} ${headers} ${PROTO_SOURCES} ${PROTO_HEADERS})
 
 set(LIBRARIES ${Boost_LIBRARIES} ${ZLIB_LIBRARIES})
 

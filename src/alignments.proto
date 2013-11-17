@@ -1,0 +1,60 @@
+package proto;
+
+// A ReadaAlignment represents the alignment of one end of a fragment.
+message ReadAlignment {
+
+  // Specifies if this end was sequenced first according to the SAM file.
+  // Always true if the sequencing was single-end.
+  required bool first = 1;
+  
+  // The 0-based left endpoint of the alignment of the read to the reference.
+  optional uint32 left_pos = 2;
+  
+  // The 0-based right endpoint of the alignment of the read to the reference.
+  optional uint32 right_pos = 3;
+  
+  // The positions in the read that differ from the reference.
+  optional bytes mismatch_indices = 4;
+  
+  // The nucleotides of the read at mismatched positions, represented as 2 bits 
+  // (A=00, C=01, G=10, T=11) packed into bytes. Bit pairs are stored so that later
+  // pairs in the sequence are at more significant positions in the byte.
+  optional bytes mismatch_nucs = 5;
+}
+
+// The FragmentAlignment stores data for a single alignment of a fragment. If
+// a ReadAlignment from the first FragmentAlignment of a Fragment is identical
+// to a later one, it is left out in the later one. For example, if read_l in
+// the third alignment is identical to read_l in the first alignment, it is
+// left empty in the third alignment.
+message FragmentAlignment {
+  // The ID of the target aligned to (index in SAM header order).
+  required uint32 target_id = 1;
+  
+  // The length of the fragment according to this alignment. 0 if single-end.
+  optional uint32 length = 2 [deprecated=true];
+  
+  // The alignment of the 5' (left) read, if it exists and is not identical
+  // to the first alignment.
+  optional ReadAlignment read_l = 3;
+  
+  // The alignment of the 3' (right) read, if it exists and is not identical
+  // to the first alignment.
+  optional ReadAlignment read_r = 4;
+}
+
+// The Fragment stores the alignments of a single fragment (paired or
+// single-end read). If a ReadAlignment from the first FragmentAlignment of a
+// Fragment is identical to a later one, it is left out in the later one. For
+// example, if read_l in the third alignment is identical to read_l in the
+// first alignment, it is left empty in the third alignment.  
+message Fragment {
+  // The unique "query" name of the read (pair) according to the SAM file.
+  optional string name = 1;
+  
+  // True iff the fragment was sequenced as a pair.
+  required bool paired = 2;
+  
+  // A collection of alignments for the fragment.
+  repeated FragmentAlignment alignments = 3; 
+}

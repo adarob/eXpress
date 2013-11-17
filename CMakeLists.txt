@@ -24,14 +24,21 @@ find_package(Boost 1.39
     	date_time
     REQUIRED)
 
-find_package(Protobuf)
-
 find_library(GPERFTOOLS_TCMALLOC_LIB tcmalloc)
 if (GPERFTOOLS_TCMALLOC_LIB)
    message(STATUS "Found GPERFTOOLS_TCMALLOC: ${GPERFTOOLS_TCMALLOC_LIB}")
 else (GPERFTOOLS_TCMALLOC_LIB)
    message(STATUS "Could NOT find GPERFTOOLS_TCMALLOC: Install to improve speed.")
 endif(GPERFTOOLS_TCMALLOC_LIB)
+
+find_package(Protobuf)
+if (PROTOBUF_FOUND)
+  include_directories(${Boost_INCLUDE_DIRS} ${PROTOBUF_INCLUDE_DIR} "${CMAKE_CURRENT_SOURCE_DIR}/bamtools/include") 
+	set(PROTO_INT 1)
+else (PROTOBUF_FOUND)
+  include_directories(${Boost_INCLUDE_DIRS} "${CMAKE_CURRENT_SOURCE_DIR}/bamtools/include") 
+	set(PROTO_INT 0)
+endif(PROTOBUF_FOUND)
 
 if(WIN32)
 	set(CMAKE_CXX_FLAGS "/EHsc")
@@ -40,14 +47,6 @@ else(WIN32)
 	find_package(ZLIB REQUIRED)
 	set(WIN32_INT 0)
 endif(WIN32)
-
-if (PROTOBUF_FOUND)
-  include_directories(${Boost_INCLUDE_DIRS} ${PROTOBUF_INCLUDE_DIR} "${CMAKE_CURRENT_SOURCE_DIR}/bamtools/include") 
-	set(PROTO_INT 1)
-else (PROTOBUF_FOUND)
-  include_directories(${Boost_INCLUDE_DIRS} "${CMAKE_CURRENT_SOURCE_DIR}/bamtools/include") 
-	set(PROTO_INT 0)
-endif(PROTOBUF_FOUND)
 
 configure_file (
   "${PROJECT_SOURCE_DIR}/src/config.h.in"
