@@ -590,7 +590,7 @@ void TargetTable::output_results(string output_dir, size_t tot_counts,
   struct result res[size()];
   
   size_t bundle_id = 0;
-  int t_id = 0;
+  size_t t_id = 0;
   foreach (Bundle* bundle, _bundle_table.bundles()) {
     ++bundle_id;
 
@@ -681,6 +681,8 @@ void TargetTable::output_results(string output_dir, size_t tot_counts,
             count_beta = 1;
           }
         }
+        
+        t_id = targ.id();
 
         // Store results for output
         res[t_id].count_alpha = count_alpha;
@@ -739,21 +741,10 @@ void TargetTable::output_results(string output_dir, size_t tot_counts,
             }
           }
         }
-        ++t_id;
       }
     } else {
       for (size_t i = 0; i < bundle_targ.size(); ++i) {
         
-        res[t_id].fpkm = 0.0;
-        res[t_id].fpkm_std_dev = 0.0;
-        res[t_id].fpkm_lo = 0.0;
-        res[t_id].fpkm_hi = 0.0;
-        res[t_id].count_alpha = 0.0;
-        res[t_id].count_beta = 0.0;
-        res[t_id].est_counts = 0.0;
-        res[t_id].eff_len = 0.0;
-        res[t_id].eff_counts = 0.0;
-        res[t_id].cpb = 0.0;
         
         if (output_varcov) {
           for (size_t j = 0; j < bundle_targ.size(); ++j) {
@@ -764,7 +755,6 @@ void TargetTable::output_results(string output_dir, size_t tot_counts,
           }
           varcov_file << endl;
         }
-        ++t_id;
       }
     }
   }
@@ -787,6 +777,8 @@ void TargetTable::output_results(string output_dir, size_t tot_counts,
     for (size_t i = 0; i < bundle_targ.size(); ++i) {
       
       Target& targ = *bundle_targ[i];
+      
+      t_id = targ.id();
       
       double tpm;
       
