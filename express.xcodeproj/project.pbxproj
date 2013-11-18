@@ -25,8 +25,6 @@
 		0A649D04183001F00065224F /* libbamtools.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A649D03183001F00065224F /* libbamtools.a */; };
 		0A93C755165D968800571C1C /* directiondetector.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0A93C753165D968800571C1C /* directiondetector.cpp */; };
 		0A9F0E1014CF64FF00379DC6 /* markovmodel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0A9F0E0F14CF64FF00379DC6 /* markovmodel.cpp */; };
-		0AC83E56162C31D600DE4074 /* alignments.pb.cc in Sources */ = {isa = PBXBuildFile; fileRef = 0AC8DF4716167845009C4080 /* alignments.pb.cc */; };
-		0AC83E57162C31D600DE4074 /* targets.pb.cc in Sources */ = {isa = PBXBuildFile; fileRef = 0AC8DF4A161678DA009C4080 /* targets.pb.cc */; };
 		0AC83E5D162C31D600DE4074 /* biascorrection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0A5C762A136F2EF10095365C /* biascorrection.cpp */; };
 		0AC83E5F162C31D600DE4074 /* bundles.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0ACBB2F0143EA2DD001322D2 /* bundles.cpp */; };
 		0AC83E64162C31D600DE4074 /* fragments.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0A5C762E136F2EF10095365C /* fragments.cpp */; };
@@ -96,10 +94,6 @@
 		0AA3D63614D106B800448167 /* threadsafety.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = threadsafety.h; sourceTree = "<group>"; };
 		0AB8C58F155EE921007D6E6F /* library.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = library.h; sourceTree = "<group>"; };
 		0AC83E48162C293000DE4074 /* express-spark */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "express-spark"; sourceTree = BUILT_PRODUCTS_DIR; };
-		0AC8DF4716167845009C4080 /* alignments.pb.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = alignments.pb.cc; path = proto/alignments.pb.cc; sourceTree = "<group>"; };
-		0AC8DF4816167845009C4080 /* alignments.pb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = alignments.pb.h; path = proto/alignments.pb.h; sourceTree = "<group>"; };
-		0AC8DF4A161678DA009C4080 /* targets.pb.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = targets.pb.cc; path = proto/targets.pb.cc; sourceTree = "<group>"; };
-		0AC8DF4B161678DA009C4080 /* targets.pb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = targets.pb.h; path = proto/targets.pb.h; sourceTree = "<group>"; };
 		0AC98198177640AD002A1149 /* logger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = logger.h; sourceTree = "<group>"; };
 		0ACBB2F0143EA2DD001322D2 /* bundles.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = bundles.cpp; sourceTree = "<group>"; };
 		0ACBB2F1143EA2DD001322D2 /* bundles.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = bundles.h; sourceTree = "<group>"; };
@@ -162,7 +156,6 @@
 		0A5C7629136F2EF10095365C /* src */ = {
 			isa = PBXGroup;
 			children = (
-				0AC8DF46161677F2009C4080 /* proto */,
 				0AB8C58F155EE921007D6E6F /* library.h */,
 				0AEC98C914414B5100DE2C43 /* config.h */,
 				0A4DC487140ACC640091CA28 /* update_check.h */,
@@ -196,17 +189,6 @@
 				0A04E7BF1540B87200D9A162 /* threadsafety.cpp */,
 			);
 			path = src;
-			sourceTree = "<group>";
-		};
-		0AC8DF46161677F2009C4080 /* proto */ = {
-			isa = PBXGroup;
-			children = (
-				0AC8DF4716167845009C4080 /* alignments.pb.cc */,
-				0AC8DF4A161678DA009C4080 /* targets.pb.cc */,
-				0AC8DF4B161678DA009C4080 /* targets.pb.h */,
-				0AC8DF4816167845009C4080 /* alignments.pb.h */,
-			);
-			name = proto;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -297,8 +279,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				0AC83E56162C31D600DE4074 /* alignments.pb.cc in Sources */,
-				0AC83E57162C31D600DE4074 /* targets.pb.cc in Sources */,
 				0AC83E5D162C31D600DE4074 /* biascorrection.cpp in Sources */,
 				0AC83E5F162C31D600DE4074 /* bundles.cpp in Sources */,
 				0AC83E64162C31D600DE4074 /* fragments.cpp in Sources */,

@@ -60,15 +60,15 @@
       <CommandLineArguments>
          <CommandLineArgument
             argument = "--rf-stranded -o /Users/adarob/Downloads/trunc/out /Users/adarob/Downloads/trunc/trans.fa /Users/adarob/Downloads/trunc/bam.bam"
-            isEnabled = "YES">
+            isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
             argument = "--stop-at 10000 --no-bias-correct --haplotype-file=/Volumes/math.mcb.berkeley.edu/experiments/express/simulation/ugt3a2/haplotypes.csv -o /Volumes/math.mcb.berkeley.edu/experiments/express/simulation/ugt3a2/hap_out  /Volumes/math.mcb.berkeley.edu/experiments/express/simulation/ugt3a2/ugt3a2_hap.fa /Volumes/math.mcb.berkeley.edu/experiments/express/simulation/ugt3a2/hits.hap.bam"
             isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "-B 2 --frag-len-mean 250 --frag-len-stddev 50 -o $(SRCROOT)/sample_data3/out2 $(SRCROOT)/sample_data3/hox_ucsc.fa $(SRCROOT)/sample_data3/hits_1M.sam"
-            isEnabled = "NO">
+            argument = "-o $(SRCROOT)/sample_data1/out $(SRCROOT)/sample_data1/transcripts.fasta $(SRCROOT)/sample_data1/hits2.sam"
+            isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
             argument = "--no-bias-correct -o hap -H /Volumes/math.mcb.berkeley.edu/experiments/ase/t1s1b0/hap.csv /Volumes/math.mcb.berkeley.edu/experiments/ase/t1s1b0/ugt3a2.fa /Volumes/math.mcb.berkeley.edu/experiments/ase/t1s1b0/hits.bam"

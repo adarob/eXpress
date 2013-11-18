@@ -3,8 +3,8 @@ cmake_minimum_required (VERSION 2.6)
 project(express)
 
 set(${PROJECT_NAME}_VERSION_MAJOR 1)
-set(${PROJECT_NAME}_VERSION_MINOR 4)
-set(${PROJECT_NAME}_VERSION_PATCH 4)
+set(${PROJECT_NAME}_VERSION_MINOR 5)
+set(${PROJECT_NAME}_VERSION_PATCH 0)
 
 set(CMAKE_CXX_FLAGS "-Wall")
 

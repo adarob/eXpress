@@ -39,15 +39,15 @@ Installation steps, tutorial, manual, documentation, etc. are all available
 through the eXpress website:
 http://bio.math.berkeley.edu/eXpress/
 
-Join the mailing list to stay informed of updates and announcements:
-http://groups.google.com/group/express-announcements
+Join the user group and mailing list to stay informed of updates and announcements:
+http://groups.google.com/group/express-users
 
 --------------------------------------------------------------------------------
 IV.  License:
 --------------------------------------------------------------------------------
 
 eXpress is distributed under the Artistic License 2.0.
-Copyright (c) 2011 Adam Roberts and Lior Pachter.
+Copyright (c) 2011-2013 Adam Roberts and Lior Pachter.
 
 See included file LICENSE for details.
 
@@ -61,6 +61,9 @@ V.   Acknowledgements:
 --------------------------------------------------------------------------------
 VI.  References:
 --------------------------------------------------------------------------------
+
+Roberts A (2013). Thesis: Ambiguous fragment assignment for high-throughput
+sequencing experiments. EECS Department, University of California, Berkeley.
 
 Roberts A and Pachter L (2012). Streaming fragment assignment for real-time
 analysis of sequencing experiments. Nature Methods.
