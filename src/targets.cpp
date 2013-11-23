@@ -515,6 +515,19 @@ void project_to_polytope(vector<Target*> bundle_targ,
   }
 }
 
+struct Result {
+  double fpkm, fpkm_std_dev, fpkm_lo, fpkm_hi;
+  double count_alpha, count_beta;
+  double est_counts, eff_len, eff_counts;
+  double cpb; // counts per base for TPM calculation
+  
+  void set_zeros() {
+    fpkm = fpkm_std_dev = fpkm_lo = fpkm_hi =
+    count_alpha = count_beta = est_counts =
+    eff_len = eff_counts = cpb = 0.0;
+  }
+};
+
 void TargetTable::masses_to_counts() {
   foreach (Bundle* bundle, _bundle_table.bundles()) {
     
@@ -584,20 +597,6 @@ void TargetTable::output_results(string output_dir, size_t tot_counts,
 
   const double l_bil = log(1000000000.);
   const double l_tot_counts = log((double)tot_counts);
-
-  struct Result
-  {
-    double fpkm, fpkm_std_dev, fpkm_lo, fpkm_hi;
-    double count_alpha, count_beta;
-    double est_counts, eff_len, eff_counts;
-    double cpb; // counts per base for TPM calculation
-    
-    void set_zeros() {
-      fpkm = fpkm_std_dev = fpkm_lo = fpkm_hi =
-      count_alpha = count_beta = est_counts =
-      eff_len = eff_counts = cpb = 0.0;
-    }
-  };
   
   vector<Result> res(size());
   
