@@ -123,8 +123,7 @@
       <!-- Navigation item -->
       <ul>
         <li><a href="overview.html">About</a></li>
-      </ul>            
-      <!-- Navigation item -->
+      </ul>        
       <ul>
         <li><a href="#">Download<!--[if IE 7]><!--></a><!--<![endif]-->
           <!--[if lte IE 6]><table><tr><td><![endif]-->
@@ -137,15 +136,16 @@
             </ul>
           <!--[if lte IE 6]></td></tr></table></a><![endif]-->
         </li>
-      </ul>                  
-       <!-- Navigation item -->
+      </ul>   
       <ul>
         <li><a href="tutorial.html">Getting Started</a></li>
       </ul>
-      <!-- Navigation item -->
+      <ul>
+        <li><a href="https://github.com/adarob/eXpress">Source</a></li>
+      </ul>
       <ul>
         <li><a href="manual.html">Manual</a></li>
-      </ul>
+      </ul> 
       <ul>
         <li><a href="faq.html">FAQ</a></li>
       </ul>
@@ -162,12 +162,18 @@
         <div class="content-1col-nobox">
           <h1>News</h1>
           
+          <h2>11.18.2013 &bull; eXpress is now on GitHub!</h2>
+          <p>In order to speed up development, we're excited to announce that the eXpress codebase will now be stored on a public repository at GitHub (<a href=https://github.com/adarob/eXpress>https://github.com/adarob/eXpress</a>).
+          <p>If you have a feature you want to add or a bug you want to fix, please feel free to make a pull request.  If you're just interested in helping further the project along but don't have anything specific in mind, check out the <a href=https://github.com/adarob/eXpress/issues>Issues</a> page or <a href=mailto:ask.xprs@gmail.com>contact us</a>! We always have a few more ideas than we have time to implement.</p>
+          <p>Thanks to everyone for their contributions so far.  We hope you can help make eXpress even better!<p>
+   		    </ul>
+   		    
           <h2>11.17.2013 &bull; eXpress 1.5.0 released</h2>
           <p>This update contains the following fixes and improvements:</p>
           <ul>
-          <li>Now compatible with inputs containing more than 2 haplotypes. Just create a comma-separate list of haplotypes, one set per line, and use the <tt><a href=manual.html#options>-H,--haplotype-file</a></tt> option. 
-          <li>Added TPM to output. (Thanks to Richard Smith for the implementation!)
-          <li>Made auxiliary parameter updates atomic to correct biases that are most apparent in ASE analyses. Leads to significant improvements in accuracy even in non-ASE settings. See the <a href=https://groups.google.com/forum/#!category-topic/express-users/questions--support/5Dy5KycNjeE>user group</a> for more details.
+          <li>Now compatible with inputs containing more than 2 haplotypes. Just create a comma-separate list of haplotypes, one set per line, and use the <tt><a href=manual.html#options>-H,--haplotype-file</a></tt> option.  <i>Thanks to Lindy McBride for helping test this feature.</i>
+          <li>Added TPM to output. <i>Thanks to Richard Smith for the implementation!</i>
+          <li>Made auxiliary parameter updates atomic to correct biases that are most apparent in ASE analyses. Leads to significant improvements in accuracy even in non-ASE settings. See the <a href=https://groups.google.com/forum/#!category-topic/express-users/questions--support/5Dy5KycNjeE>user group</a> for more details. <i>Thanks to William Nelson for helping squash this bug.</i>
    		    </ul>
    		    <p>More exciting news coming later this week...stay tuned!</p>
    		    

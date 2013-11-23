@@ -585,7 +585,7 @@ void TargetTable::output_results(string output_dir, size_t tot_counts,
   const double l_bil = log(1000000000.);
   const double l_tot_counts = log((double)tot_counts);
 
-  struct result
+  struct Result
   {
     double fpkm, fpkm_std_dev, fpkm_lo, fpkm_hi;
     double count_alpha, count_beta;
@@ -599,7 +599,7 @@ void TargetTable::output_results(string output_dir, size_t tot_counts,
     }
   };
   
-  struct result res[size()];
+  vector<Result> res(size());
   
   size_t bundle_id = 0;
   size_t t_id = 0;
@@ -697,6 +697,7 @@ void TargetTable::output_results(string output_dir, size_t tot_counts,
         t_id = targ.id();
 
         // Store results for output
+        assert(t_id < size());
         res[t_id].count_alpha = count_alpha;
         res[t_id].count_beta = count_beta;
         
