@@ -300,7 +300,7 @@ TargetTable::TargetTable(string targ_fasta_file, string haplotype_file,
   if (lib.bias_table && !known_aux_params) {
     info_msg += " and measuring bias background";
   }
-  info_msg += "...\n";
+  info_msg += "...";
   logger.info(info_msg.c_str());
 
   size_t num_targs = targ_index.size();
@@ -316,6 +316,9 @@ TargetTable::TargetTable(string targ_fasta_file, string haplotype_file,
   if (infile.is_open()) {
     while (infile.good()) {
       getline(infile, line, '\n');
+      if (line.empty()) {
+        continue;
+      }
       if (line[0] == '>') {
         if (!name.empty()) {
           if (alpha_map) {
@@ -369,10 +372,13 @@ TargetTable::TargetTable(string targ_fasta_file, string haplotype_file,
                     "'%s'.", it->first.c_str(), targ_fasta_file.c_str());
     }
   }
+  logger.info("Initialized %d targets.", size());
   
   // Load haplotype information, if provided
   if (haplotype_file.size()) {
+    logger.info("Loading haplotype information...");
     infile.open(haplotype_file.c_str());
+    size_t num_haplotype_groups = 0;
     if (infile.is_open()) {
       const size_t BUFF_SIZE = 99999;
       char line_buff[BUFF_SIZE];
@@ -407,8 +413,11 @@ TargetTable::TargetTable(string targ_fasta_file, string haplotype_file,
         }
         // Ownership is given to the targets.
         new HaplotypeHandler(haplotype_targets);
+        num_haplotype_groups++;
       }
     }
+    logger.info("Initialized " SIZE_T_FMT " haplotype groups.",
+                num_haplotype_groups);
   }
 }
 

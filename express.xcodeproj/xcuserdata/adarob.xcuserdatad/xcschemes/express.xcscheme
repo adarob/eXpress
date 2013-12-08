@@ -60,11 +60,11 @@
       <CommandLineArguments>
          <CommandLineArgument
             argument = "--no-bias-correct -o /Users/adarob/Downloads/trunc/out /Users/adarob/Downloads/trunc/trans2.fa /Users/adarob/Downloads/trunc/test_hits.bam"
-            isEnabled = "YES">
+            isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
             argument = "--stop-at 10000 --no-bias-correct --haplotype-file=/Volumes/math.mcb.berkeley.edu/experiments/express/simulation/ugt3a2/haplotypes.csv -o /Volumes/math.mcb.berkeley.edu/experiments/express/simulation/ugt3a2/hap_out  /Volumes/math.mcb.berkeley.edu/experiments/express/simulation/ugt3a2/ugt3a2_hap.fa /Volumes/math.mcb.berkeley.edu/experiments/express/simulation/ugt3a2/hits.hap.bam"
-            isEnabled = "NO">
+            isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
             argument = "-o $(SRCROOT)/sample_data1/out $(SRCROOT)/sample_data1/transcripts.fasta $(SRCROOT)/sample_data1/hits2.sam"
