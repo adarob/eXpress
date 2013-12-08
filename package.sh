@@ -1,6 +1,7 @@
 #!/bin/bash
 
-VERSION=1.5.0
+VERSION=1.5.1
+OLD_VERSION=1.5.0
 MAC=express-$VERSION-macosx_x86_64
 LINUX=express-$VERSION-linux_x86_64
 WIN=express-$VERSION-win32_x86_64
@@ -21,6 +22,7 @@ rmdir html/doc/html
 mv html/doc/latex/refman.pdf html/doc/express-doc.pdf
 rm -r html/doc/latex
 
+sed -i '' "s/express-$OLD_VERSION/express-$VERSION/g" html/*.html
 
 #Create new download directories
 mkdir html/downloads/express-$VERSION
