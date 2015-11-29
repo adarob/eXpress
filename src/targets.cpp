@@ -301,7 +301,7 @@ TargetTable::TargetTable(string targ_fasta_file, string haplotype_file,
     info_msg += " and measuring bias background";
   }
   info_msg += "...";
-  logger.info(info_msg.c_str());
+  logger.info_stderr(info_msg.c_str());
 
   size_t num_targs = targ_index.size();
   _targ_map = vector<Target*>(num_targs, NULL);
@@ -372,7 +372,7 @@ TargetTable::TargetTable(string targ_fasta_file, string haplotype_file,
                     "'%s'.", it->first.c_str(), targ_fasta_file.c_str());
     }
   }
-  logger.info("Initialized %d targets.", size());
+  logger.info_stderr("Initialized %d targets.", size());
   
   // Load haplotype information, if provided
   if (haplotype_file.size()) {
@@ -416,7 +416,7 @@ TargetTable::TargetTable(string targ_fasta_file, string haplotype_file,
         num_haplotype_groups++;
       }
     }
-    logger.info("Initialized " SIZE_T_FMT " haplotype groups.",
+    logger.info_stderr("Initialized " SIZE_T_FMT " haplotype groups.",
                 num_haplotype_groups);
   }
 }

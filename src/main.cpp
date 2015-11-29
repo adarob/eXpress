@@ -706,7 +706,7 @@ size_t threaded_calc_abundances(Librarian& libs) {
 
         // Output progress
         if (num_frags % 1000000 == 0) {
-          logger.info("Fragments Processed (%s): %d\tNumber of Bundles: %d.",
+          logger.info_stderr("Fragments Processed (%s): %d\tNumber of Bundles: %d.",
                       lib.in_file_name.c_str(), num_frags,
                       lib.targ_table->num_bundles());
           dir_detector.report_if_improper_direction();
@@ -951,7 +951,7 @@ int preprocess_main() {
   lib.targ_table.reset(new TargetTable(fasta_file_name, "", 0, 0, 0.0, NULL,
                                        &libs));
   
-  logger.info("Converting targets to Protocol Buffers...");
+  logger.info_stderr("Converting targets to Protocol Buffers...");
   fstream targ_out((output_dir + "/targets.pb").c_str(),
                    ios::out | ios::trunc);
   string out_buff;
@@ -969,7 +969,7 @@ int preprocess_main() {
   }
   targ_out.close();
   
-  logger.info("Converting fragment alignments to Protocol Buffers...");
+  logger.info_stderr("Converting fragment alignments to Protocol Buffers...");
   ostream frag_out(cout.rdbuf());
   
   size_t num_frags = 0;
@@ -1076,7 +1076,7 @@ int preprocess_main() {
     
     // Output progress
     if (num_frags % 1000000 == 0) {
-      logger.info("Fragments Processed: %d", num_frags);
+      logger.info_stderr("Fragments Processed: %d", num_frags);
     }
   }
   
