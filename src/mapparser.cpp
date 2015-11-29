@@ -105,10 +105,10 @@ MapParser::MapParser(Library* lib, bool write_active)
     _parser.reset(new SAMParser(&cin));
     is_sam = true;
   } else {
-    logger.info("Attempting to read '%s' in BAM format...", in_file.c_str());
+    logger.info_stderr("Attempting to read '%s' in BAM format...", in_file.c_str());
     BamTools::BamReader* reader = new BamTools::BamReader();
     if (reader->Open(in_file)) {
-      logger.info("Parsing BAM header...");
+      logger.info_stderr("Parsing BAM header...");
       _parser.reset(new BAMParser(reader));
       if (out_file.size()) {
         out_file += ".bam";
@@ -124,7 +124,7 @@ MapParser::MapParser(Library* lib, bool write_active)
       }
     } else {
       delete reader;
-      logger.info("Input is not in BAM format. Trying SAM...");
+      logger.info_stderr("Input is not in BAM format. Trying SAM...");
       ifstream* ifs = new ifstream(in_file.c_str());
       if (!ifs->is_open()) {
         logger.severe("Unable to open input SAM file '%s'.", in_file.c_str());

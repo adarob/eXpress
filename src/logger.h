@@ -21,6 +21,7 @@ class Logger {
   const static size_t BUFF_SIZE = 4096;
   
   std::ostream* _info_out;
+  std::ostream* _info_stderr_out; //for eXpress-D preprocessing
   std::ostream* _warn_out;
   std::ostream* _severe_out;
   mutable boost::mutex _mut;
@@ -31,7 +32,12 @@ class Logger {
   
 public:
   Logger()
-    : _info_out(&std::cout), _warn_out(&std::cerr), _severe_out(&std::cerr) {}
+    : _info_out(&std::cout), _info_stderr_out(&std::cerr), _warn_out(&std::cerr), _severe_out(&std::cerr) {}
+
+  void info_stderr_out(std::ostream* out) {
+    boost::unique_lock<boost::mutex>(_mut);
+    _info_stderr_out = out;
+  }
 
   void info_out(std::ostream* out) {
     boost::unique_lock<boost::mutex>(_mut);
@@ -56,6 +62,16 @@ public:
     vsnprintf(buffer, BUFF_SIZE, msg, arg);
     va_end(arg);
     *_info_out << get_time() << " - " << buffer << std::endl;
+  }
+
+  void info_stderr(const char* msg, ...) const {
+    boost::unique_lock<boost::mutex>(_mut);
+    char buffer[BUFF_SIZE];
+    std::va_list arg;
+    va_start(arg, msg);
+    vsnprintf(buffer, BUFF_SIZE, msg, arg);
+    va_end(arg);
+    *_info_stderr_out << get_time() << " - " << buffer << std::endl;
   }
 
   void warn(const char* msg, ...) const {
