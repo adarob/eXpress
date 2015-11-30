@@ -31,7 +31,7 @@ class Logger {
   
 public:
   Logger()
-    : _info_out(&std::cout), _warn_out(&std::cerr), _severe_out(&std::cerr) {}
+    : _info_out(&std::cerr), _warn_out(&std::cerr), _severe_out(&std::cerr) {}
 
   void info_out(std::ostream* out) {
     boost::unique_lock<boost::mutex>(_mut);
