@@ -41,12 +41,26 @@ else (PROTOBUF_FOUND)
 endif(PROTOBUF_FOUND)
 
 if(WIN32)
+    if (EXISTS "${PROJECT_SOURCE_DIR}/bamtools/lib/libbamtools.lib")
+      set(BAMTOOLS_LIBRARIES "${PROJECT_SOURCE_DIR}/bamtools/lib/libbamtools.lib")
+    else()
+      find_library(BAMTOOLS_LIBRARIES libbamtools.lib)
+    endif()
 	set(CMAKE_CXX_FLAGS "/EHsc")
 	set(WIN32_INT 1)
 else(WIN32)
+    if (EXISTS "${PROJECT_SOURCE_DIR}/bamtools/lib/libbamtools.a")
+      set(BAMTOOLS_LIBRARIES "${PROJECT_SOURCE_DIR}/bamtools/lib/libbamtools.a")
+    else()
+      find_library(BAMTOOLS_LIBRARIES libbamtools.a)
+    endif()
 	find_package(ZLIB REQUIRED)
 	set(WIN32_INT 0)
 endif(WIN32)
+
+if (NOT BAMTOOLS_LIBRARIES)
+    message(FATAL_ERROR "Could not find libbamtools")
+endif(NOT BAMTOOLS_LIBRARIES)
 
 configure_file (
   "${PROJECT_SOURCE_DIR}/src/config.h.in"
