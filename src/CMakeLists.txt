@@ -7,7 +7,7 @@ endif(PROTOBUF_FOUND)
 
 add_executable(express ${sources} ${headers} ${PROTO_SOURCES} ${PROTO_HEADERS})
 
-set(LIBRARIES ${Boost_LIBRARIES} ${ZLIB_LIBRARIES} ${BAMTOOLS_LIBRARIES})
+set(LIBRARIES ${Boost_LIBRARIES} ${BAMTOOLS_LIBRARIES} ${ZLIB_LIBRARIES})
 
 if (GPERFTOOLS_TCMALLOC) 
    set(LIBRARIES ${LIBRARIES} "libtcmalloc_minimal.a")
